@@ -1,20 +1,30 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { Send } from 'lucide-react'
+import {
+  Send,
+  Sparkles,
+  MessageSquare,
+  Zap,
+  Moon,
+  Heart,
+  Target,
+  Lock,
+} from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { IconBadge } from '@/components/ui/icon-badge'
+import { Pill } from '@/components/ui/pill'
 
 interface Message {
   role: 'user' | 'assistant'
   content: string
 }
 
-const SUGGESTED = [
-  'What does my HRV trend mean?',
-  'Why has my energy been low this week?',
-  'What patterns are affecting my sleep?',
-  'How does my blood work look compared to last time?',
-  'What should I focus on to improve my health score?',
+const SUGGESTED: { text: string; icon: React.ElementType; tone: 'sage' | 'amber' | 'rose' | 'ink' }[] = [
+  { text: 'Why was my energy low last week?',     icon: Zap,    tone: 'amber' },
+  { text: 'How can I improve my sleep?',           icon: Moon,   tone: 'sage'  },
+  { text: 'What\'s impacting my recovery?',        icon: Heart,  tone: 'rose'  },
+  { text: 'How close am I to my goal?',            icon: Target, tone: 'ink'   },
 ]
 
 export default function ChatPage() {
@@ -64,57 +74,55 @@ export default function ChatPage() {
     }
   }
 
+  const empty = messages.length === 0
+
   return (
-    <div className="max-w-2xl mx-auto flex flex-col h-[calc(100vh-80px)] pt-4">
+    <div className="max-w-2xl mx-auto flex flex-col min-h-[calc(100vh-180px)] fade-up">
       {/* Header */}
-      <div className="mb-4 flex-shrink-0">
-        <div className="text-[10.5px] font-bold tracking-[0.1em] uppercase text-t3 mb-1">
-          AI Health Co-pilot
+      <header className="flex items-start gap-4 mb-6 shrink-0">
+        <IconBadge icon={Sparkles} size="xl" tone="sage" />
+        <div className="flex-1">
+          <div className="text-eyebrow uppercase text-sage-deep mb-1">Ask Anything</div>
+          <h1 className="font-sans text-h1 text-ink tracking-tight">
+            Your personal{' '}
+            <span className="italic-accent">health AI.</span>
+          </h1>
+          <p className="text-body-sm text-ink-2 mt-2 max-w-[58ch]">
+            Conversational insights built on your wearable, blood and check-in data.
+          </p>
         </div>
-        <h1 className="font-serif text-[22px] font-bold text-t1 tracking-[-0.02em]">
-          Ask Anything
-        </h1>
-        <p className="text-[12px] text-t3 mt-0.5">
-          Powered by your data · Educational insights only · Not medical advice
-        </p>
-      </div>
+      </header>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto space-y-4 pb-4">
-        {messages.length === 0 && (
-          <div className="space-y-4">
-            {/* Intro card */}
-            <div
-              className="rounded-2xl p-5"
-              style={{
-                background: 'rgba(110,155,94,0.04)',
-                border: '1px solid rgba(110,155,94,0.12)',
-              }}
-            >
-              <div className="text-[13.5px] font-semibold text-t1 mb-2">
-                Your AI health co-pilot is ready
+      <div className="flex-1 space-y-4 mb-4">
+        {empty && (
+          <div className="space-y-5">
+            <div className="rounded-card bg-sage-wash border border-accent-ring p-5 flex gap-3">
+              <IconBadge icon={MessageSquare} tone="sage" size="md" />
+              <div>
+                <div className="text-body font-semibold text-ink mb-1">
+                  Ask anything about your health.
+                </div>
+                <p className="text-caption text-ink-2 leading-[1.65]">
+                  I have access to your recent check-ins, blood results, wearable data and patterns.
+                  All replies are educational only — never medical advice.
+                </p>
               </div>
-              <p className="text-[12.5px] text-t2 leading-[1.75]">
-                Ask me anything about your health data. I have access to your recent check-ins,
-                blood results, wearable data, and patterns to give you personalised educational
-                insights.
-              </p>
             </div>
 
-            {/* Suggestions */}
             <div>
-              <div className="text-[10.5px] font-bold tracking-[0.1em] uppercase text-t3 mb-2">
-                Try asking
-              </div>
-              <div className="flex flex-wrap gap-2">
+              <div className="text-eyebrow uppercase text-ink-3 mb-3">Try asking</div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 {SUGGESTED.map((s) => (
                   <button
-                    key={s}
-                    onClick={() => send(s)}
-                    className="text-[12px] px-3 py-1.5 rounded-full text-t2 hover:text-t1 hover:border-[var(--b1)] transition-all"
-                    style={{ background: '#FAF8F4', border: '1px solid rgba(26,26,22,0.07)' }}
+                    key={s.text}
+                    onClick={() => send(s.text)}
+                    className="group flex items-center gap-3 px-3.5 py-3 rounded-card bg-white border border-line hover:border-line-2 hover:bg-off-white transition-all text-left"
                   >
-                    {s}
+                    <IconBadge icon={s.icon} tone={s.tone} size="sm" />
+                    <span className="text-body-sm text-ink-2 group-hover:text-ink leading-snug">
+                      {s.text}
+                    </span>
                   </button>
                 ))}
               </div>
@@ -123,22 +131,19 @@ export default function ChatPage() {
         )}
 
         {messages.map((m, i) => (
-          <div
-            key={i}
-            className={cn('flex', m.role === 'user' ? 'justify-end' : 'justify-start')}
-          >
+          <div key={i} className={cn('flex', m.role === 'user' ? 'justify-end' : 'justify-start')}>
+            {m.role === 'assistant' && (
+              <div className="mr-2 mt-1 hidden sm:block">
+                <IconBadge icon={Sparkles} tone="sage" size="sm" />
+              </div>
+            )}
             <div
               className={cn(
-                'max-w-[85%] px-4 py-3 rounded-2xl text-[13px] leading-[1.75]',
+                'max-w-[85%] px-4 py-3 rounded-card text-body-sm leading-[1.7]',
                 m.role === 'user'
-                  ? 'text-bg font-medium'
-                  : 'text-t1',
+                  ? 'bg-sage text-white font-medium rounded-tr-sm'
+                  : 'bg-white border border-line text-ink rounded-tl-sm',
               )}
-              style={
-                m.role === 'user'
-                  ? { background: '#6E9B5E' }
-                  : { background: '#FAF8F4', border: '1px solid rgba(26,26,22,0.07)' }
-              }
             >
               {m.content.split('\n').map((line, j) => (
                 <span key={j}>
@@ -152,14 +157,14 @@ export default function ChatPage() {
 
         {loading && (
           <div className="flex justify-start">
-            <div
-              className="px-4 py-3 rounded-2xl flex items-center gap-1.5"
-              style={{ background: '#FAF8F4', border: '1px solid rgba(26,26,22,0.07)' }}
-            >
+            <div className="mr-2 mt-1 hidden sm:block">
+              <IconBadge icon={Sparkles} tone="sage" size="sm" />
+            </div>
+            <div className="px-4 py-3 rounded-card bg-white border border-line flex items-center gap-1.5">
               {[0, 0.15, 0.3].map((delay) => (
                 <span
                   key={delay}
-                  className="w-1.5 h-1.5 rounded-full bg-t3 animate-blink"
+                  className="w-1.5 h-1.5 rounded-full bg-ink-3 animate-blink"
                   style={{ animationDelay: `${delay}s` }}
                 />
               ))}
@@ -171,32 +176,35 @@ export default function ChatPage() {
       </div>
 
       {/* Input */}
-      <div
-        className="flex-shrink-0 flex items-end gap-3 rounded-2xl p-3"
-        style={{ background: '#FFFFFF', border: '1px solid rgba(26,26,22,0.09)' }}
-      >
-        <textarea
-          ref={inputRef}
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Ask about your health data…"
-          rows={1}
-          className="flex-1 bg-transparent text-t1 text-[13px] placeholder:text-t4 outline-none resize-none leading-relaxed"
-          style={{ maxHeight: '120px' }}
-        />
-        <button
-          onClick={() => send(input)}
-          disabled={!input.trim() || loading}
-          className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-all disabled:opacity-30"
-          style={{ background: '#6E9B5E' }}
-        >
-          <Send className="w-4 h-4 text-bg" />
-        </button>
+      <div className="sticky bottom-24 lg:bottom-6 shrink-0">
+        <div className="flex items-end gap-2.5 rounded-pill p-2 pl-5 bg-white border border-line shadow-card focus-within:border-accent-ring transition-colors">
+          <textarea
+            ref={inputRef}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Ask me anything about your health, trends, recovery, sleep or goals…"
+            rows={1}
+            className="flex-1 bg-transparent text-ink text-body-sm placeholder:text-ink-3 outline-none resize-none leading-relaxed py-2"
+            style={{ maxHeight: '120px' }}
+          />
+          <button
+            onClick={() => send(input)}
+            disabled={!input.trim() || loading}
+            className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-sage text-white hover:bg-sage-deep disabled:opacity-40 transition-all"
+            aria-label="Send"
+          >
+            <Send className="w-4 h-4" />
+          </button>
+        </div>
+
+        <div className="flex items-center justify-center gap-2 mt-2.5">
+          <Pill tone="ink" size="sm">
+            <Lock className="w-2.5 h-2.5" />
+            Private · personal · built around you
+          </Pill>
+        </div>
       </div>
-      <p className="text-[10px] text-t4 text-center mt-2">
-        Educational insights only — not medical advice
-      </p>
     </div>
   )
 }

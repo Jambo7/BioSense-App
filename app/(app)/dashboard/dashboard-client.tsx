@@ -1,25 +1,44 @@
 'use client'
 
 import Link from 'next/link'
-import { ClipboardCheck, Droplets, Wifi, Dna, CheckCircle } from 'lucide-react'
+import {
+  ClipboardCheck,
+  Droplets,
+  Wifi,
+  Sparkles,
+  CheckCircle2,
+  ArrowRight,
+  Moon,
+  Heart,
+  Activity,
+  Flame,
+  TestTube2,
+  ChevronRight,
+} from 'lucide-react'
 import { scoreLabel } from '@/lib/score'
-import { Card, CardLabel } from '@/components/ui/card'
+import { Card, CardLabel, CardTitle } from '@/components/ui/card'
+import { ScoreRing } from '@/components/ui/score-ring'
+import { IconBadge } from '@/components/ui/icon-badge'
+import { Pill } from '@/components/ui/pill'
+import { SparkLine } from '@/components/ui/spark-line'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 function greet(name: string) {
   const h = new Date().getHours()
   const first = name.split(' ')[0]
-  if (h < 12) return `Good morning, ${first}.`
-  if (h < 17) return `Good afternoon, ${first}.`
-  if (h < 21) return `Good evening, ${first}.`
+  if (h < 12)  return `Good morning, ${first}.`
+  if (h < 17)  return `Good afternoon, ${first}.`
+  if (h < 21)  return `Good evening, ${first}.`
   return `Evening, ${first}.`
 }
 
-const PILLAR_LABELS: Record<string, string> = {
-  sleep: 'Sleep',
-  recovery: 'Recovery',
-  stress: 'Stress',
-  activity: 'Activity',
-  biomarkers: 'Biomarkers',
+const PILLAR_META: Record<string, { label: string; icon: React.ElementType; tone: 'sage' | 'rose' | 'amber' | 'ink' }> = {
+  sleep:      { label: 'Sleep',      icon: Moon,     tone: 'sage'  },
+  recovery:   { label: 'Recovery',   icon: Heart,    tone: 'sage'  },
+  stress:     { label: 'Stress',     icon: Flame,    tone: 'amber' },
+  activity:   { label: 'Activity',   icon: Activity, tone: 'sage'  },
+  biomarkers: { label: 'Biomarkers', icon: TestTube2,tone: 'sage'  },
 }
 
 const GOAL_LABELS: Record<string, string> = {
@@ -59,221 +78,215 @@ export function DashboardClient({
   const sl = healthScore != null ? scoreLabel(healthScore) : null
   const hasData = healthScore != null
 
-  const weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-  const todayIdx = (new Date().getDay() + 6) % 7 // Mon=0
+  const weekDays = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
+  const todayIdx = (new Date().getDay() + 6) % 7
+
+  const trendValues = recentCheckins.slice().reverse().map(c => (c.energy + c.sleep + c.mood) / 3)
 
   return (
-    <div className="space-y-6 pt-2">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
+    <div className="space-y-6 fade-up">
+      {/* ── Page header ── */}
+      <header className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
-          <div className="text-[10.5px] font-bold tracking-[0.1em] uppercase text-t3 mb-1">
-            {user.goalType ? GOAL_LABELS[user.goalType] : 'Health'} Dashboard
+          <div className="text-eyebrow uppercase text-sage-deep mb-2">
+            {user.goalType ? GOAL_LABELS[user.goalType] : 'Your'} dashboard
           </div>
-          <h1 className="font-serif text-[26px] font-bold text-t1 tracking-[-0.02em] leading-tight">
+          <h1 className="font-sans text-h1 text-ink tracking-tight">
             {greet(user.name || 'there')}
           </h1>
           {user.goalText && (
-            <p className="text-[13px] text-t2 mt-1 leading-relaxed">
-              Goal: <em className="text-t1">{user.goalText}</em>
+            <p className="text-body-sm text-ink-2 mt-2 leading-relaxed">
+              Goal: <span className="italic-accent text-base">{user.goalText}</span>
             </p>
           )}
         </div>
 
         {!hasCheckinToday && (
-          <Link
-            href="/checkin"
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-[12.5px] font-semibold text-bg bg-accent hover:brightness-110 transition-all flex-shrink-0"
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-bg animate-pulse" />
-            Daily check-in →
+          <Link href="/checkin" className="shrink-0">
+            <Button variant="primary" size="md" className="gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-white/80 animate-pulse" />
+              Today&apos;s check-in
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Button>
           </Link>
         )}
-      </div>
+        {hasCheckinToday && (
+          <Pill tone="soft-sage" size="md" className="shrink-0 self-start sm:self-auto">
+            <CheckCircle2 className="w-3.5 h-3.5" /> Checked in today
+          </Pill>
+        )}
+      </header>
 
-      {/* Top row — Health Score + streak */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {/* Health Score */}
-        <Card
-          accent={hasData}
-          className="sm:col-span-2 flex items-center gap-6"
-        >
+      {/* ── Hero card: Score ring + breakdown + streak ── */}
+      <Card padding="lg" className="overflow-hidden relative">
+        <div
+          className="absolute -top-24 -right-24 w-64 h-64 rounded-full pointer-events-none opacity-50"
+          style={{ background: 'radial-gradient(circle, rgba(168,191,163,0.35) 0%, transparent 70%)' }}
+        />
+
+        <div className="relative grid grid-cols-1 lg:grid-cols-[auto_1fr_auto] gap-8 items-center">
           {/* Ring */}
-          <div className="relative flex-shrink-0">
-            <svg width="90" height="90" viewBox="0 0 90 90">
-              <circle cx="45" cy="45" r="38" fill="none" stroke="#222222" strokeWidth="8" />
-              {hasData && (
-                <circle
-                  cx="45"
-                  cy="45"
-                  r="38"
-                  fill="none"
-                  stroke={sl!.color}
-                  strokeWidth="8"
-                  strokeLinecap="round"
-                  strokeDasharray={`${2 * Math.PI * 38}`}
-                  strokeDashoffset={`${2 * Math.PI * 38 * (1 - healthScore! / 100)}`}
-                  transform="rotate(-90 45 45)"
-                  style={{ transition: 'stroke-dashoffset 1s ease' }}
-                />
-              )}
-            </svg>
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span
-                className="font-mono text-[22px] font-bold leading-none"
-                style={{ color: sl?.color ?? '#4f6b57' }}
-              >
-                {hasData ? healthScore : '—'}
-              </span>
-              {hasData && (
-                <span className="text-[9px] font-bold tracking-widest text-t3 uppercase mt-0.5">
-                  /100
-                </span>
-              )}
-            </div>
+          <div className="flex flex-col items-center text-center">
+            <CardLabel className="mb-3 self-start lg:self-center">Health score</CardLabel>
+            <ScoreRing
+              value={healthScore ?? 0}
+              size={156}
+              thickness={11}
+              tone={sl?.tone ?? 'ink'}
+              label={sl?.label ?? 'No data'}
+              sublabel={hasData ? 'Based on your latest data' : 'Add data to begin'}
+            />
           </div>
 
-          <div className="flex-1 min-w-0">
-            <CardLabel>Health Score</CardLabel>
-            <div
-              className="text-[18px] font-bold mb-1 leading-tight"
-              style={{ color: sl?.color ?? '#4f6b57' }}
-            >
-              {sl?.label ?? 'No data yet'}
-            </div>
+          {/* Breakdown */}
+          <div className="lg:border-l lg:border-line lg:pl-8">
+            <CardLabel>Pillar breakdown</CardLabel>
             {hasData && scoreBreakdown ? (
-              <div className="space-y-1.5">
-                {Object.entries(scoreBreakdown).map(([key, val]) => (
-                  <div key={key} className="flex items-center gap-2">
-                    <span className="text-[10.5px] text-t3 w-[72px] flex-shrink-0">
-                      {PILLAR_LABELS[key] ?? key}
-                    </span>
-                    <div className="flex-1 h-1.5 rounded-full bg-s3 overflow-hidden">
-                      <div
-                        className="h-full rounded-full transition-all duration-700"
-                        style={{ width: `${val}%`, background: scoreLabel(val).color }}
-                      />
+              <div className="space-y-3 mt-1">
+                {Object.entries(scoreBreakdown).map(([key, val]) => {
+                  const meta = PILLAR_META[key] ?? { label: key, icon: Activity, tone: 'sage' as const }
+                  const tone = scoreLabel(val).tone
+                  const color = scoreLabel(val).color
+                  return (
+                    <div key={key} className="flex items-center gap-3">
+                      <IconBadge icon={meta.icon} tone={tone} size="sm" />
+                      <span className="text-body-sm text-ink w-[88px] shrink-0">{meta.label}</span>
+                      <div className="flex-1 h-1.5 rounded-pill bg-sand-deep overflow-hidden">
+                        <div
+                          className="h-full rounded-pill transition-all duration-700"
+                          style={{ width: `${val}%`, background: color }}
+                        />
+                      </div>
+                      <span className="text-body-sm font-semibold text-ink w-[32px] text-right tabular-nums">
+                        {val}
+                      </span>
                     </div>
-                    <span className="font-mono text-[10.5px] text-t2 w-[28px] text-right">
-                      {val}
-                    </span>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             ) : (
-              <p className="text-[12px] text-t3 leading-relaxed">
-                Complete your first check-in to start calculating your score
+              <p className="text-body-sm text-ink-2 leading-relaxed">
+                Complete your first check-in to start calculating your health score and unlock pillar insights.
               </p>
             )}
           </div>
-        </Card>
 
-        {/* Streak */}
-        <Card className="flex flex-col justify-between">
-          <CardLabel>Check-in streak</CardLabel>
-          <div>
-            <span className="font-mono text-[40px] font-bold text-t1 leading-none">
-              {checkinCount}
-            </span>
-            <span className="text-[13px] text-t3 ml-2">days</span>
-          </div>
+          {/* Streak */}
+          <div className="lg:border-l lg:border-line lg:pl-8 min-w-[170px]">
+            <CardLabel>Check-in streak</CardLabel>
+            <div className="flex items-baseline gap-1.5">
+              <span className="font-sans text-[44px] font-bold text-ink leading-none tabular-nums">{checkinCount}</span>
+              <span className="text-body-sm text-ink-3">day{checkinCount === 1 ? '' : 's'}</span>
+            </div>
 
-          {/* Mini week grid */}
-          <div className="flex gap-1 mt-4">
-            {weekDays.map((day, i) => {
-              const filled = i <= todayIdx && checkinCount > 0
-              return (
-                <div key={day} className="flex-1 flex flex-col items-center gap-1">
-                  <div
-                    className="w-full h-6 rounded-md transition-all"
-                    style={{
-                      background: filled ? 'rgba(110,155,94,0.25)' : '#E5E1D8',
-                      border: i === todayIdx ? '1px solid rgba(110,155,94,0.4)' : 'none',
-                    }}
-                  />
-                  <span className="text-[8.5px] text-t4">{day[0]}</span>
-                </div>
-              )
-            })}
-          </div>
-
-          {checkinCount === 0 && (
-            <p className="text-[11px] text-t3 mt-2">Start your streak today →</p>
-          )}
-        </Card>
-      </div>
-
-      {/* Weekly check-in trend */}
-      {recentCheckins.length > 0 && (
-        <Card>
-          <CardLabel>This week — energy / sleep / mood</CardLabel>
-          <div className="flex items-end gap-1 h-[60px]">
-            {recentCheckins
-              .slice()
-              .reverse()
-              .map((c) => {
-                const avg = (c.energy + c.sleep + c.mood) / 3
-                const pct = (avg / 10) * 100
+            <div className="flex gap-1.5 mt-4">
+              {weekDays.map((day, i) => {
+                const filled = i <= todayIdx && checkinCount > 0
+                const isToday = i === todayIdx
                 return (
-                  <div
-                    key={c.date}
-                    className="flex-1 rounded-sm transition-all"
-                    style={{
-                      height: `${Math.max(8, pct)}%`,
-                      background: `rgba(110,155,94,${0.2 + (avg / 10) * 0.6})`,
-                    }}
-                    title={`${c.date}: avg ${avg.toFixed(1)}/10`}
-                  />
+                  <div key={i} className="flex-1 flex flex-col items-center gap-1.5">
+                    <div
+                      className={cn(
+                        'w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-semibold transition-all',
+                        filled
+                          ? 'bg-sage text-white'
+                          : 'bg-sand-deep text-ink-3',
+                        isToday && !filled && 'ring-2 ring-sage ring-offset-2 ring-offset-white',
+                      )}
+                    >
+                      {day}
+                    </div>
+                  </div>
                 )
               })}
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      {/* ── Trend strip ── */}
+      {recentCheckins.length > 1 && (
+        <Card>
+          <div className="flex items-start justify-between gap-3 mb-4">
+            <div>
+              <CardLabel className="mb-1">This week</CardLabel>
+              <CardTitle>Energy, sleep & mood trend</CardTitle>
+            </div>
+            <Pill tone="soft-sage" size="md">
+              {recentCheckins.length}/7 check-ins
+            </Pill>
+          </div>
+          <div className="-mx-1">
+            <SparkLine
+              values={trendValues}
+              width={800}
+              height={80}
+              tone="sage"
+              showFill
+              showDots
+              highlightLast
+              className="w-full h-auto"
+            />
+          </div>
+          <div className="grid grid-cols-7 gap-1 mt-1">
+            {weekDays.map((d, i) => (
+              <div key={i} className={cn('text-center text-[10px]', i === todayIdx ? 'text-sage-deep font-semibold' : 'text-ink-3')}>
+                {d}
+              </div>
+            ))}
           </div>
         </Card>
       )}
 
-      {/* Action cards */}
+      {/* ── Quick action grid ── */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        {/* Daily check-in */}
         <Link href="/checkin">
           <Card
-            className={`cursor-pointer hover:border-[var(--b1)] transition-all h-full ${hasCheckinToday ? 'opacity-60' : ''}`}
+            className={cn(
+              'group transition-all hover:border-line-2 hover:bg-off-white cursor-pointer h-full',
+              hasCheckinToday && 'opacity-70',
+            )}
           >
-            <div className="mb-3 text-accent"><ClipboardCheck className="w-5 h-5" /></div>
-            <div className="text-[13px] font-semibold text-t1 mb-1">
-              {hasCheckinToday ? <span className="flex items-center gap-1.5">Check-in done <CheckCircle className="w-3.5 h-3.5 text-opt inline" /></span> : 'Daily check-in'}
+            <div className="flex items-start justify-between mb-3">
+              <IconBadge icon={ClipboardCheck} size="md" tone="sage" />
+              <ChevronRight className="w-4 h-4 text-ink-3 group-hover:text-ink transition-colors" />
             </div>
-            <div className="text-[12px] text-t3 leading-relaxed">
-              {hasCheckinToday
-                ? 'Come back tomorrow'
-                : '4 sliders · takes under 15 seconds'}
+            <div className="text-h3 text-ink mb-1">
+              {hasCheckinToday ? 'Done for today' : 'Daily check-in'}
+            </div>
+            <div className="text-caption text-ink-2 leading-relaxed">
+              {hasCheckinToday ? 'Come back tomorrow to keep your streak alive.' : '4 quick taps · under 15 seconds'}
             </div>
           </Card>
         </Link>
 
-        {/* Blood upload */}
         <Link href="/blood">
-          <Card className="cursor-pointer hover:border-[var(--b1)] transition-all h-full">
-            <div className="mb-3 text-accent"><Droplets className="w-5 h-5" /></div>
-            <div className="text-[13px] font-semibold text-t1 mb-1">
+          <Card className="group transition-all hover:border-line-2 hover:bg-off-white cursor-pointer h-full">
+            <div className="flex items-start justify-between mb-3">
+              <IconBadge icon={Droplets} size="md" tone="rose" />
+              <ChevronRight className="w-4 h-4 text-ink-3 group-hover:text-ink transition-colors" />
+            </div>
+            <div className="text-h3 text-ink mb-1">
               {hasBlood ? 'Upload new results' : 'Upload blood results'}
             </div>
-            <div className="text-[12px] text-t3 leading-relaxed">
-              {hasBlood
-                ? 'Add your latest lab panel for trend analysis'
-                : 'Upload a lab PDF · AI analysis in seconds'}
+            <div className="text-caption text-ink-2 leading-relaxed">
+              {hasBlood ? 'Add your latest panel for trend analysis.' : 'Drop a lab PDF · AI analysis in seconds'}
             </div>
           </Card>
         </Link>
 
-        {/* Wearables */}
         <Link href="/wearables">
-          <Card className="cursor-pointer hover:border-[var(--b1)] transition-all h-full">
-            <div className="mb-3 text-accent"><Wifi className="w-5 h-5" /></div>
-            <div className="text-[13px] font-semibold text-t1 mb-1">
+          <Card className="group transition-all hover:border-line-2 hover:bg-off-white cursor-pointer h-full">
+            <div className="flex items-start justify-between mb-3">
+              <IconBadge icon={Wifi} size="md" tone="amber" />
+              <ChevronRight className="w-4 h-4 text-ink-3 group-hover:text-ink transition-colors" />
+            </div>
+            <div className="text-h3 text-ink mb-1">
               {connectedWearables.length > 0
                 ? `${connectedWearables.length} connected`
                 : 'Connect wearables'}
             </div>
-            <div className="text-[12px] text-t3 leading-relaxed">
+            <div className="text-caption text-ink-2 leading-relaxed truncate">
               {connectedWearables.length > 0
                 ? connectedWearables.join(', ')
                 : 'Oura, Whoop, Garmin, Apple Health'}
@@ -282,29 +295,17 @@ export function DashboardClient({
         </Link>
       </div>
 
-      {/* Ask Anything CTA */}
+      {/* ── Ask Anything CTA ── */}
       <Link href="/chat">
-        <div
-          className="flex items-center gap-4 p-5 rounded-2xl cursor-pointer hover:brightness-105 transition-all"
-          style={{
-            background:
-              'linear-gradient(135deg, rgba(110,155,94,0.06) 0%, rgba(90,112,64,0.04) 100%)',
-            border: '1px solid rgba(110,155,94,0.15)',
-          }}
-        >
-          <div
-            className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-            style={{ background: 'rgba(110,155,94,0.1)', border: '1px solid rgba(110,155,94,0.2)' }}
-          >
-            <Dna className="w-5 h-5 text-accent" />
-          </div>
-          <div>
-            <div className="text-[13px] font-semibold text-t1 mb-0.5">Ask Anything</div>
-            <div className="text-[12px] text-t3">
-              Your AI health co-pilot · Powered by your data · Not medical advice
+        <div className="group flex items-center gap-4 p-5 rounded-card cursor-pointer transition-all bg-gradient-to-r from-sage-wash to-transparent hover:from-sage-tint border border-accent-ring">
+          <IconBadge icon={Sparkles} size="lg" tone="sage" />
+          <div className="flex-1 min-w-0">
+            <div className="text-h3 text-ink mb-0.5">Ask Anything</div>
+            <div className="text-caption text-ink-2">
+              Your personal health AI · built on your data · educational only
             </div>
           </div>
-          <div className="ml-auto text-t3 text-sm">→</div>
+          <ArrowRight className="w-5 h-5 text-sage-deep group-hover:translate-x-1 transition-transform shrink-0" />
         </div>
       </Link>
     </div>

@@ -6,6 +6,8 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
 import { toast } from 'sonner'
+import { ArrowRight, Check } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { signupSchema, type SignupInput } from '@/lib/validations'
@@ -26,26 +28,21 @@ function Checkbox({
   return (
     <div>
       <label htmlFor={id} className="flex items-start gap-3 cursor-pointer group">
-        <div
+        <button
+          type="button"
           onClick={() => onChange(!checked)}
-          className={`mt-0.5 w-4 h-4 rounded flex-shrink-0 border flex items-center justify-center transition-all
-            ${checked ? 'bg-accent border-accent' : 'border-[var(--b1)] bg-s1 hover:border-[var(--b2)]'}`}
-        >
-          {checked && (
-            <svg
-              className="w-2.5 h-2.5 text-bg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={3}
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-            </svg>
+          className={cn(
+            'mt-0.5 w-[18px] h-[18px] rounded-[5px] flex-shrink-0 border flex items-center justify-center transition-all',
+            checked
+              ? 'bg-sage border-sage'
+              : 'bg-white border-line-2 hover:border-sage',
           )}
-        </div>
-        <span className="text-[12.5px] text-t2 leading-relaxed">{label}</span>
+        >
+          {checked && <Check className="w-3 h-3 text-white" strokeWidth={3.5} />}
+        </button>
+        <span className="text-body-sm text-ink-2 leading-relaxed">{label}</span>
       </label>
-      {error && <p className="mt-1 ml-7 text-xs text-urg">{error}</p>}
+      {error && <p className="mt-1 ml-[30px] text-caption text-rose">{error}</p>}
     </div>
   )
 }
@@ -116,15 +113,16 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="max-w-[400px] w-full">
-      <div className="text-[10.5px] font-bold tracking-[0.12em] uppercase text-t3 mb-4">
+    <div className="max-w-[420px] w-full">
+      <div className="text-eyebrow uppercase text-sage-deep mb-3">
         Create your account
       </div>
-      <h2 className="font-serif text-[24px] font-bold tracking-[-0.02em] text-t1 mb-1.5 leading-tight">
-        Start your health journey.
+      <h2 className="font-sans text-[28px] font-bold text-ink mb-2 leading-[1.1] tracking-tight">
+        Start your{' '}
+        <span className="italic-accent">health journey.</span>
       </h2>
-      <p className="text-[13px] text-t2 mb-7 leading-relaxed">
-        Your data stays private. Educational insights only — not medical advice.
+      <p className="text-body-sm text-ink-2 mb-7 leading-relaxed">
+        Your data stays private. Educational insights only — never medical advice.
       </p>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -138,7 +136,7 @@ export default function SignupPage() {
           error={errors.name?.message}
         />
         <Input
-          label="Email address"
+          label="Email"
           id="email"
           type="email"
           placeholder="name@example.com"
@@ -156,11 +154,7 @@ export default function SignupPage() {
           error={errors.password?.message}
         />
 
-        {/* Legal checkboxes */}
-        <div
-          className="space-y-3 pt-4 mt-4"
-          style={{ borderTop: '1px solid rgba(26,26,22,0.07)' }}
-        >
+        <div className="space-y-3 pt-5 mt-5 border-t border-line">
           <Checkbox
             id="age"
             checked={!!ageV}
@@ -176,7 +170,7 @@ export default function SignupPage() {
             label={
               <>
                 I agree to the{' '}
-                <Link href="/terms" target="_blank" className="text-accent underline">
+                <Link href="/terms" target="_blank" className="text-sage-deep underline font-medium">
                   Terms & Conditions
                 </Link>
               </>
@@ -190,10 +184,10 @@ export default function SignupPage() {
             label={
               <>
                 I agree to the{' '}
-                <Link href="/privacy" target="_blank" className="text-accent underline">
+                <Link href="/privacy" target="_blank" className="text-sage-deep underline font-medium">
                   Privacy Policy
                 </Link>{' '}
-                (UAE PDPL compliant)
+                <span className="text-ink-3">(UAE PDPL compliant)</span>
               </>
             }
           />
@@ -206,14 +200,15 @@ export default function SignupPage() {
           />
         </div>
 
-        <Button type="submit" variant="primary" size="lg" loading={loading} className="w-full mt-6">
-          Create account <span className="ml-1">→</span>
+        <Button type="submit" variant="primary" size="lg" loading={loading} fullWidth className="mt-7">
+          Create account
+          <ArrowRight className="w-4 h-4" />
         </Button>
       </form>
 
-      <p className="text-[11px] text-t4 mt-5 leading-relaxed">
-        <span className="text-t3">Already have an account?</span>{' '}
-        <Link href="/login" className="text-accent font-semibold hover:brightness-110">
+      <p className="text-caption text-ink-3 mt-5 leading-relaxed">
+        Already have an account?{' '}
+        <Link href="/login" className="text-sage-deep font-semibold hover:text-sage transition-colors">
           Sign in →
         </Link>
       </p>

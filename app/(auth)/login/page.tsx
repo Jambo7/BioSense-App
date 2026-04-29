@@ -7,6 +7,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
 import { toast } from 'sonner'
+import { ArrowRight, Sparkles } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { loginSchema, type LoginInput } from '@/lib/validations'
@@ -22,9 +23,7 @@ export default function LoginPage() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginInput>({
-    resolver: zodResolver(loginSchema),
-  })
+  } = useForm<LoginInput>({ resolver: zodResolver(loginSchema) })
 
   async function onSubmit(data: LoginInput) {
     setLoading(true)
@@ -41,7 +40,6 @@ export default function LoginPage() {
         return
       }
 
-      // Let the root page handle routing based on session state
       router.push('/')
       router.refresh()
     } catch {
@@ -68,21 +66,21 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="max-w-[380px] w-full">
-      <div className="text-[10.5px] font-bold tracking-[0.12em] uppercase text-t3 mb-4">
-        Member dashboard access
+    <div className="max-w-[400px] w-full">
+      <div className="text-eyebrow uppercase text-sage-deep mb-3">
+        Member access
       </div>
-      <h2 className="font-serif text-[26px] font-bold tracking-[-0.02em] text-t1 mb-1.5 leading-tight">
+      <h2 className="font-sans text-[30px] font-bold text-ink mb-2 leading-[1.1] tracking-tight">
         Welcome back.
       </h2>
-      <p className="text-[13px] text-t2 mb-8 leading-relaxed">
-        Sign in to access your results, insights, and{' '}
-        <strong className="text-t1">BioSense AI</strong>.
+      <p className="text-body-sm text-ink-2 mb-8 leading-relaxed">
+        Sign in to access your insights, results and{' '}
+        <span className="text-ink font-medium">BioSense AI</span>.
       </p>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <Input
-          label="Email address"
+          label="Email"
           id="email"
           type="email"
           placeholder="name@example.com"
@@ -100,22 +98,34 @@ export default function LoginPage() {
           error={errors.password?.message}
         />
 
-        <Button type="submit" variant="primary" size="lg" loading={loading} className="w-full mt-6">
-          Sign in <span className="ml-1">→</span>
+        <Button
+          type="submit"
+          variant="primary"
+          size="lg"
+          loading={loading}
+          fullWidth
+          className="mt-6"
+        >
+          Sign in
+          <ArrowRight className="w-4 h-4" />
         </Button>
       </form>
 
       {isDev && (
-        <div className="mt-4 p-3 rounded-lg border border-dashed border-[var(--b2)] bg-[rgba(110,155,94,0.04)]">
+        <div className="mt-4 p-3.5 rounded-card bg-sage-wash border border-dashed border-accent-ring">
           <div className="flex items-center justify-between gap-3">
-            <div className="text-[11px] text-t3 leading-tight">
-              <span className="font-semibold text-t2">Dev mode</span>
-              <br />
-              Skip auth & jump straight to the dashboard.
+            <div className="flex items-center gap-2.5 min-w-0">
+              <Sparkles className="w-4 h-4 text-sage-deep shrink-0" />
+              <div className="min-w-0">
+                <div className="text-caption font-semibold text-sage-deep">Dev mode</div>
+                <div className="text-micro text-ink-3 leading-snug">
+                  Skip auth & jump to dashboard
+                </div>
+              </div>
             </div>
             <Button
               type="button"
-              variant="ghost"
+              variant="soft"
               size="sm"
               loading={devLoading}
               onClick={onDevBypass}
@@ -126,15 +136,18 @@ export default function LoginPage() {
         </div>
       )}
 
-      <div className="flex items-center gap-3 my-5">
-        <div className="flex-1 h-px" style={{ background: 'rgba(26,26,22,0.07)' }} />
-        <span className="text-[11px] text-t4">or</span>
-        <div className="flex-1 h-px" style={{ background: 'rgba(26,26,22,0.07)' }} />
+      <div className="flex items-center gap-3 my-6">
+        <div className="flex-1 h-px bg-line" />
+        <span className="text-micro text-ink-3">or</span>
+        <div className="flex-1 h-px bg-line" />
       </div>
 
-      <p className="text-[11px] text-t4 leading-relaxed">
-        <span className="text-t3">New to BioSense?</span>{' '}
-        <Link href="/signup" className="text-accent font-semibold hover:brightness-110">
+      <p className="text-caption text-ink-3 leading-relaxed">
+        New to BioSense?{' '}
+        <Link
+          href="/signup"
+          className="text-sage-deep font-semibold hover:text-sage transition-colors"
+        >
           Apply for access →
         </Link>
       </p>

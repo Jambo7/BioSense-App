@@ -4,8 +4,10 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { toast } from 'sonner'
-import { ShieldCheck } from 'lucide-react'
+import { ShieldCheck, Check, ArrowRight } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import { IconBadge } from '@/components/ui/icon-badge'
 
 export default function ConsentPage() {
   const router = useRouter()
@@ -22,8 +24,6 @@ export default function ConsentPage() {
     try {
       const res = await fetch('/api/user/consent', { method: 'POST' })
       if (!res.ok) throw new Error()
-      // Pass a truthy value so the JWT callback's `session` param is defined
-      // and triggers the DB re-read of hasConsented
       await update({ refresh: true })
       router.push('/onboarding')
     } catch {
@@ -33,82 +33,61 @@ export default function ConsentPage() {
   }
 
   return (
-    <div className="max-w-[420px] w-full">
-      {/* Icon */}
-      <div
-        className="w-12 h-12 rounded-xl flex items-center justify-center mb-6"
-        style={{ background: 'rgba(110,155,94,0.08)', border: '1px solid rgba(110,155,94,0.2)' }}
-      >
-        <ShieldCheck className="w-5 h-5 text-accent" />
-      </div>
+    <div className="max-w-[440px] w-full">
+      <IconBadge icon={ShieldCheck} size="xl" tone="sage" className="mb-6" />
 
-      <div className="text-[10.5px] font-bold tracking-[0.12em] uppercase text-t3 mb-3">
+      <div className="text-eyebrow uppercase text-sage-deep mb-3">
         Before you continue
       </div>
-      <h2 className="font-serif text-[24px] font-bold tracking-[-0.02em] text-t1 mb-5 leading-tight">
-        Important — please read
+      <h2 className="font-sans text-[28px] font-bold text-ink mb-6 leading-[1.1] tracking-tight">
+        Important — please read.
       </h2>
 
-      <div
-        className="rounded-xl p-5 mb-6 space-y-4"
-        style={{
-          background: 'rgba(110,155,94,0.04)',
-          border: '1px solid rgba(110,155,94,0.15)',
-        }}
-      >
-        <p className="text-[13.5px] text-t1 font-semibold leading-relaxed">
+      <div className="rounded-card p-5 mb-6 bg-sage-wash border border-accent-ring space-y-4">
+        <p className="text-body text-ink font-semibold leading-relaxed">
           BioSense provides educational health insights only.
         </p>
-        <p className="text-[13px] text-t2 leading-[1.75]">
+        <p className="text-body-sm text-ink-2 leading-[1.7]">
           BioSense is not a medical service. The platform does not provide medical advice,
-          diagnoses, or treatment recommendations. All insights are generated using AI and are
-          intended for general educational and informational purposes only.
+          diagnoses or treatment recommendations. All insights are AI-generated and intended for
+          general educational and informational purposes only.
         </p>
-        <p className="text-[13px] text-t2 leading-[1.75]">
+        <p className="text-body-sm text-ink-2 leading-[1.7]">
           You must consult a qualified healthcare professional before making any changes to your
-          health, medication, or lifestyle based on anything you see in BioSense.
+          health, medication or lifestyle based on anything you see in BioSense.
         </p>
       </div>
 
-      <div className="space-y-3 mb-6">
+      <div className="space-y-2.5 mb-6">
         {[
           'Insights are AI-generated and may not always be accurate or complete',
           'BioSense does not replace your doctor or any clinical service',
-          'You are responsible for how you interpret and act on information in the platform',
+          'You are responsible for how you interpret and act on information here',
           'If you experience symptoms, always seek professional medical advice',
         ].map((item) => (
-          <div key={item} className="flex items-start gap-3 text-[12.5px] text-t2">
-            <span className="text-accent font-bold mt-0.5 flex-shrink-0">✓</span>
-            {item}
+          <div key={item} className="flex items-start gap-2.5 text-body-sm text-ink-2">
+            <Check className="w-4 h-4 text-sage-deep mt-0.5 shrink-0" strokeWidth={2.5} />
+            <span className="leading-relaxed">{item}</span>
           </div>
         ))}
       </div>
 
-      {/* Consent checkbox */}
-      <label
-        className="flex items-start gap-3 cursor-pointer mb-6"
-        style={{ borderTop: '1px solid rgba(26,26,22,0.07)', paddingTop: '20px' }}
-      >
-        <div
+      <label className="flex items-start gap-3 cursor-pointer mb-6 pt-5 border-t border-line">
+        <button
+          type="button"
           onClick={() => setAccepted(!accepted)}
-          className={`mt-0.5 w-4 h-4 rounded flex-shrink-0 border flex items-center justify-center transition-all
-            ${accepted ? 'bg-accent border-accent' : 'border-[var(--b1)] bg-s1 hover:border-[var(--b2)]'}`}
-        >
-          {accepted && (
-            <svg
-              className="w-2.5 h-2.5 text-bg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={3}
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-            </svg>
+          className={cn(
+            'mt-0.5 w-[18px] h-[18px] rounded-[5px] flex-shrink-0 border flex items-center justify-center transition-all',
+            accepted
+              ? 'bg-sage border-sage'
+              : 'bg-white border-line-2 hover:border-sage',
           )}
-        </div>
-        <span className="text-[13px] text-t1 leading-relaxed">
+        >
+          {accepted && <Check className="w-3 h-3 text-white" strokeWidth={3.5} />}
+        </button>
+        <span className="text-body-sm text-ink leading-relaxed">
           I agree to the{' '}
-          <a href="/consent-agreement" target="_blank" className="text-accent underline">
+          <a href="/consent-agreement" target="_blank" className="text-sage-deep underline font-medium">
             User Consent Agreement
           </a>
           . I understand that BioSense provides educational insights only and does not provide
@@ -121,10 +100,11 @@ export default function ConsentPage() {
         size="lg"
         loading={loading}
         disabled={!accepted}
-        className="w-full"
+        fullWidth
         onClick={handleAccept}
       >
-        I understand — continue →
+        I understand — continue
+        <ArrowRight className="w-4 h-4" />
       </Button>
     </div>
   )
