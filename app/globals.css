@@ -119,3 +119,45 @@ html, body {
 
 @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 .fade-up { animation: fadeUp 320ms var(--ease) forwards; }
+
+@keyframes pulseDot {
+  0%, 100% { transform: scale(1);   opacity: 1; }
+  50%      { transform: scale(1.3); opacity: 0.6; }
+}
+.pulse-dot { animation: pulseDot 1.8s ease-in-out infinite; }
+
+@keyframes pulseRing {
+  0%   { transform: scale(0.85); opacity: 0.6; }
+  100% { transform: scale(1.6);  opacity: 0; }
+}
+.pulse-ring { animation: pulseRing 1.8s cubic-bezier(0,0,0.2,1) infinite; }
+
+.tap {
+  transition: transform 180ms var(--ease), box-shadow 180ms var(--ease);
+}
+.tap:active { transform: scale(0.985); }
+
+/* Stagger helper — children animate in sequence */
+.stagger > * { opacity: 0; animation: fadeUp 420ms var(--ease) forwards; }
+.stagger > *:nth-child(1) { animation-delay:   0ms; }
+.stagger > *:nth-child(2) { animation-delay:  60ms; }
+.stagger > *:nth-child(3) { animation-delay: 120ms; }
+.stagger > *:nth-child(4) { animation-delay: 180ms; }
+.stagger > *:nth-child(5) { animation-delay: 240ms; }
+.stagger > *:nth-child(6) { animation-delay: 300ms; }
+.stagger > *:nth-child(7) { animation-delay: 360ms; }
+.stagger > *:nth-child(8) { animation-delay: 420ms; }
+
+/* Warm hero background — used on the dashboard score card */
+.hero-glow {
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%,   rgba(168,191,163,0.28) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 100% 100%,rgba(217,160,91,0.10)  0%, transparent 70%),
+    #FFFFFF;
+}
+
+.hero-sage {
+  background:
+    radial-gradient(ellipse 90% 70% at 50% 100%, rgba(111,143,107,0.16) 0%, transparent 70%),
+    linear-gradient(180deg, #FAFAF8 0%, #F2EEE6 100%);
+}

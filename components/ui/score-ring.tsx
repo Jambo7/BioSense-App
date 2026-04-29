@@ -9,6 +9,8 @@ interface ScoreRingProps {
   sublabel?: string
   tone?: 'sage' | 'rose' | 'amber' | 'ink'
   className?: string
+  glow?: boolean
+  centerSize?: number
 }
 
 /**
@@ -26,6 +28,8 @@ export function ScoreRing({
   sublabel,
   tone = 'sage',
   className,
+  glow = false,
+  centerSize,
 }: ScoreRingProps) {
   const clamped = Math.max(0, Math.min(value, max))
   const pct = clamped / max
@@ -40,15 +44,39 @@ export function ScoreRing({
     ink:   '#1A1C1A',
   }
 
+  const glowTones = {
+    sage:  'rgba(168,191,163,0.45)',
+    rose:  'rgba(201,122,122,0.35)',
+    amber: 'rgba(217,160,91,0.35)',
+    ink:   'rgba(26,28,26,0.20)',
+  }
+
+  const numberSize = centerSize ?? size * 0.32
+
   return (
     <div className={cn('relative inline-flex items-center justify-center', className)} style={{ width: size, height: size }}>
-      <svg width={size} height={size} className="-rotate-90">
+      {glow && (
+        <div
+          className="absolute inset-0 rounded-full pointer-events-none"
+          style={{
+            background: `radial-gradient(circle, ${glowTones[tone]} 0%, transparent 65%)`,
+            transform: 'scale(1.35)',
+          }}
+        />
+      )}
+      <svg width={size} height={size} className="-rotate-90 relative">
+        <defs>
+          <linearGradient id={`ring-grad-${tone}`} x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%"   stopColor={tones[tone]} stopOpacity="0.85" />
+            <stop offset="100%" stopColor={tones[tone]} stopOpacity="1" />
+          </linearGradient>
+        </defs>
         <circle
           cx={size / 2}
           cy={size / 2}
           r={r}
           fill="none"
-          stroke="rgba(26,28,26,0.07)"
+          stroke="rgba(26,28,26,0.06)"
           strokeWidth={thickness}
         />
         <circle
@@ -56,23 +84,31 @@ export function ScoreRing({
           cy={size / 2}
           r={r}
           fill="none"
-          stroke={tones[tone]}
+          stroke={`url(#ring-grad-${tone})`}
           strokeWidth={thickness}
           strokeLinecap="round"
           strokeDasharray={c}
           strokeDashoffset={dashOffset}
-          style={{ transition: 'stroke-dashoffset 700ms cubic-bezier(0.16,1,0.3,1)' }}
+          style={{ transition: 'stroke-dashoffset 900ms cubic-bezier(0.16,1,0.3,1)' }}
         />
       </svg>
-      <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <div className="font-sans font-bold text-ink leading-none" style={{ fontSize: size * 0.32 }}>
+      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+        <div
+          className="font-sans font-bold text-ink leading-none tabular-nums"
+          style={{ fontSize: numberSize, letterSpacing: '-0.03em' }}
+        >
           {Math.round(clamped)}
         </div>
         {label && (
-          <div className="text-caption text-ink-2 mt-1.5">{label}</div>
+          <div
+            className="italic-accent text-base mt-2 leading-none"
+            style={{ fontSize: numberSize * 0.34 }}
+          >
+            {label}
+          </div>
         )}
         {sublabel && (
-          <div className="text-micro text-ink-3 mt-0.5">{sublabel}</div>
+          <div className="text-micro uppercase tracking-[0.14em] text-ink-3 mt-1.5">{sublabel}</div>
         )}
       </div>
     </div>

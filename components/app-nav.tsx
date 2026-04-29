@@ -37,7 +37,7 @@ export function AppNav() {
         {/* Wordmark */}
         <Link href="/dashboard" className="flex items-center gap-2 group">
           <BrandMark size={26} tone="sage" />
-          <span className="font-sans text-[16px] font-semibold text-ink tracking-[-0.015em] hidden sm:inline">
+          <span className="font-sans text-[16px] font-semibold text-ink tracking-[-0.015em]">
             BioSense
           </span>
         </Link>
