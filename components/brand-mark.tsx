@@ -1,16 +1,15 @@
 interface BrandMarkProps {
   size?: number
   className?: string
+  tone?: 'sage' | 'ink' | 'white'
 }
 
 /**
- * BioSense S mark — the custom "S" logo rendered in the brand gradient
- * (Grape #5A7040 → Imperial Red #6E9B5E).
- * Per brand guidelines: gradient applies to the mark only, not the wordmark text.
- * Never recreate, redraw, or alter; this SVG approximates the approved mark.
+ * BioSense mark — flowing double-loop infinity-style "8" rendered
+ * in solid sage (matches moodboard brand identity sheet).
  */
-export function BrandMark({ size = 28, className = '' }: BrandMarkProps) {
-  const gid = 'bs-brand-grad'
+export function BrandMark({ size = 28, className = '', tone = 'sage' }: BrandMarkProps) {
+  const stroke = tone === 'sage' ? '#6F8F6B' : tone === 'white' ? '#FFFFFF' : '#1A1C1A'
   return (
     <svg
       width={size}
@@ -21,51 +20,50 @@ export function BrandMark({ size = 28, className = '' }: BrandMarkProps) {
       className={className}
       aria-label="BioSense"
     >
-      <defs>
-        <linearGradient id={gid} x1="36" y1="0" x2="0" y2="36" gradientUnits="userSpaceOnUse">
-          <stop offset="0%"   stopColor="#5A7040" />
-          <stop offset="100%" stopColor="#6E9B5E" />
-        </linearGradient>
-      </defs>
-      {/*
-       * Flowing S path — two opposing arcs forming the brand S mark.
-       * Upper arc: sweeps left from upper-right to middle-left.
-       * Lower arc: sweeps right from middle-right to lower-left.
-       * Stroke-based with rounded ends to match the brand mark style.
-       */}
       <path
-        d="
-          M 27 7
-          C 27 4.5 24 3 20 3
-          C 14 3 9 6.5 9 11.5
-          C 9 15.5 12 17.5 18 19
-          C 24 20.5 27 22.5 27 26.5
-          C 27 31 22 33.5 16 33
-          C 11 32.5 9 30 9 28
-        "
-        stroke={`url(#${gid})`}
-        strokeWidth="4"
+        d="M 18 4
+           C 11 4   6  8.5  6 13.5
+           C 6  17  10 19   18 20
+           C 26 21 30 23.5  30 28
+           C 30 32  25 33   18 32"
+        stroke={stroke}
+        strokeWidth="2.6"
         strokeLinecap="round"
         strokeLinejoin="round"
         fill="none"
+      />
+      <path
+        d="M 18 4
+           C 25 4   30  8   30 12.5
+           C 30 17  26 19   18 20"
+        stroke={stroke}
+        strokeWidth="2.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="none"
+        opacity="0.55"
       />
     </svg>
   )
 }
 
-/**
- * Full wordmark lock-up: S mark + "BioSense" text.
- * "Bio" and "ense" in white; gradient only on the mark.
- */
-export function BrandWordmark({ size = 28, textSize = 15 }: { size?: number; textSize?: number }) {
+interface WordmarkProps {
+  size?: number
+  textSize?: number
+  tone?: 'sage' | 'ink' | 'white'
+  className?: string
+}
+
+export function BrandWordmark({ size = 26, textSize = 16, tone = 'ink', className = '' }: WordmarkProps) {
+  const textColor = tone === 'white' ? '#FFFFFF' : tone === 'sage' ? '#5A7556' : '#1A1C1A'
   return (
-    <span className="flex items-center gap-2">
-      <BrandMark size={size} />
+    <span className={`flex items-center gap-2 ${className}`}>
+      <BrandMark size={size} tone={tone === 'ink' ? 'sage' : tone} />
       <span
-        className="font-sans font-semibold text-t1 tracking-[-0.01em]"
-        style={{ fontSize: textSize }}
+        className="font-sans font-semibold tracking-[-0.015em]"
+        style={{ fontSize: textSize, color: textColor }}
       >
-        Bio<span style={{ color: 'transparent' }}>S</span>ense
+        BioSense
       </span>
     </span>
   )

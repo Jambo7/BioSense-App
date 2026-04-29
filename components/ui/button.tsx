@@ -2,41 +2,46 @@ import { ButtonHTMLAttributes, forwardRef } from 'react'
 import { cn } from '@/lib/utils'
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'ghost' | 'subtle'
+  variant?: 'primary' | 'ghost' | 'subtle' | 'soft' | 'danger'
   size?: 'sm' | 'md' | 'lg'
   loading?: boolean
+  fullWidth?: boolean
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (
-    { className, variant = 'primary', size = 'md', loading, children, disabled, ...props },
+    { className, variant = 'primary', size = 'md', loading, fullWidth, children, disabled, ...props },
     ref,
   ) => {
     const base =
-      'inline-flex items-center justify-center gap-2 font-medium rounded-lg transition-all duration-150 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer'
+      'inline-flex items-center justify-center gap-2 font-medium rounded-pill transition-all duration-150 ' +
+      'disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer ' +
+      'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--a-ring)] ' +
+      'active:scale-[0.98]'
 
     const variants = {
-      primary: 'text-white hover:brightness-110 active:scale-98 font-semibold',
-      ghost: 'bg-transparent border border-[var(--b1)] text-t1 hover:bg-s2 hover:border-[var(--b2)]',
-      subtle: 'bg-s2 border border-[var(--b0)] text-t2 hover:text-t1 hover:border-[var(--b1)]',
+      primary:
+        'bg-sage text-white hover:bg-sage-deep shadow-pill',
+      soft:
+        'bg-sage-tint text-sage-deep hover:bg-[rgba(111,143,107,0.16)]',
+      ghost:
+        'bg-transparent border border-line-2 text-ink hover:bg-sage-wash hover:border-accent-ring',
+      subtle:
+        'bg-off-white border border-line text-ink-2 hover:text-ink hover:border-line-2',
+      danger:
+        'bg-rose text-white hover:brightness-95',
     }
 
     const sizes = {
-      sm: 'text-xs px-3 py-1.5',
-      md: 'text-sm px-4 py-2.5',
-      lg: 'text-sm px-6 py-3',
+      sm: 'text-[12.5px] px-3.5 py-1.5 h-8',
+      md: 'text-[13.5px] px-5 py-2.5 h-10',
+      lg: 'text-[14px] px-7 py-3 h-12 font-semibold',
     }
-
-    const gradientStyle =
-      variant === 'primary'
-        ? { background: 'linear-gradient(135deg, #5A7040 0%, #6E9B5E 100%)' }
-        : undefined
 
     return (
       <button
         ref={ref}
-        className={cn(base, variants[variant], sizes[size], className)}
-        style={gradientStyle}
+        className={cn(base, variants[variant], sizes[size], fullWidth && 'w-full', className)}
         disabled={disabled || loading}
         {...props}
       >

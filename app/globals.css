@@ -1,57 +1,102 @@
 @import "tailwindcss";
 
 :root {
-  --b0: rgba(26, 26, 22, 0.07);
-  --b1: rgba(26, 26, 22, 0.11);
-  --b2: rgba(26, 26, 22, 0.16);
-  --a-bg:   rgba(110, 155, 94, 0.08);
-  --a-ring: rgba(110, 155, 94, 0.30);
-  --brand-gradient: linear-gradient(135deg, #8AB87A 0%, #5A7040 100%);
-  --brand-gradient-h: linear-gradient(90deg, #8AB87A 0%, #5A7040 100%);
-  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --sage:        #6F8F6B;
+  --sage-soft:   #A8BFA3;
+  --sage-deep:   #5A7556;
+  --sand:        #F2EEE6;
+  --sand-deep:   #E8E2D6;
+  --off-white:   #FAFAF8;
+  --white:       #FFFFFF;
+  --ink:         #1A1C1A;
+  --ink-2:       #5A5C5A;
+  --ink-3:       #8A8C8A;
+  --ink-4:       #C0C2C0;
+  --line:        rgba(26, 28, 26, 0.07);
+  --line-2:      rgba(26, 28, 26, 0.12);
+  --sage-tint:   rgba(111, 143, 107, 0.10);
+  --sage-wash:   rgba(111, 143, 107, 0.05);
+  --rose:        #C97A7A;
+  --rose-tint:   rgba(201, 122, 122, 0.10);
+  --amber:       #D9A05B;
+  --amber-tint:  rgba(217, 160, 91, 0.10);
+
+  --ease:        cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-soft:   cubic-bezier(0.4, 0, 0.2, 1);
+
+  --b0: var(--line);
+  --b1: var(--line);
+  --b2: var(--line-2);
+  --a-bg:   var(--sage-tint);
+  --a-ring: rgba(111, 143, 107, 0.30);
+  --brand-gradient:   linear-gradient(135deg, #A8BFA3 0%, #5A7556 100%);
+  --brand-gradient-h: linear-gradient(90deg,  #A8BFA3 0%, #5A7556 100%);
 }
 
-html,
-body {
-  background: #F5F1EC;
-  color: #1A1A16;
-  font-family: var(--font-inter), system-ui, sans-serif;
-  -webkit-font-smoothing: antialiased;
+* { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
+html, body {
+  background: var(--sand);
+  color: var(--ink);
+  font-family: var(--font-dm-sans), system-ui, sans-serif;
+  font-feature-settings: 'cv11' on, 'ss03' on;
   overflow-x: hidden;
 }
 
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-thumb {
-  background: #C8C4BC;
-  border-radius: 2px;
-}
+::selection { background: var(--sage-tint); color: var(--ink); }
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--ink-4); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: var(--ink-3); }
 
 *:focus-visible {
-  outline: 2px solid rgba(110, 155, 94, 0.55);
+  outline: 2px solid var(--a-ring);
   outline-offset: 2px;
+  border-radius: 4px;
 }
 
 .border-b0 { border-color: var(--b0); }
 .border-b1 { border-color: var(--b1); }
 .border-b2 { border-color: var(--b2); }
+.border-line   { border-color: var(--line); }
+.border-line-2 { border-color: var(--line-2); }
 .border-accent-ring { border-color: var(--a-ring); }
-.bg-accent-subtle   { background-color: var(--a-bg); }
+.bg-accent-subtle   { background-color: var(--sage-tint); }
+.bg-sage-wash       { background-color: var(--sage-wash); }
 
 .text-brand-gradient {
   background: var(--brand-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  color: transparent;
 }
 
-.border-brand-gradient {
-  border-image: var(--brand-gradient-h) 1;
+.italic-accent {
+  font-family: var(--font-dm-serif), Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  color: var(--sage-deep);
+  letter-spacing: -0.015em;
 }
 
 .card {
-  background: #FFFFFF;
-  border: 1px solid var(--b0);
-  border-radius: 11px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 20px 22px;
+}
+.card-soft {
+  background: var(--off-white);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 20px 22px;
+}
+.card-sage {
+  background: var(--sage-wash);
+  border: 1px solid var(--a-ring);
+  border-radius: 14px;
   padding: 20px 22px;
 }
 
@@ -60,7 +105,17 @@ body {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  opacity: 0.08;
-  background-image: radial-gradient(circle, rgba(26,26,22,0.25) 1px, transparent 1px);
-  background-size: 32px 32px;
+  opacity: 0.07;
+  background-image: radial-gradient(circle, rgba(26,28,26,0.40) 1px, transparent 1px);
+  background-size: 28px 28px;
 }
+
+.divider {
+  height: 1px;
+  background: var(--line);
+  border: none;
+  margin: 16px 0;
+}
+
+@keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.fade-up { animation: fadeUp 320ms var(--ease) forwards; }

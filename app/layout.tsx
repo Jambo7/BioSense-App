@@ -1,31 +1,27 @@
 import type { Metadata } from 'next'
-import { Inter, Playfair_Display, JetBrains_Mono } from 'next/font/google'
+import { DM_Sans, DM_Serif_Display } from 'next/font/google'
 import './globals.css'
 import { Providers } from './providers'
 import { Toaster } from 'sonner'
 
-const inter = Inter({
+const dmSans = DM_Sans({
   subsets: ['latin'],
-  variable: '--font-inter',
+  variable: '--font-dm-sans',
+  weight: ['400', '500', '600', '700'],
   display: 'swap',
 })
 
-const playfair = Playfair_Display({
+const dmSerif = DM_Serif_Display({
   subsets: ['latin'],
-  variable: '--font-playfair',
-  display: 'swap',
-})
-
-const jetbrains = JetBrains_Mono({
-  subsets: ['latin'],
-  variable: '--font-jetbrains',
+  variable: '--font-dm-serif',
+  weight: ['400'],
   display: 'swap',
 })
 
 export const metadata: Metadata = {
-  title: 'BioSense — Personalised Health Intelligence',
+  title: 'BioSense — Understand your biology. Live your best.',
   description:
-    'A continuous, personalised health system that turns your data into clear actions.',
+    'Personalised health intelligence. Sleep better, recover faster, perform stronger.',
 }
 
 export default function RootLayout({
@@ -36,18 +32,21 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${playfair.variable} ${jetbrains.variable}`}
+      className={`${dmSans.variable} ${dmSerif.variable}`}
     >
-      <body>
+      <body className="bg-sand text-ink antialiased">
         <Providers>
           {children}
           <Toaster
-            position="top-right"
+            position="top-center"
             toastOptions={{
               style: {
                 background: '#FFFFFF',
-                border: '1px solid rgba(26,26,22,0.09)',
-                color: '#1A1A16',
+                border: '1px solid rgba(26,28,26,0.07)',
+                color: '#1A1C1A',
+                borderRadius: '12px',
+                fontSize: '13.5px',
+                fontFamily: 'var(--font-dm-sans), system-ui, sans-serif',
               },
             }}
           />

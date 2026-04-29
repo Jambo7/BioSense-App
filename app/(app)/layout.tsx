@@ -12,14 +12,16 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   // is outside this layout, so we never create a redirect loop here.
 
   return (
-    <div className="min-h-screen bg-bg">
+    <div className="min-h-screen bg-sand">
       <AppNav />
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 pb-24 md:pb-16 pt-4">{children}</main>
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 pb-28 lg:pb-16 pt-6 sm:pt-8">
+        {children}
+      </main>
 
       {/* Persistent legal footer */}
-      <footer className="fixed bottom-0 left-0 right-0 pointer-events-none z-10">
+      <footer className="hidden lg:block fixed bottom-0 left-0 right-0 pointer-events-none z-10">
         <div className="max-w-5xl mx-auto px-4 pb-3 text-right">
-          <span className="text-[10px] text-t4">
+          <span className="text-micro text-ink-3 bg-sand/90 px-2 py-0.5 rounded-pill">
             Educational insights only — not medical advice
           </span>
         </div>
