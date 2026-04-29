@@ -14,7 +14,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   return (
     <div className="min-h-screen bg-bg">
       <AppNav />
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 pb-16 pt-4">{children}</main>
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 pb-24 md:pb-16 pt-4">{children}</main>
 
       {/* Persistent legal footer */}
       <footer className="fixed bottom-0 left-0 right-0 pointer-events-none z-10">

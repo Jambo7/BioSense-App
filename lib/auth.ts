@@ -3,6 +3,9 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import bcrypt from 'bcryptjs'
 import { prisma } from './prisma'
 
+const isDev = process.env.NODE_ENV !== 'production'
+const DEV_USER_EMAIL = 'dev@biosense.local'
+
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
@@ -32,6 +35,38 @@ export const authOptions: NextAuthOptions = {
         }
       },
     }),
+    // Dev-only bypass: hard-disabled in production at the provider level.
+    // Even if the client-side button somehow reached prod, this provider
+    // wouldn't be registered, so signIn('dev-bypass') would fail.
+    ...(isDev
+      ? [
+          CredentialsProvider({
+            id: 'dev-bypass',
+            name: 'Dev bypass',
+            credentials: {},
+            async authorize() {
+              const user = await prisma.user.upsert({
+                where: { email: DEV_USER_EMAIL },
+                update: {},
+                create: {
+                  email: DEV_USER_EMAIL,
+                  name: 'Dev User',
+                  ageVerified: true,
+                  hasConsented: true,
+                  onboardingDone: true,
+                },
+              })
+              return {
+                id: user.id,
+                email: user.email,
+                name: user.name,
+                hasConsented: user.hasConsented,
+                onboardingDone: user.onboardingDone,
+              }
+            },
+          }),
+        ]
+      : []),
   ],
   session: {
     strategy: 'jwt',

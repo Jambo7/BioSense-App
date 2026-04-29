@@ -9,23 +9,23 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Brand backgrounds — Night (#0A0A0A) and surface levels
-        bg:  '#0A0A0A',
-        s1:  '#111111',
-        s2:  '#1A1A1A',
-        s3:  '#222222',
-        s4:  '#2C2C2C',
-        // Text — Seasalt (#F7F7F7) hierarchy
-        t1:  '#F7F7F7',
-        t2:  '#A3A3A3',
-        t3:  '#666666',
-        t4:  '#3A3A3A',
-        // Brand accent — Imperial Red
-        accent:      '#F04D4D',
-        'accent-dim':'#C73D3D',
-        // Brand secondary — Grape
-        grape:       '#7625B0',
-        'grape-dim': '#5C1D8C',
+        // Brand backgrounds — warm cream + surface levels (sage-olive rebrand)
+        bg:  '#F5F1EC',
+        s1:  '#FAF7F2',
+        s2:  '#EFEAE3',
+        s3:  '#E5DFD6',
+        s4:  '#D9D2C7',
+        // Text — warm near-black hierarchy
+        t1:  '#1A1A16',
+        t2:  '#5A5751',
+        t3:  '#8A8780',
+        t4:  '#B8B5AE',
+        // Brand accent — Sage / olive green
+        accent:      '#6E9B5E',
+        'accent-dim':'#5A7040',
+        // Brand secondary — kept for legacy refs
+        grape:       '#6E9B5E',
+        'grape-dim': '#5A7040',
         // Semantic health colours (not brand colours)
         opt:  '#22C55E',
         near: '#3B82F6',
@@ -39,15 +39,15 @@ const config: Config = {
         mono:  ['var(--font-jetbrains)', 'SF Mono', 'monospace'],
       },
       borderColor: {
-        DEFAULT: 'rgba(247,247,247,0.06)',
-        subtle:  'rgba(247,247,247,0.10)',
-        medium:  'rgba(247,247,247,0.16)',
-        accent:  'rgba(240,77,77,0.25)',
-        grape:   'rgba(118,37,176,0.25)',
+        DEFAULT: 'rgba(26,26,22,0.07)',
+        subtle:  'rgba(26,26,22,0.11)',
+        medium:  'rgba(26,26,22,0.16)',
+        accent:  'rgba(110,155,94,0.25)',
+        grape:   'rgba(110,155,94,0.25)',
       },
       backgroundColor: {
-        'accent-subtle': 'rgba(240,77,77,0.08)',
-        'grape-subtle':  'rgba(118,37,176,0.08)',
+        'accent-subtle': 'rgba(110,155,94,0.08)',
+        'grape-subtle':  'rgba(110,155,94,0.08)',
       },
       keyframes: {
         'fade-up': {

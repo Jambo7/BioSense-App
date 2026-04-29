@@ -116,8 +116,8 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       <div
         className="w-full lg:w-[480px] flex flex-col justify-center p-8 lg:p-12 relative z-10"
         style={{
-          borderLeft: '1px solid rgba(247,247,247,0.05)',
-          background: 'rgba(10,10,10,0.96)',
+          borderLeft: '1px solid rgba(26,26,22,0.07)',
+          background: 'rgba(255,255,255,0.92)',
           backdropFilter: 'blur(40px)',
         }}
       >

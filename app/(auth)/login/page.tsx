@@ -11,9 +11,12 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { loginSchema, type LoginInput } from '@/lib/validations'
 
+const isDev = process.env.NODE_ENV !== 'production'
+
 export default function LoginPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
+  const [devLoading, setDevLoading] = useState(false)
 
   const {
     register,
@@ -44,6 +47,23 @@ export default function LoginPage() {
     } catch {
       toast.error('Something went wrong. Please try again.')
       setLoading(false)
+    }
+  }
+
+  async function onDevBypass() {
+    setDevLoading(true)
+    try {
+      const result = await signIn('dev-bypass', { redirect: false })
+      if (result?.error) {
+        toast.error('Dev bypass failed (provider only enabled in dev mode).')
+        setDevLoading(false)
+        return
+      }
+      router.push('/')
+      router.refresh()
+    } catch {
+      toast.error('Dev bypass failed.')
+      setDevLoading(false)
     }
   }
 
@@ -84,6 +104,27 @@ export default function LoginPage() {
           Sign in <span className="ml-1">→</span>
         </Button>
       </form>
+
+      {isDev && (
+        <div className="mt-4 p-3 rounded-lg border border-dashed border-[var(--b2)] bg-[rgba(110,155,94,0.04)]">
+          <div className="flex items-center justify-between gap-3">
+            <div className="text-[11px] text-t3 leading-tight">
+              <span className="font-semibold text-t2">Dev mode</span>
+              <br />
+              Skip auth & jump straight to the dashboard.
+            </div>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              loading={devLoading}
+              onClick={onDevBypass}
+            >
+              Skip login
+            </Button>
+          </div>
+        </div>
+      )}
 
       <div className="flex items-center gap-3 my-5">
         <div className="flex-1 h-px" style={{ background: 'rgba(26,26,22,0.07)' }} />

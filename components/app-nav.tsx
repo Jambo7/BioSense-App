@@ -29,10 +29,11 @@ export function AppNav() {
   const pathname = usePathname()
 
   return (
+    <>
     <header
       className="sticky top-0 z-50 flex items-center justify-between px-4 sm:px-6 h-[54px]"
       style={{
-        background: 'rgba(3,5,8,0.85)',
+        background: 'rgba(245,241,236,0.85)',
         backdropFilter: 'blur(24px)',
         borderBottom: '1px solid rgba(26,26,22,0.07)',
       }}
@@ -87,5 +88,33 @@ export function AppNav() {
         </button>
       </div>
     </header>
+
+    {/* Mobile bottom tab bar */}
+    <nav
+      className="md:hidden fixed bottom-0 left-0 right-0 z-50 flex items-stretch justify-around px-1 pb-[env(safe-area-inset-bottom)]"
+      style={{
+        background: 'rgba(245,241,236,0.96)',
+        backdropFilter: 'blur(24px)',
+        borderTop: '1px solid rgba(26,26,22,0.07)',
+      }}
+    >
+      {navItems.map(({ href, label, icon: Icon }) => {
+        const active = pathname.startsWith(href)
+        return (
+          <Link
+            key={href}
+            href={href}
+            className={cn(
+              'flex-1 flex flex-col items-center justify-center gap-0.5 py-2 text-[10px] font-medium transition-colors',
+              active ? 'text-accent' : 'text-t3 active:text-t2',
+            )}
+          >
+            <Icon className="w-[18px] h-[18px]" />
+            <span className="leading-none">{label}</span>
+          </Link>
+        )
+      })}
+    </nav>
+    </>
   )
 }
