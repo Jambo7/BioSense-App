@@ -1,70 +1,77 @@
+import Image from 'next/image'
+import { cn } from '@/lib/utils'
+
+const LOGO_SRC = '/biosense-wordmark.png'
+const LOGO_W = 1024
+const LOGO_H = 215
+const ASPECT = LOGO_W / LOGO_H // ≈ 4.76
+
+interface BrandWordmarkProps {
+  /** Rendered height in px. Width is derived from the original 1024×215 ratio. */
+  height?: number
+  className?: string
+  priority?: boolean
+}
+
+/**
+ * Official BioSense wordmark — full lockup (Bio + sage S mark + ense).
+ * Always uses the supplied PNG so the proportions and colours are pixel-true
+ * to the brand sheet. For separate icon-only use see {@link BrandMark}.
+ */
+export function BrandWordmark({ height = 26, className = '', priority }: BrandWordmarkProps) {
+  const width = Math.round(height * ASPECT)
+  return (
+    <Image
+      src={LOGO_SRC}
+      alt="BioSense"
+      width={width}
+      height={height}
+      priority={priority}
+      className={cn('block select-none', className)}
+      sizes={`${width}px`}
+    />
+  )
+}
+
 interface BrandMarkProps {
+  /** Rendered size of the icon in px (square). */
   size?: number
   className?: string
+  /** Kept for API compatibility — colour comes from the asset, so this is ignored. */
   tone?: 'sage' | 'ink' | 'white'
 }
 
 /**
- * BioSense mark — flowing double-loop infinity-style "8" rendered
- * in solid sage (matches moodboard brand identity sheet).
+ * Just the sage "S" mark from the official wordmark, extracted via CSS clip.
+ * Useful in tight spaces (favicons, small headers) where the full wordmark
+ * would be too long. Because it's clipped from the same asset, the colour
+ * and proportions match the brand sheet exactly.
+ *
+ * The "S" sits roughly in the horizontal middle of the wordmark — we crop a
+ * square window around it.
  */
-export function BrandMark({ size = 28, className = '', tone = 'sage' }: BrandMarkProps) {
-  const stroke = tone === 'sage' ? '#6F8F6B' : tone === 'white' ? '#FFFFFF' : '#1A1C1A'
+export function BrandMark({ size = 28, className = '' }: BrandMarkProps) {
+  // Slice the middle ~21.5% of the wordmark width (where the S sits)
+  // and scale the underlying image so that slice fills our square box.
+  const fullW = size / 0.215            // total scaled width of the underlying image
+  const fullH = fullW / ASPECT          // matching scaled height
+  const offsetX = (fullW - size) / 2 * -1
+  const offsetY = (fullH - size) / 2 * -1
   return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 36 36"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className={className}
+    <span
+      className={cn('relative inline-block overflow-hidden align-middle', className)}
+      style={{ width: size, height: size }}
       aria-label="BioSense"
     >
-      <path
-        d="M 18 4
-           C 11 4   6  8.5  6 13.5
-           C 6  17  10 19   18 20
-           C 26 21 30 23.5  30 28
-           C 30 32  25 33   18 32"
-        stroke={stroke}
-        strokeWidth="2.6"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        fill="none"
+      <Image
+        src={LOGO_SRC}
+        alt=""
+        width={Math.round(fullW)}
+        height={Math.round(fullH)}
+        className="absolute max-w-none"
+        style={{ left: offsetX, top: offsetY }}
+        sizes={`${Math.round(fullW)}px`}
       />
-      <path
-        d="M 18 4
-           C 25 4   30  8   30 12.5
-           C 30 17  26 19   18 20"
-        stroke={stroke}
-        strokeWidth="2.6"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        fill="none"
-        opacity="0.55"
-      />
-    </svg>
-  )
-}
-
-interface WordmarkProps {
-  size?: number
-  textSize?: number
-  tone?: 'sage' | 'ink' | 'white'
-  className?: string
-}
-
-export function BrandWordmark({ size = 26, textSize = 16, tone = 'ink', className = '' }: WordmarkProps) {
-  const textColor = tone === 'white' ? '#FFFFFF' : tone === 'sage' ? '#5A7556' : '#1A1C1A'
-  return (
-    <span className={`flex items-center gap-2 ${className}`}>
-      <BrandMark size={size} tone={tone === 'ink' ? 'sage' : tone} />
-      <span
-        className="font-sans font-semibold tracking-[-0.015em]"
-        style={{ fontSize: textSize, color: textColor }}
-      >
-        BioSense
-      </span>
     </span>
   )
 }

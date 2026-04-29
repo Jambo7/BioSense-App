@@ -24,7 +24,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         />
 
         <div className="relative z-10 flex flex-col h-full p-12 xl:p-16">
-          <BrandWordmark size={28} textSize={17} tone="ink" />
+          <BrandWordmark height={28} priority />
 
           {/* Hero copy */}
           <div className="mt-auto mb-auto max-w-[540px]">
@@ -82,7 +82,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       <div className="w-full lg:w-[480px] flex flex-col justify-center p-6 sm:p-10 lg:p-12 relative bg-off-white lg:border-l border-line">
         {/* Mobile wordmark */}
         <div className="flex items-center justify-between mb-10 lg:hidden">
-          <BrandWordmark size={26} textSize={16} tone="ink" />
+          <BrandWordmark height={26} priority />
         </div>
 
         {children}
