@@ -2,14 +2,10 @@ import { HTMLAttributes } from 'react'
 import { cn } from '@/lib/utils'
 
 interface PillProps extends HTMLAttributes<HTMLSpanElement> {
-  tone?: 'sage' | 'rose' | 'amber' | 'ink' | 'sand' | 'soft-sage'
+  tone?: 'sage' | 'rose' | 'amber' | 'ink' | 'sand' | 'soft-sage' | 'glass'
   size?: 'sm' | 'md'
 }
 
-/**
- * Small status / tag chip. Used for impact tiers ("High impact",
- * "Medium"), score states ("Optimal", "Good"), etc.
- */
 export function Pill({
   className,
   tone = 'sage',
@@ -18,12 +14,13 @@ export function Pill({
   ...props
 }: PillProps) {
   const tones = {
-    sage:        'bg-sage text-white',
-    'soft-sage': 'bg-[rgba(168,191,163,0.55)] text-sage-deep',
-    rose:        'bg-rose-soft text-[#7A4949]',
-    amber:       'bg-[rgba(217,160,91,0.20)] text-[#7A5A2C]',
-    ink:         'bg-[rgba(26,28,26,0.08)] text-ink-2',
+    sage:        'bg-grad-sage text-white shadow-[0_2px_6px_-1px_rgba(111,143,107,0.35)]',
+    'soft-sage': 'bg-[linear-gradient(180deg,rgba(168,191,163,0.35)_0%,rgba(111,143,107,0.18)_100%)] text-sage-deep ring-1 ring-inset ring-[rgba(168,191,163,0.40)]',
+    rose:        'bg-rose-soft text-[#7A4949] ring-1 ring-inset ring-[rgba(201,122,122,0.20)]',
+    amber:       'bg-[rgba(217,160,91,0.18)] text-[#7A5A2C] ring-1 ring-inset ring-[rgba(217,160,91,0.30)]',
+    ink:         'bg-[rgba(26,28,26,0.06)] text-ink-2 ring-1 ring-inset ring-[rgba(26,28,26,0.08)]',
     sand:        'bg-sand-deep text-ink-2',
+    glass:       'glass text-ink',
   }
 
   const sizes = {

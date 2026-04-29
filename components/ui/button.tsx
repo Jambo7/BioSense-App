@@ -2,7 +2,7 @@ import { ButtonHTMLAttributes, forwardRef } from 'react'
 import { cn } from '@/lib/utils'
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'ghost' | 'subtle' | 'soft' | 'danger'
+  variant?: 'primary' | 'ghost' | 'subtle' | 'soft' | 'danger' | 'glass'
   size?: 'sm' | 'md' | 'lg'
   loading?: boolean
   fullWidth?: boolean
@@ -14,22 +14,24 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     ref,
   ) => {
     const base =
-      'inline-flex items-center justify-center gap-2 font-medium rounded-pill transition-all duration-150 ' +
-      'disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer ' +
+      'group relative inline-flex items-center justify-center gap-2 font-medium rounded-pill transition-all duration-200 ' +
+      'disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer overflow-hidden ' +
       'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--a-ring)] ' +
-      'active:scale-[0.98]'
+      'active:scale-[0.97]'
 
     const variants = {
       primary:
-        'bg-sage text-white hover:bg-sage-deep shadow-pill',
+        'text-white bg-grad-sage shadow-button hover:shadow-[var(--shadow-button-hover)]',
       soft:
-        'bg-sage-tint text-sage-deep hover:bg-[rgba(111,143,107,0.16)]',
+        'bg-sage-tint text-sage-deep hover:bg-[rgba(111,143,107,0.18)]',
       ghost:
-        'bg-transparent border border-line-2 text-ink hover:bg-sage-wash hover:border-accent-ring',
+        'bg-white/60 backdrop-blur-md border border-line-2 text-ink hover:bg-white hover:border-accent-ring',
       subtle:
-        'bg-off-white border border-line text-ink-2 hover:text-ink hover:border-line-2',
+        'bg-white/70 backdrop-blur-md border border-line text-ink-2 hover:text-ink hover:border-line-2',
+      glass:
+        'glass text-ink hover:bg-white/85',
       danger:
-        'bg-rose text-white hover:brightness-95',
+        'bg-grad-rose text-white shadow-[0_4px_14px_-2px_rgba(201,122,122,0.4)] hover:brightness-[1.05]',
     }
 
     const sizes = {
@@ -38,6 +40,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       lg: 'text-[14px] px-7 py-3 h-12 font-semibold',
     }
 
+    const isPrimary = variant === 'primary' || variant === 'danger'
+
     return (
       <button
         ref={ref}
@@ -45,13 +49,16 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         disabled={disabled || loading}
         {...props}
       >
+        {/* Shimmer sweep on hover for primary actions */}
+        {isPrimary && <span className="shimmer-overlay" />}
+
         {loading ? (
           <>
             <span className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />
-            {children}
+            <span className="relative">{children}</span>
           </>
         ) : (
-          children
+          <span className="relative inline-flex items-center gap-2">{children}</span>
         )}
       </button>
     )

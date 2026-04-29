@@ -31,9 +31,8 @@ export function AppNav() {
 
   return (
     <>
-      <header
-        className="sticky top-0 z-40 h-[60px] flex items-center justify-between px-4 sm:px-6 bg-sand/85 backdrop-blur-xl border-b border-line"
-      >
+      {/* ── Top bar (glass) ── */}
+      <header className="glass-nav sticky top-0 z-40 h-[60px] flex items-center justify-between px-4 sm:px-6">
         {/* Wordmark */}
         <Link href="/dashboard" className="flex items-center group">
           <BrandWordmark height={22} priority />
@@ -48,14 +47,20 @@ export function AppNav() {
                 key={href}
                 href={href}
                 className={cn(
-                  'flex items-center gap-1.5 px-3 h-8 rounded-pill text-caption font-medium transition-all',
+                  'flex items-center gap-1.5 px-3.5 h-9 rounded-pill text-caption font-medium transition-all relative',
                   active
-                    ? 'bg-sage-tint text-sage-deep'
-                    : 'text-ink-2 hover:text-ink hover:bg-[rgba(26,28,26,0.04)]',
+                    ? 'text-sage-deep'
+                    : 'text-ink-2 hover:text-ink',
                 )}
               >
-                <Icon className="w-3.5 h-3.5" strokeWidth={2} />
-                {label}
+                {active && (
+                  <span
+                    className="absolute inset-0 rounded-pill bg-[linear-gradient(180deg,rgba(168,191,163,0.30)_0%,rgba(111,143,107,0.18)_100%)] ring-1 ring-inset ring-[rgba(168,191,163,0.40)]"
+                    aria-hidden
+                  />
+                )}
+                <Icon className="w-3.5 h-3.5 relative" strokeWidth={2} />
+                <span className="relative">{label}</span>
               </Link>
             )
           })}
@@ -68,7 +73,7 @@ export function AppNav() {
             className="w-9 h-9 inline-flex items-center justify-center rounded-full text-ink-2 hover:text-ink hover:bg-[rgba(26,28,26,0.04)] transition-colors"
             aria-label="Notifications"
           >
-            <Bell className="w-[18px] h-[18px]" strokeWidth={1.75} />
+            <Bell className="w-[18px] h-[18px]" strokeWidth={1.85} />
           </button>
           <Link
             href="/profile"
@@ -80,41 +85,52 @@ export function AppNav() {
             )}
             aria-label="Profile"
           >
-            <User className="w-[18px] h-[18px]" strokeWidth={1.75} />
+            <User className="w-[18px] h-[18px]" strokeWidth={1.85} />
           </Link>
           <button
             onClick={() => signOut({ callbackUrl: '/login' })}
             className="w-9 h-9 inline-flex items-center justify-center rounded-full text-ink-3 hover:text-rose hover:bg-rose-tint transition-colors"
             aria-label="Sign out"
           >
-            <LogOut className="w-[18px] h-[18px]" strokeWidth={1.75} />
+            <LogOut className="w-[18px] h-[18px]" strokeWidth={1.85} />
           </button>
         </div>
       </header>
 
-      {/* Mobile bottom tab bar */}
+      {/* ── Mobile bottom tab bar (glass) ── */}
       <nav
-        className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-xl border-t border-line pb-[env(safe-area-inset-bottom)]"
+        className="lg:hidden glass-tabbar fixed bottom-0 left-0 right-0 z-40 pb-[env(safe-area-inset-bottom)]"
       >
-        <div className="flex items-stretch justify-around max-w-3xl mx-auto px-1">
+        <div className="flex items-stretch justify-around max-w-3xl mx-auto px-1 pt-1.5">
           {navItems.map(({ href, label, icon: Icon }) => {
             const active = pathname.startsWith(href)
             return (
               <Link
                 key={href}
                 href={href}
-                className={cn(
-                  'flex-1 flex flex-col items-center justify-center gap-1 py-2.5 transition-colors',
-                  active ? 'text-sage-deep' : 'text-ink-3 active:text-ink-2',
-                )}
+                className="flex-1 flex flex-col items-center justify-center gap-1 py-2 transition-colors relative"
               >
-                <div className={cn(
-                  'flex items-center justify-center transition-all',
-                  active && 'scale-105',
-                )}>
-                  <Icon className="w-[19px] h-[19px]" strokeWidth={active ? 2.25 : 1.75} />
+                <div className="relative w-9 h-9 flex items-center justify-center">
+                  {active && (
+                    <span
+                      className="absolute inset-0 rounded-full bg-[linear-gradient(180deg,rgba(168,191,163,0.40)_0%,rgba(111,143,107,0.22)_100%)] ring-1 ring-inset ring-[rgba(168,191,163,0.45)]"
+                      aria-hidden
+                    />
+                  )}
+                  <Icon
+                    className={cn(
+                      'w-[19px] h-[19px] relative transition-all',
+                      active ? 'text-sage-deep scale-105' : 'text-ink-3',
+                    )}
+                    strokeWidth={active ? 2.25 : 1.85}
+                  />
                 </div>
-                <span className={cn('text-[10px] leading-none', active && 'font-semibold')}>
+                <span
+                  className={cn(
+                    'text-[10px] leading-none transition-colors',
+                    active ? 'text-sage-deep font-semibold' : 'text-ink-3',
+                  )}
+                >
                   {label}
                 </span>
               </Link>

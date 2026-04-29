@@ -25,7 +25,6 @@ import { ScoreRing } from '@/components/ui/score-ring'
 import { IconBadge } from '@/components/ui/icon-badge'
 import { Pill } from '@/components/ui/pill'
 import { SparkLine } from '@/components/ui/spark-line'
-import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
 function timeContext(name: string) {
@@ -95,7 +94,6 @@ export function DashboardClient({
 
   const trendValues = recentCheckins.slice().reverse().map(c => (c.energy + c.sleep + c.mood) / 3)
 
-  // Encouraging line from the score
   const heroLine = !hasData
     ? 'Add your first data to see your readiness.'
     : healthScore! >= 85 ? 'Your body is ready to perform.'
@@ -116,29 +114,25 @@ export function DashboardClient({
           {ctx.greet}
         </h1>
         {user.goalText && (
-          <div className="flex items-center gap-2 mt-3">
+          <div className="flex items-center gap-2 mt-3 flex-wrap">
             <Pill tone="soft-sage" size="sm">
               {user.goalType ? GOAL_LABELS[user.goalType] : 'Goal'}
             </Pill>
-            <span className="text-caption text-ink-2 truncate italic-accent text-base">
+            <span className="text-caption italic-accent text-base truncate">
               {user.goalText}
             </span>
           </div>
         )}
       </header>
 
-      {/* ── Today's check-in CTA (priority slot) ── */}
+      {/* ── Today's check-in CTA ── */}
       {!hasCheckinToday && (
         <Link href="/checkin" className="block">
-          <Card
-            padding="md"
-            variant="sage"
-            className="tap relative overflow-hidden flex items-center gap-3"
-          >
+          <Card padding="md" variant="glass-sage" className="tap relative overflow-hidden flex items-center gap-3">
             <div className="relative shrink-0">
               <span className="absolute inset-0 rounded-full bg-sage pulse-ring" />
-              <span className="relative w-10 h-10 rounded-full bg-sage flex items-center justify-center">
-                <ClipboardCheck className="w-5 h-5 text-white" strokeWidth={2} />
+              <span className="relative w-11 h-11 rounded-full bg-grad-sage flex items-center justify-center shadow-button">
+                <ClipboardCheck className="w-5 h-5 text-white" strokeWidth={2.2} />
               </span>
             </div>
             <div className="flex-1 min-w-0">
@@ -156,8 +150,8 @@ export function DashboardClient({
       )}
 
       {hasCheckinToday && (
-        <Card padding="md" className="tap flex items-center gap-3 bg-off-white">
-          <IconBadge icon={CheckCircle2} tone="sage" size="md" />
+        <Card padding="md" className="tap flex items-center gap-3">
+          <IconBadge icon={CheckCircle2} tone="sage" variant="gradient" size="md" />
           <div className="flex-1 min-w-0">
             <div className="text-body font-semibold text-ink">Checked in today</div>
             <div className="text-caption text-ink-2 leading-snug">
@@ -169,8 +163,17 @@ export function DashboardClient({
       )}
 
       {/* ── Hero score card ── */}
-      <Card padding="lg" className="hero-glow relative overflow-hidden">
-        <div className="flex flex-col items-center text-center pt-1 pb-2">
+      <Card padding="lg" variant="glass-strong" className="relative overflow-hidden">
+        {/* Inner sage halo bloom */}
+        <div
+          className="absolute -top-10 left-1/2 -translate-x-1/2 w-[72%] h-[60%] rounded-full pointer-events-none"
+          style={{
+            background: 'radial-gradient(ellipse at center, rgba(168,191,163,0.30) 0%, transparent 70%)',
+            filter: 'blur(20px)',
+          }}
+        />
+
+        <div className="relative flex flex-col items-center text-center pt-1 pb-2">
           <div className="text-eyebrow uppercase text-sage-deep mb-5 flex items-center gap-2">
             <Leaf className="w-3 h-3" />
             Health score
@@ -178,12 +181,13 @@ export function DashboardClient({
 
           <ScoreRing
             value={healthScore ?? 0}
-            size={188}
-            thickness={11}
+            size={196}
+            thickness={12}
             tone={sl?.tone ?? 'ink'}
             label={sl?.label ?? 'No data'}
             glow
-            centerSize={64}
+            breathe
+            centerSize={68}
           />
 
           <p className="text-body text-ink-2 mt-6 max-w-[34ch] leading-[1.55]">
@@ -193,23 +197,30 @@ export function DashboardClient({
 
         {/* Pillar breakdown */}
         {hasData && scoreBreakdown && (
-          <div className="mt-6 pt-6 border-t border-line space-y-2.5">
+          <div className="relative mt-6 pt-6 border-t border-line space-y-2.5">
             <CardLabel className="mb-1">Pillar breakdown</CardLabel>
             {Object.entries(scoreBreakdown).map(([key, val]) => {
               const meta = PILLAR_META[key] ?? { label: key, icon: Activity }
               const tone = scoreLabel(val).tone
-              const color = scoreLabel(val).color
+              const pillarGrad =
+                tone === 'sage'
+                  ? 'linear-gradient(90deg,#A8BFA3 0%,#5A7556 100%)'
+                  : tone === 'rose'
+                    ? 'linear-gradient(90deg,#E5B5B5 0%,#A85454 100%)'
+                    : tone === 'amber'
+                      ? 'linear-gradient(90deg,#EDC68A 0%,#A77530 100%)'
+                      : 'linear-gradient(90deg,#5A5C5A 0%,#1A1C1A 100%)'
               return (
                 <div key={key} className="flex items-center gap-3">
-                  <IconBadge icon={meta.icon} tone={tone} size="sm" />
+                  <IconBadge icon={meta.icon} tone={tone} variant="tint" size="sm" />
                   <span className="text-body-sm text-ink w-[78px] sm:w-[88px] shrink-0">{meta.label}</span>
-                  <div className="flex-1 h-1.5 rounded-pill bg-sand-deep overflow-hidden">
+                  <div className="flex-1 h-2 rounded-pill bg-[rgba(26,28,26,0.05)] overflow-hidden">
                     <div
                       className="h-full rounded-pill"
                       style={{
                         width: `${val}%`,
-                        background: color,
-                        transition: 'width 900ms cubic-bezier(0.16,1,0.3,1)',
+                        background: pillarGrad,
+                        transition: 'width 1100ms cubic-bezier(0.16,1,0.3,1)',
                       }}
                     />
                   </div>
@@ -223,7 +234,7 @@ export function DashboardClient({
         )}
 
         {!hasData && (
-          <div className="mt-6 pt-6 border-t border-line text-center">
+          <div className="relative mt-6 pt-6 border-t border-line text-center">
             <p className="text-body-sm text-ink-2 leading-relaxed max-w-[34ch] mx-auto">
               Complete your first check-in to start calculating your score and unlock pillar insights.
             </p>
@@ -234,10 +245,10 @@ export function DashboardClient({
       {/* ── Streak + Trend (stacked on mobile, side-by-side on desktop) ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
         {/* Streak */}
-        <Card padding="md" className="tap relative overflow-hidden">
+        <Card padding="md" className="tap">
           <div className="flex items-center gap-3 mb-4">
             <div className="relative">
-              <IconBadge icon={Flame} size="md" tone="amber" />
+              <IconBadge icon={Flame} size="md" tone="amber" variant="gradient" />
               {checkinCount > 0 && (
                 <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-amber pulse-dot ring-2 ring-white" />
               )}
@@ -266,8 +277,8 @@ export function DashboardClient({
                     className={cn(
                       'w-full aspect-square max-w-[36px] rounded-full flex items-center justify-center text-[10px] font-semibold transition-all',
                       filled
-                        ? 'bg-sage text-white shadow-pill'
-                        : 'bg-sand-deep text-ink-3',
+                        ? 'bg-grad-sage text-white shadow-[0_2px_6px_-1px_rgba(111,143,107,0.40)]'
+                        : 'bg-[rgba(26,28,26,0.05)] text-ink-3',
                       isToday && !filled && 'ring-2 ring-sage ring-offset-2 ring-offset-white',
                     )}
                   >
@@ -323,7 +334,7 @@ export function DashboardClient({
           </Card>
         ) : (
           <Card padding="md" className="tap flex flex-col items-center justify-center text-center min-h-[180px]">
-            <IconBadge icon={Activity} tone="sage" size="lg" className="mb-3" />
+            <IconBadge icon={Activity} tone="sage" variant="gradient" size="lg" className="mb-3" />
             <div className="text-body font-semibold text-ink mb-1">Build your trend</div>
             <p className="text-caption text-ink-2 leading-relaxed max-w-[24ch]">
               After a few check-ins your weekly trend appears here.
@@ -344,7 +355,7 @@ export function DashboardClient({
                 hasCheckinToday && 'opacity-70',
               )}
             >
-              <IconBadge icon={ClipboardCheck} size="lg" tone="sage" />
+              <IconBadge icon={ClipboardCheck} size="lg" tone="sage" variant="gradient" />
               <div className="flex-1 min-w-0">
                 <div className="text-body font-semibold text-ink mb-0.5">
                   {hasCheckinToday ? 'Done for today' : 'Daily check-in'}
@@ -359,7 +370,7 @@ export function DashboardClient({
 
           <Link href="/blood">
             <Card padding="md" className="tap group h-full flex items-center gap-3 sm:flex-col sm:items-start sm:gap-4">
-              <IconBadge icon={Droplets} size="lg" tone="rose" />
+              <IconBadge icon={Droplets} size="lg" tone="rose" variant="gradient" />
               <div className="flex-1 min-w-0">
                 <div className="text-body font-semibold text-ink mb-0.5">
                   {hasBlood ? 'New results' : 'Blood results'}
@@ -374,7 +385,7 @@ export function DashboardClient({
 
           <Link href="/wearables">
             <Card padding="md" className="tap group h-full flex items-center gap-3 sm:flex-col sm:items-start sm:gap-4">
-              <IconBadge icon={Wifi} size="lg" tone="amber" />
+              <IconBadge icon={Wifi} size="lg" tone="amber" variant="gradient" />
               <div className="flex-1 min-w-0">
                 <div className="text-body font-semibold text-ink mb-0.5">
                   {connectedWearables.length > 0
@@ -395,13 +406,8 @@ export function DashboardClient({
 
       {/* ── Ask Anything CTA ── */}
       <Link href="/chat">
-        <Card
-          padding="md"
-          className="tap relative overflow-hidden flex items-center gap-4 hero-sage border-accent-ring"
-        >
-          <div className="relative shrink-0">
-            <IconBadge icon={Sparkles} size="lg" tone="sage" />
-          </div>
+        <Card padding="md" variant="glass-sage" className="tap relative overflow-hidden flex items-center gap-4">
+          <IconBadge icon={Sparkles} size="lg" tone="sage" variant="gradient" />
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-0.5">
               <span className="text-body font-semibold text-ink">Ask Anything</span>

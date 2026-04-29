@@ -65,9 +65,10 @@ const config: Config = {
         'micro':    ['10.5px',                  { lineHeight: '1.3' }],
       },
       borderRadius: {
-        'card':  '14px',
+        'card':  '20px',
+        'card-lg': '24px',
         'pill':  '999px',
-        'badge': '12px',
+        'badge': '14px',
       },
       borderColor: {
         DEFAULT: 'rgba(26,28,26,0.07)',
