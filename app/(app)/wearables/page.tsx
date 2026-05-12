@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import { toast } from 'sonner'
 import {
   ExternalLink,
@@ -16,14 +17,54 @@ import { Button } from '@/components/ui/button'
 import { Card, CardLabel } from '@/components/ui/card'
 import { IconBadge } from '@/components/ui/icon-badge'
 import { Pill } from '@/components/ui/pill'
+import { cn } from '@/lib/utils'
 
 const WEARABLES = [
-  { id: 'oura',    name: 'Oura Ring',      Icon: Watch,      desc: 'Sleep, HRV, readiness, temperature',  type: 'oauth' },
-  { id: 'whoop',   name: 'Whoop',          Icon: Watch,      desc: 'Recovery, strain, sleep performance', type: 'oauth' },
-  { id: 'garmin',  name: 'Garmin',         Icon: Watch,      desc: 'Activity, HRV, steps, VO₂ max',       type: 'oauth' },
-  { id: 'samsung', name: 'Samsung Health', Icon: Smartphone, desc: 'Steps, heart rate, sleep (Android)',  type: 'oauth' },
-  { id: 'apple',   name: 'Apple Health',   Icon: Smartphone, desc: 'Upload Health Auto Export JSON',      type: 'upload' },
+  { id: 'oura',    name: 'Oura Ring',      Icon: Watch,      image: '/wearables/oura.png',    desc: 'Sleep, HRV, readiness, temperature',  type: 'oauth' },
+  { id: 'whoop',   name: 'Whoop',          Icon: Watch,      image: '/wearables/whoop.png',   desc: 'Recovery, strain, sleep performance', type: 'oauth' },
+  { id: 'garmin',  name: 'Garmin',         Icon: Watch,      image: '/wearables/garmin.png',  desc: 'Activity, HRV, steps, VO₂ max',       type: 'oauth' },
+  { id: 'samsung', name: 'Samsung Health', Icon: Smartphone, image: '/wearables/samsung.png', desc: 'Steps, heart rate, sleep (Android)',  type: 'oauth' },
+  { id: 'apple',   name: 'Apple Health',   Icon: Smartphone, image: '/wearables/apple.png',   desc: 'Upload Health Auto Export JSON',      type: 'upload' },
 ]
+
+function WearableThumb({
+  src,
+  alt,
+  fallbackIcon: Icon,
+  connected,
+}: {
+  src?: string
+  alt: string
+  fallbackIcon: typeof Watch
+  connected: boolean
+}) {
+  const [errored, setErrored] = useState(false)
+
+  if (!src || errored) {
+    return <IconBadge icon={Icon} size="lg" tone={connected ? 'sage' : 'sand'} />
+  }
+
+  return (
+    <div
+      className={cn(
+        'relative w-12 h-12 rounded-2xl overflow-hidden bg-white shrink-0',
+        'ring-1 ring-inset',
+        connected
+          ? 'ring-[rgba(111,143,107,0.35)] shadow-[0_2px_6px_-2px_rgba(111,143,107,0.30)]'
+          : 'ring-[rgba(26,28,26,0.06)]',
+      )}
+    >
+      <Image
+        src={src}
+        alt={alt}
+        fill
+        sizes="48px"
+        className="object-contain p-1"
+        onError={() => setErrored(true)}
+      />
+    </div>
+  )
+}
 
 interface WearableSync {
   provider: string
@@ -145,7 +186,12 @@ export default function WearablesPage() {
 
           return (
             <Card key={w.id} padding="md" className="flex items-center gap-4">
-              <IconBadge icon={w.Icon} size="lg" tone={conn ? 'sage' : 'sand'} />
+              <WearableThumb
+                src={w.image}
+                alt={w.name}
+                fallbackIcon={w.Icon}
+                connected={conn}
+              />
 
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-0.5 flex-wrap">

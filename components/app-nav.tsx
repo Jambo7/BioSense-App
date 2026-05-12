@@ -6,25 +6,40 @@ import { signOut } from 'next-auth/react'
 import { cn } from '@/lib/utils'
 import { BrandWordmark } from '@/components/brand-mark'
 import {
-  LayoutDashboard,
-  ClipboardCheck,
-  Droplets,
-  Activity,
+  Sun,
+  Lightbulb,
   MessageSquare,
-  FileText,
+  TrendingUp,
   User,
   LogOut,
   Bell,
+  Watch,
 } from 'lucide-react'
 
-const navItems = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/checkin',   label: 'Check-in',  icon: ClipboardCheck },
-  { href: '/blood',     label: 'Blood',     icon: Droplets },
-  { href: '/wearables', label: 'Wearables', icon: Activity },
-  { href: '/chat',      label: 'Ask',       icon: MessageSquare },
-  { href: '/reports',   label: 'Reports',   icon: FileText },
+/**
+ * Bottom (mobile) / top centre (desktop) navigation.
+ *
+ *  Today    → /dashboard (with /checkin nested under it as a child action)
+ *  Insights → /blood     (will host expanded biomarker insights)
+ *  Ask      → /chat      (the AI conversation experience)
+ *  Trends   → /reports   (graphs + reports — historical data view)
+ *  You      → /profile   (settings, goals, account, data export)
+ *
+ * Wearables intentionally lives OUTSIDE the primary nav now — it's reached
+ * via the prominent coloured "Connect wearables" button in the top bar.
+ */
+const navItems: { href: string; label: string; icon: typeof Sun; matchPaths?: string[] }[] = [
+  { href: '/dashboard', label: 'Today',    icon: Sun,            matchPaths: ['/dashboard', '/checkin'] },
+  { href: '/blood',     label: 'Insights', icon: Lightbulb },
+  { href: '/chat',      label: 'Ask',      icon: MessageSquare },
+  { href: '/reports',   label: 'Trends',   icon: TrendingUp },
+  { href: '/profile',   label: 'You',      icon: User },
 ]
+
+function isActive(pathname: string, item: (typeof navItems)[number]) {
+  const paths = item.matchPaths ?? [item.href]
+  return paths.some((p) => pathname === p || pathname.startsWith(`${p}/`))
+}
 
 export function AppNav() {
   const pathname = usePathname()
@@ -32,25 +47,24 @@ export function AppNav() {
   return (
     <>
       {/* ── Top bar (glass) ── */}
-      <header className="glass-nav sticky top-0 z-40 h-[60px] flex items-center justify-between px-4 sm:px-6">
+      <header className="glass-nav sticky top-0 z-40 h-[60px] flex items-center justify-between px-4 sm:px-6 gap-3">
         {/* Wordmark */}
-        <Link href="/dashboard" className="flex items-center group">
+        <Link href="/dashboard" className="flex items-center group shrink-0">
           <BrandWordmark height={22} priority />
         </Link>
 
         {/* Desktop nav */}
         <nav className="hidden lg:flex items-center gap-0.5 absolute left-1/2 -translate-x-1/2">
-          {navItems.map(({ href, label, icon: Icon }) => {
-            const active = pathname.startsWith(href)
+          {navItems.map((item) => {
+            const active = isActive(pathname, item)
+            const Icon = item.icon
             return (
               <Link
-                key={href}
-                href={href}
+                key={item.href}
+                href={item.href}
                 className={cn(
                   'flex items-center gap-1.5 px-3.5 h-9 rounded-pill text-caption font-medium transition-all relative',
-                  active
-                    ? 'text-sage-deep'
-                    : 'text-ink-2 hover:text-ink',
+                  active ? 'text-sage-deep' : 'text-ink-2 hover:text-ink',
                 )}
               >
                 {active && (
@@ -60,14 +74,32 @@ export function AppNav() {
                   />
                 )}
                 <Icon className="w-3.5 h-3.5 relative" strokeWidth={2} />
-                <span className="relative">{label}</span>
+                <span className="relative">{item.label}</span>
               </Link>
             )
           })}
         </nav>
 
         {/* Right actions */}
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1.5 shrink-0">
+          {/* Connect wearables — primary brand-coloured CTA. Always visible
+              so the user can reach it from anywhere; lives outside the
+              primary nav since it's a setup action, not a destination.
+              Visual treatment lives in `.btn-sage` (globals.css). */}
+          <Link
+            href="/wearables"
+            className={cn(
+              'btn-sage',
+              'inline-flex items-center gap-1.5 h-9 px-3.5 sm:px-4 rounded-pill',
+              'font-semibold text-caption',
+            )}
+            aria-label="Connect wearables"
+          >
+            <Watch className="w-[14px] h-[14px]" strokeWidth={2.25} />
+            <span className="sm:hidden">Wearables</span>
+            <span className="hidden sm:inline">Connect wearables</span>
+          </Link>
+
           <button
             type="button"
             className="w-9 h-9 inline-flex items-center justify-center rounded-full text-ink-2 hover:text-ink hover:bg-[rgba(26,28,26,0.04)] transition-colors"
@@ -75,18 +107,7 @@ export function AppNav() {
           >
             <Bell className="w-[18px] h-[18px]" strokeWidth={1.85} />
           </button>
-          <Link
-            href="/profile"
-            className={cn(
-              'w-9 h-9 inline-flex items-center justify-center rounded-full transition-colors',
-              pathname === '/profile'
-                ? 'bg-sage-tint text-sage-deep'
-                : 'text-ink-2 hover:text-ink hover:bg-[rgba(26,28,26,0.04)]',
-            )}
-            aria-label="Profile"
-          >
-            <User className="w-[18px] h-[18px]" strokeWidth={1.85} />
-          </Link>
+
           <button
             onClick={() => signOut({ callbackUrl: '/login' })}
             className="w-9 h-9 inline-flex items-center justify-center rounded-full text-ink-3 hover:text-rose hover:bg-rose-tint transition-colors"
@@ -102,12 +123,13 @@ export function AppNav() {
         className="lg:hidden glass-tabbar fixed bottom-0 left-0 right-0 z-40 pb-[env(safe-area-inset-bottom)]"
       >
         <div className="flex items-stretch justify-around max-w-3xl mx-auto px-1 pt-1.5">
-          {navItems.map(({ href, label, icon: Icon }) => {
-            const active = pathname.startsWith(href)
+          {navItems.map((item) => {
+            const active = isActive(pathname, item)
+            const Icon = item.icon
             return (
               <Link
-                key={href}
-                href={href}
+                key={item.href}
+                href={item.href}
                 className="flex-1 flex flex-col items-center justify-center gap-1 py-2 transition-colors relative"
               >
                 <div className="relative w-9 h-9 flex items-center justify-center">
@@ -131,7 +153,7 @@ export function AppNav() {
                     active ? 'text-sage-deep font-semibold' : 'text-ink-3',
                   )}
                 >
-                  {label}
+                  {item.label}
                 </span>
               </Link>
             )

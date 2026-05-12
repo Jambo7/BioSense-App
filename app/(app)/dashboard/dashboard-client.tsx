@@ -125,42 +125,77 @@ export function DashboardClient({
         )}
       </header>
 
-      {/* ── Today's check-in CTA ── */}
-      {!hasCheckinToday && (
-        <Link href="/checkin" className="block">
-          <Card padding="md" variant="glass-sage" className="tap relative overflow-hidden flex items-center gap-3">
+      {/* ── Today's check-in: hero panel button (always prominent) ── */}
+      <Link href="/checkin" className="block group">
+        <Card
+          padding="lg"
+          variant={hasCheckinToday ? 'glass-strong' : 'glass-sage'}
+          className="tap relative overflow-hidden"
+        >
+          {/* Soft sage bloom — only when there's still an action to take */}
+          {!hasCheckinToday && (
+            <div
+              className="absolute -top-10 -right-10 w-48 h-48 rounded-full pointer-events-none opacity-80"
+              style={{
+                background:
+                  'radial-gradient(circle at center, rgba(168,191,163,0.45) 0%, transparent 70%)',
+                filter: 'blur(22px)',
+              }}
+              aria-hidden
+            />
+          )}
+
+          <div className="relative flex items-center gap-4">
             <div className="relative shrink-0">
-              <span className="absolute inset-0 rounded-full bg-sage pulse-ring" />
-              <span className="relative w-11 h-11 rounded-full bg-grad-sage flex items-center justify-center shadow-button">
-                <ClipboardCheck className="w-5 h-5 text-white" strokeWidth={2.2} />
+              {!hasCheckinToday && (
+                <span className="absolute inset-0 rounded-full bg-sage pulse-ring" />
+              )}
+              <span
+                className={cn(
+                  'relative w-14 h-14 rounded-full flex items-center justify-center shadow-button',
+                  hasCheckinToday
+                    ? 'bg-white ring-1 ring-[rgba(168,191,163,0.45)]'
+                    : 'bg-grad-sage',
+                )}
+              >
+                {hasCheckinToday ? (
+                  <CheckCircle2 className="w-6 h-6 text-sage-deep" strokeWidth={2.2} />
+                ) : (
+                  <ClipboardCheck className="w-6 h-6 text-white" strokeWidth={2.2} />
+                )}
               </span>
             </div>
+
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-1.5">
-                <span className="text-body font-semibold text-ink">Today&apos;s check-in</span>
-                <span className="w-1.5 h-1.5 rounded-full bg-sage pulse-dot" />
+              <div className="flex items-center gap-2 mb-0.5">
+                <span className="font-sans text-[20px] sm:text-h3 font-semibold text-ink leading-tight tracking-tight">
+                  {hasCheckinToday ? "Today's check-in done" : "Today's check-in"}
+                </span>
+                {!hasCheckinToday && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-sage pulse-dot" />
+                )}
               </div>
               <div className="text-caption text-ink-2 leading-snug">
-                4 quick taps · keep your streak alive
+                {hasCheckinToday
+                  ? `${checkinCount} day${checkinCount === 1 ? '' : 's'} logged · view or update`
+                  : '4 quick taps · keep your streak alive'}
               </div>
             </div>
-            <ArrowRight className="w-5 h-5 text-sage-deep shrink-0" />
-          </Card>
-        </Link>
-      )}
 
-      {hasCheckinToday && (
-        <Card padding="md" className="tap flex items-center gap-3">
-          <IconBadge icon={CheckCircle2} tone="sage" variant="gradient" size="md" />
-          <div className="flex-1 min-w-0">
-            <div className="text-body font-semibold text-ink">Checked in today</div>
-            <div className="text-caption text-ink-2 leading-snug">
-              Come back tomorrow to keep your streak.
+            <div
+              className={cn(
+                'w-10 h-10 rounded-full flex items-center justify-center shrink-0',
+                'transition-transform group-hover:translate-x-0.5',
+                hasCheckinToday
+                  ? 'bg-[rgba(168,191,163,0.18)] text-sage-deep'
+                  : 'bg-white/35 text-white backdrop-blur-sm',
+              )}
+            >
+              <ArrowRight className="w-4 h-4" strokeWidth={2.25} />
             </div>
           </div>
-          <Pill tone="soft-sage" size="sm">Done</Pill>
         </Card>
-      )}
+      </Link>
 
       {/* ── Hero score card ── */}
       <Card padding="lg" variant="glass-strong" className="relative overflow-hidden">

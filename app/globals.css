@@ -165,6 +165,53 @@ html, body {
 .bg-grad-sage      { background: var(--grad-sage); }
 .bg-grad-sage-soft { background: var(--grad-sage-soft); }
 .bg-grad-sage-h    { background: var(--grad-sage-h); }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   .btn-sage — primary brand CTA pill.
+
+   Refined, smooth take on a sage gradient button. Aligned with the rest of
+   the app's glassy, low-contrast aesthetic — a hint of dimension from a
+   single inset highlight + a soft sage halo, without the heavy
+   skeuomorphic top/bottom edges or text shadow.
+
+   Used by the top-right "Connect wearables" button. Layout (height,
+   padding, gap, border-radius) is left to Tailwind utilities so the button
+   stays responsive.
+   ──────────────────────────────────────────────────────────────────────── */
+.btn-sage {
+  background: linear-gradient(180deg, #8DB389 0%, #6F8F6B 60%, #5A7556 100%);
+  box-shadow:
+    /* gentle top sheen, just enough to feel lit from above */
+    inset 0 1px 0 rgba(255, 255, 255, 0.26),
+    /* soft hairline ring for definition against any background */
+    0 0 0 1px rgba(90, 117, 86, 0.18),
+    /* tight contact shadow */
+    0 1px 2px rgba(40, 56, 38, 0.10),
+    /* soft sage halo so it sits warmly above the surface */
+    0 4px 12px -3px rgba(111, 143, 107, 0.35);
+  color: #ffffff;
+  transition:
+    box-shadow 220ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform  140ms cubic-bezier(0.16, 1, 0.3, 1),
+    background 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.btn-sage:hover {
+  background: linear-gradient(180deg, #97BC93 0%, #779773 60%, #5F7B5B 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.32),
+    0 0 0 1px rgba(90, 117, 86, 0.22),
+    0 1px 2px rgba(40, 56, 38, 0.10),
+    0 6px 16px -3px rgba(111, 143, 107, 0.45);
+}
+.btn-sage:active {
+  transform: scale(0.985);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.20),
+    0 0 0 1px rgba(90, 117, 86, 0.22),
+    0 1px 2px rgba(40, 56, 38, 0.12),
+    0 2px 6px -2px rgba(111, 143, 107, 0.30);
+  transition-duration: 80ms;
+}
 .bg-grad-rose      { background: var(--grad-rose); }
 .bg-grad-amber     { background: var(--grad-amber); }
 
@@ -304,6 +351,141 @@ html, body {
   margin: 16px 0;
 }
 
+/* ─── Intelligence mark (animated brand "S") ─────────────────────────── */
+@keyframes mark-breathe {
+  0%, 100% { transform: scale(1);    }
+  50%      { transform: scale(1.045); }
+}
+.animate-mark-breathe { animation: mark-breathe 3.6s ease-in-out infinite; }
+
+@keyframes mark-halo {
+  0%, 100% { opacity: 0.40; transform: scale(0.94); }
+  50%      { opacity: 0.80; transform: scale(1.10); }
+}
+.animate-mark-halo { animation: mark-halo 3.6s ease-in-out infinite; }
+
+@keyframes mark-halo-fast {
+  0%, 100% { opacity: 0.55; transform: scale(0.96); }
+  50%      { opacity: 1;    transform: scale(1.18); }
+}
+.animate-mark-halo-fast { animation: mark-halo-fast 1.4s ease-in-out infinite; }
+
+@keyframes mark-spin {
+  from { transform: rotate(0deg);   }
+  to   { transform: rotate(360deg); }
+}
+/* Mark spin — deliberately slow; the mark's emphasis is the constant glow,
+   the rotation is just a hint of life on top. */
+.animate-mark-spin      { animation: mark-spin 16s linear infinite; }
+.animate-mark-spin-fast { animation: mark-spin 3s   linear infinite; }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Input pill — "hollow" perimeter design.
+
+   The visible feature is the COLOURED RING around the outside of the box.
+   The inside is pure white. There is virtually no outward bloom — the
+   colours live on the perimeter itself, not in a halo around it.
+
+   Two safe animations (neither rotates a DOM element, so nothing can ever
+   sweep outside the input bounds):
+
+   1. `input-ring-flow` — animates the conic-gradient's start angle via a
+      registered CSS @property. The DIV stays fixed; only the colour stops
+      slide around the perimeter. Zero geometric movement.
+   2. `input-pulse-shadow` — animates a small 1px ring + faint outer shadow
+      so the box gently breathes. Always tracks the box's exact rounded
+      outline (it's a box-shadow), so it can't leak.
+   ──────────────────────────────────────────────────────────────────────── */
+
+@property --ring-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes input-ring-flow {
+  from { --ring-angle: 0deg;   }
+  to   { --ring-angle: 360deg; }
+}
+
+@keyframes input-pulse-shadow {
+  0%, 100% {
+    box-shadow:
+      0 0 0 1px rgba(168,191,163,0.12),
+      0 0 10px -6px rgba(168,191,163,0.18),
+      0 4px 12px -8px rgba(26,28,26,0.05);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px rgba(168,191,163,0.20),
+      0 0 16px -6px rgba(168,191,163,0.30),
+      0 4px 12px -8px rgba(26,28,26,0.05);
+  }
+}
+
+/* Wrapper — pure white pill, gentle ring-tint shadow */
+.input-pill {
+  position: relative;
+  background: #fff;
+  border-radius: 22px;
+  animation: input-pulse-shadow 3.6s ease-in-out infinite;
+}
+
+/* Coloured perimeter ring — drawn as a conic gradient, then "punched"
+   hollow with mask-composite so only a 2px ring remains. The ring's
+   starting angle is animated via @property, so the colours flow smoothly
+   around the box without any element ever rotating. */
+.input-pill::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 2px;
+  pointer-events: none;
+  background: conic-gradient(
+    from var(--ring-angle, 0deg),
+    rgba(168, 191, 163, 0.95) 0%,
+    rgba(218, 230, 213, 1)    18%,
+    rgba(238, 247, 232, 1)    30%,
+    rgba(168, 191, 163, 1)    48%,
+    rgba(111, 143, 107, 1)    62%,
+    rgba(168, 191, 163, 1)    78%,
+    rgba(218, 230, 213, 1)    90%,
+    rgba(168, 191, 163, 0.95) 100%
+  );
+  animation: input-ring-flow 9s linear infinite;
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+}
+
+/* When focused, lock the breathing shadow at its brighter peak and
+   slightly intensify the ring colours so the box feels "energised". */
+.input-pill:focus-within {
+  animation: none;
+  box-shadow:
+    0 0 0 1px rgba(168,191,163,0.24),
+    0 0 22px -6px rgba(168,191,163,0.40),
+    0 4px 14px -8px rgba(26,28,26,0.06);
+}
+.input-pill:focus-within::before {
+  filter: saturate(1.15) brightness(1.04);
+}
+
+/* The pill itself shows the focused state (brighter glow + saturated ring),
+   so suppress the global :focus-visible outline on the inner textarea —
+   otherwise it draws a rectangular ring inside the rounded pill. */
+.input-pill textarea:focus,
+.input-pill textarea:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .ambient-bg::before,
   .ambient-bg::after,
@@ -312,5 +494,12 @@ html, body {
   .pulse-ring,
   .breathe,
   .stagger > *,
+  .animate-mark-breathe,
+  .animate-mark-halo,
+  .animate-mark-halo-fast,
+  .animate-mark-spin,
+  .animate-mark-spin-fast,
+  .input-pill,
+  .input-pill::before,
   .fade-up { animation: none !important; }
 }
