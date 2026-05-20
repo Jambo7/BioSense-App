@@ -9,6 +9,7 @@ import {
   Heart,
   Target,
   Plus,
+  type LucideIcon,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { IconBadge } from '@/components/ui/icon-badge'
@@ -21,7 +22,7 @@ interface Message {
 
 interface Suggested {
   text: string
-  icon: React.ElementType
+  icon: LucideIcon
   tone: 'sage' | 'amber' | 'rose' | 'ink'
   /** Solid, on-brand wash. Diagonal gradient from white to a clear hit of
    *  the tone colour so each card has visible personality without going
