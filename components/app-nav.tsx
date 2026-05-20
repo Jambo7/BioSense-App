@@ -92,22 +92,26 @@ export function AppNav() {
 
         {/* Right actions */}
         <div className="flex items-center gap-1.5 shrink-0">
-          {/* Connect wearables — primary brand-coloured CTA. Always visible
-              so the user can reach it from anywhere; lives outside the
-              primary nav since it's a setup action, not a destination.
-              Visual treatment lives in `.btn-sage` (globals.css). */}
+          {/* Wearables shortcut — refined sage-tinted pill. Visibly green so
+              it doesn't get lost, but softer than the heavy solid CTA so
+              it still feels secondary to the floating Ask button. */}
           <Link
             href="/wearables"
             className={cn(
-              'btn-sage',
-              'inline-flex items-center gap-1.5 h-9 px-3.5 sm:px-4 rounded-pill',
-              'font-semibold text-caption',
+              'inline-flex items-center gap-1.5 h-8 px-3 sm:px-3.5 rounded-pill',
+              'text-[12px] font-semibold text-white',
+              'bg-[linear-gradient(180deg,rgba(141,179,137,0.95)_0%,rgba(111,143,107,0.95)_100%)]',
+              'ring-1 ring-inset ring-[rgba(90,117,86,0.30)]',
+              'shadow-[inset_0_1px_0_rgba(255,255,255,0.22),0_1px_2px_rgba(40,56,38,0.10),0_4px_12px_-3px_rgba(111,143,107,0.42)]',
+              'transition-all',
+              'hover:bg-[linear-gradient(180deg,rgba(151,188,147,1)_0%,rgba(119,151,115,1)_100%)]',
+              'hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.28),0_1px_2px_rgba(40,56,38,0.10),0_6px_16px_-3px_rgba(111,143,107,0.52)]',
+              'active:scale-[0.98]',
             )}
-            aria-label="Connect wearables"
+            aria-label="Wearables"
           >
             <Watch className="w-[14px] h-[14px]" strokeWidth={2.25} />
-            <span className="sm:hidden">Wearables</span>
-            <span className="hidden sm:inline">Connect wearables</span>
+            <span>Wearables</span>
           </Link>
 
           <button

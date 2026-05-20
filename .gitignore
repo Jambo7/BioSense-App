@@ -33,6 +33,7 @@ yarn-error.log*
 # env files — local secrets, never commit
 .env
 .env.local
+.env.production
 .env.*.local
 
 # vercel
@@ -43,3 +44,4 @@ yarn-error.log*
 next-env.d.ts
 
 /app/generated/prisma
+.env*.local

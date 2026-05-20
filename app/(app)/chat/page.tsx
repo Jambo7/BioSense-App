@@ -156,6 +156,11 @@ export default function ChatPage() {
         {/* Sage-dominant tint — multiplies more green into the image and
             deepens the overall tone so the photo stops reading "white". */}
         <div className="absolute inset-0 mix-blend-multiply bg-[linear-gradient(180deg,rgba(168,191,163,0.30)_0%,rgba(111,143,107,0.28)_55%,rgba(90,117,86,0.22)_100%)]" />
+        {/* Soft white fade at top + bottom so the glass nav and tab bar
+            land on a near-white surface (no harsh seam where the photo
+            meets the bar). Matches the deployment look. */}
+        <div className="absolute inset-x-0 top-0 h-[60px] bg-[linear-gradient(180deg,rgba(255,255,255,0.55)_0%,rgba(255,255,255,0)_100%)]" />
+        <div className="absolute inset-x-0 bottom-0 h-[180px] bg-[linear-gradient(0deg,rgba(255,255,255,0.85)_0%,rgba(255,255,255,0.55)_45%,rgba(255,255,255,0)_100%)]" />
       </div>
     )}
 
