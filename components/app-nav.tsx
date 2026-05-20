@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { signOut } from 'next-auth/react'
+import Image from 'next/image'
 import { cn } from '@/lib/utils'
 import { BrandWordmark } from '@/components/brand-mark'
 import {
@@ -28,10 +29,19 @@ import {
  * Wearables intentionally lives OUTSIDE the primary nav now — it's reached
  * via the prominent coloured "Connect wearables" button in the top bar.
  */
-const navItems: { href: string; label: string; icon: typeof Sun; matchPaths?: string[] }[] = [
+type NavItem = {
+  href: string
+  label: string
+  icon: typeof Sun
+  matchPaths?: string[]
+  /** Marks this item as the central floating CTA in the mobile tab bar. */
+  center?: boolean
+}
+
+const navItems: NavItem[] = [
   { href: '/dashboard', label: 'Today',    icon: Sun,            matchPaths: ['/dashboard', '/checkin'] },
   { href: '/blood',     label: 'Insights', icon: Lightbulb },
-  { href: '/chat',      label: 'Ask',      icon: MessageSquare },
+  { href: '/chat',      label: 'Ask',      icon: MessageSquare, center: true },
   { href: '/reports',   label: 'Trends',   icon: TrendingUp },
   { href: '/profile',   label: 'You',      icon: User },
 ]
@@ -118,14 +128,82 @@ export function AppNav() {
         </div>
       </header>
 
-      {/* ── Mobile bottom tab bar (glass) ── */}
+      {/* ── Mobile bottom tab bar (glass) ──
+          Layout: 2 flat items, the floating Ask CTA, 2 flat items.
+          The Ask button lifts out of the bar (negative top margin) and
+          carries the brand colour + S mark, mirroring the pattern from
+          Stealth's "Ask Claw". `overflow-visible` on the nav lets the
+          button extend above the bar's top edge. */}
       <nav
-        className="lg:hidden glass-tabbar fixed bottom-0 left-0 right-0 z-40 pb-[env(safe-area-inset-bottom)]"
+        className="lg:hidden glass-tabbar fixed bottom-0 left-0 right-0 z-40 pb-[env(safe-area-inset-bottom)] overflow-visible"
       >
         <div className="flex items-stretch justify-around max-w-3xl mx-auto px-1 pt-1.5">
           {navItems.map((item) => {
             const active = isActive(pathname, item)
             const Icon = item.icon
+
+            // ── Central floating CTA (Ask) ─────────────────────────────
+            // Solid sage-gradient disc with the brand S in white.
+            // White "notch" ring punches it cleanly out of the glass tab
+            // bar (Stealth pattern). Soft sage halo behind the button
+            // breathes — faster when on /chat so the button signals the
+            // active destination.
+            if (item.center) {
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  aria-label={item.label}
+                  className="flex-1 flex flex-col items-center justify-end gap-1 py-2 relative"
+                >
+                  <div className="relative -mt-7">
+                    {/* Soft sage halo behind the button */}
+                    <span
+                      aria-hidden
+                      className={cn(
+                        'absolute -inset-3 rounded-full pointer-events-none',
+                        'bg-[radial-gradient(circle,rgba(168,191,163,0.55)_0%,rgba(168,191,163,0.20)_45%,transparent_75%)]',
+                        'blur-md',
+                        active ? 'animate-mark-halo-fast' : 'animate-mark-halo',
+                      )}
+                    />
+                    {/* The button itself */}
+                    <div
+                      className={cn(
+                        'relative w-[60px] h-[60px] rounded-full flex items-center justify-center',
+                        'bg-[linear-gradient(180deg,#8DB389_0%,#6F8F6B_55%,#5A7556_100%)]',
+                        'ring-[5px] ring-white',
+                        'transition-transform active:scale-[0.96]',
+                        active && 'scale-[1.03]',
+                      )}
+                      style={{
+                        boxShadow:
+                          'inset 0 1px 0 rgba(255,255,255,0.30), 0 2px 4px rgba(40,56,38,0.18), 0 10px 24px -4px rgba(111,143,107,0.55)',
+                      }}
+                    >
+                      <Image
+                        src="/biosense-mark-white.png"
+                        alt=""
+                        width={32}
+                        height={32}
+                        priority
+                        className="relative block select-none [filter:drop-shadow(0_1px_1px_rgba(0,0,0,0.18))]"
+                      />
+                    </div>
+                  </div>
+                  <span
+                    className={cn(
+                      'text-[10px] leading-none mt-1',
+                      active ? 'text-sage-deep font-semibold' : 'text-ink-2 font-medium',
+                    )}
+                  >
+                    {item.label}
+                  </span>
+                </Link>
+              )
+            }
+
+            // ── Regular flat tab item ──────────────────────────────────
             return (
               <Link
                 key={item.href}

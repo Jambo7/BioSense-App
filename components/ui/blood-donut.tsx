@@ -41,11 +41,15 @@ export function BloodDonut({
   const cx = size / 2
   const cy = size / 2
 
-  // Tiny visual gap (in radians of the circle) between adjacent segments
-  // so colours don't bleed into each other when there are 2+ tiers.
-  const gap = total > 1 && [t1, t2, t3].filter((n) => n > 0).length > 1 ? 0.012 : 0
+  // With round linecaps, each rendered arc end extends visually by half the
+  // stroke thickness past its dash endpoint. We a) shorten each dash by
+  // exactly that amount on both sides so the proportions stay accurate,
+  // and b) leave a small gap between segments so the rounded ends have
+  // breathing room (rather than touching/overlapping into a hard seam).
+  const tierCount = [t1, t2, t3].filter((n) => n > 0).length
+  const gap = total > 0 && tierCount > 1 ? thickness * 0.45 : 0 // px along the arc
+  const capInset = thickness / 2                                 // px per end
 
-  // Build segments with cumulative offsets.
   let offset = 0
   const segments = (
     [
@@ -55,10 +59,10 @@ export function BloodDonut({
     ]
       .filter(([, count]) => count > 0)
       .map(([key, count]) => {
-        const pct = count / total
-        const length = Math.max((pct - gap) * c, 0.0001)
-        const start = offset
-        offset += pct * c
+        const arc = (count / total) * c
+        const start = offset + capInset + gap / 2
+        const length = Math.max(arc - thickness - gap, 0.0001)
+        offset += arc
         return {
           key,
           color: TIER_COLOR[key as keyof typeof TIER_COLOR],
@@ -73,7 +77,23 @@ export function BloodDonut({
 
   return (
     <div className="relative" style={{ width: size, height: size }}>
-      <svg width={size} height={size} className="block -rotate-90">
+      <svg width={size} height={size} className="block -rotate-90 overflow-visible">
+        <defs>
+          {/* Soft drop shadow so the ring has a touch of depth on the
+              glass card — sage-tinted, very low intensity. */}
+          <filter id="donut-shadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur in="SourceAlpha" stdDeviation="1.6" />
+            <feOffset dy="1" result="off" />
+            <feComponentTransfer in="off" result="dim">
+              <feFuncA type="linear" slope="0.28" />
+            </feComponentTransfer>
+            <feMerge>
+              <feMergeNode in="dim" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
+
         {/* Faint background ring */}
         <circle
           cx={cx}
@@ -98,22 +118,25 @@ export function BloodDonut({
           />
         )}
 
-        {/* Live segments */}
-        {!empty &&
-          segments.map((s) => (
-            <circle
-              key={s.key}
-              cx={cx}
-              cy={cy}
-              r={r}
-              fill="none"
-              stroke={s.color}
-              strokeWidth={thickness}
-              strokeLinecap="butt"
-              strokeDasharray={`${s.length} ${c}`}
-              strokeDashoffset={-s.start}
-            />
-          ))}
+        {/* Live segments — rounded caps for a smooth, modern feel */}
+        {!empty && (
+          <g filter="url(#donut-shadow)">
+            {segments.map((s) => (
+              <circle
+                key={s.key}
+                cx={cx}
+                cy={cy}
+                r={r}
+                fill="none"
+                stroke={s.color}
+                strokeWidth={thickness}
+                strokeLinecap="round"
+                strokeDasharray={`${s.length} ${c}`}
+                strokeDashoffset={-s.start}
+              />
+            ))}
+          </g>
+        )}
       </svg>
 
       {/* Centre label — total markers + headline % in range */}
