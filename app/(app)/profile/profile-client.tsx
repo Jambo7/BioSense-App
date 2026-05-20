@@ -2,15 +2,28 @@
 
 import { useState } from 'react'
 import { toast } from 'sonner'
+import {
+  User,
+  Target,
+  HeartPulse,
+  ShieldCheck,
+  Download,
+  Trash2,
+  Pencil,
+  Check,
+  X,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { Input, Textarea } from '@/components/ui/input'
 import { Card, CardLabel } from '@/components/ui/card'
+import { IconBadge } from '@/components/ui/icon-badge'
+import { Pill } from '@/components/ui/pill'
 
 const GOAL_OPTIONS = [
   { value: 'PERFORMANCE', label: 'Performance' },
-  { value: 'HEALTH', label: 'Longevity & Health' },
-  { value: 'BODY_COMP', label: 'Body Composition' },
-  { value: 'WELLBEING', label: 'Wellbeing' },
+  { value: 'HEALTH',      label: 'Longevity & Health' },
+  { value: 'BODY_COMP',   label: 'Body Composition' },
+  { value: 'WELLBEING',   label: 'Wellbeing' },
 ]
 
 interface ProfileData {
@@ -55,14 +68,8 @@ export function ProfileClient({ user }: { user: ProfileData }) {
           goalType: form.goalType,
           goalText: form.goalText,
           goalDeadline: form.goalDeadline || null,
-          allergies: form.allergies
-            .split(',')
-            .map((s) => s.trim())
-            .filter(Boolean),
-          conditions: form.conditions
-            .split(',')
-            .map((s) => s.trim())
-            .filter(Boolean),
+          allergies: form.allergies.split(',').map((s) => s.trim()).filter(Boolean),
+          conditions: form.conditions.split(',').map((s) => s.trim()).filter(Boolean),
           lifestyle: form.lifestyle,
         }),
       })
@@ -96,36 +103,48 @@ export function ProfileClient({ user }: { user: ProfileData }) {
     else toast.error('Failed to delete account')
   }
 
-  return (
-    <div className="max-w-xl mx-auto pt-4 space-y-5">
-      <div>
-        <div className="text-[10.5px] font-bold tracking-[0.1em] uppercase text-t3 mb-2">
-          Account
-        </div>
-        <h1 className="font-serif text-[24px] font-bold text-t1 mb-1 tracking-[-0.02em]">
-          Profile
-        </h1>
-        <p className="text-[13px] text-t2">
-          Member since {new Date(user.createdAt).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })} ·{' '}
-          <span
-            className="px-2 py-0.5 rounded-full text-[10.5px] font-semibold"
-            style={{
-              background: user.subscriptionStatus === 'ACTIVE' ? 'rgba(110,155,94,0.1)' : '#F0ECE5',
-              color: user.subscriptionStatus === 'ACTIVE' ? '#6E9B5E' : '#4f6b57',
-              border: user.subscriptionStatus === 'ACTIVE' ? '1px solid rgba(110,155,94,0.2)' : '1px solid rgba(26,26,22,0.07)',
-            }}
-          >
-            {user.subscriptionStatus}
-          </span>
-        </p>
-      </div>
+  const initials = (user.name ?? user.email)
+    .split(' ')
+    .map((s) => s[0])
+    .filter(Boolean)
+    .slice(0, 2)
+    .join('')
+    .toUpperCase()
 
-      {/* Profile fields */}
+  const isActive = user.subscriptionStatus === 'ACTIVE'
+
+  return (
+    <div className="max-w-2xl mx-auto fade-up space-y-5">
+      {/* Hero header */}
+      <Card padding="lg" className="flex flex-col sm:flex-row sm:items-center gap-5">
+        <div className="w-20 h-20 rounded-full bg-sage-tint border-2 border-accent-ring flex items-center justify-center text-h1 font-bold text-sage-deep shrink-0 mx-auto sm:mx-0">
+          {initials}
+        </div>
+        <div className="flex-1 text-center sm:text-left">
+          <h1 className="font-sans text-h2 text-ink tracking-tight">{user.name ?? 'Your account'}</h1>
+          <div className="text-body-sm text-ink-2 mt-0.5">{user.email}</div>
+          <div className="flex flex-wrap gap-2 justify-center sm:justify-start mt-3">
+            <Pill tone={isActive ? 'soft-sage' : 'ink'} size="md">
+              {isActive ? 'Active' : user.subscriptionStatus}
+            </Pill>
+            <Pill tone="ink" size="md">
+              Member since{' '}
+              {new Date(user.createdAt).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}
+            </Pill>
+          </div>
+        </div>
+      </Card>
+
+      {/* Personal details */}
       <Card>
         <div className="flex items-center justify-between mb-4">
-          <CardLabel className="mb-0">Personal details</CardLabel>
+          <div className="flex items-center gap-2">
+            <IconBadge icon={User} tone="sage" size="sm" />
+            <CardLabel className="mb-0">Personal details</CardLabel>
+          </div>
           {!editing && (
             <Button variant="subtle" size="sm" onClick={() => setEditing(true)}>
+              <Pencil className="w-3 h-3" />
               Edit
             </Button>
           )}
@@ -139,10 +158,10 @@ export function ProfileClient({ user }: { user: ProfileData }) {
             disabled={!editing}
           />
           <Input
-            label="Email address"
+            label="Email"
             value={user.email}
             disabled
-            className="opacity-60"
+            hint="Contact support to change your email."
           />
           <Input
             label="Age"
@@ -155,38 +174,35 @@ export function ProfileClient({ user }: { user: ProfileData }) {
         </div>
       </Card>
 
+      {/* Goal */}
       <Card>
-        <CardLabel>Goal</CardLabel>
+        <div className="flex items-center gap-2 mb-4">
+          <IconBadge icon={Target} tone="amber" size="sm" />
+          <CardLabel className="mb-0">Your goal</CardLabel>
+        </div>
         <div className="space-y-4">
           <div>
-            <label className="block text-[10.5px] font-bold tracking-[0.08em] uppercase text-t3 mb-1.5">
-              Goal type
-            </label>
+            <label className="block text-eyebrow uppercase text-ink-3 mb-2">Goal type</label>
             <select
               value={form.goalType}
               onChange={(e) => setForm({ ...form, goalType: e.target.value })}
               disabled={!editing}
-              className="w-full px-3.5 py-2.5 bg-s1 border border-[var(--b1)] rounded-lg text-t1 text-sm outline-none focus:border-[var(--a-ring)] transition-colors disabled:opacity-60"
+              className="w-full px-4 h-11 bg-white border border-line rounded-[10px] text-ink text-[14px] outline-none focus:border-[var(--a-ring)] focus:ring-2 focus:ring-[rgba(111,143,107,0.10)] disabled:opacity-60"
             >
               {GOAL_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value} className="bg-s1">
+                <option key={o.value} value={o.value}>
                   {o.label}
                 </option>
               ))}
             </select>
           </div>
-          <div>
-            <label className="block text-[10.5px] font-bold tracking-[0.08em] uppercase text-t3 mb-1.5">
-              Goal description
-            </label>
-            <textarea
-              rows={2}
-              value={form.goalText}
-              onChange={(e) => setForm({ ...form, goalText: e.target.value })}
-              disabled={!editing}
-              className="w-full px-3.5 py-2.5 bg-s1 border border-[var(--b1)] rounded-lg text-t1 text-sm placeholder:text-t4 outline-none focus:border-[var(--a-ring)] resize-none transition-colors disabled:opacity-60"
-            />
-          </div>
+          <Textarea
+            label="Goal description"
+            rows={2}
+            value={form.goalText}
+            onChange={(e) => setForm({ ...form, goalText: e.target.value })}
+            disabled={!editing}
+          />
           <Input
             label="Target date"
             type="date"
@@ -197,8 +213,12 @@ export function ProfileClient({ user }: { user: ProfileData }) {
         </div>
       </Card>
 
+      {/* Health context */}
       <Card>
-        <CardLabel>Health context</CardLabel>
+        <div className="flex items-center gap-2 mb-4">
+          <IconBadge icon={HeartPulse} tone="rose" size="sm" />
+          <CardLabel className="mb-0">Health context</CardLabel>
+        </div>
         <div className="space-y-4">
           <Input
             label="Dietary restrictions / allergies"
@@ -224,47 +244,37 @@ export function ProfileClient({ user }: { user: ProfileData }) {
       </Card>
 
       {editing && (
-        <div className="flex gap-3">
-          <Button
-            variant="ghost"
-            size="md"
-            onClick={() => setEditing(false)}
-            className="flex-1"
-          >
-            Cancel
+        <div className="flex gap-3 sticky bottom-24 lg:bottom-4 z-10 bg-sand/90 backdrop-blur-sm rounded-pill p-2">
+          <Button variant="ghost" size="md" onClick={() => setEditing(false)} fullWidth>
+            <X className="w-4 h-4" /> Cancel
           </Button>
-          <Button
-            variant="primary"
-            size="md"
-            loading={saving}
-            onClick={handleSave}
-            className="flex-1"
-          >
-            Save changes
+          <Button variant="primary" size="md" loading={saving} onClick={handleSave} fullWidth>
+            <Check className="w-4 h-4" /> Save changes
           </Button>
         </div>
       )}
 
-      {/* PDPL / Data rights */}
-      <Card>
-        <CardLabel>Data & privacy (UAE PDPL)</CardLabel>
-        <div className="space-y-2 text-[12.5px] text-t2 mb-4 leading-relaxed">
-          <p>
-            Under the UAE Federal Decree-Law No. 45 of 2021 (PDPL), you have the right to access,
-            export, correct, and delete your personal data at any time.
-          </p>
+      {/* Data & privacy */}
+      <Card variant="soft">
+        <div className="flex items-center gap-2 mb-3">
+          <IconBadge icon={ShieldCheck} tone="sage" size="sm" />
+          <CardLabel className="mb-0">Data & privacy (UAE PDPL)</CardLabel>
         </div>
+        <p className="text-body-sm text-ink-2 mb-4 leading-relaxed">
+          Under UAE Federal Decree-Law No. 45 of 2021 (PDPL), you have the right to access,
+          export, correct and delete your personal data at any time.
+        </p>
         <div className="flex flex-wrap gap-2">
           <Button variant="subtle" size="sm" onClick={handleExport}>
-            Export my data
+            <Download className="w-3.5 h-3.5" /> Export my data
           </Button>
           <Button
             variant="subtle"
             size="sm"
-            className="text-urg border-urg/20 hover:bg-urg/5"
+            className="text-rose hover:bg-rose-tint hover:border-rose"
             onClick={handleDeleteAccount}
           >
-            Delete account
+            <Trash2 className="w-3.5 h-3.5" /> Delete account
           </Button>
         </div>
       </Card>

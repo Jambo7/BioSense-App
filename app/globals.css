@@ -1,66 +1,505 @@
 @import "tailwindcss";
 
 :root {
-  --b0: rgba(26, 26, 22, 0.07);
-  --b1: rgba(26, 26, 22, 0.11);
-  --b2: rgba(26, 26, 22, 0.16);
-  --a-bg:   rgba(110, 155, 94, 0.08);
-  --a-ring: rgba(110, 155, 94, 0.30);
-  --brand-gradient: linear-gradient(135deg, #8AB87A 0%, #5A7040 100%);
-  --brand-gradient-h: linear-gradient(90deg, #8AB87A 0%, #5A7040 100%);
-  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --sage:        #6F8F6B;
+  --sage-soft:   #A8BFA3;
+  --sage-deep:   #5A7556;
+  --sage-mist:   #C8D6C5;
+  --sand:        #F5F1EA;
+  --sand-deep:   #E8E2D6;
+  --off-white:   #FAFAF8;
+  --white:       #FFFFFF;
+  --ink:         #1A1C1A;
+  --ink-2:       #5A5C5A;
+  --ink-3:       #8A8C8A;
+  --ink-4:       #C0C2C0;
+  --line:        rgba(26, 28, 26, 0.06);
+  --line-2:      rgba(26, 28, 26, 0.10);
+  --sage-tint:   rgba(111, 143, 107, 0.10);
+  --sage-wash:   rgba(111, 143, 107, 0.05);
+  --sage-glow:   rgba(168, 191, 163, 0.35);
+  --rose:        #C97A7A;
+  --rose-soft:   #E9C9C9;
+  --rose-tint:   rgba(201, 122, 122, 0.10);
+  --amber:       #D9A05B;
+  --amber-tint:  rgba(217, 160, 91, 0.10);
+
+  --ease:        cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-soft:   cubic-bezier(0.4, 0, 0.2, 1);
+
+  --b0: var(--line);
+  --b1: var(--line);
+  --b2: var(--line-2);
+  --a-bg:   var(--sage-tint);
+  --a-ring: rgba(111, 143, 107, 0.30);
+
+  --grad-sage:        linear-gradient(180deg, #82A77E 0%, #5A7556 100%);
+  --grad-sage-soft:   linear-gradient(180deg, #B8CFB3 0%, #82A77E 100%);
+  --grad-sage-h:      linear-gradient(135deg, #A8BFA3 0%, #5A7556 100%);
+  --grad-rose:        linear-gradient(180deg, #D49595 0%, #B86B6B 100%);
+  --grad-amber:       linear-gradient(180deg, #E5B477 0%, #C88A45 100%);
+
+  --shadow-float:
+    0 1px 2px rgba(26, 28, 26, 0.04),
+    0 8px 24px -6px rgba(111, 143, 107, 0.16),
+    0 24px 48px -16px rgba(26, 28, 26, 0.06);
+  --shadow-float-hover:
+    0 1px 2px rgba(26, 28, 26, 0.04),
+    0 12px 32px -6px rgba(111, 143, 107, 0.22),
+    0 32px 64px -16px rgba(26, 28, 26, 0.08);
+  --shadow-button:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    0 1px 2px rgba(90, 117, 86, 0.30),
+    0 4px 14px -2px rgba(111, 143, 107, 0.35);
+  --shadow-button-hover:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    0 1px 2px rgba(90, 117, 86, 0.35),
+    0 6px 20px -2px rgba(111, 143, 107, 0.45);
+  --shadow-glass:
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    0 1px 0 rgba(26, 28, 26, 0.03),
+    0 12px 28px -8px rgba(111, 143, 107, 0.18);
 }
 
-html,
-body {
-  background: #F5F1EC;
-  color: #1A1A16;
-  font-family: var(--font-inter), system-ui, sans-serif;
-  -webkit-font-smoothing: antialiased;
+* { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
+html, body {
+  background: #FFFFFF;
+  color: var(--ink);
+  font-family: var(--font-dm-sans), system-ui, sans-serif;
+  font-feature-settings: 'cv11' on, 'ss03' on;
   overflow-x: hidden;
 }
 
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-thumb {
-  background: #C8C4BC;
-  border-radius: 2px;
-}
+::selection { background: var(--sage-tint); color: var(--ink); }
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--ink-4); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: var(--ink-3); }
 
 *:focus-visible {
-  outline: 2px solid rgba(110, 155, 94, 0.55);
+  outline: 2px solid var(--a-ring);
   outline-offset: 2px;
+  border-radius: 4px;
 }
 
+/* ─── Border helpers ────────────────────────────────────────────────────── */
 .border-b0 { border-color: var(--b0); }
 .border-b1 { border-color: var(--b1); }
 .border-b2 { border-color: var(--b2); }
+.border-line   { border-color: var(--line); }
+.border-line-2 { border-color: var(--line-2); }
 .border-accent-ring { border-color: var(--a-ring); }
-.bg-accent-subtle   { background-color: var(--a-bg); }
+.bg-accent-subtle   { background-color: var(--sage-tint); }
+.bg-sage-wash       { background-color: var(--sage-wash); }
 
+/* ─── Brand text accent ─────────────────────────────────────────────────── */
 .text-brand-gradient {
-  background: var(--brand-gradient);
+  background: var(--grad-sage-h);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  color: transparent;
 }
 
-.border-brand-gradient {
-  border-image: var(--brand-gradient-h) 1;
+.italic-accent {
+  font-family: var(--font-dm-serif), Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  color: var(--sage-deep);
+  letter-spacing: -0.015em;
 }
 
-.card {
-  background: #FFFFFF;
-  border: 1px solid var(--b0);
-  border-radius: 11px;
-  padding: 20px 22px;
+/* ─── Glass surface system ──────────────────────────────────────────────── */
+.glass {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(18px) saturate(1.2);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  box-shadow: var(--shadow-glass);
 }
 
-.dot-grid::after {
+.glass-strong {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(24px) saturate(1.3);
+  -webkit-backdrop-filter: blur(24px) saturate(1.3);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    0 8px 32px -8px rgba(111, 143, 107, 0.18);
+}
+
+.glass-sage {
+  background: linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(168,191,163,0.16) 100%);
+  backdrop-filter: blur(20px) saturate(1.3);
+  -webkit-backdrop-filter: blur(20px) saturate(1.3);
+  border: 1px solid rgba(168, 191, 163, 0.30);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    0 12px 28px -8px rgba(111, 143, 107, 0.25);
+}
+
+.glass-nav {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(22px) saturate(1.3);
+  -webkit-backdrop-filter: blur(22px) saturate(1.3);
+  border-bottom: 1px solid rgba(26, 28, 26, 0.05);
+}
+
+.glass-tabbar {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(28px) saturate(1.4);
+  -webkit-backdrop-filter: blur(28px) saturate(1.4);
+  border-top: 1px solid rgba(26, 28, 26, 0.05);
+  box-shadow: 0 -8px 32px -12px rgba(111, 143, 107, 0.18);
+}
+
+/* ─── Floating shadow utilities ─────────────────────────────────────────── */
+.shadow-float       { box-shadow: var(--shadow-float); }
+.shadow-float-hover { box-shadow: var(--shadow-float-hover); }
+.shadow-button      { box-shadow: var(--shadow-button); }
+.shadow-glass       { box-shadow: var(--shadow-glass); }
+
+/* ─── Gradient backgrounds ──────────────────────────────────────────────── */
+.bg-grad-sage      { background: var(--grad-sage); }
+.bg-grad-sage-soft { background: var(--grad-sage-soft); }
+.bg-grad-sage-h    { background: var(--grad-sage-h); }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   .btn-sage — primary brand CTA pill.
+
+   Refined, smooth take on a sage gradient button. Aligned with the rest of
+   the app's glassy, low-contrast aesthetic — a hint of dimension from a
+   single inset highlight + a soft sage halo, without the heavy
+   skeuomorphic top/bottom edges or text shadow.
+
+   Used by the top-right "Connect wearables" button. Layout (height,
+   padding, gap, border-radius) is left to Tailwind utilities so the button
+   stays responsive.
+   ──────────────────────────────────────────────────────────────────────── */
+.btn-sage {
+  background: linear-gradient(180deg, #8DB389 0%, #6F8F6B 60%, #5A7556 100%);
+  box-shadow:
+    /* gentle top sheen, just enough to feel lit from above */
+    inset 0 1px 0 rgba(255, 255, 255, 0.26),
+    /* soft hairline ring for definition against any background */
+    0 0 0 1px rgba(90, 117, 86, 0.18),
+    /* tight contact shadow */
+    0 1px 2px rgba(40, 56, 38, 0.10),
+    /* soft sage halo so it sits warmly above the surface */
+    0 4px 12px -3px rgba(111, 143, 107, 0.35);
+  color: #ffffff;
+  transition:
+    box-shadow 220ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform  140ms cubic-bezier(0.16, 1, 0.3, 1),
+    background 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.btn-sage:hover {
+  background: linear-gradient(180deg, #97BC93 0%, #779773 60%, #5F7B5B 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.32),
+    0 0 0 1px rgba(90, 117, 86, 0.22),
+    0 1px 2px rgba(40, 56, 38, 0.10),
+    0 6px 16px -3px rgba(111, 143, 107, 0.45);
+}
+.btn-sage:active {
+  transform: scale(0.985);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.20),
+    0 0 0 1px rgba(90, 117, 86, 0.22),
+    0 1px 2px rgba(40, 56, 38, 0.12),
+    0 2px 6px -2px rgba(111, 143, 107, 0.30);
+  transition-duration: 80ms;
+}
+.bg-grad-rose      { background: var(--grad-rose); }
+.bg-grad-amber     { background: var(--grad-amber); }
+
+/* ─── Ambient backdrop ──────────────────────────────────────────────────── */
+/* Floating sage orbs that very slowly drift across the canvas behind everything.
+   Three layers, different sizes / opacities / animation speeds. */
+.ambient-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.ambient-bg::before,
+.ambient-bg::after,
+.ambient-bg > .orb {
   content: "";
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  will-change: transform;
+}
+.ambient-bg::before {
+  /* Top-left soft sage bloom */
+  width: 56vmax;
+  height: 56vmax;
+  top: -16vmax;
+  left: -14vmax;
+  background: radial-gradient(circle, rgba(168, 191, 163, 0.55) 0%, transparent 65%);
+  animation: drift1 32s ease-in-out infinite alternate;
+}
+.ambient-bg::after {
+  /* Bottom-right deeper sage */
+  width: 52vmax;
+  height: 52vmax;
+  bottom: -18vmax;
+  right: -16vmax;
+  background: radial-gradient(circle, rgba(111, 143, 107, 0.40) 0%, transparent 65%);
+  animation: drift2 38s ease-in-out infinite alternate;
+}
+.ambient-bg > .orb {
+  /* Top-right subtle warm amber */
+  width: 38vmax;
+  height: 38vmax;
+  top: -12vmax;
+  right: -12vmax;
+  background: radial-gradient(circle, rgba(217, 160, 91, 0.16) 0%, transparent 70%);
+  animation: drift3 44s ease-in-out infinite alternate;
+}
+@keyframes drift1 {
+  0%   { transform: translate3d(0,    0,    0) scale(1);    }
+  100% { transform: translate3d(6vw,  4vh,  0) scale(1.08); }
+}
+@keyframes drift2 {
+  0%   { transform: translate3d(0,    0,    0) scale(1);    }
+  100% { transform: translate3d(-5vw, -3vh, 0) scale(1.05); }
+}
+@keyframes drift3 {
+  0%   { transform: translate3d(0,    0,    0) scale(1);    }
+  100% { transform: translate3d(-4vw, 5vh,  0) scale(1.10); }
+}
+
+/* ─── Animations ────────────────────────────────────────────────────────── */
+@keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.fade-up { animation: fadeUp 320ms var(--ease) forwards; }
+
+@keyframes pulseDot {
+  0%, 100% { transform: scale(1);   opacity: 1; }
+  50%      { transform: scale(1.3); opacity: 0.6; }
+}
+.pulse-dot { animation: pulseDot 1.8s ease-in-out infinite; }
+
+@keyframes pulseRing {
+  0%   { transform: scale(0.85); opacity: 0.6; }
+  100% { transform: scale(1.6);  opacity: 0; }
+}
+.pulse-ring { animation: pulseRing 1.8s cubic-bezier(0,0,0.2,1) infinite; }
+
+@keyframes breathe {
+  0%, 100% { transform: scale(1);   opacity: 0.85; }
+  50%      { transform: scale(1.06); opacity: 1; }
+}
+.breathe { animation: breathe 4s ease-in-out infinite; }
+
+@keyframes shimmer {
+  0%   { transform: translateX(-120%); }
+  100% { transform: translateX(220%);  }
+}
+.shimmer-overlay {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  opacity: 0.08;
-  background-image: radial-gradient(circle, rgba(26,26,22,0.25) 1px, transparent 1px);
-  background-size: 32px 32px;
+  overflow: hidden;
+  border-radius: inherit;
+}
+.shimmer-overlay::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.35) 50%,
+    transparent 100%
+  );
+  transform: translateX(-120%);
+  transition: transform 0s;
+}
+.group:hover .shimmer-overlay::after {
+  animation: shimmer 1.4s ease-out;
+}
+
+.tap {
+  transition: transform 220ms var(--ease), box-shadow 220ms var(--ease);
+}
+.tap:hover  { transform: translateY(-1px); box-shadow: var(--shadow-float-hover); }
+.tap:active { transform: scale(0.99) translateY(0); }
+
+/* Stagger helper — children animate in sequence */
+.stagger > * { opacity: 0; animation: fadeUp 420ms var(--ease) forwards; }
+.stagger > *:nth-child(1) { animation-delay:   0ms; }
+.stagger > *:nth-child(2) { animation-delay:  60ms; }
+.stagger > *:nth-child(3) { animation-delay: 120ms; }
+.stagger > *:nth-child(4) { animation-delay: 180ms; }
+.stagger > *:nth-child(5) { animation-delay: 240ms; }
+.stagger > *:nth-child(6) { animation-delay: 300ms; }
+.stagger > *:nth-child(7) { animation-delay: 360ms; }
+.stagger > *:nth-child(8) { animation-delay: 420ms; }
+
+.divider {
+  height: 1px;
+  background: var(--line);
+  border: none;
+  margin: 16px 0;
+}
+
+/* ─── Intelligence mark (animated brand "S") ─────────────────────────── */
+@keyframes mark-breathe {
+  0%, 100% { transform: scale(1);    }
+  50%      { transform: scale(1.045); }
+}
+.animate-mark-breathe { animation: mark-breathe 3.6s ease-in-out infinite; }
+
+@keyframes mark-halo {
+  0%, 100% { opacity: 0.40; transform: scale(0.94); }
+  50%      { opacity: 0.80; transform: scale(1.10); }
+}
+.animate-mark-halo { animation: mark-halo 3.6s ease-in-out infinite; }
+
+@keyframes mark-halo-fast {
+  0%, 100% { opacity: 0.55; transform: scale(0.96); }
+  50%      { opacity: 1;    transform: scale(1.18); }
+}
+.animate-mark-halo-fast { animation: mark-halo-fast 1.4s ease-in-out infinite; }
+
+@keyframes mark-spin {
+  from { transform: rotate(0deg);   }
+  to   { transform: rotate(360deg); }
+}
+/* Mark spin — deliberately slow; the mark's emphasis is the constant glow,
+   the rotation is just a hint of life on top. */
+.animate-mark-spin      { animation: mark-spin 16s linear infinite; }
+.animate-mark-spin-fast { animation: mark-spin 3s   linear infinite; }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Input pill — "hollow" perimeter design.
+
+   The visible feature is the COLOURED RING around the outside of the box.
+   The inside is pure white. There is virtually no outward bloom — the
+   colours live on the perimeter itself, not in a halo around it.
+
+   Two safe animations (neither rotates a DOM element, so nothing can ever
+   sweep outside the input bounds):
+
+   1. `input-ring-flow` — animates the conic-gradient's start angle via a
+      registered CSS @property. The DIV stays fixed; only the colour stops
+      slide around the perimeter. Zero geometric movement.
+   2. `input-pulse-shadow` — animates a small 1px ring + faint outer shadow
+      so the box gently breathes. Always tracks the box's exact rounded
+      outline (it's a box-shadow), so it can't leak.
+   ──────────────────────────────────────────────────────────────────────── */
+
+@property --ring-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes input-ring-flow {
+  from { --ring-angle: 0deg;   }
+  to   { --ring-angle: 360deg; }
+}
+
+@keyframes input-pulse-shadow {
+  0%, 100% {
+    box-shadow:
+      0 0 0 1px rgba(168,191,163,0.12),
+      0 0 10px -6px rgba(168,191,163,0.18),
+      0 4px 12px -8px rgba(26,28,26,0.05);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px rgba(168,191,163,0.20),
+      0 0 16px -6px rgba(168,191,163,0.30),
+      0 4px 12px -8px rgba(26,28,26,0.05);
+  }
+}
+
+/* Wrapper — pure white pill, gentle ring-tint shadow */
+.input-pill {
+  position: relative;
+  background: #fff;
+  border-radius: 22px;
+  animation: input-pulse-shadow 3.6s ease-in-out infinite;
+}
+
+/* Coloured perimeter ring — drawn as a conic gradient, then "punched"
+   hollow with mask-composite so only a 2px ring remains. The ring's
+   starting angle is animated via @property, so the colours flow smoothly
+   around the box without any element ever rotating. */
+.input-pill::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 2px;
+  pointer-events: none;
+  background: conic-gradient(
+    from var(--ring-angle, 0deg),
+    rgba(168, 191, 163, 0.95) 0%,
+    rgba(218, 230, 213, 1)    18%,
+    rgba(238, 247, 232, 1)    30%,
+    rgba(168, 191, 163, 1)    48%,
+    rgba(111, 143, 107, 1)    62%,
+    rgba(168, 191, 163, 1)    78%,
+    rgba(218, 230, 213, 1)    90%,
+    rgba(168, 191, 163, 0.95) 100%
+  );
+  animation: input-ring-flow 9s linear infinite;
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+}
+
+/* When focused, lock the breathing shadow at its brighter peak and
+   slightly intensify the ring colours so the box feels "energised". */
+.input-pill:focus-within {
+  animation: none;
+  box-shadow:
+    0 0 0 1px rgba(168,191,163,0.24),
+    0 0 22px -6px rgba(168,191,163,0.40),
+    0 4px 14px -8px rgba(26,28,26,0.06);
+}
+.input-pill:focus-within::before {
+  filter: saturate(1.15) brightness(1.04);
+}
+
+/* The pill itself shows the focused state (brighter glow + saturated ring),
+   so suppress the global :focus-visible outline on the inner textarea —
+   otherwise it draws a rectangular ring inside the rounded pill. */
+.input-pill textarea:focus,
+.input-pill textarea:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ambient-bg::before,
+  .ambient-bg::after,
+  .ambient-bg > .orb,
+  .pulse-dot,
+  .pulse-ring,
+  .breathe,
+  .stagger > *,
+  .animate-mark-breathe,
+  .animate-mark-halo,
+  .animate-mark-halo-fast,
+  .animate-mark-spin,
+  .animate-mark-spin-fast,
+  .input-pill,
+  .input-pill::before,
+  .fade-up { animation: none !important; }
 }
