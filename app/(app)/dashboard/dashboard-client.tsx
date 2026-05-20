@@ -266,9 +266,11 @@ export function DashboardClient({
 
           {/* Tight 3-col grid: number block · donut · trend/pillars stack. */}
           <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] gap-1.5 sm:gap-2 items-center">
-            {/* Left — number + label + delta pill */}
+            {/* Left — number + label + delta pill. The big score is set in
+                the DM Serif Display face for a slightly more editorial,
+                "smarter" feel (matches the client mockup). */}
             <div>
-              <div className="font-sans text-[40px] sm:text-[48px] font-bold text-ink leading-[0.95] tabular-nums tracking-tight">
+              <div className="font-serif text-[46px] sm:text-[54px] text-ink leading-[0.92] tabular-nums tracking-[-0.02em]">
                 {hasData ? Math.round(healthScore!) : '—'}
               </div>
               {sl && (
