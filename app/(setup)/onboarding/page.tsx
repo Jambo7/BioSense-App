@@ -16,6 +16,7 @@ import {
   Lock,
   Check,
   Sparkles,
+  type LucideIcon,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input, Textarea } from '@/components/ui/input'
@@ -26,7 +27,7 @@ type GoalType = 'PERFORMANCE' | 'HEALTH' | 'BODY_COMP' | 'WELLBEING'
 
 interface GoalOption {
   type: GoalType
-  Icon: React.ElementType
+  Icon: LucideIcon
   title: string
   desc: string
   tone: 'sage' | 'rose' | 'amber' | 'ink'

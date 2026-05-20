@@ -18,6 +18,7 @@ import {
   Sunrise,
   Sunset,
   Leaf,
+  type LucideIcon,
 } from 'lucide-react'
 import { scoreLabel } from '@/lib/score'
 import { Card, CardLabel } from '@/components/ui/card'
@@ -37,7 +38,7 @@ function timeContext(name: string) {
   return         { greet: `Evening, ${first}.`,             Icon: Moon,    iconTone: 'sage'  as const }
 }
 
-const PILLAR_META: Record<string, { label: string; icon: React.ElementType }> = {
+const PILLAR_META: Record<string, { label: string; icon: LucideIcon }> = {
   sleep:      { label: 'Sleep',      icon: Moon       },
   recovery:   { label: 'Recovery',   icon: Heart      },
   stress:     { label: 'Stress',     icon: Flame      },

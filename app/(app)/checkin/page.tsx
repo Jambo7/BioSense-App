@@ -13,6 +13,7 @@ import {
   CheckCircle2,
   Flame,
   ArrowRight,
+  type LucideIcon,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardLabel } from '@/components/ui/card'
@@ -25,7 +26,7 @@ type SliderKey = 'energy' | 'sleep' | 'mood' | 'stress'
 interface Metric {
   id: SliderKey
   label: string
-  Icon: React.ElementType
+  Icon: LucideIcon
   inverted?: boolean // stress: low is good
   lowLabel: string
   highLabel: string
