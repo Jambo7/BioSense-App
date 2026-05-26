@@ -486,6 +486,17 @@ html, body {
   box-shadow: none;
 }
 
+/* Horizontal-scrolling tab strips (Insights / AI sub-nav) hide their
+   scrollbar so the rail reads as a clean pill row. Scroll still works
+   via touch/wheel; we just remove the visual chrome. */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .ambient-bg::before,
   .ambient-bg::after,

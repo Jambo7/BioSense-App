@@ -1,42 +1,39 @@
 'use client'
 
 import { useState } from 'react'
+import { signOut } from 'next-auth/react'
 import { toast } from 'sonner'
 import {
   User,
-  Target,
-  HeartPulse,
   ShieldCheck,
   Download,
   Trash2,
   Pencil,
   Check,
   X,
+  LogOut,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Input, Textarea } from '@/components/ui/input'
+import { Input } from '@/components/ui/input'
 import { Card, CardLabel } from '@/components/ui/card'
 import { IconBadge } from '@/components/ui/icon-badge'
 import { Pill } from '@/components/ui/pill'
 
-const GOAL_OPTIONS = [
-  { value: 'PERFORMANCE', label: 'Performance' },
-  { value: 'HEALTH',      label: 'Longevity & Health' },
-  { value: 'BODY_COMP',   label: 'Body Composition' },
-  { value: 'WELLBEING',   label: 'Wellbeing' },
-]
-
+/**
+ * /profile is the user's ACCOUNT page only (per v6 brief).
+ *
+ *   Includes:  name, email, age, member-since pill, sign-out, data export,
+ *              data deletion (PDPL).
+ *
+ *   Does NOT include:  goals, health context, allergies, conditions,
+ *                      lifestyle. Those are personalisation FEATURES and
+ *                      now live in `AI → Preferences`.
+ */
 interface ProfileData {
   id: string
   name: string | null
   email: string
   age: number | null
-  goalType: string | null
-  goalText: string | null
-  goalDeadline: string | null
-  allergies: string[]
-  conditions: string[]
-  lifestyle: string | null
   subscriptionStatus: string
   createdAt: string
 }
@@ -48,12 +45,6 @@ export function ProfileClient({ user }: { user: ProfileData }) {
   const [form, setForm] = useState({
     name: user.name ?? '',
     age: user.age?.toString() ?? '',
-    goalType: user.goalType ?? 'HEALTH',
-    goalText: user.goalText ?? '',
-    goalDeadline: user.goalDeadline ?? '',
-    allergies: user.allergies.join(', '),
-    conditions: user.conditions.join(', '),
-    lifestyle: user.lifestyle ?? '',
   })
 
   async function handleSave() {
@@ -65,12 +56,6 @@ export function ProfileClient({ user }: { user: ProfileData }) {
         body: JSON.stringify({
           name: form.name,
           age: form.age ? parseInt(form.age) : null,
-          goalType: form.goalType,
-          goalText: form.goalText,
-          goalDeadline: form.goalDeadline || null,
-          allergies: form.allergies.split(',').map((s) => s.trim()).filter(Boolean),
-          conditions: form.conditions.split(',').map((s) => s.trim()).filter(Boolean),
-          lifestyle: form.lifestyle,
         }),
       })
       if (!res.ok) throw new Error()
@@ -172,75 +157,12 @@ export function ProfileClient({ user }: { user: ProfileData }) {
             placeholder="e.g. 34"
           />
         </div>
-      </Card>
 
-      {/* Goal */}
-      <Card>
-        <div className="flex items-center gap-2 mb-4">
-          <IconBadge icon={Target} tone="amber" size="sm" />
-          <CardLabel className="mb-0">Your goal</CardLabel>
-        </div>
-        <div className="space-y-4">
-          <div>
-            <label className="block text-eyebrow uppercase text-ink-3 mb-2">Goal type</label>
-            <select
-              value={form.goalType}
-              onChange={(e) => setForm({ ...form, goalType: e.target.value })}
-              disabled={!editing}
-              className="w-full px-4 h-11 bg-white border border-line rounded-[10px] text-ink text-[14px] outline-none focus:border-[var(--a-ring)] focus:ring-2 focus:ring-[rgba(111,143,107,0.10)] disabled:opacity-60"
-            >
-              {GOAL_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
-          </div>
-          <Textarea
-            label="Goal description"
-            rows={2}
-            value={form.goalText}
-            onChange={(e) => setForm({ ...form, goalText: e.target.value })}
-            disabled={!editing}
-          />
-          <Input
-            label="Target date"
-            type="date"
-            value={form.goalDeadline}
-            onChange={(e) => setForm({ ...form, goalDeadline: e.target.value })}
-            disabled={!editing}
-          />
-        </div>
-      </Card>
-
-      {/* Health context */}
-      <Card>
-        <div className="flex items-center gap-2 mb-4">
-          <IconBadge icon={HeartPulse} tone="rose" size="sm" />
-          <CardLabel className="mb-0">Health context</CardLabel>
-        </div>
-        <div className="space-y-4">
-          <Input
-            label="Dietary restrictions / allergies"
-            value={form.allergies}
-            onChange={(e) => setForm({ ...form, allergies: e.target.value })}
-            disabled={!editing}
-            placeholder="Comma-separated"
-          />
-          <Input
-            label="Conditions / family history"
-            value={form.conditions}
-            onChange={(e) => setForm({ ...form, conditions: e.target.value })}
-            disabled={!editing}
-            placeholder="Comma-separated"
-          />
-          <Input
-            label="Lifestyle notes"
-            value={form.lifestyle}
-            onChange={(e) => setForm({ ...form, lifestyle: e.target.value })}
-            disabled={!editing}
-          />
-        </div>
+        <p className="mt-4 text-caption text-ink-3 leading-relaxed">
+          Looking for your goals, dietary preferences and health context? They
+          now live in <span className="text-sage-deep font-medium">AI → Preferences</span>{' '}
+          so the assistant can use them directly.
+        </p>
       </Card>
 
       {editing && (
@@ -253,6 +175,26 @@ export function ProfileClient({ user }: { user: ProfileData }) {
           </Button>
         </div>
       )}
+
+      {/* Sign out — promoted because we removed it from the top nav. */}
+      <Card>
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <CardLabel className="mb-0.5">Session</CardLabel>
+            <p className="text-caption text-ink-3">
+              Signed in as <span className="text-ink-2">{user.email}</span>
+            </p>
+          </div>
+          <Button
+            variant="subtle"
+            size="sm"
+            onClick={() => signOut({ callbackUrl: '/login' })}
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            Sign out
+          </Button>
+        </div>
+      </Card>
 
       {/* Data & privacy */}
       <Card variant="soft">

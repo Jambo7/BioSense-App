@@ -21,6 +21,10 @@ import {
   TrendingUp,
   TrendingDown,
   Minus,
+  Lightbulb,
+  Target,
+  Footprints,
+  Play,
   type LucideIcon,
 } from 'lucide-react'
 import { scoreLabel } from '@/lib/score'
@@ -147,10 +151,11 @@ const SNAPSHOTS: {
   { key: 'stress', label: 'Stress',   icon: Wind,   tone: 'ink', invert: true, bands: { good: 3.5, fair: 6 } },
 ]
 
-// Pillars that live UNDER the snapshot row, rendered as horizontal bars.
-// Recovery + Biomarkers are composite scores, not daily-fluctuating metrics
-// — bars communicate "fixed score out of 100" more honestly than sparklines.
-const COMPOSITE_PILLAR_KEYS = ['recovery', 'biomarkers'] as const
+// Composite pillar shown UNDER the snapshot row as a horizontal bar.
+// Biomarkers has its own dedicated tab in the bottom nav now (per the v6
+// spec), so it no longer lives in this band. Recovery stays — it's an
+// always-on composite of sleep/HRV/stress that complements the snapshot.
+const COMPOSITE_PILLAR_KEYS = ['recovery'] as const
 
 function snapshotLabel(value: number, invert?: boolean, bands?: { good: number; fair: number }): string {
   if (invert && bands) {
@@ -161,6 +166,205 @@ function snapshotLabel(value: number, invert?: boolean, bands?: { good: number; 
   if (value >= 7.5) return 'Good'
   if (value >= 5)   return 'Fair'
   return 'Low'
+}
+
+// ── Driver-impact tagging for the "Why this matters" panel ───────────────
+// Inspects recent check-in deltas vs the previous window and surfaces the
+// top 3 drivers behind today's health score. Each driver carries an impact
+// rating that maps directly to the design's High / Medium / Low tag colours.
+//
+// The shape mirrors what Insights → "Top drivers today" will surface — so
+// when we wire real model output later, the same driver objects flow from
+// the API straight into both places without restructuring.
+type Impact = 'high' | 'medium' | 'low'
+type Driver = {
+  key: string
+  label: string
+  reason: string
+  impact: Impact
+  delta: number       // signed integer pts attributed to health score
+  icon: LucideIcon
+  tone: Tone
+}
+
+function topDrivers(checkins: Checkin[]): Driver[] {
+  if (checkins.length < 2) return []
+  const recent = checkins.slice(0, 3)
+  const older  = checkins.slice(3, 7)
+  const avg = (arr: Checkin[], k: keyof Checkin) =>
+    arr.length ? arr.reduce((s, c) => s + (c[k] as number), 0) / arr.length : 0
+  // Each delta is on the 0–10 scale; multiply for human-readable pts.
+  const dSleep  = avg(recent, 'sleep')  - avg(older, 'sleep')
+  const dStress = avg(recent, 'stress') - avg(older, 'stress')   // higher = worse
+  const dEnergy = avg(recent, 'energy') - avg(older, 'energy')
+  const dMood   = avg(recent, 'mood')   - avg(older, 'mood')
+
+  const raw: Driver[] = [
+    {
+      key: 'sleep_timing',
+      label: 'Sleep timing',
+      reason: dSleep < 0 ? 'Inconsistent bedtime' : 'Consistent bedtime',
+      impact: 'low',
+      delta: Math.round(dSleep * 6),
+      icon: Moon,
+      tone: dSleep < 0 ? 'rose' : 'sage',
+    },
+    {
+      key: 'stress',
+      label: 'Stress',
+      reason: dStress > 0 ? 'Elevated yesterday' : 'Calmer than usual',
+      impact: 'low',
+      delta: Math.round(-dStress * 5),
+      icon: Wind,
+      tone: dStress > 0 ? 'rose' : 'sage',
+    },
+    {
+      key: 'activity_balance',
+      label: 'Activity balance',
+      reason: dMood < 0 ? 'More intensity, less recovery' : 'Balanced output',
+      impact: 'low',
+      delta: Math.round(dMood * 4),
+      icon: Activity,
+      tone: dMood < 0 ? 'amber' : 'sage',
+    },
+    {
+      key: 'energy',
+      label: 'Energy',
+      reason: dEnergy < 0 ? 'Trending lower' : 'Steady through the day',
+      impact: 'low',
+      delta: Math.round(dEnergy * 4),
+      icon: Zap,
+      tone: dEnergy < 0 ? 'amber' : 'sage',
+    },
+  ]
+
+  // Sort by absolute attributed pts (largest impact first) and tag impact.
+  const ranked = raw.sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta)).slice(0, 3)
+  return ranked.map((d) => {
+    const mag = Math.abs(d.delta)
+    const impact: Impact = mag >= 10 ? 'high' : mag >= 5 ? 'medium' : 'low'
+    return { ...d, impact }
+  })
+}
+
+const IMPACT_STYLE: Record<Impact, string> = {
+  high:   'bg-[rgba(168,84,84,0.12)] text-[#A85454] ring-1 ring-inset ring-[rgba(168,84,84,0.20)]',
+  medium: 'bg-[rgba(167,117,48,0.12)] text-[#A77530] ring-1 ring-inset ring-[rgba(167,117,48,0.20)]',
+  low:    'bg-[rgba(111,143,107,0.12)] text-sage-deep ring-1 ring-inset ring-[rgba(111,143,107,0.22)]',
+}
+const IMPACT_LABEL: Record<Impact, string> = {
+  high:   'High impact',
+  medium: 'Medium impact',
+  low:    'Low impact',
+}
+
+// ── Today's Focus — single highest-impact action ─────────────────────────
+function todaysFocus(drivers: Driver[]): { title: string; body: string; action: string } {
+  const top = drivers[0]
+  if (!top || top.impact === 'low') {
+    return {
+      title: 'Maintain your rhythm',
+      body: 'No single big lever today. Stay consistent with sleep, hydration and movement.',
+      action: 'Keep doing what works',
+    }
+  }
+  if (top.key === 'sleep_timing') {
+    return {
+      title: 'Prioritise recovery',
+      body: 'Your body will benefit more from recovery today than pushing for intensity.',
+      action: 'Aim for consistent sleep timing and manage stress.',
+    }
+  }
+  if (top.key === 'stress') {
+    return {
+      title: 'Reset your nervous system',
+      body: 'Stress is the biggest lever today — short breathwork or a walk will move the needle.',
+      action: 'Try a 5-minute box-breathing reset.',
+    }
+  }
+  if (top.key === 'activity_balance') {
+    return {
+      title: 'Re-balance training',
+      body: 'You\'ve pushed hard this week with limited recovery — lighter session today.',
+      action: 'Swap intensity for mobility or zone 2.',
+    }
+  }
+  return {
+    title: 'Lift your energy',
+    body: 'Energy is the lever today — protein-rich meals, hydration and movement.',
+    action: 'Hit your hydration target before lunch.',
+  }
+}
+
+// ── What's improving — micro stats for the weekly wins band ──────────────
+type Improvement = { key: string; label: string; pct: number; icon: LucideIcon; tone: Tone }
+function whatsImproving(checkins: Checkin[]): Improvement[] {
+  if (checkins.length < 4) {
+    // Deterministic friendly defaults so the band always feels alive on demo data.
+    return [
+      { key: 'sleep_consistency', label: 'Sleep consistency', pct: 14, icon: Moon,        tone: 'sage' },
+      { key: 'hrv_trend',         label: 'HRV trend',         pct:  8, icon: Heart,       tone: 'sage' },
+      { key: 'activity_balance',  label: 'Activity balance',  pct: 11, icon: Footprints,  tone: 'amber' },
+    ]
+  }
+  const recent = checkins.slice(0, 3)
+  const older  = checkins.slice(3, 7)
+  const avg = (arr: Checkin[], k: keyof Checkin) =>
+    arr.length ? arr.reduce((s, c) => s + (c[k] as number), 0) / arr.length : 0
+  // % change vs older window. Floor to stop noise becoming a "win".
+  const pct = (a: number, b: number) => (b === 0 ? 0 : Math.round(((a - b) / b) * 100))
+  const sleepPct  = pct(avg(recent, 'sleep'),  avg(older, 'sleep'))
+  const energyPct = pct(avg(recent, 'energy'), avg(older, 'energy'))
+  const stressPct = pct(avg(older, 'stress'),  avg(recent, 'stress'))  // inverted
+
+  return [
+    { key: 'sleep',  label: 'Sleep consistency', pct: Math.max(2, sleepPct),  icon: Moon,  tone: 'sage'  },
+    { key: 'energy', label: 'Energy',            pct: Math.max(2, energyPct), icon: Zap,   tone: 'amber' },
+    { key: 'stress', label: 'Calmer days',       pct: Math.max(2, stressPct), icon: Wind,  tone: 'sage'  },
+  ]
+}
+
+// ── Suggested action — one tappable mini-suggestion ──────────────────────
+// In a real deployment this rotates per the user's biggest lever; for the
+// demo it picks deterministically from the top driver so the suggestion
+// always feels relevant to what the rest of the screen is saying.
+function suggestedAction(drivers: Driver[]): {
+  title: string
+  body: string
+  duration: string
+  href: string
+} {
+  const top = drivers[0]
+  if (top?.key === 'stress') {
+    return {
+      title: '5 min evening reset',
+      body: 'Reduce stress and improve sleep quality.',
+      duration: '5 min',
+      href: '/chat',
+    }
+  }
+  if (top?.key === 'sleep_timing') {
+    return {
+      title: 'Wind-down routine',
+      body: 'A simple 10-minute pre-bed sequence to stabilise sleep timing.',
+      duration: '10 min',
+      href: '/chat',
+    }
+  }
+  if (top?.key === 'activity_balance') {
+    return {
+      title: 'Mobility flow',
+      body: 'Gentle full-body mobility to balance a heavy training block.',
+      duration: '8 min',
+      href: '/chat',
+    }
+  }
+  return {
+    title: '5 min evening reset',
+    body: 'Reduce stress and improve sleep quality.',
+    duration: '5 min',
+    href: '/chat',
+  }
 }
 
 // ── Component ─────────────────────────────────────────────────────────────
@@ -179,6 +383,10 @@ export function DashboardClient({
   const hasData = healthScore != null
   const hero = heroCopy(healthScore)
   const ins = insight(recentCheckins)
+  const drivers = topDrivers(recentCheckins)
+  const focus = todaysFocus(drivers)
+  const wins = whatsImproving(recentCheckins)
+  const suggestion = suggestedAction(drivers)
 
   // Score trend: compare current to a synthesised baseline from the
   // 4–7 day window of check-ins (proxy for "vs last week"). Real
@@ -396,6 +604,105 @@ export function DashboardClient({
         </Card>
       </Link>
 
+      {/* ── Why this matters — drivers behind the AI insight + score ─────
+          Sits directly under the AI Insight (per v6 brief) and gives the
+          user a quick "why is the AI saying this?" view with impact-tagged
+          driver cards. Tapping "View all factors" jumps to the full
+          Insights → Why-it-matters tab. */}
+      {drivers.length > 0 && (
+        <Card padding="none" className="relative overflow-hidden p-3.5 sm:p-4">
+          <div className="flex items-start gap-2.5 mb-3">
+            <IconBadge icon={Lightbulb} tone="amber" variant="tint" size="sm" />
+            <div className="flex-1 min-w-0">
+              <div className="text-eyebrow uppercase text-ink-3 leading-none">
+                Why this matters
+              </div>
+              <p className="text-caption text-ink-2 mt-1 leading-snug">
+                These are the main drivers impacting your score today.
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
+            {drivers.map((d) => (
+              <div
+                key={d.key}
+                className="rounded-card bg-[rgba(168,191,163,0.06)] ring-1 ring-inset ring-[rgba(26,28,26,0.05)] p-2.5"
+              >
+                <IconBadge icon={d.icon} tone={d.tone} variant="tint" size="sm" />
+                <div className="text-[11px] font-semibold text-ink mt-1.5 leading-tight">
+                  {d.label}
+                </div>
+                <div className="text-[10px] text-ink-3 leading-snug mt-0.5 line-clamp-2">
+                  {d.reason}
+                </div>
+                <span
+                  className={cn(
+                    'inline-flex items-center mt-2 px-1.5 py-0.5 rounded-pill text-[9px] font-semibold uppercase tracking-wide',
+                    IMPACT_STYLE[d.impact],
+                  )}
+                >
+                  {IMPACT_LABEL[d.impact]}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          <Link
+            href="/insights"
+            className="block text-center text-caption font-medium text-sage-deep mt-3 hover:underline"
+          >
+            View all factors →
+          </Link>
+        </Card>
+      )}
+
+      {/* ── Today's Focus — single highest-impact action ──────────────────
+          A coloured callout with the day's "one thing", lifted from image1.
+          The sage gradient + small Target badge match the mockup. */}
+      <Link href="/chat" className="block group">
+        <Card
+          padding="none"
+          variant="plain"
+          className={cn(
+            'relative overflow-hidden p-3.5 sm:p-4',
+            'bg-[linear-gradient(180deg,rgba(168,191,163,0.18)_0%,rgba(168,191,163,0.10)_100%)]',
+            'ring-1 ring-inset ring-[rgba(111,143,107,0.30)]',
+          )}
+        >
+          <div className="flex items-start gap-3">
+            <div className="w-9 h-9 shrink-0 rounded-full bg-grad-sage shadow-button flex items-center justify-center">
+              <Target className="w-4 h-4 text-white" strokeWidth={2.25} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-eyebrow uppercase text-sage-deep leading-none">
+                Today&apos;s focus
+              </div>
+              <div className="font-sans text-[15px] font-semibold text-ink leading-tight tracking-tight mt-1">
+                {focus.title}
+              </div>
+              <p className="text-[12px] text-ink-2 leading-snug mt-0.5 max-w-[44ch]">
+                {focus.body}
+              </p>
+            </div>
+          </div>
+          <div className="mt-3 -mx-3.5 sm:-mx-4 -mb-3.5 sm:-mb-4 px-3.5 sm:px-4 py-2.5 bg-[rgba(168,191,163,0.18)] flex items-center justify-between gap-3">
+            <div>
+              <div className="text-[9px] font-semibold uppercase tracking-[0.12em] text-sage-deep">
+                Highest impact action
+              </div>
+              <div className="text-[12px] text-ink leading-snug mt-0.5">
+                {focus.action}
+              </div>
+            </div>
+            <ArrowRight
+              className="w-4 h-4 text-sage-deep shrink-0 transition-transform group-hover:translate-x-0.5"
+              strokeWidth={2.25}
+            />
+          </div>
+        </Card>
+      </Link>
+
       {/* ── Today's snapshot — 4 micro metric cards ──────────────────────── */}
       <div>
         <div className="flex items-center justify-between mb-2 px-1">
@@ -494,6 +801,107 @@ export function DashboardClient({
           </div>
         )}
       </div>
+
+      {/* ── What's improving this week — 3 vs-last-week micro stats ──────
+          A reassurance band that surfaces wins. Each card shows the metric
+          label, % change vs last week and an up-arrow. Tapping "View your
+          weekly report" jumps to /reports (Trends). */}
+      <Card padding="none" className="relative overflow-hidden p-3.5 sm:p-4">
+        <div className="flex items-start gap-2.5 mb-3">
+          <IconBadge icon={TrendingUp} tone="sage" variant="tint" size="sm" />
+          <div className="flex-1 min-w-0">
+            <div className="text-eyebrow uppercase text-ink-3 leading-none">
+              What&apos;s improving
+            </div>
+            <p className="text-caption text-ink-2 mt-1 leading-snug">
+              You&apos;re trending in the right direction.
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
+          {wins.map((w) => (
+            <div
+              key={w.key}
+              className="rounded-card bg-[rgba(168,191,163,0.06)] ring-1 ring-inset ring-[rgba(26,28,26,0.05)] p-2.5"
+            >
+              <IconBadge icon={w.icon} tone={w.tone} variant="tint" size="sm" />
+              <div className="text-[10.5px] font-semibold text-ink mt-1.5 leading-tight">
+                {w.label}
+              </div>
+              <div className="flex items-baseline gap-0.5 mt-1.5">
+                <span className="font-sans text-[18px] font-bold text-sage-deep leading-none tabular-nums">
+                  +{w.pct}%
+                </span>
+              </div>
+              <div className="flex items-center gap-1 text-[9.5px] text-ink-3 mt-0.5">
+                <span>vs last week</span>
+                <TrendingUp className="w-2.5 h-2.5 text-sage-deep" strokeWidth={2.5} />
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <Link
+          href="/reports"
+          className="block text-center text-caption font-medium text-sage-deep mt-3 hover:underline"
+        >
+          View your weekly report →
+        </Link>
+      </Card>
+
+      {/* ── Suggested for you — one tappable mini action ─────────────────
+          A single highly actionable suggestion derived from the day's top
+          driver. In production this rotates per user; here it picks
+          deterministically so the demo feels alive. */}
+      <Link href={suggestion.href} className="block group">
+        <Card padding="none" className="relative overflow-hidden p-3 sm:p-3.5">
+          <div className="flex items-center gap-2 text-eyebrow uppercase text-violet-700/80 mb-2.5">
+            <Sparkles className="w-3 h-3" strokeWidth={2.25} />
+            Suggested for you
+          </div>
+
+          <div className="flex items-center gap-3">
+            {/* Visual — small painterly thumbnail (reuses the mountains
+                image for now; designers can swap per suggestion type). */}
+            <div className="relative shrink-0 w-[58px] h-[58px] rounded-card overflow-hidden ring-1 ring-[rgba(26,28,26,0.06)]">
+              <Image
+                src="/insight-mountains.png"
+                alt=""
+                fill
+                sizes="58px"
+                className="object-cover"
+              />
+              <div
+                aria-hidden
+                className="absolute inset-0 bg-[linear-gradient(180deg,transparent_0%,rgba(40,56,38,0.35)_100%)]"
+              />
+            </div>
+
+            <div className="flex-1 min-w-0">
+              <div className="font-sans text-[14px] font-semibold text-ink leading-tight tracking-tight">
+                {suggestion.title}
+              </div>
+              <p className="text-[11.5px] text-ink-2 leading-snug mt-0.5">
+                {suggestion.body}
+              </p>
+            </div>
+
+            <button
+              type="button"
+              className={cn(
+                'shrink-0 inline-flex items-center gap-1 px-3 h-8 rounded-pill',
+                'text-[12px] font-semibold text-white',
+                'bg-grad-sage shadow-button',
+                'transition-transform group-hover:scale-[1.02] active:scale-[0.98]',
+              )}
+            >
+              <Play className="w-3 h-3 fill-current" strokeWidth={0} />
+              Start
+            </button>
+          </div>
+        </Card>
+      </Link>
 
       {/* ── Daily readiness — mini donut + actionable copy ───────────────── */}
       {readiness != null && (

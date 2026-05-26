@@ -2,32 +2,40 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { signOut } from 'next-auth/react'
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
 import { BrandWordmark } from '@/components/brand-mark'
 import {
   Sun,
   Lightbulb,
-  MessageSquare,
+  Sparkles,
   TrendingUp,
-  User,
-  LogOut,
+  FlaskConical,
   Bell,
   Watch,
+  User as UserIcon,
 } from 'lucide-react'
+
+/** Small inline avatar placeholder. Replace with `<Image src={user.image} />`
+ *  once we wire real avatars in via NextAuth session. */
+function UserMark() {
+  return <UserIcon className="w-4 h-4" strokeWidth={2.25} />
+}
 
 /**
  * Bottom (mobile) / top centre (desktop) navigation.
  *
- *  Today    → /dashboard (with /checkin nested under it as a child action)
- *  Insights → /blood     (will host expanded biomarker insights)
- *  Ask      → /chat      (the AI conversation experience)
- *  Trends   → /reports   (graphs + reports — historical data view)
- *  You      → /profile   (settings, goals, account, data export)
+ *  Today      → /dashboard (with /checkin nested under it as a child action)
+ *  Insights   → /insights  (the "Why" view — what's driving your score today)
+ *  AI         → /chat      (Health AI Assistant — chat + learning mode)
+ *  Trends     → /reports   (the "Am I improving?" view — progression over time)
+ *  Biomarkers → /blood     (blood-panel biomarker results + history)
  *
- * Wearables intentionally lives OUTSIDE the primary nav now — it's reached
- * via the prominent coloured "Connect wearables" button in the top bar.
+ * Account / sign-out live behind the avatar button in the top-right, NOT in
+ * the primary tab bar (per the v6 spec).
+ *
+ * Wearables shortcut remains as the sage pill in the top bar — it's a setup
+ * action, not a primary destination.
  */
 type NavItem = {
   href: string
@@ -39,11 +47,11 @@ type NavItem = {
 }
 
 const navItems: NavItem[] = [
-  { href: '/dashboard', label: 'Today',    icon: Sun,            matchPaths: ['/dashboard', '/checkin'] },
-  { href: '/blood',     label: 'Insights', icon: Lightbulb },
-  { href: '/chat',      label: 'Ask',      icon: MessageSquare, center: true },
-  { href: '/reports',   label: 'Trends',   icon: TrendingUp },
-  { href: '/profile',   label: 'You',      icon: User },
+  { href: '/dashboard', label: 'Today',      icon: Sun,           matchPaths: ['/dashboard', '/checkin'] },
+  { href: '/insights',  label: 'Insights',   icon: Lightbulb },
+  { href: '/chat',      label: 'AI',         icon: Sparkles,      center: true },
+  { href: '/reports',   label: 'Trends',     icon: TrendingUp },
+  { href: '/blood',     label: 'Biomarkers', icon: FlaskConical,  matchPaths: ['/blood', '/biomarkers'] },
 ]
 
 function isActive(pathname: string, item: (typeof navItems)[number]) {
@@ -116,19 +124,33 @@ export function AppNav() {
 
           <button
             type="button"
-            className="w-9 h-9 inline-flex items-center justify-center rounded-full text-ink-2 hover:text-ink hover:bg-[rgba(26,28,26,0.04)] transition-colors"
+            className="relative w-9 h-9 inline-flex items-center justify-center rounded-full text-ink-2 hover:text-ink hover:bg-[rgba(26,28,26,0.04)] transition-colors"
             aria-label="Notifications"
           >
             <Bell className="w-[18px] h-[18px]" strokeWidth={1.85} />
+            {/* Tiny sage dot for the placeholder notifications badge */}
+            <span
+              aria-hidden
+              className="absolute top-1.5 right-2 w-1.5 h-1.5 rounded-full bg-sage ring-1 ring-white"
+            />
           </button>
 
-          <button
-            onClick={() => signOut({ callbackUrl: '/login' })}
-            className="w-9 h-9 inline-flex items-center justify-center rounded-full text-ink-3 hover:text-rose hover:bg-rose-tint transition-colors"
-            aria-label="Sign out"
+          {/* Profile avatar — replaces the old sign-out button. Sign-out
+              now lives inside the Profile / Account page. */}
+          <Link
+            href="/profile"
+            aria-label="Account"
+            className={cn(
+              'w-9 h-9 inline-flex items-center justify-center rounded-full overflow-hidden',
+              'bg-[linear-gradient(180deg,rgba(168,191,163,0.35)_0%,rgba(111,143,107,0.25)_100%)]',
+              'ring-1 ring-inset ring-[rgba(168,191,163,0.45)]',
+              'text-sage-deep text-[12px] font-semibold',
+              'hover:ring-[rgba(168,191,163,0.65)] transition-all',
+              isActive(pathname, { href: '/profile', label: '', icon: Sun }) && 'ring-sage-deep',
+            )}
           >
-            <LogOut className="w-[18px] h-[18px]" strokeWidth={1.85} />
-          </button>
+            <UserMark />
+          </Link>
         </div>
       </header>
 

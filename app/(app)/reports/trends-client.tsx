@@ -66,16 +66,20 @@ const TONE_ICON_BG: Record<MetricSummary['tone'], string> = {
 export function TrendsClient({ summaries, windowDays, reportsCount }: TrendsClientProps) {
   return (
     <div className="max-w-2xl mx-auto fade-up space-y-4 stagger">
-      {/* ── Header ─────────────────────────────────────────────────────── */}
+      {/* ── Header — reframed in v6 as "Am I improving?" ──────────────── */}
       <header className="mb-1">
         <div className="flex items-center gap-2 text-eyebrow uppercase text-sage-deep mb-1.5">
           <TrendingUp className="w-3.5 h-3.5" strokeWidth={2} />
           Trends · last {windowDays} days
         </div>
         <h1 className="font-sans text-[26px] sm:text-h1 text-ink tracking-tight leading-[1.1]">
-          How you&apos;re{' '}
-          <span className="italic-accent">changing.</span>
+          Am I{' '}
+          <span className="italic-accent">improving?</span>
         </h1>
+        <p className="text-body-sm text-ink-2 mt-1.5 max-w-[52ch] leading-snug">
+          Track how every pillar of your health is changing over time — and where to
+          push next.
+        </p>
       </header>
 
       {/* ── Metric panels ──────────────────────────────────────────────── */}

@@ -15,12 +15,6 @@ export default async function ProfilePage() {
       name: true,
       email: true,
       age: true,
-      goalType: true,
-      goalText: true,
-      goalDeadline: true,
-      allergies: true,
-      conditions: true,
-      lifestyle: true,
       subscriptionStatus: true,
       createdAt: true,
     },
@@ -32,7 +26,6 @@ export default async function ProfilePage() {
     <ProfileClient
       user={{
         ...user,
-        goalDeadline: user.goalDeadline?.toISOString().split('T')[0] ?? null,
         createdAt: user.createdAt.toISOString(),
       }}
     />
