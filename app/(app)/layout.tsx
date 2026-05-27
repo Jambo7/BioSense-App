@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation'
+import Image from 'next/image'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { AppNav } from '@/components/app-nav'
@@ -10,10 +11,27 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   if (!session.user.hasConsented) redirect('/consent')
 
   return (
-    <div className="min-h-screen relative bg-white">
-      {/* Ambient drifting sage + amber orbs behind everything */}
+    <div className="min-h-screen relative bg-off-white">
+      {/* Drifting sage + amber orbs (deepest layer). */}
       <div className="ambient-bg" aria-hidden>
         <div className="orb" />
+      </div>
+
+      {/* Photographic foundation. Faded, right-biased, sage-tinted via
+          mix-blend so it lives behind every screen without ever competing
+          with content. Top + bottom edges fade into the page background so
+          the sticky header and tab bar always read on solid colour. */}
+      <div className="page-texture" aria-hidden>
+        <Image
+          src="/dashboard-hero-leaves.png"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-[80%_30%] opacity-[0.22] mix-blend-multiply"
+        />
+        <div className="page-texture-fade-top" />
+        <div className="page-texture-fade-bot" />
       </div>
 
       <div className="relative z-10">

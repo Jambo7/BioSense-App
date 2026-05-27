@@ -2,15 +2,34 @@ import { HTMLAttributes } from 'react'
 import { cn } from '@/lib/utils'
 
 interface CardProps extends HTMLAttributes<HTMLDivElement> {
-  variant?: 'glass' | 'glass-strong' | 'glass-sage' | 'plain' | 'soft' | 'sage' | 'rose' | 'amber'
+  variant?:
+    | 'glass'
+    | 'glass-strong'
+    | 'glass-sage'
+    | 'premium'
+    | 'plain'
+    | 'soft'
+    | 'sage'
+    | 'rose'
+    | 'amber'
   padding?: 'sm' | 'md' | 'lg' | 'none'
   accent?: boolean
 }
 
 /**
  * Universal floating surface. Defaults to glassy translucent white that lets
- * the ambient sage backdrop bleed through subtly. Use `variant="plain"` for
- * the rare case you need an opaque card on top of another card.
+ * the page texture bleed through subtly while still sitting on a real lifted
+ * shadow.
+ *
+ * Variants:
+ *   glass        – default. Soft glass over the page texture.
+ *   glass-strong – higher opacity for content-heavy cards.
+ *   glass-sage   – sage-tinted glass for accent / suggestion cards.
+ *   premium      – hero cards (Health Score, AI Insight). Bigger radius,
+ *                  warm-cream tint, deeper multi-layer shadow.
+ *   plain        – opaque white surface (rarely needed; use for nested cards).
+ *   soft         – flat off-white panel, no shadow.
+ *   sage/rose/amber – tonal accent cards.
  */
 export function Card({
   className,
@@ -21,27 +40,30 @@ export function Card({
   ...props
 }: CardProps) {
   const variants = {
-    'glass':         'glass',
-    'glass-strong':  'glass-strong',
-    'glass-sage':    'glass-sage',
-    'plain':         'bg-white border border-line shadow-float',
-    'soft':          'bg-off-white border border-line',
-    'sage':          'glass-sage',
-    'rose':          'bg-rose-tint border border-[rgba(201,122,122,0.20)] shadow-float',
-    'amber':         'bg-amber-tint border border-[rgba(217,160,91,0.20)] shadow-float',
+    'glass':         'glass rounded-card',
+    'glass-strong':  'glass-strong rounded-card',
+    'glass-sage':    'glass-sage rounded-card',
+    'premium':       'glass-premium rounded-[28px]',
+    'plain':         'bg-white border border-line shadow-float rounded-card',
+    'soft':          'bg-off-white border border-line rounded-card',
+    'sage':          'glass-sage rounded-card',
+    'rose':          'bg-rose-tint border border-[rgba(201,122,122,0.20)] shadow-float rounded-card',
+    'amber':         'bg-amber-tint border border-[rgba(217,160,91,0.20)] shadow-float rounded-card',
   }
 
+  // Padding tokens bumped to give cards more breathing room — premium feel
+  // requires that contents are NOT pressed against card edges.
   const paddings = {
     none: '',
     sm: 'p-4',
-    md: 'p-5',
-    lg: 'p-6 sm:p-7',
+    md: 'p-6',
+    lg: 'p-7 sm:p-8',
   }
 
   return (
     <div
       className={cn(
-        'rounded-card relative',
+        'relative',
         variants[variant],
         paddings[padding],
         accent && 'border-accent-ring',

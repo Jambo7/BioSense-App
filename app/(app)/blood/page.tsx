@@ -65,6 +65,14 @@ export default async function InsightsPage() {
       t3={latestCounts.t3}
       history={history}
       historyTotal={results.length}
+      markers={latestMarkers.map((m) => ({
+        name:   m.name,
+        value:  m.value,
+        unit:   m.unit,
+        refMin: m.refMin,
+        refMax: m.refMax,
+        tier:   m.tier,
+      }))}
     />
   )
 }

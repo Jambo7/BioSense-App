@@ -45,6 +45,7 @@ export default async function DashboardPage() {
     <DashboardClient
       user={{
         name: user?.name ?? '',
+        age: user?.age ?? null,
         goalType: user?.goalType ?? null,
         goalText: user?.goalText ?? null,
       }}

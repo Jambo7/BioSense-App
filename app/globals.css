@@ -112,22 +112,46 @@ html, body {
 }
 
 /* ─── Glass surface system ──────────────────────────────────────────────── */
+/* Cards default to `.glass`. Now that pages sit on a photographic texture,
+   the default surface uses a warm hairline border (not pure white) so cards
+   read as resting on a real surface rather than floating in fog. Shadow is
+   the multi-layer `--shadow-float` for proper card lift. */
 .glass {
-  background: rgba(255, 255, 255, 0.72);
+  background: rgba(255, 255, 255, 0.78);
   backdrop-filter: blur(18px) saturate(1.2);
   -webkit-backdrop-filter: blur(18px) saturate(1.2);
-  border: 1px solid rgba(255, 255, 255, 0.65);
-  box-shadow: var(--shadow-glass);
+  border: 1px solid rgba(184, 168, 144, 0.18);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.70),
+    var(--shadow-float);
 }
 
 .glass-strong {
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.88);
   backdrop-filter: blur(24px) saturate(1.3);
   -webkit-backdrop-filter: blur(24px) saturate(1.3);
-  border: 1px solid rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(184, 168, 144, 0.20);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.7),
-    0 8px 32px -8px rgba(111, 143, 107, 0.18);
+    inset 0 1px 0 rgba(255, 255, 255, 0.75),
+    var(--shadow-float);
+}
+
+/* ─── Premium surface ───────────────────────────────────────────────────
+   The "hero" card variant used by Health Score and AI Insight. Bigger
+   radius, deeper multi-layer shadow, and a slight warm-cream tint so it
+   reads as the most important surface on the page. The cream tint is
+   subtle — it lifts the card off the sage-tinted page texture without
+   competing for attention. */
+.glass-premium {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, rgba(250, 247, 240, 0.86) 100%);
+  backdrop-filter: blur(22px) saturate(1.25);
+  -webkit-backdrop-filter: blur(22px) saturate(1.25);
+  border: 1px solid rgba(184, 168, 144, 0.24);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.80),
+    0 1px 2px rgba(26, 28, 26, 0.04),
+    0 12px 32px -8px rgba(111, 143, 107, 0.20),
+    0 32px 64px -20px rgba(26, 28, 26, 0.08);
 }
 
 .glass-sage {
@@ -214,6 +238,36 @@ html, body {
 }
 .bg-grad-rose      { background: var(--grad-rose); }
 .bg-grad-amber     { background: var(--grad-amber); }
+
+/* ─── Page texture ──────────────────────────────────────────────────────
+   Soft photographic foundation that sits behind all app content. Lives
+   ABOVE the drifting sage orbs (so the photo reads first) and BELOW the
+   content layer. Top + bottom edges fade to the page background colour
+   so the sticky chrome (header / tab bar) reads cleanly.
+
+   The actual <Image> tag is rendered inside `app/(app)/layout.tsx`; this
+   class just provides the positioning + a couple of gradient overlays.
+   The "premium feel" of the app rests on this layer — without a real
+   surface beneath the cards, lifted shadows have nothing to lift off. */
+.page-texture {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+.page-texture-fade-top {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 140px;
+  background: linear-gradient(180deg, var(--off-white) 0%, rgba(250, 250, 248, 0) 100%);
+}
+.page-texture-fade-bot {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 200px;
+  background: linear-gradient(0deg, var(--off-white) 0%, rgba(250, 250, 248, 0) 100%);
+}
 
 /* ─── Ambient backdrop ──────────────────────────────────────────────────── */
 /* Floating sage orbs that very slowly drift across the canvas behind everything.

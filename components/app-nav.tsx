@@ -46,12 +46,14 @@ type NavItem = {
   center?: boolean
 }
 
+// Per v7 spec: page concept renamed Today → Home; bottom-tab order
+// flipped so Trends sits last (Biomarkers shifts left of Trends).
 const navItems: NavItem[] = [
-  { href: '/dashboard', label: 'Today',      icon: Sun,           matchPaths: ['/dashboard', '/checkin'] },
+  { href: '/dashboard', label: 'Home',       icon: Sun,           matchPaths: ['/dashboard', '/checkin'] },
   { href: '/insights',  label: 'Insights',   icon: Lightbulb },
   { href: '/chat',      label: 'AI',         icon: Sparkles,      center: true },
-  { href: '/reports',   label: 'Trends',     icon: TrendingUp },
   { href: '/blood',     label: 'Biomarkers', icon: FlaskConical,  matchPaths: ['/blood', '/biomarkers'] },
+  { href: '/reports',   label: 'Trends',     icon: TrendingUp },
 ]
 
 function isActive(pathname: string, item: (typeof navItems)[number]) {
@@ -100,25 +102,25 @@ export function AppNav() {
 
         {/* Right actions */}
         <div className="flex items-center gap-1.5 shrink-0">
-          {/* Wearables shortcut — refined sage-tinted pill. Visibly green so
-              it doesn't get lost, but softer than the heavy solid CTA so
-              it still feels secondary to the floating Ask button. */}
+          {/* Wearables shortcut — quiet outlined sage pill, sized to read
+              as secondary chrome (matches image 1). Sage-deep label on a
+              translucent white pill with a thin sage ring; no gradient and
+              no heavy shadow. Lets bell + avatar carry the right-side
+              hierarchy. */}
           <Link
             href="/wearables"
             className={cn(
               'inline-flex items-center gap-1.5 h-8 px-3 sm:px-3.5 rounded-pill',
-              'text-[12px] font-semibold text-white',
-              'bg-[linear-gradient(180deg,rgba(141,179,137,0.95)_0%,rgba(111,143,107,0.95)_100%)]',
-              'ring-1 ring-inset ring-[rgba(90,117,86,0.30)]',
-              'shadow-[inset_0_1px_0_rgba(255,255,255,0.22),0_1px_2px_rgba(40,56,38,0.10),0_4px_12px_-3px_rgba(111,143,107,0.42)]',
-              'transition-all',
-              'hover:bg-[linear-gradient(180deg,rgba(151,188,147,1)_0%,rgba(119,151,115,1)_100%)]',
-              'hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.28),0_1px_2px_rgba(40,56,38,0.10),0_6px_16px_-3px_rgba(111,143,107,0.52)]',
+              'text-[12px] font-medium text-sage-deep',
+              'bg-white/70 backdrop-blur-sm',
+              'ring-1 ring-inset ring-[rgba(111,143,107,0.32)]',
+              'transition-colors',
+              'hover:bg-white/90 hover:ring-[rgba(111,143,107,0.50)]',
               'active:scale-[0.98]',
             )}
             aria-label="Wearables"
           >
-            <Watch className="w-[14px] h-[14px]" strokeWidth={2.25} />
+            <Watch className="w-[14px] h-[14px]" strokeWidth={2} />
             <span>Wearables</span>
           </Link>
 
