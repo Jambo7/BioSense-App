@@ -9,6 +9,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   if (!session) redirect('/login')
   if (!session.user.hasConsented) redirect('/consent')
+  // Registration info-gathering is mandatory — block the app until it's done.
+  if (!session.user.onboardingDone) redirect('/onboarding')
 
   return (
     <div className="min-h-screen relative bg-off-white">

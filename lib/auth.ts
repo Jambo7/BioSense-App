@@ -79,8 +79,9 @@ export const authOptions: NextAuthOptions = {
         token.hasConsented = (user as any).hasConsented
         token.onboardingDone = (user as any).onboardingDone
       }
-      // Refresh from DB on update trigger
-      if (trigger === 'update' && session) {
+      // Refresh from DB on any update trigger (e.g. after onboarding/consent),
+      // regardless of whether a session payload was passed to update().
+      if (trigger === 'update') {
         const dbUser = await prisma.user.findUnique({ where: { id: token.id as string } })
         if (dbUser) {
           token.hasConsented = dbUser.hasConsented

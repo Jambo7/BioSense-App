@@ -26,6 +26,38 @@ enum PatternConfidence {
   LOW
 }
 
+enum BiologicalSex {
+  MALE
+  FEMALE
+  UNDISCLOSED
+}
+
+enum ActivityLevel {
+  LOW
+  MODERATE
+  HIGH
+  VERY_HIGH
+}
+
+enum SleepQuality {
+  GREAT
+  OKAY
+  POOR
+}
+
+enum EnergyLevel {
+  HIGH
+  VARIABLE
+  LOW
+}
+
+enum LearningPhase {
+  FOUNDATIONS
+  LIFESTYLE
+  HEALTH_CONTEXT
+  LONGITUDINAL
+}
+
 model User {
   id                 String             @id @default(cuid())
   email              String             @unique
@@ -40,6 +72,17 @@ model User {
   conditions         String[]
   lifestyle          String?
   preferences        String[]
+  // Registration / info-gathering capture
+  country            String?
+  dob                DateTime?
+  biologicalSex      BiologicalSex?
+  activityLevel      ActivityLevel?
+  sleepQuality       SleepQuality?
+  energyLevel        EnergyLevel?
+  baselineStress     Int?
+  goals              String[]
+  registrationNotes  String?
+  welcomeEmailSentAt DateTime?
   onboardingDone     Boolean            @default(false)
   hasConsented       Boolean            @default(false)
   subscriptionId     String?
@@ -62,6 +105,10 @@ model User {
   patterns       Pattern[]
   consents       Consent[]
   notifLogs      NotificationLog[]
+
+  learningSessions LearningSession[]
+  learnedFacts     LearnedFact[]
+  learningProgress LearningProgress[]
 }
 
 // NextAuth required models
@@ -233,4 +280,54 @@ model NotificationLog {
   channel String
   sentAt  DateTime @default(now())
   user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ── Learning Mode ──────────────────────────────────────────────────────────
+// A conversational session where BioSense asks the user a handful of questions
+// (5-8 max) about one focus section, then pauses. `messages` stores the full
+// turn-by-turn transcript as JSON.
+model LearningSession {
+  id            String        @id @default(cuid())
+  userId        String
+  phase         LearningPhase @default(FOUNDATIONS)
+  section       String
+  title         String?
+  messages      Json
+  questionCount Int           @default(0)
+  status        String        @default("active") // active | paused | complete
+  startedAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  endedAt       DateTime?
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// A single durable thing BioSense has learned about the user. Editable + deletable.
+model LearnedFact {
+  id         String   @id @default(cuid())
+  userId     String
+  section    String
+  text       String
+  confidence String   @default("Medium") // High | Medium | Low
+  source     String   @default("learning") // learning | registration | chat
+  sessionId  String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// Per-section completeness so the "My understanding" dashboard can render.
+model LearningProgress {
+  id        String   @id @default(cuid())
+  userId    String
+  section   String
+  percent   Int      @default(0)
+  status    String   @default("Just started")
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, section])
 }

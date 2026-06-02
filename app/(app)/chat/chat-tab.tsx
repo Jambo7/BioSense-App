@@ -13,6 +13,7 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { IntelligenceMark } from '@/components/brand-mark'
+import { RichText } from '@/components/ui/rich-text'
 
 interface Message {
   role: 'user' | 'assistant'
@@ -294,12 +295,16 @@ export function ChatTab() {
                     : 'bg-[#F2F4F0] text-ink rounded-bl-md shadow-[0_1px_2px_rgba(26,28,26,0.04),0_4px_14px_-8px_rgba(111,143,107,0.20)]',
                 )}
               >
-                {m.content.split('\n').map((line, j, arr) => (
-                  <span key={j}>
-                    {line}
-                    {j < arr.length - 1 && <br />}
-                  </span>
-                ))}
+                {m.role === 'assistant' ? (
+                  <RichText text={m.content} />
+                ) : (
+                  m.content.split('\n').map((line, j, arr) => (
+                    <span key={j}>
+                      {line}
+                      {j < arr.length - 1 && <br />}
+                    </span>
+                  ))
+                )}
               </div>
             </div>
           ))}

@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
     const { message, history } = schema.parse(body)
 
     // Gather user context
-    const [user, recentCheckins, latestScore, latestBlood, patterns, chatHistory] =
+    const [user, recentCheckins, latestScore, latestBlood, patterns, chatHistory, learnedFacts] =
       await Promise.all([
         prisma.user.findUnique({ where: { id: session.user.id } }),
         prisma.dailyCheckin.findMany({
@@ -52,6 +52,12 @@ export async function POST(req: NextRequest) {
           where: { userId: session.user.id },
           orderBy: { createdAt: 'desc' },
           take: 5,
+        }),
+        prisma.learnedFact.findMany({
+          where: { userId: session.user.id },
+          orderBy: { createdAt: 'desc' },
+          take: 25,
+          select: { section: true, text: true },
         }),
       ])
 
@@ -85,12 +91,20 @@ export async function POST(req: NextRequest) {
             .join(', ')
         : null
 
+    const learnedSummary =
+      learnedFacts.length > 0
+        ? learnedFacts.map((f) => `- [${f.section}] ${f.text}`).join('\n')
+        : 'Nothing learned yet'
+
     const contextBlock = `
 USER PROFILE:
 - Name: ${user?.name ?? 'Unknown'}
-- Goal: ${user?.goalType ?? 'Not set'} — "${user?.goalText ?? ''}"
+- Goals: ${user?.goals?.join(', ') || user?.goalText || 'Not set'}
 - Conditions: ${user?.conditions?.join(', ') || 'None stated'}
 - Lifestyle: ${user?.lifestyle || 'Not specified'}
+
+WHAT BIOSENSE HAS LEARNED (from Learning Mode + registration):
+${learnedSummary}
 
 CURRENT HEALTH SCORE: ${latestScore?.score ?? 'Not calculated'}
 

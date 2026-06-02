@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { signupSchema, type SignupInput } from '@/lib/validations'
+import { COUNTRIES } from '@/lib/countries'
 
 function Checkbox({
   id,
@@ -82,6 +83,7 @@ export default function SignupPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: data.name,
+          country: data.country,
           email: data.email,
           password: data.password,
         }),
@@ -135,6 +137,35 @@ export default function SignupPage() {
           {...register('name')}
           error={errors.name?.message}
         />
+        <div className="w-full">
+          <label htmlFor="country" className="block text-eyebrow uppercase text-ink-3 mb-2">
+            Country of residence
+          </label>
+          <select
+            id="country"
+            defaultValue=""
+            autoComplete="country-name"
+            {...register('country')}
+            className={cn(
+              'w-full px-4 h-11 bg-white border border-line rounded-[10px]',
+              'text-ink text-[14px] outline-none transition-all duration-150 appearance-none',
+              'hover:border-line-2',
+              'focus:border-[var(--a-ring)] focus:ring-2 focus:ring-[rgba(111,143,107,0.10)]',
+              "bg-[url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%239AA191' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E\")] bg-no-repeat bg-[right_1rem_center]",
+              errors.country && 'border-rose',
+            )}
+          >
+            <option value="" disabled>
+              Select your country
+            </option>
+            {COUNTRIES.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </select>
+          {errors.country && <p className="mt-1.5 text-caption text-rose">{errors.country.message}</p>}
+        </div>
         <Input
           label="Email"
           id="email"

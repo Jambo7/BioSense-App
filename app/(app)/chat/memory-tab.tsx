@@ -1,7 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import {
   Lock,
   Trash2,
@@ -28,6 +29,37 @@ import { IconBadge } from '@/components/ui/icon-badge'
 export function MemoryTab() {
   const [confirming, setConfirming] = useState(false)
   const [deleted, setDeleted] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const [count, setCount] = useState<number | null>(null)
+
+  useEffect(() => {
+    ;(async () => {
+      try {
+        const res = await fetch('/api/learning/facts')
+        if (res.ok) {
+          const data = await res.json()
+          setCount(data.facts?.length ?? 0)
+        }
+      } catch {
+        /* non-fatal */
+      }
+    })()
+  }, [])
+
+  async function deleteAll() {
+    setDeleting(true)
+    try {
+      const res = await fetch('/api/learning/facts', { method: 'DELETE' })
+      if (!res.ok) throw new Error()
+      setDeleted(true)
+      setConfirming(false)
+      setCount(0)
+    } catch {
+      toast.error('Could not delete your saved knowledge. Please try again.')
+    } finally {
+      setDeleting(false)
+    }
+  }
 
   return (
     <div className="space-y-4">
@@ -40,6 +72,14 @@ export function MemoryTab() {
               Everything BioSense learns about you is private. You can review, edit
               or delete any piece of saved knowledge at any time. Memory is never
               sold or shared.
+              {count !== null && (
+                <>
+                  {' '}
+                  <span className="text-sage-deep font-medium">
+                    {count} item{count === 1 ? '' : 's'} saved.
+                  </span>
+                </>
+              )}
             </p>
           </div>
         </div>
@@ -93,13 +133,11 @@ export function MemoryTab() {
                   <>
                     <button
                       type="button"
-                      onClick={() => {
-                        setDeleted(true)
-                        setConfirming(false)
-                      }}
-                      className="inline-flex items-center gap-1.5 h-8 px-3 rounded-pill text-[12px] font-semibold text-white bg-[#A85454] shadow-[0_4px_12px_-3px_rgba(168,84,84,0.40)] hover:bg-[#9A4848] transition-colors"
+                      onClick={deleteAll}
+                      disabled={deleting}
+                      className="inline-flex items-center gap-1.5 h-8 px-3 rounded-pill text-[12px] font-semibold text-white bg-[#A85454] shadow-[0_4px_12px_-3px_rgba(168,84,84,0.40)] hover:bg-[#9A4848] transition-colors disabled:opacity-60"
                     >
-                      Yes, delete everything
+                      {deleting ? 'Deleting…' : 'Yes, delete everything'}
                     </button>
                     <button
                       type="button"
