@@ -4,7 +4,7 @@ interface SparkLineProps {
   values: number[]
   width?: number
   height?: number
-  tone?: 'sage' | 'rose' | 'amber' | 'ink'
+  tone?: 'sage' | 'rose' | 'amber' | 'violet' | 'sky' | 'teal' | 'ink' | 'sand'
   showFill?: boolean
   showDots?: boolean
   highlightLast?: boolean
@@ -28,10 +28,14 @@ export function SparkLine({
   if (values.length < 2) return <div style={{ width, height }} className={className} />
 
   const tones = {
-    sage:  { stroke: '#6F8F6B', fill: 'rgba(111,143,107,0.16)' },
-    rose:  { stroke: '#C97A7A', fill: 'rgba(201,122,122,0.14)' },
-    amber: { stroke: '#D9A05B', fill: 'rgba(217,160,91,0.14)' },
-    ink:   { stroke: '#1A1C1A', fill: 'rgba(26,28,26,0.08)' },
+    sage:   { stroke: '#6F8F6B', fill: 'rgba(111,143,107,0.16)' },
+    rose:   { stroke: '#C97A7A', fill: 'rgba(201,122,122,0.14)' },
+    amber:  { stroke: '#D9A05B', fill: 'rgba(217,160,91,0.14)' },
+    violet: { stroke: '#8B7BB8', fill: 'rgba(139,123,184,0.16)' },
+    sky:    { stroke: '#6B93C4', fill: 'rgba(107,147,196,0.16)' },
+    teal:   { stroke: '#5BA89B', fill: 'rgba(91,168,155,0.16)' },
+    ink:    { stroke: '#1A1C1A', fill: 'rgba(26,28,26,0.08)' },
+    sand:   { stroke: '#B8A890', fill: 'rgba(184,168,144,0.14)' },
   }
 
   const min = Math.min(...values)
@@ -88,7 +92,7 @@ interface BarStripProps {
   values: number[]
   labels?: string[]
   highlightIndex?: number
-  highlightTone?: 'rose' | 'sage' | 'amber'
+  highlightTone?: 'rose' | 'sage' | 'amber' | 'violet' | 'sky' | 'teal'
   height?: number
   className?: string
 }
@@ -106,7 +110,14 @@ export function BarStrip({
   className,
 }: BarStripProps) {
   const max = Math.max(...values, 1)
-  const tones = { sage: '#6F8F6B', rose: '#C97A7A', amber: '#D9A05B' }
+  const tones = {
+    sage:   '#6F8F6B',
+    rose:   '#C97A7A',
+    amber:  '#D9A05B',
+    violet: '#8B7BB8',
+    sky:    '#6B93C4',
+    teal:   '#5BA89B',
+  }
   const hl = tones[highlightTone]
 
   return (

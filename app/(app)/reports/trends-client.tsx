@@ -84,9 +84,7 @@ export function TrendsClient({ summaries, reportsCount }: TrendsClientProps) {
             className={cn(
               'inline-flex items-center gap-1.5 h-8 px-3 rounded-pill',
               'text-[12px] font-medium text-sage-deep',
-              'bg-white/70 backdrop-blur-sm',
-              'ring-1 ring-inset ring-[rgba(111,143,107,0.22)]',
-              'hover:bg-white transition-colors shrink-0 whitespace-nowrap',
+              'tile tile-hover shrink-0 whitespace-nowrap',
             )}
           >
             <Settings className="w-3 h-3" strokeWidth={2.25} />
@@ -108,8 +106,8 @@ export function TrendsClient({ summaries, reportsCount }: TrendsClientProps) {
                 className={cn(
                   'shrink-0 h-9 px-3.5 rounded-pill text-[12.5px] font-medium transition-all',
                   active
-                    ? 'bg-grad-sage text-white shadow-button'
-                    : 'text-ink-2 hover:bg-white/70 bg-white/40 ring-1 ring-inset ring-[rgba(184,168,144,0.18)]',
+                    ? 'btn-sage text-white'
+                    : 'text-ink-2 tile tile-hover',
                 )}
               >
                 {t.label}
@@ -168,7 +166,7 @@ function GoalsTab() {
             <Link
               key={g.key}
               href="/profile"
-              className="flex items-center gap-3 sm:gap-4 p-3 sm:p-3.5 rounded-card bg-white/55 backdrop-blur-sm ring-1 ring-inset ring-[rgba(184,168,144,0.18)] hover:bg-white/80 transition-all group"
+              className="flex items-center gap-3 sm:gap-4 p-3 sm:p-3.5 rounded-card tile tile-hover group"
             >
               <ScoreRing
                 value={g.progress}
@@ -211,7 +209,7 @@ function GoalsTab() {
 
         <Link
           href="/profile"
-          className="mt-4 flex items-center justify-between gap-3 rounded-card bg-[rgba(168,191,163,0.10)] ring-1 ring-inset ring-[rgba(111,143,107,0.22)] px-3.5 py-3 hover:bg-[rgba(168,191,163,0.18)] transition-colors group"
+          className="mt-4 flex items-center justify-between gap-3 rounded-card tile-sage tile-hover px-3.5 py-3 group"
         >
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-full bg-white/80 ring-1 ring-inset ring-[rgba(111,143,107,0.20)] flex items-center justify-center">
@@ -283,7 +281,7 @@ function TrajectoryTab({ summaries }: { summaries: MetricSummary[] }) {
           {stats.map((s) => (
             <div
               key={s.eyebrow}
-              className="rounded-[14px] bg-white/65 ring-1 ring-inset ring-[rgba(184,168,144,0.18)] px-3 py-2.5"
+              className="rounded-[14px] tile px-3 py-2.5"
             >
               <div className="text-[9.5px] font-semibold uppercase tracking-[0.14em] text-ink-3">
                 {s.eyebrow}
@@ -320,7 +318,7 @@ function TrajectoryTab({ summaries }: { summaries: MetricSummary[] }) {
 
         <Link
           href="/insights"
-          className="mt-5 flex items-center justify-between gap-3 rounded-card bg-[rgba(168,191,163,0.14)] ring-1 ring-inset ring-[rgba(111,143,107,0.22)] px-3.5 py-3 hover:bg-[rgba(168,191,163,0.20)] transition-colors group"
+          className="mt-5 flex items-center justify-between gap-3 rounded-card tile-sage tile-hover px-3.5 py-3 group"
         >
           <div className="flex items-center gap-2.5 min-w-0">
             <Sparkles className="w-4 h-4 text-sage-deep shrink-0" strokeWidth={2.25} />
@@ -421,7 +419,7 @@ function LifestyleTab({ summaries }: { summaries: MetricSummary[] }) {
           {lifestyle.map((l) => (
             <div
               key={l.key}
-              className="flex items-center gap-3 sm:gap-4 p-3 sm:p-3.5 rounded-card bg-white/55 backdrop-blur-sm ring-1 ring-inset ring-[rgba(184,168,144,0.18)]"
+              className="flex items-center gap-3 sm:gap-4 p-3 sm:p-3.5 rounded-card tile"
             >
               <IconBadge icon={l.icon} tone={l.tone} variant="tint" size="md" />
               <div className="flex-1 min-w-0">
@@ -457,7 +455,7 @@ function LifestyleTab({ summaries }: { summaries: MetricSummary[] }) {
 
         <Link
           href="/insights"
-          className="mt-4 flex items-center justify-between gap-3 rounded-card bg-[rgba(168,191,163,0.14)] ring-1 ring-inset ring-[rgba(111,143,107,0.22)] px-3.5 py-3 hover:bg-[rgba(168,191,163,0.20)] transition-colors group"
+          className="mt-4 flex items-center justify-between gap-3 rounded-card tile-sage tile-hover px-3.5 py-3 group"
         >
           <div className="flex items-center gap-2.5 min-w-0">
             <Sparkles className="w-4 h-4 text-sage-deep shrink-0" strokeWidth={2.25} />
@@ -521,7 +519,7 @@ function ReportsTab({ reportsCount }: { reportsCount: number }) {
             <Link
               key={r.key}
               href="/reports/ai"
-              className="flex items-start gap-3 sm:gap-4 p-3 sm:p-3.5 rounded-card bg-white/55 backdrop-blur-sm ring-1 ring-inset ring-[rgba(184,168,144,0.18)] hover:bg-white/80 transition-all group"
+              className="flex items-start gap-3 sm:gap-4 p-3 sm:p-3.5 rounded-card tile tile-hover group"
             >
               <IconBadge icon={r.icon} tone={r.tone} variant="tint" size="md" />
               <div className="flex-1 min-w-0">
@@ -544,7 +542,7 @@ function ReportsTab({ reportsCount }: { reportsCount: number }) {
 
         <Link
           href="/reports/ai"
-          className="mt-4 flex items-center justify-between gap-3 rounded-card bg-[rgba(168,191,163,0.14)] ring-1 ring-inset ring-[rgba(111,143,107,0.22)] px-3.5 py-3 hover:bg-[rgba(168,191,163,0.20)] transition-colors group"
+          className="mt-4 flex items-center justify-between gap-3 rounded-card tile-sage tile-hover px-3.5 py-3 group"
         >
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-full bg-white/80 ring-1 ring-inset ring-[rgba(111,143,107,0.20)] flex items-center justify-center">

@@ -23,12 +23,12 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 import { Card } from '@/components/ui/card'
-import { IconBadge } from '@/components/ui/icon-badge'
+import { IconBadge, type IconBadgeTone } from '@/components/ui/icon-badge'
 import { SparkLine } from '@/components/ui/spark-line'
 import { cn } from '@/lib/utils'
 
 type Checkin = { date: string; energy: number; sleep: number; mood: number; stress: number }
-type Tone = 'sage' | 'amber' | 'rose' | 'ink' | 'violet'
+type Tone = IconBadgeTone
 type Impact = 'high' | 'medium' | 'low' | 'moderate'
 
 const IMPACT_STYLE: Record<Impact, string> = {
@@ -84,9 +84,7 @@ export function InsightsClient({ recentCheckins }: InsightsClientProps) {
             className={cn(
               'inline-flex items-center gap-1.5 h-8 px-3 rounded-pill',
               'text-[12px] font-medium text-sage-deep',
-              'bg-white/70 backdrop-blur-sm',
-              'ring-1 ring-inset ring-[rgba(111,143,107,0.22)]',
-              'hover:bg-white transition-colors shrink-0 whitespace-nowrap',
+              'tile tile-hover shrink-0 whitespace-nowrap',
             )}
           >
             <Settings className="w-3 h-3" strokeWidth={2.25} />
@@ -108,8 +106,8 @@ export function InsightsClient({ recentCheckins }: InsightsClientProps) {
                 className={cn(
                   'shrink-0 h-9 px-3.5 rounded-pill text-[12.5px] font-medium transition-all',
                   active
-                    ? 'bg-grad-sage text-white shadow-button'
-                    : 'text-ink-2 hover:bg-white/70 bg-white/40 ring-1 ring-inset ring-[rgba(184,168,144,0.18)]',
+                    ? 'btn-sage text-white'
+                    : 'text-ink-2 tile tile-hover',
                 )}
               >
                 {t.label}
@@ -148,7 +146,7 @@ function TodayTab({ checkins }: { checkins: Checkin[] }) {
           {drivers.map((d) => (
             <div
               key={d.key}
-              className="flex items-start gap-3 sm:gap-4 p-3 sm:p-3.5 rounded-card bg-white/55 backdrop-blur-sm ring-1 ring-inset ring-[rgba(184,168,144,0.18)]"
+              className="flex items-start gap-3 sm:gap-4 p-3 sm:p-3.5 rounded-card tile"
             >
               <IconBadge icon={d.icon} tone={d.tone} variant="tint" size="md" />
               <div className="flex-1 min-w-0">
@@ -176,7 +174,7 @@ function TodayTab({ checkins }: { checkins: Checkin[] }) {
           ))}
         </div>
 
-        <div className="mt-4 flex items-start gap-2.5 rounded-card bg-[rgba(232,226,214,0.40)] ring-1 ring-inset ring-[rgba(184,168,144,0.22)] px-3.5 py-3">
+        <div className="mt-4 flex items-start gap-2.5 rounded-card tile px-3.5 py-3">
           <Sparkles className="w-3.5 h-3.5 text-sage-deep mt-0.5 shrink-0" strokeWidth={2.25} />
           <div className="flex-1 min-w-0">
             <p className="text-[12.5px] text-ink leading-snug">
@@ -214,7 +212,7 @@ function PatternsTab() {
     {
       key: 'morning_focus',
       icon: Sunrise,
-      tone: 'sage' as Tone,
+      tone: 'sky' as Tone,
       title: 'Morning activity boosts your focus.',
       detail: 'Days you exercise in the morning, your focus is 22% higher compared to other days.',
       delta: '+22%',
@@ -224,7 +222,7 @@ function PatternsTab() {
     {
       key: 'stress_sleep',
       icon: Cloud,
-      tone: 'amber' as Tone,
+      tone: 'teal' as Tone,
       title: 'Stress impacts your sleep quality.',
       detail: 'On days with high stress, your sleep quality is 18% lower on average.',
       delta: '-18%',
@@ -248,11 +246,11 @@ function PatternsTab() {
           {patterns.map((p) => (
             <div
               key={p.key}
-              className="flex items-start gap-3 sm:gap-4 p-3 sm:p-3.5 rounded-card bg-white/55 backdrop-blur-sm ring-1 ring-inset ring-[rgba(184,168,144,0.18)]"
+              className="flex items-start gap-3 sm:gap-4 p-3 sm:p-3.5 rounded-card tile"
             >
               <IconBadge
                 icon={p.icon}
-                tone={p.tone === 'violet' ? 'sage' : p.tone}
+                tone={p.tone}
                 variant="tint"
                 size="md"
               />
@@ -277,7 +275,7 @@ function PatternsTab() {
                   values={p.series}
                   width={64}
                   height={26}
-                  tone={p.positive ? 'sage' : 'rose'}
+                  tone={p.tone}
                   showFill
                 />
               </div>
@@ -303,7 +301,7 @@ function PredictionsTab() {
     {
       key: 'sleep_decline',
       icon: Moon,
-      tone: 'amber' as Tone,
+      tone: 'violet' as Tone,
       title: 'Sleep quality may decline later this week.',
       detail: 'A busy schedule and rising stress may impact your sleep Fri-Sat.',
       confidence: 'Medium',
@@ -311,7 +309,7 @@ function PredictionsTab() {
     {
       key: 'hydration_pay_off',
       icon: Droplet,
-      tone: 'sage' as Tone,
+      tone: 'sky' as Tone,
       title: 'Hydration improvement will pay off.',
       detail: 'Improving your hydration consistently will support better energy and focus.',
       confidence: 'Medium',
@@ -339,7 +337,7 @@ function PredictionsTab() {
           {predictions.map((p) => (
             <div
               key={p.key}
-              className="flex items-start gap-3 sm:gap-4 p-3 sm:p-3.5 rounded-card bg-white/55 backdrop-blur-sm ring-1 ring-inset ring-[rgba(184,168,144,0.18)]"
+              className="flex items-start gap-3 sm:gap-4 p-3 sm:p-3.5 rounded-card tile"
             >
               <IconBadge icon={p.icon} tone={p.tone} variant="tint" size="md" />
               <div className="flex-1 min-w-0">
@@ -367,7 +365,7 @@ function PredictionsTab() {
           ))}
         </div>
 
-        <div className="mt-4 flex items-start gap-2.5 rounded-card bg-[rgba(232,226,214,0.40)] ring-1 ring-inset ring-[rgba(184,168,144,0.22)] px-3.5 py-3">
+        <div className="mt-4 flex items-start gap-2.5 rounded-card tile px-3.5 py-3">
           <Sparkles className="w-3.5 h-3.5 text-sage-deep mt-0.5 shrink-0" strokeWidth={2.25} />
           <p className="text-[12.5px] text-ink leading-snug flex-1 min-w-0">
             Small consistent actions today can lead to big improvements in the next few days.
@@ -381,28 +379,32 @@ function PredictionsTab() {
 
 // ── Tab 4: KNOWS ABOUT YOU ───────────────────────────────────────────────
 function KnowsTab() {
-  const knowledge = [
+  const knowledge: { key: string; icon: LucideIcon; tone: Tone; title: string; detail: string }[] = [
     {
       key: 'weekday_consistency',
       icon: CalendarDays,
+      tone: 'sky',
       title: "You're most consistent on weekdays.",
       detail: 'Your routines are stronger Mon–Fri than weekends.',
     },
     {
       key: 'sleep_need',
       icon: Moon,
+      tone: 'violet',
       title: 'You need 7-8h of sleep to feel your best.',
       detail: 'Below 7h, your energy and mood drop noticeably.',
     },
     {
       key: 'stress_response',
       icon: Wind,
+      tone: 'teal',
       title: 'You respond strongly to stress.',
       detail: 'Your HRV drops quickly when stress is high.',
     },
     {
       key: 'protein_response',
       icon: Heart,
+      tone: 'amber',
       title: 'You perform better with higher protein.',
       detail: 'Higher protein days = better recovery & focus.',
     },
@@ -424,9 +426,9 @@ function KnowsTab() {
             <Link
               key={k.key}
               href="/chat"
-              className="flex items-start gap-3 sm:gap-4 p-3 sm:p-3.5 rounded-card bg-white/55 backdrop-blur-sm ring-1 ring-inset ring-[rgba(184,168,144,0.18)] hover:bg-white/80 hover:ring-[rgba(111,143,107,0.30)] transition-all group"
+              className="flex items-start gap-3 sm:gap-4 p-3 sm:p-3.5 rounded-card tile tile-hover group"
             >
-              <IconBadge icon={k.icon} tone="sage" variant="tint" size="md" />
+              <IconBadge icon={k.icon} tone={k.tone} variant="tint" size="md" />
               <div className="flex-1 min-w-0">
                 <div className="font-sans text-[13.5px] font-semibold text-ink leading-tight">
                   {k.title}
@@ -440,7 +442,7 @@ function KnowsTab() {
           ))}
         </div>
 
-        <div className="mt-4 flex items-start gap-2.5 rounded-card bg-[rgba(168,191,163,0.14)] ring-1 ring-inset ring-[rgba(111,143,107,0.22)] px-3.5 py-3">
+        <div className="mt-4 flex items-start gap-2.5 rounded-card tile-sage px-3.5 py-3">
           <Leaf className="w-3.5 h-3.5 text-sage-deep mt-0.5 shrink-0" strokeWidth={2.25} />
           <p className="text-[12.5px] text-ink leading-snug flex-1 min-w-0">
             We&apos;re always learning and will continue to update this as we learn more about you.
@@ -541,10 +543,10 @@ function todayDrivers(checkins: Checkin[]): TodayDriver[] {
   if (checkins.length < 2) {
     // Friendly defaults that mirror v7 image 3 panel 1.
     return [
-      { key: 'sleep',    label: 'Sleep timing', reason: 'You went to bed 52 mins later than your usual average.',  impact: 'high',     icon: Moon,     tone: 'rose'  },
-      { key: 'stress',   label: 'Stress',       reason: 'Stress levels have been elevated since yesterday afternoon.', impact: 'high', icon: Wind,     tone: 'rose'  },
-      { key: 'hrv',      label: 'HRV',          reason: 'Your 7-day average is slightly below your usual range.',  impact: 'moderate', icon: Heart,    tone: 'amber' },
-      { key: 'activity', label: 'Activity',     reason: 'You moved less than usual today.',                        impact: 'low',      icon: Activity, tone: 'sage'  },
+      { key: 'sleep',    label: 'Sleep timing', reason: 'You went to bed 52 mins later than your usual average.',  impact: 'high',     icon: Moon,     tone: 'violet' },
+      { key: 'stress',   label: 'Stress',       reason: 'Stress levels have been elevated since yesterday afternoon.', impact: 'high', icon: Wind,     tone: 'teal'   },
+      { key: 'hrv',      label: 'HRV',          reason: 'Your 7-day average is slightly below your usual range.',  impact: 'moderate', icon: Heart,    tone: 'rose'   },
+      { key: 'activity', label: 'Activity',     reason: 'You moved less than usual today.',                        impact: 'low',      icon: Activity, tone: 'sky'    },
     ]
   }
   const recent = checkins.slice(0, 3)
@@ -563,7 +565,7 @@ function todayDrivers(checkins: Checkin[]): TodayDriver[] {
       reason: dSleep < 0 ? 'You went to bed later than your usual average.' : 'Bedtime is consistent with your usual rhythm.',
       impact: 'low',
       icon: Moon,
-      tone: dSleep < 0 ? 'rose' : 'sage',
+      tone: 'violet',
     },
     {
       key: 'stress',
@@ -571,7 +573,7 @@ function todayDrivers(checkins: Checkin[]): TodayDriver[] {
       reason: dStress > 0 ? 'Stress levels have been elevated since yesterday.' : 'Stress has eased over the last few days.',
       impact: 'low',
       icon: Wind,
-      tone: dStress > 0 ? 'rose' : 'sage',
+      tone: 'teal',
     },
     {
       key: 'hrv',
@@ -579,7 +581,7 @@ function todayDrivers(checkins: Checkin[]): TodayDriver[] {
       reason: dEnergy < 0 ? 'Slightly below your usual range.' : 'Tracking inside your healthy range.',
       impact: 'low',
       icon: Heart,
-      tone: dEnergy < 0 ? 'amber' : 'sage',
+      tone: 'rose',
     },
     {
       key: 'activity',
@@ -587,7 +589,7 @@ function todayDrivers(checkins: Checkin[]): TodayDriver[] {
       reason: dMood < 0 ? 'You moved less than usual.' : 'Activity is on rhythm with your usual week.',
       impact: 'low',
       icon: Activity,
-      tone: dMood < 0 ? 'amber' : 'sage',
+      tone: 'sky',
     },
   ]
 

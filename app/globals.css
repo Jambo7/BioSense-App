@@ -1,4 +1,10 @@
 @import "tailwindcss";
+/* Tailwind v4 no longer auto-loads `tailwind.config.ts`. Without this line
+   every custom theme token (rounded-card / rounded-pill radii, the sage/ink
+   colour palette, eyebrow font sizes, card shadows…) silently fails to
+   generate — which left every panel and pill with SHARP corners and the
+   wrong tones. This bridges the legacy config into the v4 build. */
+@config "../tailwind.config.ts";
 
 :root {
   --sage:        #6F8F6B;
@@ -39,14 +45,24 @@
   --grad-rose:        linear-gradient(180deg, #D49595 0%, #B86B6B 100%);
   --grad-amber:       linear-gradient(180deg, #E5B477 0%, #C88A45 100%);
 
+  /* Softer, larger-spread shadows give cards a true "lift off the surface"
+     feel without any hard edge. Layered: tiny contact + warm sage halo +
+     wide ambient bloom. Updated in the v7-polish pass to match the
+     reference image (softer, more diffuse glow under each card). */
+  /* Neutral GREY ambient lift (per brief). A tight contact line, a soft
+     even halo that wraps the panel on every side (low offset, no negative
+     spread), then a wide diffuse bloom for grounding. Neutral ink-grey —
+     no green tint — so panels read clean and premium, floating on a halo. */
   --shadow-float:
     0 1px 2px rgba(26, 28, 26, 0.04),
-    0 8px 24px -6px rgba(111, 143, 107, 0.16),
-    0 24px 48px -16px rgba(26, 28, 26, 0.06);
+    0 6px 20px rgba(26, 28, 26, 0.06),
+    0 18px 44px -12px rgba(26, 28, 26, 0.13),
+    0 36px 72px -28px rgba(26, 28, 26, 0.10);
   --shadow-float-hover:
-    0 1px 2px rgba(26, 28, 26, 0.04),
-    0 12px 32px -6px rgba(111, 143, 107, 0.22),
-    0 32px 64px -16px rgba(26, 28, 26, 0.08);
+    0 1px 2px rgba(26, 28, 26, 0.05),
+    0 8px 26px rgba(26, 28, 26, 0.08),
+    0 26px 56px -12px rgba(26, 28, 26, 0.16),
+    0 48px 92px -30px rgba(26, 28, 26, 0.12);
   --shadow-button:
     inset 0 1px 0 rgba(255, 255, 255, 0.22),
     0 1px 2px rgba(90, 117, 86, 0.30),
@@ -58,7 +74,8 @@
   --shadow-glass:
     inset 0 1px 0 rgba(255, 255, 255, 0.6),
     0 1px 0 rgba(26, 28, 26, 0.03),
-    0 12px 28px -8px rgba(111, 143, 107, 0.18);
+    0 6px 18px rgba(26, 28, 26, 0.05),
+    0 16px 36px -10px rgba(26, 28, 26, 0.12);
 }
 
 * { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
@@ -117,20 +134,23 @@ html, body {
    read as resting on a real surface rather than floating in fog. Shadow is
    the multi-layer `--shadow-float` for proper card lift. */
 .glass {
-  background: rgba(255, 255, 255, 0.78);
-  backdrop-filter: blur(18px) saturate(1.2);
-  -webkit-backdrop-filter: blur(18px) saturate(1.2);
-  border: 1px solid rgba(184, 168, 144, 0.18);
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(20px) saturate(1.2);
+  -webkit-backdrop-filter: blur(20px) saturate(1.2);
+  /* Hairline border kept ultra-faint so the shadow does the lifting work,
+     not the border. Matches the brief where cards float on a halo, not
+     on a defined outline. */
+  border: 1px solid rgba(184, 168, 144, 0.10);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.70),
     var(--shadow-float);
 }
 
 .glass-strong {
-  background: rgba(255, 255, 255, 0.88);
+  background: rgba(255, 255, 255, 0.90);
   backdrop-filter: blur(24px) saturate(1.3);
   -webkit-backdrop-filter: blur(24px) saturate(1.3);
-  border: 1px solid rgba(184, 168, 144, 0.20);
+  border: 1px solid rgba(184, 168, 144, 0.12);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.75),
     var(--shadow-float);
@@ -143,15 +163,17 @@ html, body {
    subtle — it lifts the card off the sage-tinted page texture without
    competing for attention. */
 .glass-premium {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, rgba(250, 247, 240, 0.86) 100%);
-  backdrop-filter: blur(22px) saturate(1.25);
-  -webkit-backdrop-filter: blur(22px) saturate(1.25);
-  border: 1px solid rgba(184, 168, 144, 0.24);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94) 0%, rgba(250, 247, 240, 0.88) 100%);
+  backdrop-filter: blur(24px) saturate(1.25);
+  -webkit-backdrop-filter: blur(24px) saturate(1.25);
+  /* Border barely there — the shadow stack defines the edge, not the line. */
+  border: 1px solid rgba(184, 168, 144, 0.14);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.80),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
     0 1px 2px rgba(26, 28, 26, 0.04),
-    0 12px 32px -8px rgba(111, 143, 107, 0.20),
-    0 32px 64px -20px rgba(26, 28, 26, 0.08);
+    0 8px 26px rgba(26, 28, 26, 0.07),
+    0 24px 54px -12px rgba(26, 28, 26, 0.15),
+    0 48px 92px -30px rgba(26, 28, 26, 0.12);
 }
 
 .glass-sage {
@@ -161,22 +183,117 @@ html, body {
   border: 1px solid rgba(168, 191, 163, 0.30);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.55),
-    0 12px 28px -8px rgba(111, 143, 107, 0.25);
+    0 6px 20px rgba(26, 28, 26, 0.06),
+    0 18px 40px -12px rgba(26, 28, 26, 0.12);
 }
 
+/* ─── Soft nested tile ──────────────────────────────────────────────────
+   Premium replacement for the old flat `bg-white/55 + 1px ring` nested
+   panels that read as "boxy". Gives inner panels a soft glassy gradient
+   fill, a barely-there frosted edge, an inset top highlight and a gentle
+   sage glow beneath — so they feel lifted and dimensional rather than
+   boxed-in. Used site-wide for list rows, stat tiles, note strips, etc.
+   Keep the `rounded-card` (or `rounded-pill`) utility on the element for
+   the radius; `.tile` only handles surface + depth. */
+.tile {
+  /* Bright, near-opaque surface so the tile clearly reads as a distinct
+     panel sitting ABOVE its parent card (even white-on-white). The lift
+     comes from a layered soft drop shadow — a tight contact line, a warm
+     sage glow, and a wide ambient bloom — plus a crisp white top sheen.
+     No dark hairline border (that's what made the old panels read "boxy");
+     the soft shadow alone defines the edge. */
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.97) 0%, rgba(251, 250, 247, 0.90) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px) saturate(1.15);
+  -webkit-backdrop-filter: blur(10px) saturate(1.15);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    0 1px 2px rgba(26, 28, 26, 0.05),
+    0 4px 14px rgba(26, 28, 26, 0.05),
+    0 14px 30px -12px rgba(26, 28, 26, 0.13),
+    0 26px 50px -24px rgba(26, 28, 26, 0.13);
+}
+.tile-hover {
+  transition:
+    box-shadow 240ms var(--ease),
+    transform  240ms var(--ease),
+    background 240ms var(--ease);
+}
+.tile-hover:hover {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(253, 252, 250, 0.95) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    0 1px 2px rgba(26, 28, 26, 0.05),
+    0 6px 18px rgba(26, 28, 26, 0.07),
+    0 20px 40px -12px rgba(26, 28, 26, 0.18),
+    0 34px 62px -26px rgba(26, 28, 26, 0.16);
+  transform: translateY(-2px);
+}
+/* Sage-tinted variant for accent / suggestion tiles. */
+.tile-sage {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.78) 0%, rgba(168, 191, 163, 0.22) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(10px) saturate(1.2);
+  -webkit-backdrop-filter: blur(10px) saturate(1.2);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.80),
+    0 1px 2px rgba(26, 28, 26, 0.04),
+    0 4px 14px rgba(26, 28, 26, 0.05),
+    0 14px 30px -12px rgba(26, 28, 26, 0.13),
+    0 26px 50px -24px rgba(26, 28, 26, 0.13);
+}
+.tile-sage.tile-hover:hover {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.88) 0%, rgba(168, 191, 163, 0.30) 100%);
+}
+
+/* ─── Top bar ───────────────────────────────────────────────────────────
+   Per the v7 reference image, the top bar should disappear into the page
+   — logo + Wearables pill + bell + avatar sit naturally on the photographic
+   texture, with no defined header rectangle. The blur is gone, the bottom
+   border is gone, the background is fully transparent. The bar simply
+   floats above the texture, lifted by the page itself. */
 .glass-nav {
-  background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: blur(22px) saturate(1.3);
-  -webkit-backdrop-filter: blur(22px) saturate(1.3);
-  border-bottom: 1px solid rgba(26, 28, 26, 0.06);
+  background: transparent;
+  border-bottom: none;
+  /* Subtle scrim BEHIND the bar contents so dark text always reads cleanly
+     over the photo when scrolled. Drawn as a top-fading gradient via the
+     ::before so the bar itself can stay fully transparent. */
+  position: relative;
+}
+.glass-nav::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  /* Sits BELOW the bar contents within the header's stacking context
+     (header has z-40 + sticky which establishes the context). The
+     translucent gradient gives scrolled content enough of a fade to
+     keep logo + pills legible without ever reading as a defined bar. */
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(250, 250, 248, 0.85) 0%,
+    rgba(250, 250, 248, 0.55) 55%,
+    rgba(250, 250, 248, 0)    100%
+  );
+  -webkit-mask: linear-gradient(180deg, #000 0%, #000 60%, transparent 100%);
+          mask: linear-gradient(180deg, #000 0%, #000 60%, transparent 100%);
 }
 
-.glass-tabbar {
-  background: rgba(255, 255, 255, 0.96);
+/* ─── Bottom tab bar ────────────────────────────────────────────────────
+   Edge-to-edge bar matching the v7 docx reference images (image1 + image2).
+   Reads as "lifted" from the page via a soft sage halo radiating UP from
+   the top edge — no harsh bottom-border line, no boxed-in container feel.
+   Pill class name kept for backwards compatibility with the JSX. */
+.tabbar-pill {
+  background: rgba(255, 255, 255, 0.94);
   backdrop-filter: blur(28px) saturate(1.4);
   -webkit-backdrop-filter: blur(28px) saturate(1.4);
-  border-top: 1px solid rgba(26, 28, 26, 0.06);
-  box-shadow: 0 -8px 32px -12px rgba(111, 143, 107, 0.18);
+  border-top: 1px solid rgba(184, 168, 144, 0.18);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.80),
+    0 -2px 4px rgba(26, 28, 26, 0.03),
+    0 -10px 32px -6px rgba(111, 143, 107, 0.22);
 }
 
 /* ─── Floating shadow utilities ─────────────────────────────────────────── */
@@ -256,16 +373,21 @@ html, body {
   pointer-events: none;
   overflow: hidden;
 }
+/* Top fade kept very short + soft so the texture reads as a natural
+   wash behind the greeting (matches the brief where olive branches bleed
+   naturally into the upper portion of the screen). The top-bar scrim
+   already handles legibility behind logo / pills, so we don't need a
+   heavy fade here. */
 .page-texture-fade-top {
   position: absolute;
   inset: 0 0 auto 0;
-  height: 140px;
-  background: linear-gradient(180deg, var(--off-white) 0%, rgba(250, 250, 248, 0) 100%);
+  height: 40px;
+  background: linear-gradient(180deg, rgba(250, 250, 248, 0.40) 0%, rgba(250, 250, 248, 0) 100%);
 }
 .page-texture-fade-bot {
   position: absolute;
   inset: auto 0 0 0;
-  height: 200px;
+  height: 220px;
   background: linear-gradient(0deg, var(--off-white) 0%, rgba(250, 250, 248, 0) 100%);
 }
 

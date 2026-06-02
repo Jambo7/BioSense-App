@@ -147,7 +147,7 @@ export default function OnboardingPage() {
             </div>
           </div>
 
-          <div className="mt-10 p-5 sm:p-6 bg-white rounded-card border border-line">
+          <div className="mt-10 p-5 sm:p-6 tile rounded-card">
             <div className="text-eyebrow uppercase text-ink-3 mb-4">Step 1: Choose a goal type</div>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
               {goals.map((g) => {
@@ -211,7 +211,7 @@ export default function OnboardingPage() {
             The more specific you are, the better BioSense can personalise your insights and recommendations.
           </p>
 
-          <div className="bg-white rounded-card border border-line p-5 sm:p-6 space-y-4">
+          <div className="tile rounded-card p-5 sm:p-6 space-y-4">
             <Textarea
               label="What are you working towards?"
               rows={3}
@@ -270,7 +270,7 @@ export default function OnboardingPage() {
             <span className="text-caption text-sage-deep font-medium">Encrypted end-to-end · only you can see this</span>
           </div>
 
-          <div className="bg-white rounded-card border border-line p-5 sm:p-6 space-y-4">
+          <div className="tile rounded-card p-5 sm:p-6 space-y-4">
             <Input
               label="Dietary restrictions or allergies"
               placeholder="Gluten-free, lactose intolerant, nut allergy"
@@ -360,7 +360,7 @@ export default function OnboardingPage() {
             with a quick daily check-in to begin building your data.
           </p>
 
-          <div className="bg-white rounded-card border border-line p-5 sm:p-6 mb-8 text-left max-w-[440px] mx-auto">
+          <div className="tile rounded-card p-5 sm:p-6 mb-8 text-left max-w-[440px] mx-auto">
             <div className="text-eyebrow uppercase text-ink-3 mb-3">Next up</div>
             <div className="space-y-2.5">
               {[

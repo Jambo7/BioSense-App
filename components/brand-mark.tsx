@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
 
-const LOGO_SRC = '/biosense-wordmark.png'
+const LOGO_SRC = '/biosense-wordmark-v2.png'
 const MARK_SRC = '/biosense-mark.png'
 const LOGO_W = 1024
 const LOGO_H = 215

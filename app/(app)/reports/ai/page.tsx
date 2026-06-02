@@ -356,7 +356,7 @@ function SampleWeeklyReport() {
         </div>
 
         {/* Consistency check */}
-        <div className="rounded-[12px] border border-line p-4 flex items-center gap-3 bg-off-white">
+        <div className="rounded-[12px] tile p-4 flex items-center gap-3">
           <IconBadge icon={CheckCircle2} tone="sage" size="md" />
           <div className="flex-1">
             <div className="text-body-sm font-semibold text-ink">
@@ -382,7 +382,7 @@ function SampleWeeklyReport() {
         </div>
 
         {/* Final note */}
-        <div className="rounded-[12px] bg-sand-deep/40 border border-line p-4 flex items-start gap-3">
+        <div className="rounded-[12px] tile p-4 flex items-start gap-3">
           <IconBadge icon={Sparkles} tone="amber" size="md" />
           <div>
             <div className="text-body-sm font-semibold text-ink mb-1">Final note</div>

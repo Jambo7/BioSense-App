@@ -66,11 +66,16 @@ export function AppNav() {
 
   return (
     <>
-      {/* ── Top bar (glass) ── */}
+      {/* ── Top bar ──
+          Per v7-polish: header is now fully transparent — logo, Wearables
+          pill, bell, and avatar sit naturally over the page texture (no
+          defined header rectangle, no border, no blur). A very soft
+          top-down scrim drawn from inside `.glass-nav::before` keeps text
+          legible when content scrolls under the bar. */}
       <header className="glass-nav sticky top-0 z-40 h-[60px] flex items-center justify-between px-4 sm:px-6 gap-3">
         {/* Wordmark */}
         <Link href="/dashboard" className="flex items-center group shrink-0">
-          <BrandWordmark height={22} priority />
+          <BrandWordmark height={28} priority />
         </Link>
 
         {/* Desktop nav */}
@@ -156,14 +161,16 @@ export function AppNav() {
         </div>
       </header>
 
-      {/* ── Mobile bottom tab bar (glass) ──
-          Layout: 2 flat items, the floating Ask CTA, 2 flat items.
-          The Ask button lifts out of the bar (negative top margin) and
-          carries the brand colour + S mark, mirroring the pattern from
-          Stealth's "Ask Claw". `overflow-visible` on the nav lets the
-          button extend above the bar's top edge. */}
+      {/* ── Mobile bottom tab bar ──
+          Edge-to-edge bar that hugs the bottom of the screen — matches the
+          v7 docx reference images (image1 + image2 both show this shape,
+          not a floating pill). The bar carries a soft sage halo above its
+          top edge so it still reads as "lifted" from the page, and the
+          central Ask CTA overhangs above the bar's top edge via the
+          `-mt-7` on the button itself. `overflow-visible` on the bar lets
+          that CTA extend up cleanly. */}
       <nav
-        className="lg:hidden glass-tabbar fixed bottom-0 left-0 right-0 z-40 pb-[env(safe-area-inset-bottom)] overflow-visible"
+        className="lg:hidden tabbar-pill fixed bottom-0 left-0 right-0 z-40 pb-[env(safe-area-inset-bottom)] overflow-visible rounded-none border-x-0"
       >
         <div className="flex items-stretch justify-around max-w-3xl mx-auto px-1 pt-1.5">
           {navItems.map((item) => {

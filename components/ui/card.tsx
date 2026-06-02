@@ -43,7 +43,7 @@ export function Card({
     'glass':         'glass rounded-card',
     'glass-strong':  'glass-strong rounded-card',
     'glass-sage':    'glass-sage rounded-card',
-    'premium':       'glass-premium rounded-[28px]',
+    'premium':       'glass-premium rounded-[32px]',
     'plain':         'bg-white border border-line shadow-float rounded-card',
     'soft':          'bg-off-white border border-line rounded-card',
     'sage':          'glass-sage rounded-card',

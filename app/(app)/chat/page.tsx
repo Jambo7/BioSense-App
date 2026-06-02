@@ -73,7 +73,7 @@ export default function AIPage() {
                   className={cn(
                     'shrink-0 h-8 px-3 rounded-pill text-[12px] font-medium transition-all',
                     active
-                      ? 'bg-grad-sage text-white shadow-button'
+                      ? 'btn-sage text-white'
                       : 'text-ink-2 hover:bg-[rgba(26,28,26,0.04)]',
                   )}
                 >

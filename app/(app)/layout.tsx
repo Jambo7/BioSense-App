@@ -17,18 +17,21 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         <div className="orb" />
       </div>
 
-      {/* Photographic foundation. Faded, right-biased, sage-tinted via
-          mix-blend so it lives behind every screen without ever competing
-          with content. Top + bottom edges fade into the page background so
-          the sticky header and tab bar always read on solid colour. */}
+      {/* Photographic foundation. Per v7-polish, the texture is now anchored
+          to the TOP-RIGHT (matches the brief where the olive branches and
+          vase concentrate in the upper-right quadrant and naturally fade
+          out across the rest of the screen). Opacity bumped slightly so
+          the photo reads as a real surface peeking through, not a ghost.
+          Top fade is now barely there so the texture bleeds naturally
+          behind the (now-transparent) top bar — no hard horizontal line. */}
       <div className="page-texture" aria-hidden>
         <Image
-          src="/dashboard-hero-leaves.png"
+          src="/dashboard-hero-leaves-v6.png"
           alt=""
           fill
           priority
           sizes="100vw"
-          className="object-cover object-[80%_30%] opacity-[0.22] mix-blend-multiply"
+          className="object-cover object-[50%_0%] opacity-[0.65]"
         />
         <div className="page-texture-fade-top" />
         <div className="page-texture-fade-bot" />
@@ -36,6 +39,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
       <div className="relative z-10">
         <AppNav />
+        {/* pb-32 leaves room for the edge-to-edge tab bar + its overhanging
+            Ask CTA on mobile. lg+ uses the top nav so no bottom padding. */}
         <main className="max-w-5xl mx-auto px-4 sm:px-6 pb-32 lg:pb-16 pt-5 sm:pt-8">
           {children}
         </main>

@@ -150,11 +150,7 @@ export function PreferencesTab() {
               key={k.id}
               type="button"
               className={cn(
-                'rounded-card bg-white ring-1 ring-line p-3 text-left group',
-                'shadow-[0_1px_2px_rgba(26,28,26,0.04),0_4px_14px_-6px_rgba(111,143,107,0.18)]',
-                'hover:ring-[rgba(168,191,163,0.55)] hover:-translate-y-px',
-                'hover:shadow-[0_1px_2px_rgba(26,28,26,0.05),0_8px_22px_-6px_rgba(111,143,107,0.28)]',
-                'transition-all',
+                'rounded-card tile tile-hover p-3 text-left group',
               )}
             >
               <IconBadge icon={k.icon} tone={k.tone} variant="gradient" size="sm" />
