@@ -6,11 +6,19 @@ const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
 }
 
+function normalizeDatabaseUrl(url: string): string {
+  // pg v8 warns when sslmode=require is used because it currently maps to
+  // verify-full; be explicit so the Next.js dev overlay stays clean.
+  return url.replace(/sslmode=(?:require|prefer|verify-ca)/gi, 'sslmode=verify-full')
+}
+
 function createPrismaClient(): PrismaClient {
-  const connectionString = process.env.DATABASE_URL
-  if (!connectionString) {
+  const raw = process.env.DATABASE_URL
+  if (!raw) {
     throw new Error('DATABASE_URL environment variable is not set')
   }
+
+  const connectionString = normalizeDatabaseUrl(raw)
 
   // Cloud SQL on Cloud Run uses Unix socket — pg handles this via the host path
   // e.g. postgresql://user:pass@/dbname?host=/cloudsql/project:region:instance

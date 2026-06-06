@@ -19,21 +19,15 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         <div className="orb" />
       </div>
 
-      {/* Photographic foundation. Per v7-polish, the texture is now anchored
-          to the TOP-RIGHT (matches the brief where the olive branches and
-          vase concentrate in the upper-right quadrant and naturally fade
-          out across the rest of the screen). Opacity bumped slightly so
-          the photo reads as a real surface peeking through, not a ghost.
-          Top fade is now barely there so the texture bleeds naturally
-          behind the (now-transparent) top bar — no hard horizontal line. */}
-      <div className="page-texture" aria-hidden>
+      {/* Soft sage ribbon background (3rd-June spec — replaces plant photo). */}
+      <div className="page-texture page-texture-waves" aria-hidden>
         <Image
-          src="/dashboard-hero-leaves-v6.png"
+          src="/bg-waves.svg"
           alt=""
           fill
           priority
           sizes="100vw"
-          className="object-cover object-[50%_0%] opacity-[0.65]"
+          className="object-cover object-top opacity-[0.92]"
         />
         <div className="page-texture-fade-top" />
         <div className="page-texture-fade-bot" />

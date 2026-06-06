@@ -62,10 +62,21 @@ export async function POST(req: NextRequest) {
       message = 'Strong week — your recovery has improved. See what worked.'
     }
 
+    const urlMap: Record<string, string> = {
+      energy_low_3d: '/insights',
+      sleep_low_3d: '/insights',
+      positive_trend: '/reports',
+    }
+
     if (trigger) {
-      // Log notification (actual delivery via Resend/Push in Phase 6)
       await prisma.notificationLog.create({
-        data: { userId: user.id, trigger, message, channel: 'push' },
+        data: {
+          userId: user.id,
+          trigger,
+          message,
+          channel: 'push',
+          url: urlMap[trigger] ?? '/dashboard',
+        },
       })
       triggered.push(`${user.id}:${trigger}`)
     }

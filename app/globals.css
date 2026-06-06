@@ -391,6 +391,11 @@ html, body {
   background: linear-gradient(0deg, var(--off-white) 0%, rgba(250, 250, 248, 0) 100%);
 }
 
+/* 3rd-June spec: soft flowing sage ribbons on cream (replaces plant photo). */
+.page-texture-waves {
+  background: linear-gradient(180deg, #FAFAF8 0%, #F5F1EA 55%, #FAFAF8 100%);
+}
+
 /* ─── Ambient backdrop ──────────────────────────────────────────────────── */
 /* Floating sage orbs that very slowly drift across the canvas behind everything.
    Three layers, different sizes / opacities / animation speeds. */

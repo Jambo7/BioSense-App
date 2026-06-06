@@ -1,11 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import {
   TrendingUp,
   TrendingDown,
-  Settings,
   ArrowRight,
   Moon,
   Wind,
@@ -27,6 +26,7 @@ import { Card } from '@/components/ui/card'
 import { ScoreRing } from '@/components/ui/score-ring'
 import { SparkLine } from '@/components/ui/spark-line'
 import { IconBadge } from '@/components/ui/icon-badge'
+import { DiscoveryCard } from '@/components/discovery-card'
 import { type MetricSlug } from '@/lib/trends'
 
 interface MetricSummary {
@@ -60,10 +60,15 @@ const TABS: { id: Tab; label: string }[] = [
 
 export function TrendsClient({ summaries, reportsCount }: TrendsClientProps) {
   const [tab, setTab] = useState<Tab>('goals')
+  const [showDiscovery, setShowDiscovery] = useState(false)
+
+  const sleepSummary = summaries.find((s) => s.slug === 'sleep')
+  const recoveryPct = sleepSummary?.delta != null && sleepSummary.delta > 0
+    ? Math.min(50, Math.round(sleepSummary.delta * 3))
+    : 31
 
   return (
     <div className="max-w-3xl mx-auto fade-up space-y-5">
-      {/* Header */}
       <header className="relative pt-2 pb-1">
         <div className="flex items-start justify-between gap-3">
           <div>
@@ -81,17 +86,27 @@ export function TrendsClient({ summaries, reportsCount }: TrendsClientProps) {
           </div>
           <button
             type="button"
+            onClick={() => setShowDiscovery((v) => !v)}
             className={cn(
               'inline-flex items-center gap-1.5 h-8 px-3 rounded-pill',
               'text-[12px] font-medium text-sage-deep',
               'tile tile-hover shrink-0 whitespace-nowrap',
+              showDiscovery && 'ring-1 ring-[rgba(111,143,107,0.40)]',
             )}
           >
-            <Settings className="w-3 h-3" strokeWidth={2.25} />
-            Trends settings
+            <Sparkles className="w-3 h-3" strokeWidth={2.25} />
+            BioSense Discovered
           </button>
         </div>
       </header>
+
+      {showDiscovery && (
+        <DiscoveryCard
+          headline="You recover"
+          accent={`${recoveryPct}% better when you sleep before 10:30pm.`}
+          detail="Consistent early sleep has the biggest positive impact on your recovery."
+        />
+      )}
 
       {/* Tab strip */}
       <div className="relative -mx-1 px-1">
@@ -126,90 +141,50 @@ export function TrendsClient({ summaries, reportsCount }: TrendsClientProps) {
 }
 
 // ── Tab 1: GOALS ─────────────────────────────────────────────────────────
+type UserGoal = {
+  id: string
+  title: string
+  pillars: string | null
+  progress: number
+  status: string
+}
+
 function GoalsTab() {
-  const goals = [
-    {
-      key: 'ironman',
-      title: 'Half Ironman readiness',
-      pillars: 'Endurance · Recovery · Consistency',
-      progress: 72,
-      delta: 12,
-      tone: 'sage' as const,
-      status: 'On track',
-      statusTone: 'sage' as const,
-    },
-    {
-      key: 'sleep',
-      title: 'Improve sleep consistency',
-      pillars: 'Sleep · Routine · Recovery',
-      progress: 48,
-      delta: 6,
-      tone: 'amber' as const,
-      status: 'Needs focus',
-      statusTone: 'amber' as const,
-    },
-  ]
+  const [goals, setGoals] = useState<UserGoal[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    ;(async () => {
+      try {
+        const res = await fetch('/api/goals')
+        if (res.ok) {
+          const data = await res.json()
+          setGoals(data.goals ?? [])
+        }
+      } finally {
+        setLoading(false)
+      }
+    })()
+  }, [])
+
+  const accent = goals.length === 0
+    ? 'your first goal.'
+    : `steady progress on ${goals.length} goal${goals.length === 1 ? '' : 's'}.`
 
   return (
     <div className="space-y-5">
       <HeroIntroCard
         eyebrow="Goals overview"
         lead="You're making"
-        accent="steady progress on 2 goals."
+        accent={accent}
         body="Track the goals that matter most to you and see how your daily habits drive them forward."
         decoration="mountains"
       />
 
       <Card variant="glass" padding="lg">
-        <div className="space-y-3">
-          {goals.map((g) => (
-            <Link
-              key={g.key}
-              href="/profile"
-              className="flex items-center gap-3 sm:gap-4 p-3 sm:p-3.5 rounded-card tile tile-hover group"
-            >
-              <ScoreRing
-                value={g.progress}
-                size={72}
-                thickness={7}
-                tone={g.tone}
-                centerSize={22}
-              />
-              <div className="flex-1 min-w-0">
-                <div className="font-sans text-[14.5px] font-semibold text-ink leading-tight">
-                  {g.title}
-                </div>
-                <div className="text-[11.5px] text-ink-3 leading-snug mt-1">
-                  {g.pillars}
-                </div>
-                <div className="flex items-center gap-2 mt-1.5">
-                  <span className={cn(
-                    'inline-flex items-center gap-1 text-[11px] font-semibold',
-                    g.delta >= 0 ? 'text-sage-deep' : 'text-[#A85454]',
-                  )}>
-                    {g.delta >= 0 ? <TrendingUp className="w-3 h-3" strokeWidth={2.5} /> : <TrendingDown className="w-3 h-3" strokeWidth={2.5} />}
-                    {g.delta >= 0 ? '+' : ''}{g.delta}% vs last 30 days
-                  </span>
-                </div>
-              </div>
-              <div className="flex flex-col items-end gap-1.5 shrink-0">
-                <span className={cn(
-                  'inline-flex items-center px-2 py-0.5 rounded-pill text-[10.5px] font-semibold uppercase tracking-wide',
-                  g.statusTone === 'sage'
-                    ? 'bg-[rgba(168,191,163,0.22)] text-sage-deep ring-1 ring-inset ring-[rgba(111,143,107,0.22)]'
-                    : 'bg-[rgba(237,198,138,0.30)] text-[#A77530] ring-1 ring-inset ring-[rgba(217,160,91,0.30)]',
-                )}>
-                  {g.status}
-                </span>
-                <ArrowRight className="w-4 h-4 text-ink-3 transition-transform group-hover:translate-x-0.5" strokeWidth={2.25} />
-              </div>
-            </Link>
-          ))}
-        </div>
-
         <Link
-          href="/profile"
-          className="mt-4 flex items-center justify-between gap-3 rounded-card tile-sage tile-hover px-3.5 py-3 group"
+          href="/reports/goals/new"
+          className="mb-4 flex items-center justify-between gap-3 rounded-card tile-sage tile-hover px-3.5 py-3 group"
         >
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-full bg-white/80 ring-1 ring-inset ring-[rgba(111,143,107,0.20)] flex items-center justify-center">
@@ -226,6 +201,57 @@ function GoalsTab() {
           </div>
           <ArrowRight className="w-4 h-4 text-sage-deep transition-transform group-hover:translate-x-0.5" strokeWidth={2.25} />
         </Link>
+
+        {loading ? (
+          <p className="text-caption text-ink-3 text-center py-6">Loading goals…</p>
+        ) : goals.length === 0 ? (
+          <p className="text-caption text-ink-3 text-center py-6">
+            No goals yet — add one above to get started.
+          </p>
+        ) : (
+          <div className="space-y-3">
+            {goals.map((g) => {
+              const tone = g.progress >= 60 ? 'sage' as const : 'amber' as const
+              const statusTone = g.status === 'On track' ? 'sage' as const : 'amber' as const
+              return (
+                <Link
+                  key={g.id}
+                  href={`/reports/goals/${g.id}`}
+                  className="flex items-center gap-3 sm:gap-4 p-3 sm:p-3.5 rounded-card tile tile-hover group"
+                >
+                  <ScoreRing
+                    value={g.progress}
+                    size={72}
+                    thickness={7}
+                    tone={tone}
+                    centerSize={22}
+                  />
+                  <div className="flex-1 min-w-0">
+                    <div className="font-sans text-[14.5px] font-semibold text-ink leading-tight">
+                      {g.title}
+                    </div>
+                    {g.pillars && (
+                      <div className="text-[11.5px] text-ink-3 leading-snug mt-1">
+                        {g.pillars}
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex flex-col items-end gap-1.5 shrink-0">
+                    <span className={cn(
+                      'inline-flex items-center px-2 py-0.5 rounded-pill text-[10.5px] font-semibold uppercase tracking-wide',
+                      statusTone === 'sage'
+                        ? 'bg-[rgba(168,191,163,0.22)] text-sage-deep ring-1 ring-inset ring-[rgba(111,143,107,0.22)]'
+                        : 'bg-[rgba(237,198,138,0.30)] text-[#A77530] ring-1 ring-inset ring-[rgba(217,160,91,0.30)]',
+                    )}>
+                      {g.status}
+                    </span>
+                    <ArrowRight className="w-4 h-4 text-ink-3 transition-transform group-hover:translate-x-0.5" strokeWidth={2.25} />
+                  </div>
+                </Link>
+              )
+            })}
+          </div>
+        )}
       </Card>
     </div>
   )

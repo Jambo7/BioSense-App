@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import {
-  Settings,
   Search,
   Filter,
   Leaf,
@@ -31,6 +30,8 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { groupMarkersByCategory, personalisedRec, BIOMARKER_CATEGORIES, categoryForMarker } from '@/lib/biomarkers'
+import { BiomarkerGuidanceButton } from '@/components/biomarker-guidance'
 import { Card } from '@/components/ui/card'
 import { IconBadge, type IconBadgeTone } from '@/components/ui/icon-badge'
 import { SparkLine } from '@/components/ui/spark-line'
@@ -337,12 +338,12 @@ function getContent(name: string, sub: string): MarkerContent {
 type Tab = 'list' | 'comparisons' | 'explanations' | 'recommendations'
 const TABS: { id: Tab; label: string }[] = [
   { id: 'list',            label: 'Biomarker list'  },
-  { id: 'comparisons',     label: 'Comparisons'     },
   { id: 'explanations',    label: 'Explanations'    },
+  { id: 'comparisons',     label: 'Comparisons'     },
   { id: 'recommendations', label: 'Recommendations' },
 ]
 
-export function InsightsClient({ hasResult, markers }: InsightsClientProps) {
+export function InsightsClient({ hasResult, drawDate, markers }: InsightsClientProps) {
   const [tab, setTab] = useState<Tab>('list')
   // The currently drilled-into biomarker (v7 image 6). `null` → overview
   // (v7 image 5). Selecting a marker scopes Comparisons / Explanations /
@@ -359,8 +360,13 @@ export function InsightsClient({ hasResult, markers }: InsightsClientProps) {
       }))
     : MOCK_MARKERS
 
-  // Drill into a biomarker from any list/overview and jump to Comparisons.
+  // Drill into a biomarker from list and jump to Explanations (3rd-June spec).
   function drillInto(name: string) {
+    setSelected(name)
+    setTab('explanations')
+  }
+
+  function goToComparisons(name: string) {
     setSelected(name)
     setTab('comparisons')
   }
@@ -384,18 +390,20 @@ export function InsightsClient({ hasResult, markers }: InsightsClientProps) {
                 through your blood data.
               </span>
             </h1>
-          </div>
-          <button
-            type="button"
-            className={cn(
-              'inline-flex items-center gap-1.5 h-8 px-3 rounded-pill',
-              'text-[12px] font-medium text-sage-deep',
-              'tile tile-hover shrink-0 whitespace-nowrap',
+            {drawDate && (
+              <p className="text-caption text-ink-3 mt-2">
+                Last upload:{' '}
+                <Link href="/blood/history" className="text-sage-deep font-medium hover:underline">
+                  {new Date(drawDate).toLocaleDateString('en-GB', {
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric',
+                  })}
+                </Link>
+              </p>
             )}
-          >
-            <Settings className="w-3 h-3" strokeWidth={2.25} />
-            Biomarker settings
-          </button>
+          </div>
+          <BiomarkerGuidanceButton />
         </div>
       </header>
 
@@ -424,7 +432,7 @@ export function InsightsClient({ hasResult, markers }: InsightsClientProps) {
       </div>
 
       {tab === 'list' && (
-        <ListTab markers={visible} hasReal={hasResult} onSelect={drillInto} />
+        <ListTab markers={hasResult ? visible : []} hasReal={hasResult} onSelect={drillInto} />
       )}
       {tab === 'comparisons' && (
         <ComparisonsTab
@@ -440,6 +448,7 @@ export function InsightsClient({ hasResult, markers }: InsightsClientProps) {
           selected={selectedMarker}
           onSelect={setSelected}
           onClear={clearSelection}
+          onGoToComparisons={goToComparisons}
         />
       )}
       {tab === 'recommendations' && (
@@ -523,56 +532,72 @@ function ListTab({
           <LegendChip status="no_data"      count={counts.no_data}      />
         </div>
 
-        <div className="text-eyebrow uppercase text-ink-3 mb-2.5">Key biomarkers</div>
-
-        <div className="space-y-2.5">
-          {markers.map((m) => {
-            const status = tierToStatus(m.tier)
-            const meta = STATUS_META[status]
+        <div className="space-y-5">
+          {groupMarkersByCategory(markers).map(({ category, items }) => {
+            if (!hasReal && items.length === 0) {
+              return (
+                <div key={category.id}>
+                  <div className="text-eyebrow uppercase text-ink-3 mb-1.5">{category.label}</div>
+                  <p className="text-[11.5px] text-ink-3 italic px-1">No biomarkers yet — upload a result to populate this section.</p>
+                </div>
+              )
+            }
+            if (items.length === 0) return null
             return (
-              <button
-                key={m.name}
-                type="button"
-                onClick={() => onSelect(m.name)}
-                className="w-full text-left flex items-center gap-3 sm:gap-4 p-3 sm:p-3.5 rounded-card tile tile-hover group"
-              >
-                <IconBadge icon={m.icon} tone={markerTone(m.name)} variant="tint" size="md" />
-                <div className="flex-1 min-w-0">
-                  <div className="font-sans text-[13.5px] font-semibold text-ink leading-tight">
-                    {m.name}
-                  </div>
-                  <div className="text-[11px] text-ink-3 leading-snug mt-0.5">
-                    {m.sub}
-                  </div>
+              <div key={category.id}>
+                <div className="text-eyebrow uppercase text-ink-3 mb-1.5">{category.label}</div>
+                <div className="space-y-2.5">
+                  {items.map((m) => {
+                    const status = tierToStatus(m.tier)
+                    const meta = STATUS_META[status]
+                    return (
+                      <button
+                        key={m.name}
+                        type="button"
+                        onClick={() => onSelect(m.name)}
+                        className="w-full text-left flex items-center gap-3 sm:gap-4 p-3 sm:p-3.5 rounded-card tile tile-hover group"
+                      >
+                        <IconBadge icon={m.icon} tone={markerTone(m.name)} variant="tint" size="md" />
+                        <div className="flex-1 min-w-0">
+                          <div className="font-sans text-[13.5px] font-semibold text-ink leading-tight">
+                            {m.name}
+                          </div>
+                          <div className="text-[11px] text-ink-3 leading-snug mt-0.5">
+                            {m.sub}
+                          </div>
+                        </div>
+                        <div className="text-right shrink-0 min-w-[64px]">
+                          <div className="font-sans text-[13px] font-semibold text-ink leading-none tabular-nums">
+                            {m.value}
+                          </div>
+                          <div className="text-[10px] text-ink-3 mt-1">{m.unit}</div>
+                        </div>
+                        {m.series && m.series.length >= 2 && (
+                          <div className="shrink-0 w-[64px] hidden sm:block">
+                            <SparkLine
+                              values={m.series}
+                              width={64}
+                              height={26}
+                              tone={status === 'in_range' ? 'sage' : status === 'optimise' ? 'amber' : 'rose'}
+                              showFill
+                              className="w-full h-auto"
+                            />
+                          </div>
+                        )}
+                        <span
+                          className={cn(
+                            'inline-flex items-center px-2 py-0.5 rounded-pill text-[10.5px] font-semibold uppercase tracking-wide shrink-0 whitespace-nowrap',
+                            meta.cls,
+                          )}
+                        >
+                          {meta.label}
+                        </span>
+                        <ChevronRight className="w-4 h-4 text-ink-3 shrink-0 transition-transform group-hover:translate-x-0.5" strokeWidth={2.25} />
+                      </button>
+                    )
+                  })}
                 </div>
-                <div className="text-right shrink-0 min-w-[64px]">
-                  <div className="font-sans text-[13px] font-semibold text-ink leading-none tabular-nums">
-                    {m.value}
-                  </div>
-                  <div className="text-[10px] text-ink-3 mt-1">{m.unit}</div>
-                </div>
-                {m.series && m.series.length >= 2 && (
-                  <div className="shrink-0 w-[64px] hidden sm:block">
-                    <SparkLine
-                      values={m.series}
-                      width={64}
-                      height={26}
-                      tone={status === 'in_range' ? 'sage' : status === 'optimise' ? 'amber' : 'rose'}
-                      showFill
-                      className="w-full h-auto"
-                    />
-                  </div>
-                )}
-                <span
-                  className={cn(
-                    'inline-flex items-center px-2 py-0.5 rounded-pill text-[10.5px] font-semibold uppercase tracking-wide shrink-0 whitespace-nowrap',
-                    meta.cls,
-                  )}
-                >
-                  {meta.label}
-                </span>
-                <ChevronRight className="w-4 h-4 text-ink-3 shrink-0 transition-transform group-hover:translate-x-0.5" strokeWidth={2.25} />
-              </button>
+              </div>
             )
           })}
         </div>
@@ -870,11 +895,13 @@ function ExplanationsTab({
   selected,
   onSelect,
   onClear,
+  onGoToComparisons,
 }: {
   markers: VMarker[]
   selected: VMarker | null
   onSelect: (name: string) => void
   onClear: () => void
+  onGoToComparisons: (name: string) => void
 }) {
   if (selected) {
     return (
@@ -883,6 +910,7 @@ function ExplanationsTab({
         markers={markers}
         onSelect={onSelect}
         onClear={onClear}
+        onGoToComparisons={onGoToComparisons}
       />
     )
   }
@@ -896,15 +924,16 @@ function ExplanationsOverview({
   markers: VMarker[]
   onSelect: (name: string) => void
 }) {
-  const topics = [
-    { key: 'ferritin',     icon: Beaker,   title: 'Iron & ferritin',        detail: 'Energy, oxygen transport and recovery' },
-    { key: 'vitaminD',     icon: Sun,      title: 'Vitamin D',              detail: 'Immunity, mood and bone health' },
-    { key: 'crp',          icon: Flame,    title: 'Inflammation markers',   detail: 'Systemic inflammation and long-term health' },
-    { key: 'omega3',       icon: Heart,    title: 'Cholesterol & lipids',   detail: 'Heart and cardiovascular health' },
-    { key: 'hba1c',        icon: Droplet,  title: 'Blood sugar control',    detail: 'Metabolic health and insulin sensitivity' },
-    { key: 'testosterone', icon: Activity, title: 'Hormones',               detail: 'Balance, energy and performance' },
-    { key: 'b12',          icon: Leaf,     title: 'Vitamins & minerals',    detail: 'Essential nutrients and deficiencies' },
-  ]
+  const topicIcons: Record<string, LucideIcon> = {
+    iron: Beaker, vitamins: Leaf, lipids: Heart, metabolic: Droplet,
+    inflammation: Flame, hormones: Activity, liver: Beaker, thyroid: Activity,
+  }
+  const topics = BIOMARKER_CATEGORIES.map((c) => ({
+    key: c.id,
+    icon: topicIcons[c.id] ?? Beaker,
+    title: c.label,
+    detail: c.description,
+  }))
 
   return (
     <div className="space-y-5">
@@ -922,7 +951,7 @@ function ExplanationsOverview({
           {topics.map((t) => {
             // Drill straight into the matching biomarker's explanation when
             // the user actually has it; otherwise hand off to the AI chat.
-            const match = markers.find((m) => contentKey(m.name) === t.key)
+            const match = markers.find((m) => categoryForMarker(m.name) === t.key)
             const inner = (
               <>
                 <IconBadge icon={t.icon} tone="sage" variant="tint" size="md" />
@@ -943,7 +972,7 @@ function ExplanationsOverview({
                 {inner}
               </button>
             ) : (
-              <Link key={t.key} href="/chat" className={cls}>
+              <Link key={t.key} href="/chat" className={cls} title="Start Learning Mode">
                 {inner}
               </Link>
             )
@@ -960,11 +989,13 @@ function ExplanationsDrill({
   markers,
   onSelect,
   onClear,
+  onGoToComparisons,
 }: {
   marker: VMarker
   markers: VMarker[]
   onSelect: (name: string) => void
   onClear: () => void
+  onGoToComparisons: (name: string) => void
 }) {
   const c = getContent(marker.name, marker.sub)
   const first = marker.name.split(' ')[0]
@@ -972,6 +1003,14 @@ function ExplanationsDrill({
   return (
     <div className="space-y-5">
       <DrillHeader marker={marker} markers={markers} onSelect={onSelect} onClear={onClear} />
+      <button
+        type="button"
+        onClick={() => onGoToComparisons(marker.name)}
+        className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-pill text-[12px] font-medium text-sage-deep tile tile-hover"
+      >
+        View comparisons for {marker.name}
+        <ArrowRight className="w-3.5 h-3.5" strokeWidth={2.25} />
+      </button>
 
       <Card variant="premium" padding="lg" className="relative overflow-hidden">
         <div className="flex items-start gap-4">
@@ -1067,11 +1106,22 @@ function RecommendationsOverview({
   markers: VMarker[]
   onSelect: (name: string) => void
 }) {
-  const focusAreas = [
-    { key: 'ferritin',     icon: Droplet, title: 'Improve iron stores',  detail: 'Your ferritin is below your optimal range. Focus on iron-rich foods and key nutrients to support healthy levels.' },
-    { key: 'vitaminD',     icon: Sun,     title: 'Raise vitamin D',      detail: 'Your vitamin D is below optimal. More sunlight, vitamin D3 and foods can help improve your levels.' },
-    { key: 'crp',          icon: Flame,   title: 'Reduce inflammation',  detail: 'Your CRP is slightly above normal. Anti-inflammatory nutrition, quality sleep and stress management can help.' },
-  ]
+  const needsAttention = markers.filter((m) => m.tier === 'T2' || m.tier === 'T3')
+  const focusAreas = needsAttention.length > 0
+    ? needsAttention.slice(0, 5).map((m) => ({
+        key: m.name,
+        icon: m.icon,
+        title: m.name,
+        detail: personalisedRec(m.name, m.value, m.unit ?? '', m.tier),
+        marker: m,
+      }))
+    : markers.slice(0, 3).map((m) => ({
+        key: m.name,
+        icon: m.icon,
+        title: m.name,
+        detail: personalisedRec(m.name, m.value, m.unit ?? '', m.tier),
+        marker: m,
+      }))
 
   const foundations: { key: string; icon: LucideIcon; label: string; detail: string }[] = [
     { key: 'nutrition', icon: UtensilsCrossed, label: 'Nutrition', detail: 'Balanced eating patterns' },
@@ -1093,33 +1143,25 @@ function RecommendationsOverview({
       <Card variant="glass" padding="lg">
         <div className="text-eyebrow uppercase text-ink-3 mb-3">Focus areas</div>
         <div className="space-y-3">
-          {focusAreas.map((f) => {
-            const match = markers.find((m) => contentKey(m.name) === f.key)
-            const inner = (
-              <>
-                <IconBadge icon={f.icon} tone="rose" variant="tint" size="md" />
-                <div className="flex-1 min-w-0">
-                  <div className="font-sans text-[13.5px] font-semibold text-ink leading-tight">
-                    {f.title}
-                  </div>
-                  <p className="text-[11.5px] text-ink-3 leading-snug mt-1">
-                    {f.detail}
-                  </p>
+          {focusAreas.map((f) => (
+            <button
+              key={f.key}
+              type="button"
+              onClick={() => onSelect(f.marker.name)}
+              className="w-full text-left flex items-start gap-3 sm:gap-4 p-3 sm:p-3.5 rounded-card tile tile-hover group"
+            >
+              <IconBadge icon={f.icon} tone="rose" variant="tint" size="md" />
+              <div className="flex-1 min-w-0">
+                <div className="font-sans text-[13.5px] font-semibold text-ink leading-tight">
+                  {f.title}
                 </div>
-                <ChevronRight className="w-4 h-4 text-ink-3 shrink-0 mt-1 transition-transform group-hover:translate-x-0.5" strokeWidth={2.25} />
-              </>
-            )
-            const cls = 'w-full text-left flex items-start gap-3 sm:gap-4 p-3 sm:p-3.5 rounded-card tile tile-hover group'
-            return match ? (
-              <button key={f.key} type="button" onClick={() => onSelect(match.name)} className={cls}>
-                {inner}
-              </button>
-            ) : (
-              <Link key={f.key} href="/chat" className={cls}>
-                {inner}
-              </Link>
-            )
-          })}
+                <p className="text-[11.5px] text-ink-3 leading-snug mt-1">
+                  {f.detail}
+                </p>
+              </div>
+              <ChevronRight className="w-4 h-4 text-ink-3 shrink-0 mt-1 transition-transform group-hover:translate-x-0.5" strokeWidth={2.25} />
+            </button>
+          ))}
         </div>
       </Card>
 
@@ -1196,7 +1238,7 @@ function RecommendationsDrill({
               <span className="italic-accent text-[1em] text-sage-deep">your {marker.name.toLowerCase()}.</span>
             </div>
             <p className="text-caption text-ink-2 mt-2 leading-snug max-w-[44ch]">
-              Recommendations are based on your results and health profile.
+              {personalisedRec(marker.name, marker.value, marker.unit ?? '', marker.tier)}
             </p>
           </div>
           <div className="relative w-[88px] h-[88px] shrink-0">

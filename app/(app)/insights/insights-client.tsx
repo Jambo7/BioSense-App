@@ -5,7 +5,6 @@ import Link from 'next/link'
 import {
   Brain,
   Sparkles,
-  Settings,
   Moon,
   Wind,
   Activity,
@@ -65,31 +64,18 @@ export function InsightsClient({ recentCheckins }: InsightsClientProps) {
     <div className="max-w-3xl mx-auto fade-up space-y-5">
       {/* Header */}
       <header className="relative pt-2 pb-1">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <div className="flex items-center gap-2 text-eyebrow uppercase text-sage-deep mb-2">
-              <Brain className="w-3.5 h-3.5" strokeWidth={2.25} />
-              <span>Insights</span>
-            </div>
-            <h1 className="font-sans text-[28px] sm:text-[34px] text-ink tracking-tight leading-[1.04] max-w-[18ch] font-bold">
-              Understand what&apos;s
-              <br />
-              <span className="italic-accent text-[1.02em] text-sage-deep font-normal">
-                driving your health.
-              </span>
-            </h1>
+        <div>
+          <div className="flex items-center gap-2 text-eyebrow uppercase text-sage-deep mb-2">
+            <Brain className="w-3.5 h-3.5" strokeWidth={2.25} />
+            <span>Insights</span>
           </div>
-          <button
-            type="button"
-            className={cn(
-              'inline-flex items-center gap-1.5 h-8 px-3 rounded-pill',
-              'text-[12px] font-medium text-sage-deep',
-              'tile tile-hover shrink-0 whitespace-nowrap',
-            )}
-          >
-            <Settings className="w-3 h-3" strokeWidth={2.25} />
-            Insights settings
-          </button>
+          <h1 className="font-sans text-[28px] sm:text-[34px] text-ink tracking-tight leading-[1.04] max-w-[18ch] font-bold">
+            Understand what&apos;s
+            <br />
+            <span className="italic-accent text-[1.02em] text-sage-deep font-normal">
+              driving your health.
+            </span>
+          </h1>
         </div>
       </header>
 

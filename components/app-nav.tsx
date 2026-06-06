@@ -13,6 +13,7 @@ import {
   FlaskConical,
   Bell,
   Watch,
+  GraduationCap,
   User as UserIcon,
 } from 'lucide-react'
 
@@ -107,11 +108,20 @@ export function AppNav() {
 
         {/* Right actions */}
         <div className="flex items-center gap-1.5 shrink-0">
-          {/* Wearables shortcut — quiet outlined sage pill, sized to read
-              as secondary chrome (matches image 1). Sage-deep label on a
-              translucent white pill with a thin sage ring; no gradient and
-              no heavy shadow. Lets bell + avatar carry the right-side
-              hierarchy. */}
+          <Link
+            href="/tutorial"
+            className={cn(
+              'inline-flex items-center gap-1.5 h-8 px-3 sm:px-3.5 rounded-pill',
+              'text-[12px] font-medium text-white',
+              'bg-grad-sage shadow-button',
+              'transition-all hover:scale-[1.02] active:scale-[0.98]',
+            )}
+            aria-label="Tutorial"
+          >
+            <GraduationCap className="w-[14px] h-[14px]" strokeWidth={2} />
+            <span className="hidden sm:inline">Tutorial</span>
+          </Link>
+
           <Link
             href="/wearables"
             className={cn(
@@ -129,18 +139,17 @@ export function AppNav() {
             <span>Wearables</span>
           </Link>
 
-          <button
-            type="button"
+          <Link
+            href="/notifications"
             className="relative w-9 h-9 inline-flex items-center justify-center rounded-full text-ink-2 hover:text-ink hover:bg-[rgba(26,28,26,0.04)] transition-colors"
             aria-label="Notifications"
           >
             <Bell className="w-[18px] h-[18px]" strokeWidth={1.85} />
-            {/* Tiny sage dot for the placeholder notifications badge */}
             <span
               aria-hidden
               className="absolute top-1.5 right-2 w-1.5 h-1.5 rounded-full bg-sage ring-1 ring-white"
             />
-          </button>
+          </Link>
 
           {/* Profile avatar — replaces the old sign-out button. Sign-out
               now lives inside the Profile / Account page. */}
