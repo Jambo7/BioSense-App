@@ -2,7 +2,7 @@
 
 A continuous, personalised health intelligence platform. Upload blood results, connect wearables, complete daily check-ins — BioSense learns your biology and turns your data into clear, educational insights.
 
-**Live app:** https://biosense-852391237627.europe-west2.run.app
+**Live app:** https://bio-sense-app-navy.vercel.app
 
 ---
 
@@ -19,7 +19,7 @@ A continuous, personalised health intelligence platform. Upload blood results, c
 | Wearables | Oura, Whoop, Garmin, Apple Health |
 | Email | Resend |
 | Payments | Stripe |
-| Deployment | Google Cloud Run |
+| Deployment | Vercel (production) |
 
 ---
 
@@ -85,21 +85,17 @@ Visit [http://localhost:3000](http://localhost:3000)
 
 ## Deployment
 
-The app runs on **Google Cloud Run** (europe-west2). CI/CD is handled by Cloud Build — pushing to `main` triggers a new build and deploy automatically.
+The app runs on **Vercel** at [bio-sense-app-navy.vercel.app](https://bio-sense-app-navy.vercel.app). Pushing to `main` on GitHub triggers a production deploy automatically via Vercel's GitHub integration.
 
-Docker images are stored in Artifact Registry. Secrets are managed via GCP Secret Manager.
+Database: **Neon** (PostgreSQL). After schema changes, run `npx prisma db push` against the production `DATABASE_URL`.
 
-To deploy manually:
+To deploy manually via CLI:
 
 ```bash
-docker buildx build --platform linux/amd64 --push \
-  -t europe-west2-docker.pkg.dev/shift-biosense/biosense-repo/biosense:latest .
-
-gcloud run deploy biosense \
-  --image europe-west2-docker.pkg.dev/shift-biosense/biosense-repo/biosense:latest \
-  --region europe-west2 \
-  --project shift-biosense
+vercel --prod
 ```
+
+Legacy GCP Cloud Run setup is documented in [`GCP_DEPLOY.md`](GCP_DEPLOY.md) but is not the active production environment.
 
 ---
 
