@@ -45,16 +45,18 @@ type NavItem = {
   matchPaths?: string[]
   /** Marks this item as the central floating CTA in the mobile tab bar. */
   center?: boolean
+  /** Anchor key for the interactive walkthrough spotlight. */
+  tourId?: string
 }
 
 // Per v7 spec: page concept renamed Today → Home; bottom-tab order
 // flipped so Trends sits last (Biomarkers shifts left of Trends).
 const navItems: NavItem[] = [
-  { href: '/dashboard', label: 'Home',       icon: Sun,           matchPaths: ['/dashboard', '/checkin'] },
-  { href: '/insights',  label: 'Insights',   icon: Lightbulb },
-  { href: '/chat',      label: 'AI',         icon: Sparkles,      center: true },
-  { href: '/blood',     label: 'Biomarkers', icon: FlaskConical,  matchPaths: ['/blood', '/biomarkers'] },
-  { href: '/reports',   label: 'Trends',     icon: TrendingUp },
+  { href: '/dashboard', label: 'Home',       icon: Sun,           matchPaths: ['/dashboard', '/checkin'], tourId: 'home' },
+  { href: '/insights',  label: 'Insights',   icon: Lightbulb,     tourId: 'insights' },
+  { href: '/chat',      label: 'AI',         icon: Sparkles,      center: true, tourId: 'ai' },
+  { href: '/blood',     label: 'Biomarkers', icon: FlaskConical,  matchPaths: ['/blood', '/biomarkers'], tourId: 'biomarkers' },
+  { href: '/reports',   label: 'Trends',     icon: TrendingUp,    tourId: 'trends' },
 ]
 
 function isActive(pathname: string, item: (typeof navItems)[number]) {
@@ -88,6 +90,7 @@ export function AppNav() {
               <Link
                 key={item.href}
                 href={item.href}
+                data-tour={item.tourId}
                 className={cn(
                   'flex items-center gap-1.5 px-3.5 h-9 rounded-pill text-caption font-medium transition-all relative',
                   active ? 'text-sage-deep' : 'text-ink-2 hover:text-ink',
@@ -124,6 +127,7 @@ export function AppNav() {
 
           <Link
             href="/wearables"
+            data-tour="wearables"
             className={cn(
               'inline-flex items-center gap-1.5 h-8 px-3 sm:px-3.5 rounded-pill',
               'text-[12px] font-medium text-sage-deep',
@@ -141,6 +145,7 @@ export function AppNav() {
 
           <Link
             href="/notifications"
+            data-tour="notifications"
             className="relative w-9 h-9 inline-flex items-center justify-center rounded-full text-ink-2 hover:text-ink hover:bg-[rgba(26,28,26,0.04)] transition-colors"
             aria-label="Notifications"
           >
@@ -156,6 +161,7 @@ export function AppNav() {
           <Link
             href="/profile"
             aria-label="Account"
+            data-tour="profile"
             className={cn(
               'w-9 h-9 inline-flex items-center justify-center rounded-full overflow-hidden',
               'bg-[linear-gradient(180deg,rgba(168,191,163,0.35)_0%,rgba(111,143,107,0.25)_100%)]',
@@ -198,6 +204,7 @@ export function AppNav() {
                   key={item.href}
                   href={item.href}
                   aria-label={item.label}
+                  data-tour={item.tourId}
                   className="flex-1 flex flex-col items-center justify-end gap-1 py-2 relative"
                 >
                   <div className="relative -mt-7">
@@ -252,6 +259,7 @@ export function AppNav() {
               <Link
                 key={item.href}
                 href={item.href}
+                data-tour={item.tourId}
                 className="flex-1 flex flex-col items-center justify-center gap-1 py-2 transition-colors relative"
               >
                 <div className="relative w-9 h-9 flex items-center justify-center">

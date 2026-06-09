@@ -3,6 +3,8 @@ import Image from 'next/image'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { AppNav } from '@/components/app-nav'
+import { TourProvider } from '@/components/tour/tour-context'
+import { TourOverlay } from '@/components/tour/tour-overlay'
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const session = await getServerSession(authOptions)
@@ -33,23 +35,28 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         <div className="page-texture-fade-bot" />
       </div>
 
-      <div className="relative z-10">
-        <AppNav />
-        {/* pb-32 leaves room for the edge-to-edge tab bar + its overhanging
-            Ask CTA on mobile. lg+ uses the top nav so no bottom padding. */}
-        <main className="max-w-5xl mx-auto px-4 sm:px-6 pb-32 lg:pb-16 pt-5 sm:pt-8">
-          {children}
-        </main>
+      <TourProvider>
+        <div className="relative z-10">
+          <AppNav />
+          {/* pb-32 leaves room for the edge-to-edge tab bar + its overhanging
+              Ask CTA on mobile. lg+ uses the top nav so no bottom padding. */}
+          <main className="max-w-5xl mx-auto px-4 sm:px-6 pb-32 lg:pb-16 pt-5 sm:pt-8">
+            {children}
+          </main>
 
-        {/* Persistent legal footer (desktop) */}
-        <footer className="hidden lg:block fixed bottom-0 left-0 right-0 pointer-events-none z-10">
-          <div className="max-w-5xl mx-auto px-4 pb-3 text-right">
-            <span className="text-micro text-ink-3 glass px-2.5 py-1 rounded-pill">
-              Educational insights only — not medical advice
-            </span>
-          </div>
-        </footer>
-      </div>
+          {/* Persistent legal footer (desktop) */}
+          <footer className="hidden lg:block fixed bottom-0 left-0 right-0 pointer-events-none z-10">
+            <div className="max-w-5xl mx-auto px-4 pb-3 text-right">
+              <span className="text-micro text-ink-3 glass px-2.5 py-1 rounded-pill">
+                Educational insights only — not medical advice
+              </span>
+            </div>
+          </footer>
+        </div>
+
+        {/* Interactive walkthrough overlay (spotlights real controls). */}
+        <TourOverlay />
+      </TourProvider>
     </div>
   )
 }
