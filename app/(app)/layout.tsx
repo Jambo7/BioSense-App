@@ -21,10 +21,11 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         <div className="orb" />
       </div>
 
-      {/* Soft sage ribbon background (3rd-June spec — replaces plant photo). */}
+      {/* Background: soft flowing sage streamlines (per brief image2 —
+          replaces the plant photo). See scripts/build-waves-bg.cjs. */}
       <div className="page-texture page-texture-waves" aria-hidden>
         <Image
-          src="/bg-waves.svg"
+          src="/bg-waves-v2.png"
           alt=""
           fill
           priority
