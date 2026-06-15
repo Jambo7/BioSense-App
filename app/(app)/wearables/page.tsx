@@ -100,10 +100,10 @@ export default function WearablesPage() {
   async function handleConnect(id: string) {
     setLoading(id)
     try {
-      const res = await fetch(`/api/wearables/${id}/auth`)
+      const res = await fetch(`/api/wearables/terra/connect?provider=${id}`)
       const data = await res.json()
       if (data.url) window.location.href = data.url
-      else toast.error(data.error || 'Failed to start OAuth')
+      else toast.error(data.error || 'Failed to start connection')
     } catch {
       toast.error('Connection failed')
     } finally {

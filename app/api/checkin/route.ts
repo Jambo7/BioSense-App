@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { calcHealthScore } from '@/lib/score'
+import { recalculateHealthScore } from '@/lib/health-score'
 import { z } from 'zod'
 
 const schema = z.object({
@@ -28,36 +28,8 @@ export async function POST(req: NextRequest) {
       update: data,
     })
 
-    // Recalculate health score from check-in data
-    const { score, breakdown } = calcHealthScore({
-      checkin: {
-        energy: data.energy,
-        sleep: data.sleep,
-        mood: data.mood,
-        stress: data.stress,
-      },
-    })
-
-    // Get existing weights if any
-    const existingScore = await prisma.healthScore.findFirst({
-      where: { userId: session.user.id },
-      orderBy: { date: 'desc' },
-    })
-
-    await prisma.healthScore.upsert({
-      where: { userId_date: { userId: session.user.id, date: today } },
-      create: {
-        userId: session.user.id,
-        date: today,
-        score,
-        breakdown: breakdown as unknown as import('@prisma/client').Prisma.InputJsonValue,
-        personalWeights: (existingScore?.personalWeights ?? null) as import('@prisma/client').Prisma.NullableJsonNullValueInput | import('@prisma/client').Prisma.InputJsonValue,
-      },
-      update: {
-        score,
-        breakdown: breakdown as unknown as import('@prisma/client').Prisma.InputJsonValue,
-      },
-    })
+    // Recalculate health score from check-in + any connected wearable data
+    const { score } = await recalculateHealthScore(session.user.id)
 
     return NextResponse.json({ success: true, checkin, score })
   } catch (err) {
