@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
 import { z } from 'zod'
-import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { getRequestUser } from '@/lib/api-auth'
 
 const updateSchema = z.object({
   title: z.string().min(1).max(120).optional(),
@@ -14,15 +13,15 @@ const updateSchema = z.object({
 })
 
 export async function GET(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const session = await getServerSession(authOptions)
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const authed = await getRequestUser(req)
+  if (!authed) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { id } = await params
   const goal = await prisma.userGoal.findFirst({
-    where: { id, userId: session.user.id },
+    where: { id, userId: authed.id },
   })
 
   if (!goal) return NextResponse.json({ error: 'Not found' }, { status: 404 })
@@ -33,15 +32,15 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const session = await getServerSession(authOptions)
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const authed = await getRequestUser(req)
+  if (!authed) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { id } = await params
 
   try {
     const body = updateSchema.parse(await req.json())
     const goal = await prisma.userGoal.updateMany({
-      where: { id, userId: session.user.id },
+      where: { id, userId: authed.id },
       data: {
         ...body,
         targetDate: body.targetDate === null ? null : body.targetDate ? new Date(body.targetDate) : undefined,
@@ -60,15 +59,15 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const session = await getServerSession(authOptions)
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const authed = await getRequestUser(req)
+  if (!authed) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { id } = await params
   const result = await prisma.userGoal.deleteMany({
-    where: { id, userId: session.user.id },
+    where: { id, userId: authed.id },
   })
 
   if (result.count === 0) return NextResponse.json({ error: 'Not found' }, { status: 404 })

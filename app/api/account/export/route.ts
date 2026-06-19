@@ -1,16 +1,15 @@
 import { NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { getRequestUser } from '@/lib/api-auth'
 
-export async function GET() {
-  const session = await getServerSession(authOptions)
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+export async function GET(req: Request) {
+  const authed = await getRequestUser(req)
+  if (!authed) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const [user, checkins, healthScores, bloodResults, patterns, chatMessages, consents] =
     await Promise.all([
       prisma.user.findUnique({
-        where: { id: session.user.id },
+        where: { id: authed.id },
         select: {
           name: true,
           email: true,
@@ -23,15 +22,15 @@ export async function GET() {
           createdAt: true,
         },
       }),
-      prisma.dailyCheckin.findMany({ where: { userId: session.user.id } }),
-      prisma.healthScore.findMany({ where: { userId: session.user.id } }),
+      prisma.dailyCheckin.findMany({ where: { userId: authed.id } }),
+      prisma.healthScore.findMany({ where: { userId: authed.id } }),
       prisma.bloodResult.findMany({
-        where: { userId: session.user.id },
+        where: { userId: authed.id },
         select: { drawDate: true, markers: true, aiSummary: true },
       }),
-      prisma.pattern.findMany({ where: { userId: session.user.id } }),
-      prisma.chatMessage.findMany({ where: { userId: session.user.id } }),
-      prisma.consent.findMany({ where: { userId: session.user.id } }),
+      prisma.pattern.findMany({ where: { userId: authed.id } }),
+      prisma.chatMessage.findMany({ where: { userId: authed.id } }),
+      prisma.consent.findMany({ where: { userId: authed.id } }),
     ])
 
   const exportData = {
@@ -48,7 +47,7 @@ export async function GET() {
   return new NextResponse(JSON.stringify(exportData, null, 2), {
     headers: {
       'Content-Type': 'application/json',
-      'Content-Disposition': `attachment; filename="biosense-data-${session.user.id}.json"`,
+      'Content-Disposition': `attachment; filename="biosense-data-${authed.id}.json"`,
     },
   })
 }

@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { getRequestUser } from '@/lib/api-auth'
 import { computeProgress } from '@/lib/learning'
 import {
   GOAL_LABEL,
@@ -10,10 +9,10 @@ import {
   ENERGY_LABEL,
 } from '@/lib/registration'
 
-export async function GET() {
-  const session = await getServerSession(authOptions)
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  const userId = session.user.id
+export async function GET(req: Request) {
+  const authed = await getRequestUser(req)
+  if (!authed) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const userId = authed.id
 
   const [user, facts, activeSession] = await Promise.all([
     prisma.user.findUnique({

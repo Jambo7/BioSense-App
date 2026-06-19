@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { getRequestUser } from '@/lib/api-auth'
 import { z } from 'zod'
 
 const patchSchema = z.object({
@@ -13,8 +12,8 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const session = await getServerSession(authOptions)
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const authed = await getRequestUser(req)
+  if (!authed) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const { id } = await params
 
   try {
@@ -22,7 +21,7 @@ export async function PATCH(
     const { text } = patchSchema.parse(body)
 
     const existing = await prisma.learnedFact.findUnique({ where: { id } })
-    if (!existing || existing.userId !== session.user.id) {
+    if (!existing || existing.userId !== authed.id) {
       return NextResponse.json({ error: 'Not found' }, { status: 404 })
     }
 
@@ -43,15 +42,15 @@ export async function PATCH(
 
 // DELETE — remove a single learned fact.
 export async function DELETE(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const session = await getServerSession(authOptions)
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const authed = await getRequestUser(req)
+  if (!authed) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const { id } = await params
 
   const existing = await prisma.learnedFact.findUnique({ where: { id } })
-  if (!existing || existing.userId !== session.user.id) {
+  if (!existing || existing.userId !== authed.id) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
 

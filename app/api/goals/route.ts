@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
 import { z } from 'zod'
-import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { getRequestUser } from '@/lib/api-auth'
 
 const createSchema = z.object({
   title: z.string().min(1).max(120),
@@ -11,12 +10,12 @@ const createSchema = z.object({
   targetDate: z.string().optional(),
 })
 
-export async function GET() {
-  const session = await getServerSession(authOptions)
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+export async function GET(req: NextRequest) {
+  const authed = await getRequestUser(req)
+  if (!authed) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const goals = await prisma.userGoal.findMany({
-    where: { userId: session.user.id },
+    where: { userId: authed.id },
     orderBy: { createdAt: 'desc' },
   })
 
@@ -24,14 +23,14 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const session = await getServerSession(authOptions)
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const authed = await getRequestUser(req)
+  if (!authed) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   try {
     const body = createSchema.parse(await req.json())
     const goal = await prisma.userGoal.create({
       data: {
-        userId: session.user.id,
+        userId: authed.id,
         title: body.title,
         description: body.description,
         pillars: body.pillars,

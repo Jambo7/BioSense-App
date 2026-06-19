@@ -1,17 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { getRequestUser } from '@/lib/api-auth'
 import { SECTION_BY_ID } from '@/lib/learning'
 import { z } from 'zod'
 
 // GET — list every durable fact for the user.
-export async function GET() {
-  const session = await getServerSession(authOptions)
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+export async function GET(req: NextRequest) {
+  const authed = await getRequestUser(req)
+  if (!authed) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const facts = await prisma.learnedFact.findMany({
-    where: { userId: session.user.id },
+    where: { userId: authed.id },
     orderBy: { createdAt: 'desc' },
     select: { id: true, section: true, text: true, confidence: true, source: true },
   })
@@ -26,8 +25,8 @@ const createSchema = z.object({
 
 // POST — manually add a fact (user-authored memory).
 export async function POST(req: NextRequest) {
-  const session = await getServerSession(authOptions)
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const authed = await getRequestUser(req)
+  if (!authed) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   try {
     const body = await req.json()
@@ -37,7 +36,7 @@ export async function POST(req: NextRequest) {
     }
     const fact = await prisma.learnedFact.create({
       data: {
-        userId: session.user.id,
+        userId: authed.id,
         section: data.section,
         text: data.text.trim(),
         confidence: data.confidence ?? 'High',
@@ -56,10 +55,10 @@ export async function POST(req: NextRequest) {
 }
 
 // DELETE — wipe ALL saved knowledge (the "delete all" control).
-export async function DELETE() {
-  const session = await getServerSession(authOptions)
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+export async function DELETE(req: NextRequest) {
+  const authed = await getRequestUser(req)
+  if (!authed) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  await prisma.learnedFact.deleteMany({ where: { userId: session.user.id } })
+  await prisma.learnedFact.deleteMany({ where: { userId: authed.id } })
   return NextResponse.json({ success: true })
 }

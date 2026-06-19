@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { getRequestUser } from '@/lib/api-auth'
 import { recalculateHealthScore } from '@/lib/health-score'
 import { z } from 'zod'
 
@@ -13,8 +12,8 @@ const schema = z.object({
 })
 
 export async function POST(req: NextRequest) {
-  const session = await getServerSession(authOptions)
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const authed = await getRequestUser(req)
+  if (!authed) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   try {
     const body = await req.json()
@@ -23,13 +22,13 @@ export async function POST(req: NextRequest) {
     today.setHours(0, 0, 0, 0)
 
     const checkin = await prisma.dailyCheckin.upsert({
-      where: { userId_date: { userId: session.user.id, date: today } },
-      create: { userId: session.user.id, date: today, ...data },
+      where: { userId_date: { userId: authed.id, date: today } },
+      create: { userId: authed.id, date: today, ...data },
       update: data,
     })
 
     // Recalculate health score from check-in + any connected wearable data
-    const { score } = await recalculateHealthScore(session.user.id)
+    const { score } = await recalculateHealthScore(authed.id)
 
     return NextResponse.json({ success: true, checkin, score })
   } catch (err) {
@@ -42,14 +41,14 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
-  const session = await getServerSession(authOptions)
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const authed = await getRequestUser(req)
+  if (!authed) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { searchParams } = new URL(req.url)
   const limit = parseInt(searchParams.get('limit') ?? '30')
 
   const checkins = await prisma.dailyCheckin.findMany({
-    where: { userId: session.user.id },
+    where: { userId: authed.id },
     orderBy: { date: 'desc' },
     take: limit,
   })

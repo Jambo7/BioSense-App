@@ -3,9 +3,8 @@
  * Parses Health Auto Export format and stores data
  */
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { getRequestUser } from '@/lib/api-auth'
 
 interface HealthExportMetric {
   name: string
@@ -21,8 +20,8 @@ interface HealthExport {
 }
 
 export async function POST(req: NextRequest) {
-  const session = await getServerSession(authOptions)
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const authed = await getRequestUser(req)
+  if (!authed) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   try {
     const formData = await req.formData()
@@ -64,9 +63,9 @@ export async function POST(req: NextRequest) {
 
     // Store aggregated data in WearableSync
     await prisma.wearableSync.upsert({
-      where: { userId_provider: { userId: session.user.id, provider: 'apple' } },
+      where: { userId_provider: { userId: authed.id, provider: 'apple' } },
       create: {
-        userId: session.user.id,
+        userId: authed.id,
         provider: 'apple',
         lastSync: new Date(),
         data: summary,

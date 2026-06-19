@@ -4,9 +4,8 @@
  * All output constrained by App 5 language rules via BIOSENSE_SYSTEM_PROMPT
  */
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { getRequestUser } from '@/lib/api-auth'
 import { callClaude, BIOSENSE_SYSTEM_PROMPT } from '@/lib/claude'
 import { z } from 'zod'
 
@@ -19,8 +18,8 @@ const schema = z.object({
 })
 
 export async function POST(req: NextRequest) {
-  const session = await getServerSession(authOptions)
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const authed = await getRequestUser(req)
+  if (!authed) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   try {
     const body = await req.json()
@@ -29,32 +28,32 @@ export async function POST(req: NextRequest) {
     // Gather user context
     const [user, recentCheckins, latestScore, latestBlood, patterns, chatHistory, learnedFacts] =
       await Promise.all([
-        prisma.user.findUnique({ where: { id: session.user.id } }),
+        prisma.user.findUnique({ where: { id: authed.id } }),
         prisma.dailyCheckin.findMany({
-          where: { userId: session.user.id },
+          where: { userId: authed.id },
           orderBy: { date: 'desc' },
           take: 30,
         }),
         prisma.healthScore.findFirst({
-          where: { userId: session.user.id },
+          where: { userId: authed.id },
           orderBy: { date: 'desc' },
         }),
         prisma.bloodResult.findFirst({
-          where: { userId: session.user.id },
+          where: { userId: authed.id },
           orderBy: { drawDate: 'desc' },
         }),
         prisma.pattern.findMany({
-          where: { userId: session.user.id },
+          where: { userId: authed.id },
           orderBy: { discoveredAt: 'desc' },
           take: 5,
         }),
         prisma.chatMessage.findMany({
-          where: { userId: session.user.id },
+          where: { userId: authed.id },
           orderBy: { createdAt: 'desc' },
           take: 5,
         }),
         prisma.learnedFact.findMany({
-          where: { userId: session.user.id },
+          where: { userId: authed.id },
           orderBy: { createdAt: 'desc' },
           take: 25,
           select: { section: true, text: true },
@@ -141,8 +140,8 @@ Use the above context to personalise your educational response. Reference specif
     // Persist messages
     await prisma.chatMessage.createMany({
       data: [
-        { userId: session.user.id, role: 'user', content: message },
-        { userId: session.user.id, role: 'assistant', content: reply },
+        { userId: authed.id, role: 'user', content: message },
+        { userId: authed.id, role: 'assistant', content: reply },
       ],
     })
 

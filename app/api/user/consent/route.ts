@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { getRequestUser } from '@/lib/api-auth'
 
 export async function POST(req: NextRequest) {
-  const session = await getServerSession(authOptions)
-  if (!session) {
+  const authed = await getRequestUser(req)
+  if (!authed) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
@@ -17,7 +16,7 @@ export async function POST(req: NextRequest) {
   await prisma.$transaction([
     prisma.consent.create({
       data: {
-        userId: session.user.id,
+        userId: authed.id,
         tcVersion: '1.0',
         privacyVersion: '1.0',
         consentVersion: '1.0',
@@ -26,7 +25,7 @@ export async function POST(req: NextRequest) {
       },
     }),
     prisma.user.update({
-      where: { id: session.user.id },
+      where: { id: authed.id },
       data: { hasConsented: true },
     }),
   ])

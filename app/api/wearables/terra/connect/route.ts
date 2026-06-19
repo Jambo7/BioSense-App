@@ -8,8 +8,7 @@
  * events to our webhook.
  */
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
+import { getRequestUser } from '@/lib/api-auth'
 import { generateWidgetSession } from '@/lib/terra'
 
 export const runtime = 'nodejs'
@@ -28,8 +27,8 @@ const PROVIDER_SLUGS: Record<string, string> = {
 }
 
 export async function GET(req: NextRequest) {
-  const session = await getServerSession(authOptions)
-  if (!session?.user?.id) {
+  const authed = await getRequestUser(req)
+  if (!authed) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
@@ -41,7 +40,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const { url } = await generateWidgetSession({
-      referenceId: session.user.id,
+      referenceId: authed.id,
       successRedirectUrl: `${base}/wearables?connected=1`,
       failureRedirectUrl: `${base}/wearables?error=connect_failed`,
       providers,

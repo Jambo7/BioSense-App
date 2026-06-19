@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { getRequestUser } from '@/lib/api-auth'
 import { callClaude, BLOOD_ANALYSIS_PROMPT } from '@/lib/claude'
 import { categoryForMarker } from '@/lib/biomarkers'
 import OpenAI from 'openai'
@@ -54,8 +53,8 @@ function enrichMarkers(markers: object[]): object[] {
 }
 
 export async function POST(req: NextRequest) {
-  const session = await getServerSession(authOptions)
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const authed = await getRequestUser(req)
+  if (!authed) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   try {
     const formData = await req.formData()
@@ -133,7 +132,7 @@ export async function POST(req: NextRequest) {
 
     const blood = await prisma.bloodResult.create({
       data: {
-        userId: session.user.id,
+        userId: authed.id,
         drawDate: drawDate ? new Date(drawDate) : new Date(),
         markers,
         pdfUrl: null,
@@ -146,7 +145,7 @@ export async function POST(req: NextRequest) {
       today.setHours(0, 0, 0, 0)
 
       const latestCheckin = await prisma.dailyCheckin.findFirst({
-        where: { userId: session.user.id },
+        where: { userId: authed.id },
         orderBy: { date: 'desc' },
       })
 
@@ -164,9 +163,9 @@ export async function POST(req: NextRequest) {
       })
 
       await prisma.healthScore.upsert({
-        where: { userId_date: { userId: session.user.id, date: today } },
+        where: { userId_date: { userId: authed.id, date: today } },
         create: {
-          userId: session.user.id,
+          userId: authed.id,
           date: today,
           score,
           breakdown: breakdown as unknown as import('@prisma/client').Prisma.InputJsonValue,
@@ -193,12 +192,12 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function GET() {
-  const session = await getServerSession(authOptions)
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+export async function GET(req: Request) {
+  const authed = await getRequestUser(req)
+  if (!authed) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const results = await prisma.bloodResult.findMany({
-    where: { userId: session.user.id },
+    where: { userId: authed.id },
     orderBy: { drawDate: 'desc' },
     select: {
       id: true,
