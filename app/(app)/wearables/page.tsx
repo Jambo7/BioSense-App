@@ -23,6 +23,7 @@ const WEARABLES = [
   { id: 'oura',    name: 'Oura Ring',      Icon: Watch,      image: '/wearables/oura.png',    desc: 'Sleep, HRV, readiness, temperature',  type: 'oauth' },
   { id: 'whoop',   name: 'Whoop',          Icon: Watch,      image: '/wearables/whoop.png',   desc: 'Recovery, strain, sleep performance', type: 'oauth' },
   { id: 'garmin',  name: 'Garmin',         Icon: Watch,      image: '/wearables/garmin.png',  desc: 'Activity, HRV, steps, VO₂ max',       type: 'oauth' },
+  { id: 'fitbit',  name: 'Fitbit',         Icon: Watch,      image: '/wearables/fitbit.png',  desc: 'Sleep, heart rate, steps, activity',  type: 'oauth' },
   { id: 'samsung', name: 'Samsung Health', Icon: Smartphone, image: '/wearables/samsung.png', desc: 'Steps, heart rate, sleep (Android)',  type: 'oauth' },
   { id: 'apple',   name: 'Apple Health',   Icon: Smartphone, image: '/wearables/apple.png',   desc: 'Upload Health Auto Export JSON',      type: 'upload' },
 ]
@@ -258,8 +259,8 @@ export default function WearablesPage() {
         </div>
         <div className="space-y-3 text-body-sm text-ink-2 leading-relaxed">
           <p>
-            <strong className="text-ink">Oura, Whoop, Garmin, Samsung</strong> — click Connect to
-            authorise via OAuth. Data syncs automatically every few hours.
+            <strong className="text-ink">Oura, Whoop, Garmin, Fitbit, Samsung</strong> — click Connect
+            to authorise via OAuth. Data syncs automatically every few hours.
           </p>
           <p>
             <strong className="text-ink">Apple Health</strong> — install the{' '}
