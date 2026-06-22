@@ -12,6 +12,12 @@ import {
   Activity,
   Plug,
   Info,
+  ChevronDown,
+  HeartPulse,
+  Footprints,
+  Flame,
+  Moon,
+  RefreshCw,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardLabel } from '@/components/ui/card'
@@ -72,9 +78,110 @@ interface WearableSync {
   lastSync: string | null
 }
 
+interface PreviewMetrics {
+  hrv?: number
+  rhr?: number
+  steps?: number
+  activeMinutes?: number
+  sleepScore?: number
+}
+
+interface PreviewData {
+  provider: string
+  connectedAt: string
+  lastSync: string | null
+  metrics: PreviewMetrics
+}
+
+type PreviewState = { status: 'loading' } | { status: 'error' } | { status: 'ready'; data: PreviewData }
+
+const METRIC_TILES: Array<{
+  key: keyof PreviewMetrics
+  label: string
+  Icon: typeof Activity
+  unit?: string
+}> = [
+  { key: 'hrv', label: 'HRV', Icon: Activity, unit: 'ms' },
+  { key: 'rhr', label: 'Resting HR', Icon: HeartPulse, unit: 'bpm' },
+  { key: 'sleepScore', label: 'Sleep', Icon: Moon },
+  { key: 'steps', label: 'Steps', Icon: Footprints },
+  { key: 'activeMinutes', label: 'Active', Icon: Flame, unit: 'min' },
+]
+
+function formatSync(iso: string | null) {
+  if (!iso) return null
+  return new Date(iso).toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
+function WearablePreview({ state }: { state: PreviewState | undefined }) {
+  if (!state || state.status === 'loading') {
+    return (
+      <div className="flex items-center gap-2 text-caption text-ink-3 py-2">
+        <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+        Loading your latest data…
+      </div>
+    )
+  }
+
+  if (state.status === 'error') {
+    return (
+      <div className="text-caption text-ink-3 py-2">
+        Couldn’t load a preview right now — please try again shortly.
+      </div>
+    )
+  }
+
+  const { metrics, lastSync } = state.data
+  const tiles = METRIC_TILES.filter((t) => {
+    const v = metrics[t.key]
+    return typeof v === 'number' && Number.isFinite(v)
+  })
+
+  if (tiles.length === 0) {
+    return (
+      <div className="flex items-center gap-2 text-caption text-ink-3 py-2">
+        <RefreshCw className="w-3.5 h-3.5" />
+        Connected — syncing your first readings. Fresh data usually lands within a few hours.
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+        {tiles.map((t) => (
+          <div
+            key={t.key}
+            className="rounded-xl bg-[rgba(111,143,107,0.07)] ring-1 ring-inset ring-[rgba(111,143,107,0.16)] px-3 py-2.5"
+          >
+            <div className="flex items-center gap-1.5 text-micro text-sage-deep mb-1">
+              <t.Icon className="w-3 h-3" />
+              {t.label}
+            </div>
+            <div className="text-body-sm font-semibold text-ink tabular-nums">
+              {Math.round(metrics[t.key] as number).toLocaleString('en-GB')}
+              {t.unit && <span className="text-micro text-ink-3 font-normal ml-0.5">{t.unit}</span>}
+            </div>
+          </div>
+        ))}
+      </div>
+      {lastSync && (
+        <div className="text-micro text-ink-3">Latest reading · {formatSync(lastSync)}</div>
+      )}
+    </div>
+  )
+}
+
 export default function WearablesPage() {
   const [connected, setConnected] = useState<WearableSync[]>([])
   const [loading, setLoading] = useState<string | null>(null)
+  const [expanded, setExpanded] = useState<string | null>(null)
+  const [previews, setPreviews] = useState<Record<string, PreviewState>>({})
 
   useEffect(() => {
     fetch('/api/wearables')
@@ -82,6 +189,26 @@ export default function WearablesPage() {
       .then(setConnected)
       .catch(() => {})
   }, [])
+
+  async function loadPreview(id: string) {
+    setPreviews((prev) => ({ ...prev, [id]: { status: 'loading' } }))
+    try {
+      const res = await fetch(`/api/wearables/${id}`)
+      if (!res.ok) throw new Error('failed')
+      const data: PreviewData = await res.json()
+      setPreviews((prev) => ({ ...prev, [id]: { status: 'ready', data } }))
+    } catch {
+      setPreviews((prev) => ({ ...prev, [id]: { status: 'error' } }))
+    }
+  }
+
+  function togglePreview(id: string) {
+    setExpanded((cur) => {
+      const next = cur === id ? null : id
+      if (next && previews[id]?.status !== 'ready') void loadPreview(id)
+      return next
+    })
+  }
 
   function isConnected(id: string) {
     return connected.some((c) => c.provider === id)
@@ -184,40 +311,70 @@ export default function WearablesPage() {
         {WEARABLES.map((w) => {
           const conn = isConnected(w.id)
           const sync = lastSync(w.id)
+          const isOpen = expanded === w.id
 
           return (
-            <Card key={w.id} padding="md" className="flex items-center gap-4">
-              <WearableThumb
-                src={w.image}
-                alt={w.name}
-                fallbackIcon={w.Icon}
-                connected={conn}
-              />
+            <Card key={w.id} padding="md">
+              <div
+                className={cn('flex items-center gap-4', conn && 'cursor-pointer')}
+                onClick={conn ? () => togglePreview(w.id) : undefined}
+                role={conn ? 'button' : undefined}
+                tabIndex={conn ? 0 : undefined}
+                onKeyDown={
+                  conn
+                    ? (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault()
+                          togglePreview(w.id)
+                        }
+                      }
+                    : undefined
+                }
+              >
+                <WearableThumb
+                  src={w.image}
+                  alt={w.name}
+                  fallbackIcon={w.Icon}
+                  connected={conn}
+                />
 
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-                  <span className="text-body-sm font-semibold text-ink">{w.name}</span>
-                  {conn && (
-                    <Pill tone="soft-sage" size="sm">
-                      <CheckCircle2 className="w-3 h-3" /> Connected
-                    </Pill>
-                  )}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-0.5 flex-wrap">
+                    <span className="text-body-sm font-semibold text-ink">{w.name}</span>
+                    {conn && (
+                      <Pill tone="soft-sage" size="sm">
+                        <CheckCircle2 className="w-3 h-3" /> Connected
+                      </Pill>
+                    )}
+                  </div>
+                  <div className="text-caption text-ink-2">
+                    {conn ? 'Tap to view your latest readings' : w.desc}
+                  </div>
+                  {sync && <div className="text-micro text-ink-3 mt-0.5">Last sync · {sync}</div>}
                 </div>
-                <div className="text-caption text-ink-2">{w.desc}</div>
-                {sync && <div className="text-micro text-ink-3 mt-0.5">Last sync · {sync}</div>}
-              </div>
 
-              <div className="shrink-0">
-                {conn ? (
-                  <Button
-                    variant="subtle"
-                    size="sm"
-                    loading={loading === w.id}
-                    onClick={() => handleDisconnect(w.id)}
-                  >
-                    Disconnect
-                  </Button>
-                ) : w.type === 'upload' ? (
+                <div className="shrink-0 flex items-center gap-1.5">
+                  {conn ? (
+                    <>
+                      <Button
+                        variant="subtle"
+                        size="sm"
+                        loading={loading === w.id}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleDisconnect(w.id)
+                        }}
+                      >
+                        Disconnect
+                      </Button>
+                      <ChevronDown
+                        className={cn(
+                          'w-4 h-4 text-ink-3 transition-transform',
+                          isOpen && 'rotate-180',
+                        )}
+                      />
+                    </>
+                  ) : w.type === 'upload' ? (
                   <label className="cursor-pointer inline-block">
                     <input
                       type="file"
@@ -246,7 +403,14 @@ export default function WearablesPage() {
                     Connect
                   </Button>
                 )}
+                </div>
               </div>
+
+              {conn && isOpen && (
+                <div className="mt-3 pt-3 border-t border-[rgba(26,28,26,0.06)] fade-up">
+                  <WearablePreview state={previews[w.id]} />
+                </div>
+              )}
             </Card>
           )
         })}
