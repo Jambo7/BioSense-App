@@ -1,0 +1,3 @@
+# The password-encrypted env blob must travel byte-for-byte — never let Git
+# rewrite its line endings, or `npm run unlock` can fail on another machine.
+.env.enc -text

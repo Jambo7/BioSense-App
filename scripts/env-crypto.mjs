@@ -88,7 +88,7 @@ function lock(envFile, encFile, passphrase) {
 }
 
 function unlock(encFile, envFile, passphrase) {
-  const lines = readFileSync(encFile, 'utf8').split('\n')
+  const lines = readFileSync(encFile, 'utf8').split('\n').map((l) => l.replace(/\r$/, ''))
   if (lines[0] !== MAGIC) {
     console.error(`Unrecognised format in ${encFile}.`)
     process.exit(1)
