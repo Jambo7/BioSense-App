@@ -1,0 +1,124 @@
+# BioSense — Project Handover & Status
+
+> Living context doc for collaborators (human or AI agents) working across multiple
+> machines. Read this first to get up to speed, and update the **Recent changes** and
+> **Open items** sections as work progresses. **Last updated: 2026-06-26.**
+
+---
+
+## 1. What this is
+
+BioSense is a continuous, personalised health-intelligence web app. Users upload blood
+results, connect wearables, and complete daily check-ins; the app computes a health score
+and turns the data into educational insights and AI chat.
+
+- **Live app:** https://bio-sense-app-navy.vercel.app
+- **GitHub:** https://github.com/Jambo7/BioSense-App (private — clone requires GitHub auth)
+- **Marketing site:** https://bio-sense.ai (separate)
+
+---
+
+## 2. Tech stack
+
+| Layer | Technology |
+|-------|-----------|
+| Framework | Next.js 16 (App Router, TypeScript) |
+| UI | React 19, Tailwind CSS v4 |
+| Database | PostgreSQL (hosted on **Neon**) via Prisma ORM v7 |
+| Auth | NextAuth.js v4 (credentials + JWT). Dual auth: cookie sessions (web) + bearer tokens (mobile) |
+| AI | **OpenAI** (default `gpt-4o`) via `lib/claude.ts` (legacy filename; calls OpenAI) |
+| Wearables | **Terra API** (unified aggregator — Oura, Whoop, Garmin, Fitbit, Samsung, +) |
+| File storage | Cloudflare R2 (blood-test PDFs) |
+| Email | Resend |
+| Payments | Stripe |
+| Deployment | **Vercel** — pushing to `main` auto-deploys to production |
+
+---
+
+## 3. Getting set up on a machine
+
+1. Install **Git** and **Node.js 20 LTS**.
+2. `git clone https://github.com/Jambo7/BioSense-App.git && cd BioSense-App`
+3. **Add `.env`** — it is gitignored and NOT in GitHub. Copy it across securely
+   (e.g. password-protected zip). Without it the app won't run.
+4. `npm install` (also runs `prisma generate` via postinstall).
+5. `npm run dev` → http://localhost:3000
+
+The database is the shared **Neon** cloud instance (per `DATABASE_URL`), so no local
+Postgres/Docker is needed and all machines share the same data. The schema is already
+pushed to Neon — only run `npx prisma db push` after editing `prisma/schema.prisma`.
+
+### Multi-machine workflow
+- `git pull` **before** starting work; commit + `git push` **when done**.
+- Work on only one machine at a time between pulls/pushes to avoid divergence.
+
+---
+
+## 4. How key systems work
+
+- **Wearables (Terra):** Users connect a device via a hosted Terra "widget session"
+  (`/api/wearables/terra/connect`). Terra pushes normalised data to our webhook
+  (`/api/wearables/terra/webhook`), which verifies the HMAC signature, stores the payload
+  on `WearableSync` (keyed by userId+provider), and triggers a health-score recalc.
+  - `lib/terra.ts` — Terra client + signature verification.
+  - `lib/wearable-metrics.ts` — extracts HRV / resting HR / steps / active minutes /
+    sleep score from Terra payloads. **NOTE:** field paths follow Terra's documented
+    schema but are not yet validated against a real Fitbit payload.
+  - Wearables UI: `app/(app)/wearables/page.tsx`. Connected devices are tap-to-expand
+    with a live metrics preview (`GET /api/wearables/[provider]`).
+- **Health score:** `lib/score.ts` (pure calc) + `lib/health-score.ts` (recalc + persist).
+  Combines today's check-in with aggregated wearable metrics. Recalculated on check-in
+  submit AND on fresh wearable data.
+- **Mobile readiness:** `lib/api-auth.ts` `getRequestUser()` accepts either a NextAuth
+  cookie session OR a `Bearer` token, so the same API routes serve web and a future
+  mobile app. Mobile login/refresh: `/api/auth/mobile/{login,refresh}`. JSON read
+  endpoints exist for dashboard, reports, blood, insights, profile.
+
+---
+
+## 5. Current status
+
+- ✅ Web app live on Vercel; core features working (auth, onboarding, check-ins, health
+  score, blood upload + analysis, AI chat, reports, billing, push/email).
+- ✅ Terra wearable integration live. **Fitbit** added and successfully connected by the
+  client. Tap-to-preview window shipped.
+- ✅ Backend prepared for iOS/Android (dual auth + JSON endpoints) without breaking web.
+- ✅ Public privacy policy page (`app/privacy`) for wearable-provider approvals.
+- 🔶 Terra is running in the **Testing** environment. Confirm the live Vercel app uses the
+  matching Terra keys (`TERRA_DEV_ID` etc.) and that `TERRA_SIGNING_SECRET` is set on
+  Vercel (otherwise the webhook rejects events in production).
+
+---
+
+## 6. Open items / TODO
+
+- [ ] **Validate Fitbit data mapping** against a real stored payload once data syncs
+      (check `lib/wearable-metrics.ts` paths match what Fitbit actually sends).
+- [ ] **Confirm Vercel ⇄ Terra environment alignment** (Testing vs Production keys).
+- [ ] **Whoop integration** — needs the client's own Whoop developer app credentials
+      ("Add Credentials" in Terra) + a DNS CNAME; gated on company incorporation +
+      finalised privacy policy.
+- [ ] **Company incorporation** before finalising the privacy policy for provider submission.
+- [ ] **Custom-domain email** (e.g. hello@bio-sense.ai) — Google Workspace recommended.
+- [ ] **Native mobile app** (iOS first, Android later) — backend is prepped; app not built yet.
+
+---
+
+## 7. Environment variables (see `.env.example`)
+
+Required to run: `DATABASE_URL`, `NEXTAUTH_SECRET`, `NEXTAUTH_URL`.
+Wearables: `TERRA_DEV_ID`, `TERRA_API_KEY`, `TERRA_SIGNING_SECRET` (use the **Testing**
+environment keys for dev). AI: `OPENAI_API_KEY` (optional in dev). Stripe / Resend / R2
+keys are optional locally — those features skip gracefully when blank.
+
+> Never commit `.env`. Never paste real keys into chat/email/issues. Transfer secrets via
+> an encrypted/password-protected file.
+
+---
+
+## 8. Recent changes (most recent first)
+
+- 2026-06-22 — Tap-to-preview live metrics window for connected wearables.
+- 2026-06-20 — Added Fitbit to the wearables connect list.
+- (earlier) — iOS-readiness: dual web/mobile auth + JSON API endpoints; public privacy
+  policy page; Terra wearable integration.
