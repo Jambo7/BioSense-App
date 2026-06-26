@@ -36,6 +36,9 @@ yarn-error.log*
 .env.local
 .env.production
 .env.*.local
+.env.backup
+# ...but the password-encrypted blob IS committed (see `npm run lock`/`unlock`)
+!.env.enc
 
 # vercel
 .vercel
