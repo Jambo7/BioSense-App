@@ -37,12 +37,28 @@ and turns the data into educational insights and AI chat.
 
 ## 3. Getting set up on a machine
 
-1. Install **Git** and **Node.js 20 LTS**.
+1. Install **Git** and **Node.js 20+**.
 2. `git clone https://github.com/Jambo7/BioSense-App.git && cd BioSense-App`
-3. **Add `.env`** — it is gitignored and NOT in GitHub. Copy it across securely
-   (e.g. password-protected zip). Without it the app won't run.
-4. `npm install` (also runs `prisma generate` via postinstall).
-5. `npm run dev` → http://localhost:3000
+3. **Get the secrets** — the real `.env` is gitignored and NOT in GitHub. Instead an
+   **encrypted** copy travels in the repo as `.env.enc`. Decrypt it with the shared
+   passphrase:
+   ```bash
+   npm install        # need deps first; also runs prisma generate
+   npm run unlock     # enter the shared passphrase → regenerates local .env
+   ```
+   (If you don't have the passphrase, ask the project owner — it is never stored in
+   the repo. Without it the app can't run.)
+4. `npm run dev` → http://localhost:3000
+
+### Secret handling — lock / unlock
+- The plaintext `.env` **never** goes through git; only the AES-256-GCM–encrypted
+  `.env.enc` blob does (`scripts/env-crypto.mjs`, committed via `.gitattributes` as
+  binary so line endings are preserved).
+- **After changing `.env`:** run `npm run lock` (enter the passphrase) to refresh
+  `.env.enc`, then commit it — otherwise other machines pull stale secrets.
+- **On another machine / after pulling a new `.env.enc`:** run `npm run unlock`.
+- Lose the passphrase → no recovery; just re-`lock` from a machine that still has a
+  good `.env`. Share the passphrase out-of-band (password manager), never in the repo.
 
 The database is the shared **Neon** cloud instance (per `DATABASE_URL`), so no local
 Postgres/Docker is needed and all machines share the same data. The schema is already
@@ -111,13 +127,15 @@ Wearables: `TERRA_DEV_ID`, `TERRA_API_KEY`, `TERRA_SIGNING_SECRET` (use the **Te
 environment keys for dev). AI: `OPENAI_API_KEY` (optional in dev). Stripe / Resend / R2
 keys are optional locally — those features skip gracefully when blank.
 
-> Never commit `.env`. Never paste real keys into chat/email/issues. Transfer secrets via
-> an encrypted/password-protected file.
+> Never commit `.env`. Never paste real keys into chat/email/issues. Secrets travel only
+> as the encrypted `.env.enc` blob — see "Secret handling — lock / unlock" above.
 
 ---
 
 ## 8. Recent changes (most recent first)
 
+- 2026-06-26 — Added `npm run lock`/`unlock` secret workflow; secrets now travel as an
+  encrypted `.env.enc` blob in the repo.
 - 2026-06-22 — Tap-to-preview live metrics window for connected wearables.
 - 2026-06-20 — Added Fitbit to the wearables connect list.
 - (earlier) — iOS-readiness: dual web/mobile auth + JSON API endpoints; public privacy
