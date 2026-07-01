@@ -17,6 +17,7 @@ import {
   Heart,
   BatteryCharging,
   Droplet,
+  Lock,
   type LucideIcon,
 } from 'lucide-react'
 import { scoreLabel } from '@/lib/score'
@@ -25,7 +26,6 @@ import { ScoreRing } from '@/components/ui/score-ring'
 import { IconBadge } from '@/components/ui/icon-badge'
 import { SparkLine, BarStrip } from '@/components/ui/spark-line'
 import { cn } from '@/lib/utils'
-import { DashboardEmptyState } from './dashboard-empty-state'
 
 // ── Time-of-day greeting context ──────────────────────────────────────────
 function timeContext() {
@@ -278,6 +278,18 @@ function biologicalAge(actualAge: number | null, healthScore: number | null) {
   return { value, deltaYears, age }
 }
 
+// ── Locked-preview sample data ────────────────────────────────────────────
+// Seeds the dashboard with attractive-but-fake metrics for brand-new accounts
+// so the locked preview reads like a real, thriving dashboard behind the blur.
+const DEMO_CHECKINS: Checkin[] = [
+  { date: '', energy: 8, sleep: 8, mood: 8, stress: 3 },
+  { date: '', energy: 7, sleep: 8, mood: 7, stress: 3 },
+  { date: '', energy: 8, sleep: 7, mood: 8, stress: 4 },
+  { date: '', energy: 7, sleep: 7, mood: 7, stress: 4 },
+  { date: '', energy: 6, sleep: 6, mood: 7, stress: 5 },
+  { date: '', energy: 6, sleep: 7, mood: 6, stress: 5 },
+]
+
 // ── Component ─────────────────────────────────────────────────────────────
 export function DashboardClient({
   user,
@@ -296,39 +308,36 @@ export function DashboardClient({
     connectedWearables.length === 0 &&
     !hasBlood
 
-  if (isNewUser) {
-    return (
-      <DashboardEmptyState
-        name={user.name}
-        hasWearable={connectedWearables.length > 0}
-        hasCheckin={checkinCount > 0}
-        hasBlood={hasBlood}
-      />
-    )
-  }
+  // Fresh account (nothing connected, no check-ins, blood or score): keep the
+  // full dashboard but render the hero cards as a locked, blurred preview
+  // seeded with sample data. A frosted padlock panel + CTA invites the user to
+  // connect a wearable — the preview doubles as a marketing teaser.
+  const locked = isNewUser
+  const displayScore = locked ? 74 : healthScore
+  const displayCheckins = locked ? DEMO_CHECKINS : recentCheckins
 
   const ctx = timeContext()
-  const sl = healthScore != null ? scoreLabel(healthScore) : null
-  const hasData = healthScore != null
-  const drivers = topDrivers(recentCheckins)
+  const sl = displayScore != null ? scoreLabel(displayScore) : null
+  const hasData = displayScore != null
+  const drivers = topDrivers(displayCheckins)
 
   // Trajectory: derives a delta over the long-window proxy. Real version
   // subtracts a stored 90-day-old snapshot.
   const longTermDelta = (() => {
-    if (recentCheckins.length < 4) return 6
-    const recent = recentCheckins.slice(0, 3)
-    const older  = recentCheckins.slice(3, 7)
+    if (displayCheckins.length < 4) return 6
+    const recent = displayCheckins.slice(0, 3)
+    const older  = displayCheckins.slice(3, 7)
     const avgRecent = recent.reduce((s, c) => s + (c.energy + c.sleep + c.mood + (10 - c.stress)) / 4, 0) / recent.length
     const avgOlder  = older.reduce((s, c) => s + (c.energy + c.sleep + c.mood + (10 - c.stress)) / 4, 0) / older.length
     return Math.round((avgRecent - avgOlder) * 10)
   })()
-  const trajectory = trajectoryCopy(healthScore, longTermDelta)
+  const trajectory = trajectoryCopy(displayScore, longTermDelta)
   const hero = greetingHeadline(longTermDelta, hasData)
-  const series = trajectorySeries(healthScore ?? 55, `traj-${user.name}`)
-  const bio = biologicalAge(user.age, healthScore)
+  const series = trajectorySeries(displayScore ?? 55, `traj-${user.name}`)
+  const bio = biologicalAge(user.age, displayScore)
 
   // Daily readiness — composite of latest check-in.
-  const latest = recentCheckins[0]
+  const latest = displayCheckins[0]
   const readiness = latest
     ? Math.round(((latest.energy + latest.sleep + latest.mood + (10 - latest.stress)) / 40) * 100)
     : null
@@ -371,6 +380,7 @@ export function DashboardClient({
           This card carries the biological-age stat + a 90-day trajectory
           line + a key insight callout. */}
       <Card variant="premium" padding="lg" className="relative overflow-hidden">
+        <div className={cn(locked && 'blur-[3px] pointer-events-none select-none')}>
         {/* Header row: eyebrow + Long-term pill on the left; View-score
             button on the right. `flex-wrap` lets the button drop below on
             very narrow viewports rather than squashing the eyebrow into
@@ -406,7 +416,7 @@ export function DashboardClient({
         <div className="mt-4 grid grid-cols-2 gap-2.5">
           <MiniStat
             eyebrow="Health score"
-            value={hasData ? `${Math.round(healthScore!)}` : '—'}
+            value={hasData ? `${Math.round(displayScore!)}` : '—'}
             suffix={hasData ? '/100' : undefined}
             caption={sl?.label ?? ''}
             tone="sage"
@@ -469,12 +479,20 @@ export function DashboardClient({
             </div>
           </div>
         </div>
+        </div>
+        {locked && (
+          <LockedOverlay
+            title="Unlock your Health Score"
+            subtitle="See your biological age and full 90-day health trajectory."
+          />
+        )}
       </Card>
 
       {/* ── 3 / TODAY'S READINESS ───────────────────────────────────────
           Separate "Short-term" card so users see daily readiness without
           confusing it with the long-term score. Donut + 4 sub-stats grid. */}
       <Card variant="premium" padding="lg" className="relative overflow-hidden">
+        <div className={cn(locked && 'blur-[3px] pointer-events-none select-none')}>
         <div className="flex items-start justify-between gap-3 mb-3">
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1.5 text-eyebrow uppercase text-sage-deep">
@@ -545,6 +563,13 @@ export function DashboardClient({
             <ArrowRight className="w-3 h-3" strokeWidth={2.25} />
           </Link>
         </div>
+        </div>
+        {locked && (
+          <LockedOverlay
+            title="Unlock daily readiness"
+            subtitle="Know each morning whether to push hard or recover — from your sleep, HRV and stress."
+          />
+        )}
       </Card>
 
       {/* ── 4 / Why this matters — drivers behind today's score ─────────
@@ -714,7 +739,7 @@ export function DashboardClient({
             label="Health Score"
             value="+6 pts"
             caption="vs 90 days ago"
-            series={[48, 50, 52, 51, 53, 55, 56, 58, 60, 62, 63, healthScore ?? 61]}
+            series={[48, 50, 52, 51, 53, 55, 56, 58, 60, 62, 63, displayScore ?? 61]}
           />
           <ProgressStat
             label="Biological age"
@@ -736,6 +761,37 @@ export function DashboardClient({
           />
         </div>
       </Card>
+    </div>
+  )
+}
+
+// ── Locked preview overlay ────────────────────────────────────────────────
+// Frosted panel shown over hero cards for brand-new accounts. The card behind
+// renders blurred sample data; this invites the user to connect a wearable to
+// unlock the real thing (and teases what they'll get once they do).
+function LockedOverlay({ title, subtitle }: { title: string; subtitle: string }) {
+  return (
+    <div className="absolute inset-0 z-10 flex items-center justify-center p-5 bg-[rgba(247,245,240,0.45)]">
+      <div className="relative flex flex-col items-center text-center max-w-[300px]">
+        <div className="flex items-center justify-center w-11 h-11 rounded-full bg-white/85 ring-1 ring-[rgba(111,143,107,0.22)] shadow-[0_2px_12px_rgba(26,28,26,0.10)]">
+          <Lock className="w-[18px] h-[18px] text-sage-deep" strokeWidth={2.25} />
+        </div>
+        <div className="font-serif text-[19px] sm:text-[20px] text-ink leading-tight tracking-tight mt-3">
+          {title}
+        </div>
+        <p className="text-[12.5px] text-ink-2 leading-snug mt-1.5">{subtitle}</p>
+        <Link
+          href="/wearables"
+          className="inline-flex items-center gap-1.5 mt-4 px-4 h-10 rounded-pill text-white bg-grad-sage shadow-button text-[13px] font-medium hover:shadow-[var(--shadow-button-hover)] transition-shadow"
+        >
+          Connect a wearable
+          <ArrowRight className="w-3.5 h-3.5" strokeWidth={2.25} />
+        </Link>
+        <div className="flex items-center gap-1.5 text-[11px] text-ink-3 mt-2.5">
+          <Lock className="w-3 h-3" strokeWidth={2.25} />
+          Track for 14 days to unlock
+        </div>
+      </div>
     </div>
   )
 }
