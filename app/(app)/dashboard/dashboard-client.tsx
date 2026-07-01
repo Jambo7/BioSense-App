@@ -25,6 +25,7 @@ import { ScoreRing } from '@/components/ui/score-ring'
 import { IconBadge } from '@/components/ui/icon-badge'
 import { SparkLine, BarStrip } from '@/components/ui/spark-line'
 import { cn } from '@/lib/utils'
+import { DashboardEmptyState } from './dashboard-empty-state'
 
 // ── Time-of-day greeting context ──────────────────────────────────────────
 function timeContext() {
@@ -282,8 +283,30 @@ export function DashboardClient({
   user,
   healthScore,
   scoreBreakdown,
+  checkinCount,
   recentCheckins,
+  hasBlood,
+  connectedWearables,
 }: DashboardClientProps) {
+  // Fresh account: nothing connected, no check-ins, no blood, no score yet.
+  // Show a guided welcome instead of a dashboard full of placeholder numbers.
+  const isNewUser =
+    healthScore == null &&
+    checkinCount === 0 &&
+    connectedWearables.length === 0 &&
+    !hasBlood
+
+  if (isNewUser) {
+    return (
+      <DashboardEmptyState
+        name={user.name}
+        hasWearable={connectedWearables.length > 0}
+        hasCheckin={checkinCount > 0}
+        hasBlood={hasBlood}
+      />
+    )
+  }
+
   const ctx = timeContext()
   const sl = healthScore != null ? scoreLabel(healthScore) : null
   const hasData = healthScore != null
