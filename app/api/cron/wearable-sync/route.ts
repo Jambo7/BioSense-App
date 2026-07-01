@@ -11,7 +11,8 @@
  *   - `x-cron-secret: <CRON_SECRET>`            (GCP Cloud Scheduler — gcp/scheduler.sh)
  *   - `Authorization: Bearer <CRON_SECRET>`     (Vercel Cron — vercel.json)
  *
- * Scheduled every 6 hours.
+ * Scheduled once daily (Vercel Hobby allows at most one run per day).
+ * Stale connections are also refreshed when users open the Wearables page.
  */
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
