@@ -82,5 +82,28 @@ gcloud scheduler jobs update http biosense-anomaly-check \
   --project="$PROJECT"
 
 echo "✓ Anomaly check scheduler created/updated"
+
+# ── Wearable sync — every 6 hours ────────────────────────────────────────────
+# Terra does not reliably poll connected providers on its own, so we ask it to
+# push the last week of data to our webhook on a schedule.
+gcloud scheduler jobs create http biosense-wearable-sync \
+  --location="$REGION" \
+  --schedule="0 */6 * * *" \
+  --uri="$SERVICE_URL/api/cron/wearable-sync" \
+  --http-method=POST \
+  --headers="x-cron-secret=$CRON_SECRET,Content-Type=application/json" \
+  --message-body="{}" \
+  --time-zone="UTC" \
+  --description="Pull connected wearable data from Terra into WearableSync" \
+  --attempt-deadline=540s \
+  --project="$PROJECT" \
+  2>/dev/null || \
+gcloud scheduler jobs update http biosense-wearable-sync \
+  --location="$REGION" \
+  --uri="$SERVICE_URL/api/cron/wearable-sync" \
+  --headers="x-cron-secret=$CRON_SECRET,Content-Type=application/json" \
+  --project="$PROJECT"
+
+echo "✓ Wearable sync scheduler created/updated"
 echo ""
 echo "All Cloud Scheduler jobs configured."

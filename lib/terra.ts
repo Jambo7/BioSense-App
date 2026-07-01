@@ -112,6 +112,57 @@ export async function generateWidgetSession(params: {
   return { url: json.url, sessionId: json.session_id, expiresIn: json.expires_in }
 }
 
+/** Default Terra data types we request on a recurring sync. */
+export const TERRA_SYNC_TYPES = ['daily', 'sleep', 'activity', 'body'] as const
+
+export interface TerraDataRequestResult {
+  type: string
+  status: number
+  ok: boolean
+}
+
+/**
+ * Asks Terra for a user's data over a date range. With `toWebhook: true`
+ * (the default), Terra delivers the results asynchronously to our webhook
+ * (app/api/wearables/terra/webhook) rather than returning them inline — this
+ * is how we keep WearableSync fresh without relying on Terra's own polling,
+ * which we've observed can stay idle (`last_polled_at: null`) indefinitely.
+ *
+ * A per-type non-2xx (e.g. Fitbit returning 424 for activity when there are no
+ * workouts) is reported but does not throw, so one empty type never blocks the
+ * others.
+ */
+export async function requestTerraUserData(params: {
+  terraUserId: string
+  startDate: Date
+  endDate: Date
+  types?: readonly string[]
+  toWebhook?: boolean
+}): Promise<TerraDataRequestResult[]> {
+  const { devId, apiKey } = getTerraCredentials()
+  const types = params.types ?? TERRA_SYNC_TYPES
+  const toWebhook = params.toWebhook ?? true
+  const fmt = (d: Date) => d.toISOString().split('T')[0]
+
+  const headers = { 'dev-id': devId, 'x-api-key': apiKey }
+  const results: TerraDataRequestResult[] = []
+
+  for (const type of types) {
+    const url =
+      `${TERRA_API_BASE}/${type}?user_id=${encodeURIComponent(params.terraUserId)}` +
+      `&start_date=${fmt(params.startDate)}&end_date=${fmt(params.endDate)}` +
+      `&to_webhook=${toWebhook}`
+    try {
+      const res = await fetch(url, { headers })
+      results.push({ type, status: res.status, ok: res.ok })
+    } catch {
+      results.push({ type, status: 0, ok: false })
+    }
+  }
+
+  return results
+}
+
 /** A connected Terra account, as echoed back on webhook payloads. */
 export interface TerraUser {
   user_id: string
