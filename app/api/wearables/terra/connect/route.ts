@@ -22,7 +22,11 @@ const PROVIDER_SLUGS: Record<string, string> = {
   samsung: 'SAMSUNG',
   fitbit: 'FITBIT',
   strava: 'STRAVA',
-  google: 'GOOGLE',
+  // Google: offer both the new web-based Google Health API (the Fitbit Web API
+  // replacement, where most current Android/Pixel data lives) and legacy Google
+  // Fit, so the widget lets the user pick whichever their account is under.
+  // NB: Health Connect is SDK-only and needs a native app, so it's excluded.
+  google: 'GOOGLE_HEALTH,GOOGLE',
   peloton: 'PELOTON',
 }
 
