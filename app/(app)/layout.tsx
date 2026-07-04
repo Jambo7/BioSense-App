@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import Image from 'next/image'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
 import { AppNav } from '@/components/app-nav'
 import { TourProvider } from '@/components/tour/tour-context'
 import { TourOverlay } from '@/components/tour/tour-overlay'
@@ -11,8 +12,22 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   if (!session) redirect('/login')
   if (!session.user.hasConsented) redirect('/consent')
-  // Registration info-gathering is mandatory — block the app until it's done.
-  if (!session.user.onboardingDone) redirect('/onboarding')
+
+  // Check if profile is actually complete (has required fields from onboarding).
+  // This catches: 1) normal users who haven't done onboarding, 2) test/manual accounts
+  // created with onboardingDone=true but no profile data.
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { onboardingDone: true, goals: true, dob: true, biologicalSex: true },
+  })
+
+  const profileIncomplete =
+    !user?.onboardingDone ||
+    !user.goals?.length ||
+    !user.dob ||
+    !user.biologicalSex
+
+  if (profileIncomplete) redirect('/onboarding')
 
   return (
     <div className="min-h-screen relative bg-off-white">
