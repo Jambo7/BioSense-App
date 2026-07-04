@@ -30,6 +30,7 @@ const WEARABLES = [
   { id: 'whoop',   name: 'Whoop',          Icon: Watch,      image: '/wearables/whoop.png',   desc: 'Recovery, strain, sleep performance', type: 'oauth' },
   { id: 'garmin',  name: 'Garmin',         Icon: Watch,      image: '/wearables/garmin.png',  desc: 'Activity, HRV, steps, VO₂ max',       type: 'oauth' },
   { id: 'fitbit',  name: 'Fitbit',         Icon: Watch,      image: '/wearables/fitbit.png',  desc: 'Sleep, heart rate, steps, activity',  type: 'oauth' },
+  { id: 'strava',  name: 'Strava',         Icon: Activity,   image: '/wearables/strava.png',  desc: 'Running, cycling, workouts, activities', type: 'oauth' },
   { id: 'samsung', name: 'Samsung Health', Icon: Smartphone, image: '/wearables/samsung.png', desc: 'Steps, heart rate, sleep (Android)',  type: 'oauth' },
   { id: 'google',  name: 'Google Health',  Icon: Activity,   image: '/wearables/google.png',  desc: 'Steps, heart rate, sleep (Google Health / Fit)', type: 'oauth' },
   { id: 'apple',   name: 'Apple Health',   Icon: Smartphone, image: '/wearables/apple.png',   desc: 'Upload Health Auto Export JSON',      type: 'upload' },
