@@ -5,6 +5,10 @@
  * (sleep/activity/daily/etc). We verify the signature, then persist the
  * payload onto WearableSync keyed by (userId, provider).
  *
+ * Supports "ping mode" for large payloads — when enabled, Terra sends a small
+ * JSON with a pre-signed S3 URL instead of the full data. We download the
+ * full payload from that URL. Contact Terra support to enable ping mode.
+ *
  * Stage 1 goal: prove the pipe works — verify + store + log. Mapping the
  * stored payloads into the health score (lib/score.ts) is Stage 3.
  */
@@ -43,11 +47,32 @@ export async function POST(req: NextRequest) {
     console.warn('[terra] TERRA_SIGNING_SECRET not set — skipping verification (dev only)')
   }
 
-  let payload: TerraWebhookPayload
+  let initialPayload: TerraWebhookPayload & { url?: string; expires_in?: number }
   try {
-    payload = JSON.parse(rawBody) as TerraWebhookPayload
+    initialPayload = JSON.parse(rawBody)
   } catch {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
+  }
+
+  // Handle "ping mode" — Terra sends a small payload with an S3 URL for large data.
+  // We download the full payload from that URL and process it normally.
+  let payload: TerraWebhookPayload
+  if (initialPayload.type === 's3_payload' && initialPayload.url) {
+    console.log('[terra] ping mode: downloading payload from S3...')
+    try {
+      const s3Response = await fetch(initialPayload.url)
+      if (!s3Response.ok) {
+        console.error(`[terra] failed to download S3 payload: ${s3Response.status}`)
+        return NextResponse.json({ error: 'Failed to download S3 payload' }, { status: 502 })
+      }
+      payload = await s3Response.json()
+      console.log('[terra] ping mode: payload downloaded successfully')
+    } catch (err) {
+      console.error('[terra] failed to fetch S3 payload:', err)
+      return NextResponse.json({ error: 'Failed to fetch S3 payload' }, { status: 502 })
+    }
+  } else {
+    payload = initialPayload as TerraWebhookPayload
   }
 
   const { type } = payload
