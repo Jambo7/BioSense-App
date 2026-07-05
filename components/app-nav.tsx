@@ -110,46 +110,46 @@ export function AppNav() {
         </nav>
 
         {/* Right actions */}
-        <div className="flex items-center gap-1.5 shrink-0">
+        <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
           <Link
             href="/tutorial"
             className={cn(
-              'inline-flex items-center gap-1.5 h-8 px-3 sm:px-3.5 rounded-pill',
-              'text-[12px] font-medium text-white',
+              'inline-flex items-center gap-1 h-8 px-2.5 sm:px-3.5 rounded-pill',
+              'text-[11px] sm:text-[12px] font-medium text-white',
               'bg-grad-sage shadow-button',
               'transition-all hover:scale-[1.02] active:scale-[0.98]',
             )}
             aria-label="Tutorial"
           >
             <GraduationCap className="w-[14px] h-[14px]" strokeWidth={2} />
-            <span className="hidden sm:inline">Tutorial</span>
+            <span>Tutorial</span>
           </Link>
 
           <Link
             href="/wearables"
             data-tour="wearables"
             className={cn(
-              'inline-flex items-center gap-1.5 h-8 px-3 sm:px-3.5 rounded-pill',
-              'text-[12px] font-medium text-sage-deep',
+              'inline-flex items-center gap-1 h-8 px-2.5 sm:px-3.5 rounded-pill',
+              'text-[11px] sm:text-[12px] font-medium text-sage-deep',
               'bg-white/70 backdrop-blur-sm',
               'ring-1 ring-inset ring-[rgba(111,143,107,0.32)]',
               'transition-colors',
               'hover:bg-white/90 hover:ring-[rgba(111,143,107,0.50)]',
               'active:scale-[0.98]',
             )}
-            aria-label="Wearables"
+            aria-label="Connections"
           >
             <Watch className="w-[14px] h-[14px]" strokeWidth={2} />
-            <span>Wearables</span>
+            <span>Connections</span>
           </Link>
 
           <Link
             href="/notifications"
             data-tour="notifications"
-            className="relative w-9 h-9 inline-flex items-center justify-center rounded-full text-ink-2 hover:text-ink hover:bg-[rgba(26,28,26,0.04)] transition-colors"
+            className="relative w-8 h-8 sm:w-9 sm:h-9 inline-flex items-center justify-center rounded-full text-ink-2 hover:text-ink hover:bg-[rgba(26,28,26,0.04)] transition-colors"
             aria-label="Notifications"
           >
-            <Bell className="w-[18px] h-[18px]" strokeWidth={1.85} />
+            <Bell className="w-4 h-4 sm:w-[18px] sm:h-[18px]" strokeWidth={1.85} />
             <span
               aria-hidden
               className="absolute top-1.5 right-2 w-1.5 h-1.5 rounded-full bg-sage ring-1 ring-white"
@@ -163,7 +163,7 @@ export function AppNav() {
             aria-label="Account"
             data-tour="profile"
             className={cn(
-              'w-9 h-9 inline-flex items-center justify-center rounded-full overflow-hidden',
+              'w-8 h-8 sm:w-9 sm:h-9 inline-flex items-center justify-center rounded-full overflow-hidden',
               'bg-[linear-gradient(180deg,rgba(168,191,163,0.35)_0%,rgba(111,143,107,0.25)_100%)]',
               'ring-1 ring-inset ring-[rgba(168,191,163,0.45)]',
               'text-sage-deep text-[12px] font-semibold',
