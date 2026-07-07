@@ -1,13 +1,17 @@
 import { prisma } from '@/lib/prisma'
 import { requestTerraUserData } from '@/lib/terra'
+import { storeTerraDataPayloads } from '@/lib/terra-store'
 
 /** Re-nudge Terra if a connection hasn't received data in this long. */
 const STALE_MS = 6 * 60 * 60 * 1000
 
 /**
- * For each Terra-backed WearableSync belonging to `userId`, ask Terra to push
- * the last 7 days to our webhook when the row looks stale. Terra does not
+ * For each stale Terra-backed WearableSync belonging to `userId`, pull the last
+ * 7 days inline (`to_webhook=false`) and store it directly. Terra does not
  * reliably poll providers on its own (`last_polled_at: null` is common).
+ *
+ * We pull inline rather than routing through the webhook so large data days
+ * aren't rejected by the host's inbound body-size limit (Vercel 413).
  *
  * Intended to be called fire-and-forget from page/API handlers so the user
  * gets a refresh when they open Wearables without waiting for a cron.
@@ -31,12 +35,25 @@ export async function nudgeStaleWearableSyncs(userId: string): Promise<void> {
     if (now - lastSyncMs < STALE_MS) continue
 
     try {
-      await requestTerraUserData({
+      const typeResults = await requestTerraUserData({
         terraUserId,
         startDate: start,
         endDate: end,
-        toWebhook: true,
+        toWebhook: false,
       })
+
+      const stored = typeResults
+        .filter((t) => t.ok && t.data && t.data.length > 0)
+        .map((t) => ({ type: t.type, data: t.data ?? null }))
+
+      if (stored.length > 0) {
+        await storeTerraDataPayloads({
+          referenceId: userId,
+          provider: sync.provider,
+          terraUserId,
+          payloads: stored,
+        })
+      }
     } catch (err) {
       console.error(`[wearable-sync] nudge failed ${userId}/${sync.provider}:`, err)
     }

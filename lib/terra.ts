@@ -119,14 +119,29 @@ export interface TerraDataRequestResult {
   type: string
   status: number
   ok: boolean
+  /**
+   * Normalised records returned inline by Terra. Only populated when
+   * `toWebhook: false` and Terra answered synchronously (200 with a `data`
+   * array). Undefined for webhook-delivered requests or when Terra deferred
+   * the response (e.g. 202 processing for cold/large ranges).
+   */
+  data?: unknown[]
 }
 
 /**
- * Asks Terra for a user's data over a date range. With `toWebhook: true`
- * (the default), Terra delivers the results asynchronously to our webhook
- * (app/api/wearables/terra/webhook) rather than returning them inline — this
- * is how we keep WearableSync fresh without relying on Terra's own polling,
- * which we've observed can stay idle (`last_polled_at: null`) indefinitely.
+ * Asks Terra for a user's data over a date range.
+ *
+ * With `toWebhook: true`, Terra delivers the results asynchronously to our
+ * webhook (app/api/wearables/terra/webhook). The downside: large data days can
+ * exceed the host's inbound request-body limit (Vercel caps serverless bodies
+ * at ~4.5 MB → HTTP 413), so those deliveries silently fail.
+ *
+ * With `toWebhook: false` (preferred for our ≤7-day syncs), Terra returns the
+ * normalised data inline in the HTTP response, which we surface via
+ * `result.data`. Reading a response body is not subject to the inbound
+ * body-size limit, so this sidesteps the 413/503 problem entirely. Note Terra
+ * only answers inline for ranges up to 28 days; longer ranges are forced async
+ * regardless of this flag.
  *
  * A per-type non-2xx (e.g. Fitbit returning 424 for activity when there are no
  * workouts) is reported but does not throw, so one empty type never blocks the
@@ -154,7 +169,16 @@ export async function requestTerraUserData(params: {
       `&to_webhook=${toWebhook}`
     try {
       const res = await fetch(url, { headers })
-      results.push({ type, status: res.status, ok: res.ok })
+      let data: unknown[] | undefined
+      if (res.ok && !toWebhook) {
+        try {
+          const json = (await res.json()) as { data?: unknown }
+          if (Array.isArray(json.data)) data = json.data
+        } catch {
+          // Non-JSON / empty body — leave data undefined, status still reported.
+        }
+      }
+      results.push({ type, status: res.status, ok: res.ok, data })
     } catch {
       results.push({ type, status: 0, ok: false })
     }

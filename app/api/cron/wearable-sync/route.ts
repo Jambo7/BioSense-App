@@ -3,9 +3,10 @@
  *
  * Terra does not reliably poll connected providers on its own (we've seen
  * `last_polled_at: null` for days after a healthy connect). This job loops over
- * every Terra-backed WearableSync and asks Terra for the last week of data with
- * `to_webhook=true`, which makes Terra push fresh data to our webhook — the
- * webhook then stores it and recalculates the health score as usual.
+ * every Terra-backed WearableSync and pulls the last week of data inline
+ * (`to_webhook=false`), storing the response directly and recalculating the
+ * health score. Pulling inline (rather than pushing via the webhook) avoids the
+ * host's inbound request-body limit, which rejects large data days with 413.
  *
  * Auth accepts either:
  *   - `x-cron-secret: <CRON_SECRET>`            (GCP Cloud Scheduler — gcp/scheduler.sh)
@@ -17,6 +18,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { requestTerraUserData } from '@/lib/terra'
+import { storeTerraDataPayloads } from '@/lib/terra-store'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -68,12 +70,30 @@ async function handle(req: NextRequest) {
     }
 
     try {
+      // Pull inline (to_webhook=false) and store the response directly. This
+      // avoids routing large data through the webhook, whose inbound body is
+      // capped at ~4.5 MB on Vercel (HTTP 413). Our window is 7 days, well
+      // within Terra's 28-day inline limit.
       const typeResults = await requestTerraUserData({
         terraUserId,
         startDate: start,
         endDate: end,
-        toWebhook: true,
+        toWebhook: false,
       })
+
+      const stored = typeResults
+        .filter((t) => t.ok && t.data && t.data.length > 0)
+        .map((t) => ({ type: t.type, data: t.data ?? null }))
+
+      if (stored.length > 0) {
+        await storeTerraDataPayloads({
+          referenceId: sync.userId,
+          provider: sync.provider,
+          terraUserId,
+          payloads: stored,
+        })
+      }
+
       requested++
       results.push({
         userId: sync.userId,

@@ -15,11 +15,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import type { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
-import { recalculateHealthScore } from '@/lib/health-score'
 import { getReferenceId, verifyTerraSignature, type TerraWebhookPayload } from '@/lib/terra'
+import { storeTerraDataPayloads } from '@/lib/terra-store'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
+// Give the handler headroom to store data + recalc the score so a slow write
+// can't be killed mid-request and surface to Terra as a 503.
+export const maxDuration = 60
 
 const AUTH_EVENT_TYPES = new Set([
   'auth',
@@ -117,51 +120,46 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true, disconnected: true })
     }
 
-    const isAuthEvent = AUTH_EVENT_TYPES.has(type)
-    const existing = await prisma.wearableSync.findUnique({
-      where: { userId_provider: { userId: referenceId, provider } },
-    })
+    // Auth/connection events: record connection metadata, no data payload.
+    if (AUTH_EVENT_TYPES.has(type)) {
+      const existing = await prisma.wearableSync.findUnique({
+        where: { userId_provider: { userId: referenceId, provider } },
+      })
+      const prevData = (existing?.data as Record<string, unknown> | null) ?? {}
 
-    const prevData = (existing?.data as Record<string, unknown> | null) ?? {}
-    const prevPayloads = (prevData.payloads as Record<string, unknown>) ?? {}
-
-    const nextData: Record<string, unknown> = {
-      ...prevData,
-      terraUserId,
-      provider,
-      // Keep the latest payload per event type for inspection / later mapping.
-      payloads: isAuthEvent
-        ? prevPayloads
-        : { ...prevPayloads, [type]: { receivedAt: new Date().toISOString(), data: payload.data ?? null } },
-    }
-    if (isAuthEvent) {
-      nextData.connectedAt = prevData.connectedAt ?? new Date().toISOString()
-      nextData.lastAuthStatus = payload.status ?? type
-    }
-
-    await prisma.wearableSync.upsert({
-      where: { userId_provider: { userId: referenceId, provider } },
-      create: {
-        userId: referenceId,
+      const nextData: Record<string, unknown> = {
+        ...prevData,
+        terraUserId,
         provider,
-        lastSync: new Date(),
-        data: nextData as Prisma.InputJsonValue,
-      },
-      update: {
-        lastSync: new Date(),
-        data: nextData as Prisma.InputJsonValue,
-      },
-    })
-
-    // Fresh wearable data → refresh the user's health score so connected
-    // sleep/HRV/steps move the number even without a manual check-in.
-    if (!isAuthEvent) {
-      try {
-        await recalculateHealthScore(referenceId)
-      } catch (scoreErr) {
-        console.error('[terra] health score recalc failed:', scoreErr)
+        connectedAt: prevData.connectedAt ?? new Date().toISOString(),
+        lastAuthStatus: payload.status ?? type,
       }
+
+      await prisma.wearableSync.upsert({
+        where: { userId_provider: { userId: referenceId, provider } },
+        create: {
+          userId: referenceId,
+          provider,
+          lastSync: new Date(),
+          data: nextData as Prisma.InputJsonValue,
+        },
+        update: {
+          lastSync: new Date(),
+          data: nextData as Prisma.InputJsonValue,
+        },
+      })
+
+      return NextResponse.json({ ok: true, stored: true })
     }
+
+    // Data event: store the payload + refresh the health score via the shared
+    // helper (same path used by the cron/nudge inline pulls).
+    await storeTerraDataPayloads({
+      referenceId,
+      provider,
+      terraUserId,
+      payloads: [{ type, data: (payload.data as unknown[] | undefined) ?? null }],
+    })
 
     return NextResponse.json({ ok: true, stored: true })
   } catch (err) {
