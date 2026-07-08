@@ -18,6 +18,12 @@ export interface WearableMetrics {
   steps?: number
   activeMinutes?: number
   sleepScore?: number
+  /** Total time asleep, in hours (for the readiness "Sleep" tile). */
+  sleepHours?: number
+  /** Recovery / readiness score 0-100 (Whoop `scores.recovery`, etc.). */
+  recovery?: number
+  /** Average daily stress level 0-100 (Garmin/Samsung); absent for Whoop. */
+  stress?: number
 }
 
 function getPath(obj: unknown, path: string): unknown {
@@ -60,6 +66,9 @@ export function metricsFromSyncData(data: unknown): WearableMetrics {
       m.steps
     const activitySec = num(getPath(daily, 'active_durations_data.activity_seconds'))
     if (activitySec != null) m.activeMinutes = Math.round(activitySec / 60)
+    m.recovery = num(getPath(daily, 'scores.recovery')) ?? m.recovery
+    const avgStress = num(getPath(daily, 'stress_data.avg_stress_level'))
+    if (avgStress != null) m.stress = avgStress
   }
 
   // --- Sleep: sleep efficiency as a 0-100 proxy score, plus overnight HRV/RHR ---
@@ -67,6 +76,10 @@ export function metricsFromSyncData(data: unknown): WearableMetrics {
   if (sleep) {
     const eff = num(getPath(sleep, 'sleep_durations_data.sleep_efficiency'))
     if (eff != null) m.sleepScore = eff <= 1 ? Math.round(eff * 100) : Math.round(eff)
+    const asleepSec = num(
+      getPath(sleep, 'sleep_durations_data.asleep.duration_asleep_state_seconds'),
+    )
+    if (asleepSec != null) m.sleepHours = Math.round((asleepSec / 3600) * 10) / 10
     m.hrv =
       num(getPath(sleep, 'heart_rate_data.summary.avg_hrv_rmssd')) ??
       num(getPath(sleep, 'heart_rate_data.summary.avg_hrv_sdnn')) ??

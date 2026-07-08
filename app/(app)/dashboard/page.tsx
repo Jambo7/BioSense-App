@@ -1,6 +1,7 @@
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { aggregateWearableMetrics } from '@/lib/wearable-metrics'
 import { DashboardClient } from './dashboard-client'
 
 export default async function DashboardPage() {
@@ -64,6 +65,7 @@ export default async function DashboardPage() {
       }))}
       hasBlood={!!latestBlood}
       connectedWearables={wearables.map((w) => w.provider)}
+      wearableMetrics={aggregateWearableMetrics(wearables)}
     />
   )
 }

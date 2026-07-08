@@ -21,6 +21,7 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 import { scoreLabel } from '@/lib/score'
+import type { WearableMetrics } from '@/lib/wearable-metrics'
 import { Card } from '@/components/ui/card'
 import { ScoreRing } from '@/components/ui/score-ring'
 import { IconBadge } from '@/components/ui/icon-badge'
@@ -127,6 +128,14 @@ interface DashboardClientProps {
   recentCheckins: Checkin[]
   hasBlood: boolean
   connectedWearables: string[]
+  wearableMetrics: WearableMetrics
+}
+
+// Maps a 0-100 daily stress level (Garmin/Samsung scale) to a display band.
+function stressBandFromLevel(level: number): string {
+  if (level < 30) return 'Low'
+  if (level < 60) return 'Moderate'
+  return 'High'
 }
 
 // ── Driver impact tagging ────────────────────────────────────────────────
@@ -299,6 +308,7 @@ export function DashboardClient({
   recentCheckins,
   hasBlood,
   connectedWearables,
+  wearableMetrics,
 }: DashboardClientProps) {
   // Fresh account: nothing connected, no check-ins, no blood, no score yet.
   // Show a guided welcome instead of a dashboard full of placeholder numbers.
@@ -336,18 +346,42 @@ export function DashboardClient({
   const series = trajectorySeries(displayScore ?? 55, `traj-${user.name}`)
   const bio = biologicalAge(user.age, displayScore)
 
-  // Daily readiness — composite of latest check-in.
+  // Real wearable data (when a device is connected). On the locked new-user
+  // preview we intentionally ignore it (there is none).
+  const wm = locked ? null : wearableMetrics
+
+  // Daily readiness — a logged check-in takes priority; otherwise fall back to
+  // the wearable's own recovery/readiness score so the headline reflects real data.
   const latest = displayCheckins[0]
   const readiness = latest
     ? Math.round(((latest.energy + latest.sleep + latest.mood + (10 - latest.stress)) / 40) * 100)
-    : null
+    : wm?.recovery != null
+      ? Math.round(wm.recovery)
+      : null
   const readinessText = readinessCopy(readiness)
 
-  // Today's sub-stats — derived from latest check-in when available, fallback to spec defaults.
-  const sleepHours = latest ? Math.round((4 + (latest.sleep / 10) * 5) * 10) / 10 : 6.7
-  const hrvMs      = latest ? Math.round(36 + (10 - latest.stress) * 3.5)          : 52
-  const stressBand = latest ? (latest.stress <= 3.5 ? 'Low' : latest.stress <= 6 ? 'Moderate' : 'High') : 'High'
-  const recoveryPct = readiness ?? 54
+  // Today's sub-stats — prefer real wearable data, then check-in-derived
+  // estimates, then spec defaults.
+  const sleepHours =
+    wm?.sleepHours ??
+    (latest ? Math.round((4 + (latest.sleep / 10) * 5) * 10) / 10 : 6.7)
+  const hrvMs =
+    wm?.hrv != null
+      ? Math.round(wm.hrv)
+      : latest
+        ? Math.round(36 + (10 - latest.stress) * 3.5)
+        : 52
+  const stressBand =
+    wm?.stress != null
+      ? stressBandFromLevel(wm.stress)
+      : latest
+        ? latest.stress <= 3.5
+          ? 'Low'
+          : latest.stress <= 6
+            ? 'Moderate'
+            : 'High'
+        : 'High'
+  const recoveryPct = wm?.recovery != null ? Math.round(wm.recovery) : readiness ?? 54
 
   return (
     <div className="space-y-5 stagger">
