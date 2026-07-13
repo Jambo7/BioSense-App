@@ -3,7 +3,7 @@ import { requestTerraUserData } from '@/lib/terra'
 import { storeTerraDataPayloads } from '@/lib/terra-store'
 
 /** Re-nudge Terra if a connection hasn't received data in this long. */
-const STALE_MS = 6 * 60 * 60 * 1000
+const STALE_MS = 2 * 60 * 60 * 1000
 
 /**
  * For each stale Terra-backed WearableSync belonging to `userId`, pull the last
