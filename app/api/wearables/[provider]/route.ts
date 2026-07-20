@@ -3,6 +3,8 @@ import { prisma } from '@/lib/prisma'
 import { getRequestUser } from '@/lib/api-auth'
 import { metricsFromSyncData } from '@/lib/wearable-metrics'
 
+export const dynamic = 'force-dynamic'
+
 /**
  * Preview a single connected wearable — returns the latest normalised metrics
  * we've received from it (HRV, resting HR, steps, active minutes, sleep score)

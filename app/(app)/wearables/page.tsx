@@ -186,16 +186,24 @@ export default function WearablesPage() {
   const [previews, setPreviews] = useState<Record<string, PreviewState>>({})
 
   useEffect(() => {
-    fetch('/api/wearables')
-      .then((r) => r.json())
-      .then(setConnected)
-      .catch(() => {})
+    // no-store so the request always reaches the server, which triggers the
+    // background stale-sync refresh. We then re-fetch a few seconds later to
+    // surface that refresh on this same visit (no hard-refresh needed).
+    const load = () =>
+      fetch('/api/wearables', { cache: 'no-store' })
+        .then((r) => r.json())
+        .then(setConnected)
+        .catch(() => {})
+
+    load()
+    const t = setTimeout(load, 6000)
+    return () => clearTimeout(t)
   }, [])
 
   async function loadPreview(id: string) {
     setPreviews((prev) => ({ ...prev, [id]: { status: 'loading' } }))
     try {
-      const res = await fetch(`/api/wearables/${id}`)
+      const res = await fetch(`/api/wearables/${id}`, { cache: 'no-store' })
       if (!res.ok) throw new Error('failed')
       const data: PreviewData = await res.json()
       setPreviews((prev) => ({ ...prev, [id]: { status: 'ready', data } }))
@@ -254,7 +262,7 @@ export default function WearablesPage() {
       const data = await res.json()
       if (res.ok) {
         toast.success(`Apple Health imported — ${data.recordCount} records`)
-        const res2 = await fetch('/api/wearables')
+        const res2 = await fetch('/api/wearables', { cache: 'no-store' })
         setConnected(await res2.json())
       } else {
         toast.error(data.error || 'Import failed')

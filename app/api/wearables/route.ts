@@ -5,6 +5,10 @@ import { nudgeStaleWearableSyncs } from '@/lib/wearable-sync-nudge'
 
 // Allow the post-response refresh (via after()) time to hit Terra + write back.
 export const maxDuration = 60
+// Never cache: every visit must reach the server so the stale-sync refresh below
+// actually runs. Without this the browser can serve a cached response and the
+// connection silently stops updating until a manual hard-refresh.
+export const dynamic = 'force-dynamic'
 
 export async function GET(req: Request) {
   const authed = await getRequestUser(req)
@@ -28,5 +32,7 @@ export async function GET(req: Request) {
     select: { provider: true, lastSync: true },
   })
 
-  return NextResponse.json(syncs)
+  return NextResponse.json(syncs, {
+    headers: { 'Cache-Control': 'no-store, max-age=0' },
+  })
 }

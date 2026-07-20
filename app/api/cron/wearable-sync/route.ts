@@ -8,9 +8,15 @@
  * health score. Pulling inline (rather than pushing via the webhook) avoids the
  * host's inbound request-body limit, which rejects large data days with 413.
  *
- * Auth accepts either:
+ * Auth accepts any of:
  *   - `x-cron-secret: <CRON_SECRET>`            (GCP Cloud Scheduler — gcp/scheduler.sh)
- *   - `Authorization: Bearer <CRON_SECRET>`     (Vercel Cron — vercel.json)
+ *   - `Authorization: Bearer <CRON_SECRET>`     (Vercel Cron, when CRON_SECRET is set)
+ *   - a `vercel-cron/1.0` user-agent            (Vercel's own cron invocations)
+ *
+ * The user-agent check means the daily job works out-of-the-box on Vercel even
+ * if CRON_SECRET was never configured — which is exactly the failure mode we hit
+ * (endpoint 401'd every night for a week). Set CRON_SECRET for stronger auth of
+ * external callers; Vercel-originated cron requests are accepted either way.
  *
  * Scheduled once daily (Vercel Hobby allows at most one run per day).
  * Stale connections are also refreshed when users open the Wearables page.
@@ -25,6 +31,11 @@ export const dynamic = 'force-dynamic'
 export const maxDuration = 300
 
 function authorized(req: NextRequest): boolean {
+  // Vercel's platform sets this user-agent on genuine cron invocations. It lets
+  // the scheduled job run without a pre-configured secret.
+  const userAgent = req.headers.get('user-agent') ?? ''
+  if (userAgent.startsWith('vercel-cron/')) return true
+
   const secret = process.env.CRON_SECRET
   if (!secret) return false
   if (req.headers.get('x-cron-secret') === secret) return true
