@@ -7,6 +7,13 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getRequestUser } from '@/lib/api-auth'
 import { callClaude, BIOSENSE_SYSTEM_PROMPT } from '@/lib/claude'
+import { aggregateWearableMetrics } from '@/lib/wearable-metrics'
+import {
+  getBioAgeUnlockStatus,
+  getLatestBiologicalAge,
+} from '@/lib/maturity'
+import { MATURITY } from '@/lib/maturity-config'
+import { degradedChatReply, sanitizeChatReply } from '@/lib/chat-safety'
 import { z } from 'zod'
 
 const schema = z.object({
@@ -26,39 +33,80 @@ export async function POST(req: NextRequest) {
     const { message, history } = schema.parse(body)
 
     // Gather user context
-    const [user, recentCheckins, latestScore, latestBlood, patterns, chatHistory, learnedFacts] =
-      await Promise.all([
-        prisma.user.findUnique({ where: { id: authed.id } }),
-        prisma.dailyCheckin.findMany({
-          where: { userId: authed.id },
-          orderBy: { date: 'desc' },
-          take: 30,
-        }),
-        prisma.healthScore.findFirst({
-          where: { userId: authed.id },
-          orderBy: { date: 'desc' },
-        }),
-        prisma.bloodResult.findFirst({
-          where: { userId: authed.id },
-          orderBy: { drawDate: 'desc' },
-        }),
-        prisma.pattern.findMany({
-          where: { userId: authed.id },
-          orderBy: { discoveredAt: 'desc' },
-          take: 5,
-        }),
-        prisma.chatMessage.findMany({
-          where: { userId: authed.id },
-          orderBy: { createdAt: 'desc' },
-          take: 5,
-        }),
-        prisma.learnedFact.findMany({
-          where: { userId: authed.id },
-          orderBy: { createdAt: 'desc' },
-          take: 25,
-          select: { section: true, text: true },
-        }),
-      ])
+    const [
+      user,
+      recentCheckins,
+      latestScore,
+      latestBlood,
+      patterns,
+      chatHistory,
+      learnedFacts,
+      wearables,
+      bioUnlock,
+      latestBioAge,
+    ] = await Promise.all([
+      prisma.user.findUnique({ where: { id: authed.id } }),
+      prisma.dailyCheckin.findMany({
+        where: { userId: authed.id },
+        orderBy: { date: 'desc' },
+        take: 30,
+      }),
+      prisma.healthScore.findFirst({
+        where: { userId: authed.id },
+        orderBy: { date: 'desc' },
+      }),
+      prisma.bloodResult.findFirst({
+        where: { userId: authed.id },
+        orderBy: { drawDate: 'desc' },
+      }),
+      prisma.pattern.findMany({
+        where: { userId: authed.id },
+        orderBy: { discoveredAt: 'desc' },
+        take: 5,
+      }),
+      prisma.chatMessage.findMany({
+        where: { userId: authed.id },
+        orderBy: { createdAt: 'desc' },
+        take: 5,
+      }),
+      prisma.learnedFact.findMany({
+        where: { userId: authed.id },
+        orderBy: { createdAt: 'desc' },
+        take: 25,
+        select: { section: true, text: true },
+      }),
+      prisma.wearableSync.findMany({
+        where: { userId: authed.id },
+        select: { provider: true, lastSync: true, data: true },
+      }),
+      getBioAgeUnlockStatus(authed.id),
+      getLatestBiologicalAge(authed.id),
+    ])
+
+    const wearableMetrics = aggregateWearableMetrics(wearables)
+    const wearableSummary =
+      wearables.length > 0
+        ? [
+            `Connected: ${wearables.map((w) => w.provider).join(', ')}`,
+            wearableMetrics.hrv != null ? `HRV≈${Math.round(wearableMetrics.hrv)}ms` : null,
+            wearableMetrics.rhr != null ? `RHR≈${Math.round(wearableMetrics.rhr)}bpm` : null,
+            wearableMetrics.steps != null ? `Steps≈${Math.round(wearableMetrics.steps)}` : null,
+            wearableMetrics.sleepScore != null
+              ? `Sleep score≈${Math.round(wearableMetrics.sleepScore)}`
+              : null,
+            wearableMetrics.recovery != null
+              ? `Recovery≈${Math.round(wearableMetrics.recovery)}`
+              : null,
+          ]
+            .filter(Boolean)
+            .join(' | ')
+        : 'No wearables connected'
+
+    const bioAgeSummary = bioUnlock.unlocked
+      ? latestBioAge
+        ? `Unlocked — bio age ${latestBioAge.bioAge} (calendar ${latestBioAge.calendarAge}, delta ${latestBioAge.delta >= 0 ? '+' : ''}${latestBioAge.delta})`
+        : `Unlocked (day ${bioUnlock.trackingDays}/${bioUnlock.unlockDays}) but not enough signals yet (need ≥${MATURITY.BIO_AGE_MIN_SIGNALS} of HRV/RHR/sleep/energy)`
+      : `Locked — day ${bioUnlock.trackingDays} of ${bioUnlock.unlockDays} tracking`
 
     // Build context string
     const checkinSummary =
@@ -107,6 +155,12 @@ ${learnedSummary}
 
 CURRENT HEALTH SCORE: ${latestScore?.score ?? 'Not calculated'}
 
+WEARABLES:
+${wearableSummary}
+
+BIOLOGICAL AGE:
+${bioAgeSummary}
+
 LAST 7 CHECK-INS (energy/sleep/mood/stress out of 10):
 ${checkinSummary}
 
@@ -135,7 +189,13 @@ Use the above context to personalise your educational response. Reference specif
         ? `[Previous conversation context provided]\n\n${message}`
         : message
 
-    const reply = await callClaude(systemPrompt, userContent, 2000)
+    let reply: string
+    try {
+      reply = sanitizeChatReply(await callClaude(systemPrompt, userContent, 2000))
+    } catch (llmErr) {
+      console.error('Chat LLM error:', llmErr)
+      reply = degradedChatReply('error')
+    }
 
     // Persist messages
     await prisma.chatMessage.createMany({
@@ -151,6 +211,6 @@ Use the above context to personalise your educational response. Reference specif
       return NextResponse.json({ error: err.issues[0]?.message ?? "Validation error" }, { status: 400 })
     }
     console.error('Chat error:', err)
-    return NextResponse.json({ error: 'Failed to get response' }, { status: 500 })
+    return NextResponse.json({ reply: degradedChatReply('error') })
   }
 }

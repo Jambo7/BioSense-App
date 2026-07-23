@@ -119,6 +119,15 @@ function readinessCopy(score: number | null): { lead: string; accent: string; bo
 type Checkin = { date: string; energy: number; sleep: number; mood: number; stress: number }
 type Tone = 'sage' | 'amber' | 'rose' | 'violet' | 'sky' | 'teal' | 'ink'
 
+interface BioAgeProps {
+  unlocked: boolean
+  trackingDays: number
+  unlockDays: number
+  value: number | null
+  deltaYears: number | null
+  calendarAge: number | null
+}
+
 interface DashboardClientProps {
   user: { name: string; age: number | null; goalType: string | null; goalText: string | null }
   healthScore: number | null
@@ -129,6 +138,7 @@ interface DashboardClientProps {
   hasBlood: boolean
   connectedWearables: string[]
   wearableMetrics: WearableMetrics
+  bioAge: BioAgeProps
 }
 
 // Maps a 0-100 daily stress level (Garmin/Samsung scale) to a display band.
@@ -272,21 +282,6 @@ function trajectorySeries(currentScore: number, seed: string): number[] {
   return series
 }
 
-// ── Biological age — derived from health score + actual age ──────────────
-// In production this is a real model output (DunedinPACE / Phenoage). For
-// the demo, we derive it deterministically: higher score = younger bio age.
-// If we don't know the user's actual age we fall back to the spec's
-// default (36) so the card never reads "—".
-function biologicalAge(actualAge: number | null, healthScore: number | null) {
-  const age = actualAge ?? 36
-  if (healthScore == null) return { value: age, deltaYears: 0, age }
-  // 0..100 mapped to a +/- 5 year offset around the actual age.
-  const offset = ((healthScore - 50) / 50) * 4.5
-  const value = Math.round((age - offset) * 10) / 10
-  const deltaYears = Math.round((age - value) * 10) / 10
-  return { value, deltaYears, age }
-}
-
 // ── Locked-preview sample data ────────────────────────────────────────────
 // Seeds the dashboard with attractive-but-fake metrics for brand-new accounts
 // so the locked preview reads like a real, thriving dashboard behind the blur.
@@ -309,6 +304,7 @@ export function DashboardClient({
   hasBlood,
   connectedWearables,
   wearableMetrics,
+  bioAge: bioAgeProp,
 }: DashboardClientProps) {
   // Fresh account: nothing connected, no check-ins, no blood, no score yet.
   // Show a guided welcome instead of a dashboard full of placeholder numbers.
@@ -344,7 +340,26 @@ export function DashboardClient({
   const trajectory = trajectoryCopy(displayScore, longTermDelta)
   const hero = greetingHeadline(longTermDelta, hasData)
   const series = trajectorySeries(displayScore ?? 55, `traj-${user.name}`)
-  const bio = biologicalAge(user.age, displayScore)
+
+  // Biological age: real stored value after unlock gate; otherwise progress.
+  const bioUnlocked = !locked && bioAgeProp.unlocked && bioAgeProp.value != null
+  const bio = bioUnlocked
+    ? {
+        value: bioAgeProp.value!,
+        deltaYears: bioAgeProp.deltaYears ?? 0,
+        age: bioAgeProp.calendarAge ?? user.age ?? 0,
+        locked: false as const,
+        progressLabel: null as string | null,
+      }
+    : {
+        value: null as number | null,
+        deltaYears: 0,
+        age: bioAgeProp.calendarAge ?? user.age,
+        locked: true as const,
+        progressLabel: locked
+          ? `Track for ${bioAgeProp.unlockDays} days to unlock`
+          : `Day ${Math.min(bioAgeProp.trackingDays, bioAgeProp.unlockDays)} of ${bioAgeProp.unlockDays}`,
+      }
 
   // Real wearable data (when a device is connected). On the locked new-user
   // preview we intentionally ignore it (there is none).
@@ -457,15 +472,17 @@ export function DashboardClient({
           />
           <MiniStat
             eyebrow="Biological age"
-            value={`${bio.value}`}
+            value={bioUnlocked ? `${bio.value}` : '—'}
             caption={
-              bio.deltaYears > 0
-                ? `${bio.deltaYears.toFixed(1)} yrs younger (vs ${bio.age})`
-                : bio.deltaYears < 0
-                  ? `${Math.abs(bio.deltaYears).toFixed(1)} yrs older (vs ${bio.age})`
-                  : `Matching your actual age (${bio.age})`
+              bioUnlocked
+                ? bio.deltaYears > 0
+                  ? `${bio.deltaYears.toFixed(1)} yrs younger (vs ${bio.age})`
+                  : bio.deltaYears < 0
+                    ? `${Math.abs(bio.deltaYears).toFixed(1)} yrs older (vs ${bio.age})`
+                    : `Matching your actual age (${bio.age})`
+                : (bio.progressLabel ?? 'Unlock with tracking')
             }
-            tone={bio.deltaYears >= 0 ? 'sage' : 'amber'}
+            tone={bioUnlocked && bio.deltaYears >= 0 ? 'sage' : 'amber'}
           />
         </div>
 
@@ -777,9 +794,21 @@ export function DashboardClient({
           />
           <ProgressStat
             label="Biological age"
-            value={bio.deltaYears > 0 ? `-${bio.deltaYears.toFixed(1)} yrs` : 'Holding'}
-            caption="vs 90 days ago"
-            series={[40, 39.6, 39.3, 38.9, 38.6, 38.2, 37.7, 37.2, 36.6, 36.0, 35.3, bio.value].map(v => -v)}
+            value={
+              bioUnlocked
+                ? bio.deltaYears > 0
+                  ? `-${bio.deltaYears.toFixed(1)} yrs`
+                  : 'Holding'
+                : (bio.progressLabel ?? 'Locked')
+            }
+            caption={bioUnlocked ? 'vs calendar age' : 'unlock with tracking'}
+            series={
+              bioUnlocked && bio.value != null
+                ? [40, 39.6, 39.3, 38.9, 38.6, 38.2, 37.7, 37.2, 36.6, 36.0, 35.3, bio.value].map(
+                    (v) => -v,
+                  )
+                : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            }
           />
           <ProgressStat
             label="Biomarkers"
@@ -823,7 +852,7 @@ function LockedOverlay({ title, subtitle }: { title: string; subtitle: string })
         </Link>
         <div className="flex items-center gap-1.5 text-[11px] text-ink-3 mt-2.5">
           <Lock className="w-3 h-3" strokeWidth={2.25} />
-          Track for 14 days to unlock
+          Biological age unlocks after 14 days of tracking
         </div>
       </div>
     </div>

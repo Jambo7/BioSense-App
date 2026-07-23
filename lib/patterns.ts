@@ -1,7 +1,9 @@
 /**
  * Pattern detection engine — ported from JARVIS correlations.js runLagAnalysis()
- * Finds lag correlations between behaviours (sleep, stress) and outcomes (energy, HRV)
+ * Finds lag correlations between behaviours (sleep, stress) and outcomes (energy, HRV).
+ * Thresholds come from Aspect 1 dials in maturity-config.
  */
+import { MATURITY } from '@/lib/maturity-config'
 
 export interface CheckinPoint {
   date: string
@@ -47,8 +49,8 @@ function pearson(x: number[], y: number[]): number {
 
 function confidenceFromR(r: number): 'HIGH' | 'MEDIUM' | 'LOW' {
   const abs = Math.abs(r)
-  if (abs >= 0.7) return 'HIGH'
-  if (abs >= 0.45) return 'MEDIUM'
+  if (abs >= MATURITY.PATTERN_HIGH_R) return 'HIGH'
+  if (abs >= MATURITY.PATTERN_MED_R) return 'MEDIUM'
   return 'LOW'
 }
 
@@ -56,7 +58,7 @@ function confidenceFromR(r: number): 'HIGH' | 'MEDIUM' | 'LOW' {
  * Lag analysis: does X today predict Y tomorrow/2-days?
  */
 export function runLagAnalysis(checkins: CheckinPoint[]): DetectedPattern[] {
-  if (checkins.length < 7) return []
+  if (checkins.length < MATURITY.PATTERN_MIN_CHECKINS) return []
 
   const sorted = [...checkins].sort((a, b) => a.date.localeCompare(b.date))
   const patterns: DetectedPattern[] = []
@@ -74,7 +76,7 @@ export function runLagAnalysis(checkins: CheckinPoint[]): DetectedPattern[] {
         const y = sorted.slice(lag).map((c) => c[outcome] as number)
 
         const r = pearson(x, y)
-        if (Math.abs(r) < 0.45) continue
+        if (Math.abs(r) < MATURITY.PATTERN_MIN_ABS_R) continue
 
         const conf = confidenceFromR(r)
         const direction = r > 0 ? 'higher' : 'lower'
@@ -109,7 +111,7 @@ export function runLagAnalysis(checkins: CheckinPoint[]): DetectedPattern[] {
     }
   }
 
-  return patterns.slice(0, 10)
+  return patterns.slice(0, MATURITY.PATTERN_MAX_STORED)
 }
 
 /**

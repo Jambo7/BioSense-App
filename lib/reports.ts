@@ -5,6 +5,10 @@
 import { callClaude, BIOSENSE_SYSTEM_PROMPT } from './claude'
 import { getWeeklyStats } from './patterns'
 import { prisma } from './prisma'
+import {
+  aggregateWearableMetrics,
+  formatWearableMetricsSummary,
+} from './wearable-metrics'
 
 const WEEKLY_REPORT_PROMPT = `${BIOSENSE_SYSTEM_PROMPT}
 
@@ -44,13 +48,22 @@ export async function generateWeeklyReport(userId: string, period: string) {
   const weekStart = new Date()
   weekStart.setDate(weekStart.getDate() - 7)
 
-  const [checkins, score, patterns] = await Promise.all([
+  const [checkins, score, patterns, wearables, blood] = await Promise.all([
     prisma.dailyCheckin.findMany({
       where: { userId, date: { gte: weekStart } },
       orderBy: { date: 'asc' },
     }),
     prisma.healthScore.findFirst({ where: { userId }, orderBy: { date: 'desc' } }),
-    prisma.pattern.findMany({ where: { userId }, orderBy: { discoveredAt: 'desc' }, take: 3 }),
+    prisma.pattern.findMany({ where: { userId }, orderBy: { discoveredAt: 'desc' }, take: 5 }),
+    prisma.wearableSync.findMany({
+      where: { userId },
+      select: { provider: true, lastSync: true, data: true },
+    }),
+    prisma.bloodResult.findFirst({
+      where: { userId },
+      orderBy: { drawDate: 'desc' },
+      select: { drawDate: true, aiSummary: true },
+    }),
   ])
 
   const stats = getWeeklyStats(
@@ -65,6 +78,10 @@ export async function generateWeeklyReport(userId: string, period: string) {
 
   if (!stats || checkins.length < 3) return null
 
+  const metrics = aggregateWearableMetrics(wearables)
+  const wearableLine = formatWearableMetricsSummary(metrics)
+  const providers = wearables.map((w) => w.provider).join(', ') || 'none'
+
   const context = `
 Week: ${period}
 Check-ins: ${stats.checkinsCompleted}/7
@@ -75,7 +92,14 @@ Average stress: ${stats.avgStress.toFixed(1)}/10
 Best day: ${stats.bestDay}
 Worst day: ${stats.worstDay}
 Current health score: ${score?.score ?? 'N/A'}
-Top patterns: ${patterns.map((p) => p.description).join(' | ')}`
+Connected wearables: ${providers}
+Latest wearable metrics: ${wearableLine}
+Latest blood: ${
+    blood
+      ? `${blood.drawDate.toISOString().split('T')[0]} — ${(blood.aiSummary ?? '').slice(0, 240)}`
+      : 'none'
+  }
+Top patterns: ${patterns.map((p) => p.description).join(' | ') || 'none yet'}`
 
   const response = await callClaude(
     WEEKLY_REPORT_PROMPT,
@@ -112,7 +136,7 @@ export async function generateMonthlyReport(userId: string, period: string) {
   monthStart.setDate(1)
   monthStart.setHours(0, 0, 0, 0)
 
-  const [checkins, bloodResults, patterns, bioAge] = await Promise.all([
+  const [checkins, bloodResults, patterns, bioAge, wearables, score] = await Promise.all([
     prisma.dailyCheckin.findMany({
       where: { userId, date: { gte: monthStart } },
       orderBy: { date: 'asc' },
@@ -124,6 +148,11 @@ export async function generateMonthlyReport(userId: string, period: string) {
     }),
     prisma.pattern.findMany({ where: { userId }, orderBy: { discoveredAt: 'desc' }, take: 5 }),
     prisma.biologicalAge.findFirst({ where: { userId }, orderBy: { date: 'desc' } }),
+    prisma.wearableSync.findMany({
+      where: { userId },
+      select: { provider: true, lastSync: true, data: true },
+    }),
+    prisma.healthScore.findFirst({ where: { userId }, orderBy: { date: 'desc' } }),
   ])
 
   const stats = getWeeklyStats(
@@ -136,13 +165,18 @@ export async function generateMonthlyReport(userId: string, period: string) {
     })),
   )
 
+  const metrics = aggregateWearableMetrics(wearables)
+  const wearableLine = formatWearableMetricsSummary(metrics)
+
   const context = `
 Month: ${period}
 Total check-ins: ${checkins.length}
 ${stats ? `Average scores — energy: ${stats.avgEnergy.toFixed(1)}, sleep: ${stats.avgSleep.toFixed(1)}, mood: ${stats.avgMood.toFixed(1)}, stress: ${stats.avgStress.toFixed(1)}` : ''}
-Blood uploads this month: ${bloodResults.length}
-Biological age delta: ${bioAge ? `${bioAge.delta > 0 ? '+' : ''}${bioAge.delta.toFixed(1)} years vs calendar age` : 'Not calculated'}
-Key patterns: ${patterns.map((p) => `${p.description} (${p.confidence})`).join(' | ')}`
+Health score: ${score?.score ?? 'N/A'}
+Wearables: ${wearables.map((w) => w.provider).join(', ') || 'none'} (${wearableLine})
+Blood uploads (recent): ${bloodResults.length}
+Biological age delta: ${bioAge ? `${bioAge.delta > 0 ? '+' : ''}${bioAge.delta.toFixed(1)} years vs calendar age` : 'Not unlocked / not calculated'}
+Key patterns: ${patterns.map((p) => `${p.description} (${p.confidence})`).join(' | ') || 'none yet'}`
 
   const response = await callClaude(
     MONTHLY_REPORT_PROMPT,

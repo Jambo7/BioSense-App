@@ -3,6 +3,8 @@ import { prisma } from '@/lib/prisma'
 import { getRequestUser } from '@/lib/api-auth'
 import { callClaude, BLOOD_ANALYSIS_PROMPT } from '@/lib/claude'
 import { categoryForMarker } from '@/lib/biomarkers'
+import { recountTiers, sanitizeBloodMarkers } from '@/lib/blood-sanity'
+import { recalculateHealthScore } from '@/lib/health-score'
 import OpenAI from 'openai'
 
 async function parsePdf(buffer: Buffer): Promise<string> {
@@ -115,19 +117,36 @@ export async function POST(req: NextRequest) {
     let t1Count = 0
     let t2Count = 0
     let t3Count = 0
+    let rejectedMarkers = 0
 
     try {
       const jsonMatch = aiResponse.match(/\{[\s\S]*\}/)
       if (jsonMatch) {
         const parsed = JSON.parse(jsonMatch[0])
-        markers = enrichMarkers(parsed.markers ?? [])
+        const enriched = enrichMarkers(parsed.markers ?? [])
+        const sanitized = sanitizeBloodMarkers(enriched)
+        markers = sanitized.markers
+        rejectedMarkers = sanitized.rejected
         aiSummary = parsed.summary ?? ''
-        t1Count = parsed.t1Count ?? 0
-        t2Count = parsed.t2Count ?? 0
-        t3Count = parsed.t3Count ?? 0
+        const tiers = recountTiers(sanitized.markers)
+        // Prefer recount from kept markers; fall back to model counts only if tiers absent.
+        t1Count = tiers.t1Count || parsed.t1Count || 0
+        t2Count = tiers.t2Count || parsed.t2Count || 0
+        t3Count = tiers.t3Count || parsed.t3Count || 0
       }
     } catch {
       aiSummary = aiResponse
+    }
+
+    if (markers.length === 0 && rejectedMarkers > 0) {
+      return NextResponse.json(
+        {
+          error:
+            'Could not extract any plausible biomarker values from this upload. Try a clearer PDF/image.',
+          rejectedMarkers,
+        },
+        { status: 422 },
+      )
     }
 
     const blood = await prisma.bloodResult.create({
@@ -141,46 +160,18 @@ export async function POST(req: NextRequest) {
     })
 
     if (markers.length > 0) {
-      const today = new Date()
-      today.setHours(0, 0, 0, 0)
-
-      const latestCheckin = await prisma.dailyCheckin.findFirst({
-        where: { userId: authed.id },
-        orderBy: { date: 'desc' },
-      })
-
-      const { calcHealthScore } = await import('@/lib/score')
-      const { score, breakdown } = calcHealthScore({
-        checkin: latestCheckin
-          ? {
-              energy: latestCheckin.energy,
-              sleep: latestCheckin.sleep,
-              mood: latestCheckin.mood,
-              stress: latestCheckin.stress,
-            }
-          : undefined,
-        blood: { t1Count, t2Count, t3Count },
-      })
-
-      await prisma.healthScore.upsert({
-        where: { userId_date: { userId: authed.id, date: today } },
-        create: {
-          userId: authed.id,
-          date: today,
-          score,
-          breakdown: breakdown as unknown as import('@prisma/client').Prisma.InputJsonValue,
-        },
-        update: {
-          score,
-          breakdown: breakdown as unknown as import('@prisma/client').Prisma.InputJsonValue,
-        },
-      })
+      try {
+        await recalculateHealthScore(authed.id)
+      } catch (scoreErr) {
+        console.error('[blood] health score recalc failed:', scoreErr)
+      }
     }
 
     return NextResponse.json({
       success: true,
       bloodId: blood.id,
       markerCount: markers.length,
+      rejectedMarkers,
       t1Count,
       t2Count,
       t3Count,

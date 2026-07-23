@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getRequestUser } from '@/lib/api-auth'
+import {
+  getBioAgeUnlockStatus,
+  getLatestBiologicalAge,
+} from '@/lib/maturity'
 
 /**
  * JSON dashboard summary for API clients (native mobile + future web fetches).
@@ -13,32 +17,45 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const [user, latestCheckin, latestScore, checkinCount, recentCheckins, latestBlood, wearables] =
-    await Promise.all([
-      prisma.user.findUnique({ where: { id: authed.id } }),
-      prisma.dailyCheckin.findFirst({
-        where: { userId: authed.id },
-        orderBy: { date: 'desc' },
-      }),
-      prisma.healthScore.findFirst({
-        where: { userId: authed.id },
-        orderBy: { date: 'desc' },
-      }),
-      prisma.dailyCheckin.count({ where: { userId: authed.id } }),
-      prisma.dailyCheckin.findMany({
-        where: { userId: authed.id },
-        orderBy: { date: 'desc' },
-        take: 7,
-      }),
-      prisma.bloodResult.findFirst({
-        where: { userId: authed.id },
-        orderBy: { drawDate: 'desc' },
-      }),
-      prisma.wearableSync.findMany({
-        where: { userId: authed.id },
-        select: { provider: true },
-      }),
-    ])
+  const userId = authed.id
+
+  const [
+    user,
+    latestCheckin,
+    latestScore,
+    checkinCount,
+    recentCheckins,
+    latestBlood,
+    wearables,
+    bioUnlock,
+    latestBioAge,
+  ] = await Promise.all([
+    prisma.user.findUnique({ where: { id: userId } }),
+    prisma.dailyCheckin.findFirst({
+      where: { userId },
+      orderBy: { date: 'desc' },
+    }),
+    prisma.healthScore.findFirst({
+      where: { userId },
+      orderBy: { date: 'desc' },
+    }),
+    prisma.dailyCheckin.count({ where: { userId } }),
+    prisma.dailyCheckin.findMany({
+      where: { userId },
+      orderBy: { date: 'desc' },
+      take: 7,
+    }),
+    prisma.bloodResult.findFirst({
+      where: { userId },
+      orderBy: { drawDate: 'desc' },
+    }),
+    prisma.wearableSync.findMany({
+      where: { userId },
+      select: { provider: true },
+    }),
+    getBioAgeUnlockStatus(userId),
+    getLatestBiologicalAge(userId),
+  ])
 
   const today = new Date().toISOString().split('T')[0]
   const hasCheckinToday = latestCheckin
@@ -65,5 +82,13 @@ export async function GET(req: Request) {
     })),
     hasBlood: !!latestBlood,
     connectedWearables: wearables.map((w) => w.provider),
+    bioAge: {
+      unlocked: bioUnlock.unlocked,
+      trackingDays: bioUnlock.trackingDays,
+      unlockDays: bioUnlock.unlockDays,
+      value: latestBioAge?.bioAge ?? null,
+      deltaYears: latestBioAge?.delta ?? null,
+      calendarAge: latestBioAge?.calendarAge ?? user?.age ?? null,
+    },
   })
 }

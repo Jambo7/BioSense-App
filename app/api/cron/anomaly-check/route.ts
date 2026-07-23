@@ -1,13 +1,18 @@
 /**
- * Anomaly check — ported from JARVIS checkAnomalies()
- * Smart notification triggers: energy ≤3 for 3 days, sleep ≤3 for 3 days, positive trends
+ * Anomaly check — smart notification triggers:
+ * energy ≤3 for 3 days, sleep ≤3 for 3 days, positive recovery trends.
+ * Scheduled daily via Vercel Cron (vercel.json).
  */
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { isCronAuthorized } from '@/lib/cron-auth'
 
-export async function POST(req: NextRequest) {
-  const secret = req.headers.get('x-cron-secret')
-  if (secret !== process.env.CRON_SECRET) {
+export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
+export const maxDuration = 60
+
+async function handle(req: NextRequest) {
+  if (!isCronAuthorized(req)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
@@ -30,12 +35,9 @@ export async function POST(req: NextRequest) {
 
     if (recent.length < 3) continue
 
-    const avgEnergy = recent.reduce((s, c) => s + c.energy, 0) / recent.length
-    const avgSleep = recent.reduce((s, c) => s + c.sleep, 0) / recent.length
     const allEnergyLow = recent.every((c) => c.energy <= 3)
     const allSleepLow = recent.every((c) => c.sleep <= 3)
 
-    // Check for previous week's avg to detect positive trends
     const weekAgo = new Date()
     weekAgo.setDate(weekAgo.getDate() - 7)
     const prevWeek = await prisma.dailyCheckin.findMany({
@@ -69,6 +71,14 @@ export async function POST(req: NextRequest) {
     }
 
     if (trigger) {
+      // Avoid spamming the same trigger on consecutive daily runs.
+      const since = new Date()
+      since.setDate(since.getDate() - 2)
+      const recentSame = await prisma.notificationLog.findFirst({
+        where: { userId: user.id, trigger, sentAt: { gte: since } },
+      })
+      if (recentSame) continue
+
       await prisma.notificationLog.create({
         data: {
           userId: user.id,
@@ -83,4 +93,12 @@ export async function POST(req: NextRequest) {
   }
 
   return NextResponse.json({ triggered, checked: users.length })
+}
+
+export async function GET(req: NextRequest) {
+  return handle(req)
+}
+
+export async function POST(req: NextRequest) {
+  return handle(req)
 }

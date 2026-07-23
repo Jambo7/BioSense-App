@@ -9,26 +9,30 @@ import {
   Wind,
   Activity,
   Heart,
-  Sun,
-  Sunrise,
-  Cloud,
-  Droplet,
-  Check,
   Leaf,
   TrendingUp,
-  TrendingDown,
   ArrowRight,
   CalendarDays,
   type LucideIcon,
 } from 'lucide-react'
 import { Card } from '@/components/ui/card'
 import { IconBadge, type IconBadgeTone } from '@/components/ui/icon-badge'
-import { SparkLine } from '@/components/ui/spark-line'
+import type { WearableMetrics } from '@/lib/wearable-metrics'
 import { cn } from '@/lib/utils'
 
 type Checkin = { date: string; energy: number; sleep: number; mood: number; stress: number }
 type Tone = IconBadgeTone
 type Impact = 'high' | 'medium' | 'low' | 'moderate'
+
+type PatternRow = {
+  id: string
+  type: string
+  description: string
+  confidence: 'HIGH' | 'MEDIUM' | 'LOW'
+  scoreImpact: number | null
+}
+
+type LearnedFact = { id: string; section: string; text: string }
 
 const IMPACT_STYLE: Record<Impact, string> = {
   high:     'bg-[rgba(168,84,84,0.14)] text-[#A85454] ring-1 ring-inset ring-[rgba(168,84,84,0.22)]',
@@ -43,7 +47,6 @@ const IMPACT_LABEL: Record<Impact, string> = {
   low:      'Low',
 }
 
-// ── Tab definitions per v7 spec ───────────────────────────────────────────
 type Tab = 'today' | 'patterns' | 'predictions' | 'knows'
 const TABS: { id: Tab; label: string }[] = [
   { id: 'today',       label: 'Today'                  },
@@ -55,14 +58,34 @@ const TABS: { id: Tab; label: string }[] = [
 interface InsightsClientProps {
   healthScore: number | null
   recentCheckins: Checkin[]
+  patterns: PatternRow[]
+  learnedFacts: LearnedFact[]
+  wearableMetrics: WearableMetrics
+  checkinCount: number
+  patternMinCheckins: number
 }
 
-export function InsightsClient({ recentCheckins }: InsightsClientProps) {
+export function InsightsClient({
+  healthScore,
+  recentCheckins,
+  patterns,
+  learnedFacts,
+  wearableMetrics,
+  checkinCount,
+  patternMinCheckins,
+}: InsightsClientProps) {
   const [tab, setTab] = useState<Tab>('today')
+  const primary = pickPrimaryInsight({
+    patterns,
+    checkins: recentCheckins,
+    wearableMetrics,
+    healthScore,
+    checkinCount,
+    patternMinCheckins,
+  })
 
   return (
     <div className="max-w-3xl mx-auto fade-up space-y-5">
-      {/* Header */}
       <header className="relative pt-2 pb-1">
         <div>
           <div className="flex items-center gap-2 text-eyebrow uppercase text-sage-deep mb-2">
@@ -79,7 +102,21 @@ export function InsightsClient({ recentCheckins }: InsightsClientProps) {
         </div>
       </header>
 
-      {/* Tab strip */}
+      {primary && (
+        <Card variant="premium" padding="lg" className="relative overflow-hidden">
+          <div className="flex items-start gap-3">
+            <IconBadge icon={Sparkles} tone="sage" variant="tint" size="md" />
+            <div className="flex-1 min-w-0">
+              <div className="text-eyebrow uppercase text-sage-deep mb-1">Primary insight</div>
+              <div className="font-serif text-[20px] sm:text-[22px] text-ink leading-snug tracking-tight">
+                {primary.title}
+              </div>
+              <p className="text-[13px] text-ink-2 leading-snug mt-1.5">{primary.body}</p>
+            </div>
+          </div>
+        </Card>
+      )}
+
       <div className="relative -mx-1 px-1">
         <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
           {TABS.map((t) => {
@@ -103,20 +140,151 @@ export function InsightsClient({ recentCheckins }: InsightsClientProps) {
         </div>
       </div>
 
-      {tab === 'today'       && <TodayTab       checkins={recentCheckins} />}
-      {tab === 'patterns'    && <PatternsTab    />}
-      {tab === 'predictions' && <PredictionsTab />}
-      {tab === 'knows'       && <KnowsTab       />}
+      {tab === 'today' && (
+        <TodayTab checkins={recentCheckins} wearableMetrics={wearableMetrics} />
+      )}
+      {tab === 'patterns' && (
+        <PatternsTab
+          patterns={patterns}
+          checkinCount={checkinCount}
+          patternMinCheckins={patternMinCheckins}
+        />
+      )}
+      {tab === 'predictions' && <PredictionsTab patterns={patterns} checkinCount={checkinCount} />}
+      {tab === 'knows' && <KnowsTab facts={learnedFacts} />}
     </div>
   )
 }
 
-// ── Tab 1: TODAY ─────────────────────────────────────────────────────────
-// Replaces the old "Why it matters" tab. Surfaces the key factors
-// influencing the user's health right now with an impact pill and a
-// short reason line per factor.
-function TodayTab({ checkins }: { checkins: Checkin[] }) {
-  const drivers = todayDrivers(checkins)
+function pickPrimaryInsight(input: {
+  patterns: PatternRow[]
+  checkins: Checkin[]
+  wearableMetrics: WearableMetrics
+  healthScore: number | null
+  checkinCount: number
+  patternMinCheckins: number
+}): { title: string; body: string } | null {
+  const { patterns, checkins, wearableMetrics: wm, healthScore, checkinCount, patternMinCheckins } =
+    input
+
+  const top = [...patterns].sort((a, b) => {
+    const rank = (c: string) => (c === 'HIGH' ? 3 : c === 'MEDIUM' ? 2 : 1)
+    return rank(b.confidence) - rank(a.confidence) || (b.scoreImpact ?? 0) - (a.scoreImpact ?? 0)
+  })[0]
+  if (top) {
+    return {
+      title: top.description,
+      body: `Strongest association in your data so far (${top.confidence.toLowerCase()} confidence). Educational only — not a diagnosis.`,
+    }
+  }
+
+  if (wm.recovery != null && wm.recovery < 45) {
+    return {
+      title: 'Recovery looks lower than usual on your latest wearable sync.',
+      body: 'Worth watching sleep and strain over the next couple of days as you keep logging.',
+    }
+  }
+  if (wm.hrv != null && checkins[0] && checkins[0].stress >= 7) {
+    return {
+      title: 'Higher stress check-ins are showing up alongside your latest HRV reading.',
+      body: 'Keep tracking both — patterns often become clearer after a week of consistent data.',
+    }
+  }
+  if (checkins.length >= 2) {
+    const dEnergy = checkins[0].energy - checkins[1].energy
+    if (dEnergy <= -2) {
+      return {
+        title: 'Energy dipped versus yesterday’s check-in.',
+        body: 'A single day isn’t a pattern yet — a few more check-ins will show whether this sticks.',
+      }
+    }
+  }
+  if (healthScore != null && checkinCount < patternMinCheckins) {
+    return {
+      title: `Health score is ${Math.round(healthScore)} — patterns unlock at ${patternMinCheckins} check-ins.`,
+      body: `You’ve logged ${checkinCount}. Keep going to unlock sleep/stress ↔ energy/mood associations.`,
+    }
+  }
+  if (checkinCount === 0 && !wm.hrv && !wm.steps) {
+    return {
+      title: 'Connect a wearable or log a check-in to start.',
+      body: 'Insights stay empty until we have real data — we won’t invent patterns.',
+    }
+  }
+  return {
+    title: 'Still gathering signal.',
+    body: 'As check-ins and wearables accumulate, your primary insight will focus on the strongest real association — not a demo script.',
+  }
+}
+
+function EmptyState({
+  title,
+  body,
+  href,
+  cta,
+}: {
+  title: string
+  body: string
+  href?: string
+  cta?: string
+}) {
+  return (
+    <Card variant="glass" padding="lg">
+      <div className="flex flex-col items-start gap-3 py-2">
+        <div className="flex items-center justify-center w-10 h-10 rounded-full bg-[rgba(111,143,107,0.12)] ring-1 ring-[rgba(111,143,107,0.22)]">
+          <Leaf className="w-4 h-4 text-sage-deep" strokeWidth={2.25} />
+        </div>
+        <div>
+          <div className="font-sans text-[15px] font-semibold text-ink">{title}</div>
+          <p className="text-[13px] text-ink-2 leading-snug mt-1 max-w-[46ch]">{body}</p>
+        </div>
+        {href && cta && (
+          <Link
+            href={href}
+            className="inline-flex items-center gap-1.5 mt-1 px-3.5 h-9 rounded-pill text-white bg-grad-sage text-[12.5px] font-medium"
+          >
+            {cta}
+            <ArrowRight className="w-3.5 h-3.5" strokeWidth={2.25} />
+          </Link>
+        )}
+      </div>
+    </Card>
+  )
+}
+
+function TodayTab({
+  checkins,
+  wearableMetrics,
+}: {
+  checkins: Checkin[]
+  wearableMetrics: WearableMetrics
+}) {
+  const drivers = todayDrivers(checkins, wearableMetrics)
+  if (drivers.length === 0) {
+    return (
+      <div className="space-y-5">
+        <HeroIntroCard
+          eyebrow="Why it matters"
+          lead="Here's what's"
+          accent="influencing your health today."
+          body="These are the key factors impacting your recovery and wellbeing right now."
+          decoration="leaves"
+        />
+        <EmptyState
+          title="Not enough recent data yet"
+          body="Log a few daily check-ins or connect a wearable so we can show what’s moving your score today."
+          href="/checkin"
+          cta="Log today’s check-in"
+        />
+      </div>
+    )
+  }
+
+  const focus = drivers
+    .filter((d) => d.impact === 'high' || d.impact === 'moderate' || d.impact === 'medium')
+    .slice(0, 2)
+    .map((d) => d.label.toLowerCase())
+
   return (
     <div className="space-y-5">
       <HeroIntroCard
@@ -144,9 +312,7 @@ function TodayTab({ checkins }: { checkins: Checkin[] }) {
                     Impact
                   </span>
                 </div>
-                <p className="text-[12.5px] text-ink-2 leading-snug mt-1">
-                  {d.reason}
-                </p>
+                <p className="text-[12.5px] text-ink-2 leading-snug mt-1">{d.reason}</p>
               </div>
               <span
                 className={cn(
@@ -160,62 +326,36 @@ function TodayTab({ checkins }: { checkins: Checkin[] }) {
           ))}
         </div>
 
-        <div className="mt-4 flex items-start gap-2.5 rounded-card tile px-3.5 py-3">
-          <Sparkles className="w-3.5 h-3.5 text-sage-deep mt-0.5 shrink-0" strokeWidth={2.25} />
-          <div className="flex-1 min-w-0">
-            <p className="text-[12.5px] text-ink leading-snug">
+        {focus.length > 0 && (
+          <div className="mt-4 flex items-start gap-2.5 rounded-card tile px-3.5 py-3">
+            <Sparkles className="w-3.5 h-3.5 text-sage-deep mt-0.5 shrink-0" strokeWidth={2.25} />
+            <p className="text-[12.5px] text-ink leading-snug flex-1 min-w-0">
               Focusing on{' '}
-              <span className="font-semibold text-sage-deep">
-                sleep timing
-              </span>{' '}
-              and{' '}
-              <span className="font-semibold text-sage-deep">
-                stress management
-              </span>{' '}
-              will have the biggest positive impact on your recovery.
+              <span className="font-semibold text-sage-deep">{focus.join(' and ')}</span>{' '}
+              looks like the highest-leverage move from your recent data.
             </p>
           </div>
-          <ArrowRight className="w-4 h-4 text-ink-3 shrink-0" strokeWidth={2.25} />
-        </div>
+        )}
       </Card>
     </div>
   )
 }
 
-// ── Tab 2: PATTERNS & CONNECTIONS ────────────────────────────────────────
-function PatternsTab() {
-  const patterns = [
-    {
-      key: 'sleep_recovery',
-      icon: Moon,
-      tone: 'violet' as Tone,
-      title: 'Consistent sleep timing leads to better recovery.',
-      detail: 'On nights you go to bed between 9:30pm and 10:30pm, your recovery score is 28% higher on average.',
-      delta: '+28%',
-      positive: true,
-      series: [40, 45, 55, 50, 65, 70, 75, 80, 85],
-    },
-    {
-      key: 'morning_focus',
-      icon: Sunrise,
-      tone: 'sky' as Tone,
-      title: 'Morning activity boosts your focus.',
-      detail: 'Days you exercise in the morning, your focus is 22% higher compared to other days.',
-      delta: '+22%',
-      positive: true,
-      series: [50, 55, 60, 65, 60, 70, 75, 78, 82],
-    },
-    {
-      key: 'stress_sleep',
-      icon: Cloud,
-      tone: 'teal' as Tone,
-      title: 'Stress impacts your sleep quality.',
-      detail: 'On days with high stress, your sleep quality is 18% lower on average.',
-      delta: '-18%',
-      positive: false,
-      series: [75, 70, 68, 65, 60, 58, 55, 50, 48],
-    },
-  ]
+function PatternsTab({
+  patterns,
+  checkinCount,
+  patternMinCheckins,
+}: {
+  patterns: PatternRow[]
+  checkinCount: number
+  patternMinCheckins: number
+}) {
+  const iconFor = (type: string): { icon: LucideIcon; tone: Tone } => {
+    if (type.includes('sleep')) return { icon: Moon, tone: 'violet' }
+    if (type.includes('stress')) return { icon: Wind, tone: 'teal' }
+    if (type.includes('mood')) return { icon: Heart, tone: 'rose' }
+    return { icon: Activity, tone: 'sky' }
+  }
 
   return (
     <div className="space-y-5">
@@ -223,178 +363,153 @@ function PatternsTab() {
         eyebrow="Patterns & connections"
         lead="Your habits show clear"
         accent="patterns and connections."
-        body="These are the patterns we've found in your data over time."
+        body="These are associations we found in your check-in history — educational, not causal."
         decoration="circles"
       />
 
-      <Card variant="glass" padding="lg">
-        <div className="space-y-3">
-          {patterns.map((p) => (
-            <div
-              key={p.key}
-              className="flex items-start gap-3 sm:gap-4 p-3 sm:p-3.5 rounded-card tile"
-            >
-              <IconBadge
-                icon={p.icon}
-                tone={p.tone}
-                variant="tint"
-                size="md"
-              />
-              <div className="flex-1 min-w-0">
-                <div className="font-sans text-[13.5px] font-semibold text-ink leading-tight">
-                  {p.title}
-                </div>
-                <p className="text-[12px] text-ink-3 leading-snug mt-1">
-                  {p.detail}
-                </p>
-              </div>
-              <div className="flex flex-col items-end gap-1.5 shrink-0">
-                <span
-                  className={cn(
-                    'font-sans text-[14px] font-bold tabular-nums leading-none',
-                    p.positive ? 'text-sage-deep' : 'text-[#A85454]',
-                  )}
+      {patterns.length === 0 ? (
+        <EmptyState
+          title={
+            checkinCount < patternMinCheckins
+              ? `Patterns unlock after ${patternMinCheckins} check-ins`
+              : 'No clear patterns yet'
+          }
+          body={
+            checkinCount < patternMinCheckins
+              ? `You’ve logged ${checkinCount} of ${patternMinCheckins} days. Keep checking in — we’ll surface sleep/stress ↔ energy/mood links when the signal is strong enough.`
+              : 'We looked at your recent check-ins but didn’t find associations above the confidence floor. Keep logging — patterns emerge with consistency.'
+          }
+          href="/checkin"
+          cta="Log a check-in"
+        />
+      ) : (
+        <Card variant="glass" padding="lg">
+          <div className="space-y-3">
+            {patterns.map((p) => {
+              const { icon, tone } = iconFor(p.type)
+              return (
+                <div
+                  key={p.id}
+                  className="flex items-start gap-3 sm:gap-4 p-3 sm:p-3.5 rounded-card tile"
                 >
-                  {p.delta}
-                </span>
-                <SparkLine
-                  values={p.series}
-                  width={64}
-                  height={26}
-                  tone={p.tone}
-                  showFill
-                />
-              </div>
-            </div>
-          ))}
-        </div>
-      </Card>
+                  <IconBadge icon={icon} tone={tone} variant="tint" size="md" />
+                  <div className="flex-1 min-w-0">
+                    <div className="font-sans text-[13.5px] font-semibold text-ink leading-tight">
+                      {p.description}
+                    </div>
+                    <p className="text-[12px] text-ink-3 leading-snug mt-1">
+                      Confidence: {p.confidence.toLowerCase()}
+                      {p.scoreImpact != null ? ` · impact score ${p.scoreImpact}` : ''}
+                    </p>
+                  </div>
+                  <span
+                    className={cn(
+                      'inline-flex items-center px-2 py-0.5 rounded-pill text-[10.5px] font-semibold uppercase tracking-wide shrink-0',
+                      p.confidence === 'HIGH'
+                        ? 'bg-[rgba(111,143,107,0.14)] text-sage-deep'
+                        : p.confidence === 'MEDIUM'
+                          ? 'bg-[rgba(167,117,48,0.14)] text-[#A77530]'
+                          : 'bg-[rgba(26,28,26,0.06)] text-ink-2',
+                    )}
+                  >
+                    {p.confidence === 'HIGH' ? 'Strong' : p.confidence === 'MEDIUM' ? 'Moderate' : 'Weak'}
+                  </span>
+                </div>
+              )
+            })}
+          </div>
+        </Card>
+      )}
     </div>
   )
 }
 
-// ── Tab 3: PREDICTIONS ───────────────────────────────────────────────────
-function PredictionsTab() {
-  const predictions = [
-    {
-      key: 'recovery_improve',
-      icon: TrendingUp,
-      tone: 'sage' as Tone,
-      title: 'Recovery likely to improve in 3-5 days.',
-      detail: 'If your sleep timing stays consistent and stress remains managed.',
-      confidence: 'High',
-    },
-    {
-      key: 'sleep_decline',
-      icon: Moon,
-      tone: 'violet' as Tone,
-      title: 'Sleep quality may decline later this week.',
-      detail: 'A busy schedule and rising stress may impact your sleep Fri-Sat.',
-      confidence: 'Medium',
-    },
-    {
-      key: 'hydration_pay_off',
-      icon: Droplet,
-      tone: 'sky' as Tone,
-      title: 'Hydration improvement will pay off.',
-      detail: 'Improving your hydration consistently will support better energy and focus.',
-      confidence: 'Medium',
-    },
-  ]
-
+function PredictionsTab({
+  patterns,
+  checkinCount,
+}: {
+  patterns: PatternRow[]
+  checkinCount: number
+}) {
   const confidenceStyle: Record<string, string> = {
-    High:   'bg-[rgba(111,143,107,0.14)] text-sage-deep ring-1 ring-inset ring-[rgba(111,143,107,0.24)]',
-    Medium: 'bg-[rgba(167,117,48,0.14)] text-[#A77530] ring-1 ring-inset ring-[rgba(167,117,48,0.22)]',
-    Low:    'bg-[rgba(26,28,26,0.06)] text-ink-2 ring-1 ring-inset ring-[rgba(26,28,26,0.10)]',
+    HIGH:   'bg-[rgba(111,143,107,0.14)] text-sage-deep ring-1 ring-inset ring-[rgba(111,143,107,0.24)]',
+    MEDIUM: 'bg-[rgba(167,117,48,0.14)] text-[#A77530] ring-1 ring-inset ring-[rgba(167,117,48,0.22)]',
+    LOW:    'bg-[rgba(26,28,26,0.06)] text-ink-2 ring-1 ring-inset ring-[rgba(26,28,26,0.10)]',
   }
+
+  // Honest framing: these are lag associations restated as forward-looking notes —
+  // not a forecasting engine (ENG-007). No invented charts or percentages.
+  const predictions = patterns.slice(0, 3).map((p) => ({
+    key: p.id,
+    icon: p.type.includes('sleep') ? Moon : p.type.includes('stress') ? Wind : TrendingUp,
+    tone: (p.type.includes('sleep') ? 'violet' : p.type.includes('stress') ? 'teal' : 'sage') as Tone,
+    title: p.description,
+    detail:
+      'Based on a past association in your check-ins — if the link continues, similar days may show a similar next-day effect. Not a forecast model.',
+    confidence: p.confidence,
+  }))
 
   return (
     <div className="space-y-5">
       <HeroIntroCard
         eyebrow="Predictions"
-        lead="Here's what's likely"
-        accent="to happen next."
-        body="These predictions are based on your trends and behaviours."
+        lead="Early signals from"
+        accent="patterns we’ve already found."
+        body="These are educational restatements of detected associations — not clinical forecasts."
         decoration="mountains"
       />
 
-      <Card variant="glass" padding="lg">
-        <div className="space-y-3">
-          {predictions.map((p) => (
-            <div
-              key={p.key}
-              className="flex items-start gap-3 sm:gap-4 p-3 sm:p-3.5 rounded-card tile"
-            >
-              <IconBadge icon={p.icon} tone={p.tone} variant="tint" size="md" />
-              <div className="flex-1 min-w-0">
-                <div className="font-sans text-[13.5px] font-semibold text-ink leading-tight">
-                  {p.title}
+      {predictions.length === 0 ? (
+        <EmptyState
+          title="No predictions yet"
+          body={
+            checkinCount < 7
+              ? 'Predictions appear once we have enough check-ins to detect a pattern.'
+              : 'We’ll surface likely next-day effects when a pattern clears the confidence floor.'
+          }
+          href="/checkin"
+          cta="Keep checking in"
+        />
+      ) : (
+        <Card variant="glass" padding="lg">
+          <div className="space-y-3">
+            {predictions.map((p) => (
+              <div
+                key={p.key}
+                className="flex items-start gap-3 sm:gap-4 p-3 sm:p-3.5 rounded-card tile"
+              >
+                <IconBadge icon={p.icon} tone={p.tone} variant="tint" size="md" />
+                <div className="flex-1 min-w-0">
+                  <div className="font-sans text-[13.5px] font-semibold text-ink leading-tight">
+                    {p.title}
+                  </div>
+                  <p className="text-[12px] text-ink-3 leading-snug mt-1">{p.detail}</p>
                 </div>
-                <p className="text-[12px] text-ink-3 leading-snug mt-1">
-                  {p.detail}
-                </p>
+                <div className="flex flex-col items-end gap-1 shrink-0">
+                  <span className="text-[9.5px] uppercase tracking-[0.10em] text-ink-3">
+                    Confidence
+                  </span>
+                  <span
+                    className={cn(
+                      'inline-flex items-center px-2 py-0.5 rounded-pill text-[10.5px] font-semibold uppercase tracking-wide',
+                      confidenceStyle[p.confidence],
+                    )}
+                  >
+                    {p.confidence === 'HIGH' ? 'High' : p.confidence === 'MEDIUM' ? 'Medium' : 'Low'}
+                  </span>
+                </div>
               </div>
-              <div className="flex flex-col items-end gap-1 shrink-0">
-                <span className="text-[9.5px] uppercase tracking-[0.10em] text-ink-3">
-                  Confidence
-                </span>
-                <span
-                  className={cn(
-                    'inline-flex items-center px-2 py-0.5 rounded-pill text-[10.5px] font-semibold uppercase tracking-wide',
-                    confidenceStyle[p.confidence],
-                  )}
-                >
-                  {p.confidence}
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-4 flex items-start gap-2.5 rounded-card tile px-3.5 py-3">
-          <Sparkles className="w-3.5 h-3.5 text-sage-deep mt-0.5 shrink-0" strokeWidth={2.25} />
-          <p className="text-[12.5px] text-ink leading-snug flex-1 min-w-0">
-            Small consistent actions today can lead to big improvements in the next few days.
-          </p>
-          <ArrowRight className="w-4 h-4 text-ink-3 shrink-0" strokeWidth={2.25} />
-        </div>
-      </Card>
+            ))}
+          </div>
+        </Card>
+      )}
     </div>
   )
 }
 
-// ── Tab 4: KNOWS ABOUT YOU ───────────────────────────────────────────────
-function KnowsTab() {
-  const knowledge: { key: string; icon: LucideIcon; tone: Tone; title: string; detail: string }[] = [
-    {
-      key: 'weekday_consistency',
-      icon: CalendarDays,
-      tone: 'sky',
-      title: "You're most consistent on weekdays.",
-      detail: 'Your routines are stronger Mon–Fri than weekends.',
-    },
-    {
-      key: 'sleep_need',
-      icon: Moon,
-      tone: 'violet',
-      title: 'You need 7-8h of sleep to feel your best.',
-      detail: 'Below 7h, your energy and mood drop noticeably.',
-    },
-    {
-      key: 'stress_response',
-      icon: Wind,
-      tone: 'teal',
-      title: 'You respond strongly to stress.',
-      detail: 'Your HRV drops quickly when stress is high.',
-    },
-    {
-      key: 'protein_response',
-      icon: Heart,
-      tone: 'amber',
-      title: 'You perform better with higher protein.',
-      detail: 'Higher protein days = better recovery & focus.',
-    },
-  ]
+function KnowsTab({ facts }: { facts: LearnedFact[] }) {
+  const toneCycle: Tone[] = ['sky', 'violet', 'teal', 'amber', 'sage']
+  const iconCycle: LucideIcon[] = [CalendarDays, Moon, Wind, Heart, Activity]
 
   return (
     <div className="space-y-5">
@@ -402,48 +517,53 @@ function KnowsTab() {
         eyebrow="Knows about you"
         lead="A summary of what"
         accent="BioSense has learned about you."
-        body="This helps us personalise insights and recommendations."
+        body="Facts from Learning Mode and registration — not invented demo traits."
         decoration="brain"
       />
 
-      <Card variant="glass" padding="lg">
-        <div className="space-y-3">
-          {knowledge.map((k) => (
-            <Link
-              key={k.key}
-              href="/chat"
-              className="flex items-start gap-3 sm:gap-4 p-3 sm:p-3.5 rounded-card tile tile-hover group"
-            >
-              <IconBadge icon={k.icon} tone={k.tone} variant="tint" size="md" />
-              <div className="flex-1 min-w-0">
-                <div className="font-sans text-[13.5px] font-semibold text-ink leading-tight">
-                  {k.title}
+      {facts.length === 0 ? (
+        <EmptyState
+          title="Nothing learned yet"
+          body="Complete a few Learning Mode answers or keep chatting — durable facts you share will show up here."
+          href="/chat"
+          cta="Open Learning Mode"
+        />
+      ) : (
+        <Card variant="glass" padding="lg">
+          <div className="space-y-3">
+            {facts.map((f, i) => (
+              <Link
+                key={f.id}
+                href="/chat"
+                className="flex items-start gap-3 sm:gap-4 p-3 sm:p-3.5 rounded-card tile tile-hover group"
+              >
+                <IconBadge
+                  icon={iconCycle[i % iconCycle.length]}
+                  tone={toneCycle[i % toneCycle.length]}
+                  variant="tint"
+                  size="md"
+                />
+                <div className="flex-1 min-w-0">
+                  <div className="font-sans text-[13.5px] font-semibold text-ink leading-tight">
+                    {f.text}
+                  </div>
+                  <p className="text-[12px] text-ink-3 leading-snug mt-1 capitalize">
+                    From {f.section.replace(/_/g, ' ')}
+                  </p>
                 </div>
-                <p className="text-[12px] text-ink-3 leading-snug mt-1">
-                  {k.detail}
-                </p>
-              </div>
-              <ArrowRight className="w-4 h-4 text-ink-3 shrink-0 mt-1 transition-transform group-hover:translate-x-0.5" strokeWidth={2.25} />
-            </Link>
-          ))}
-        </div>
-
-        <div className="mt-4 flex items-start gap-2.5 rounded-card tile-sage px-3.5 py-3">
-          <Leaf className="w-3.5 h-3.5 text-sage-deep mt-0.5 shrink-0" strokeWidth={2.25} />
-          <p className="text-[12.5px] text-ink leading-snug flex-1 min-w-0">
-            We&apos;re always learning and will continue to update this as we learn more about you.
-          </p>
-          <Check className="w-4 h-4 text-sage-deep shrink-0" strokeWidth={2.25} />
-        </div>
-      </Card>
+                <ArrowRight
+                  className="w-4 h-4 text-ink-3 shrink-0 mt-1 transition-transform group-hover:translate-x-0.5"
+                  strokeWidth={2.25}
+                />
+              </Link>
+            ))}
+          </div>
+        </Card>
+      )}
     </div>
   )
 }
 
-// ── Shared: Hero intro card ──────────────────────────────────────────────
-// The big premium card at the top of each tab. Serif headline + body +
-// decorative element on the right (changes per tab). Sits over the page
-// texture and reads as the "anchor" of the tab.
 function HeroIntroCard({
   eyebrow,
   lead,
@@ -469,9 +589,7 @@ function HeroIntroCard({
             {lead}{' '}
             <span className="italic-accent text-[1em] text-sage-deep">{accent}</span>
           </div>
-          <p className="text-caption text-ink-2 mt-2 leading-snug max-w-[42ch]">
-            {body}
-          </p>
+          <p className="text-caption text-ink-2 mt-2 leading-snug max-w-[42ch]">{body}</p>
         </div>
         <HeroDecoration kind={decoration} />
       </div>
@@ -481,7 +599,6 @@ function HeroIntroCard({
 
 function HeroDecoration({ kind }: { kind: 'leaves' | 'circles' | 'mountains' | 'brain' }) {
   if (kind === 'circles') {
-    // Three intersecting sage-tinted circles — a Venn-y connections motif.
     return (
       <div className="relative w-[88px] h-[88px] shrink-0">
         <span className="absolute top-1 left-1 w-12 h-12 rounded-full bg-[rgba(111,143,107,0.20)] ring-1 ring-[rgba(111,143,107,0.30)]" />
@@ -505,7 +622,6 @@ function HeroDecoration({ kind }: { kind: 'leaves' | 'circles' | 'mountains' | '
       </div>
     )
   }
-  // leaves (default)
   return (
     <div className="relative w-[88px] h-[88px] shrink-0">
       <Leaf className="absolute top-2 right-6 w-7 h-7 text-sage-deep rotate-[18deg]" strokeWidth={1.5} />
@@ -515,7 +631,6 @@ function HeroDecoration({ kind }: { kind: 'leaves' | 'circles' | 'mountains' | '
   )
 }
 
-// ── Today drivers heuristic ──────────────────────────────────────────────
 type TodayDriver = {
   key: string
   label: string
@@ -525,70 +640,93 @@ type TodayDriver = {
   tone: Tone
 }
 
-function todayDrivers(checkins: Checkin[]): TodayDriver[] {
-  if (checkins.length < 2) {
-    // Friendly defaults that mirror v7 image 3 panel 1.
-    return [
-      { key: 'sleep',    label: 'Sleep timing', reason: 'You went to bed 52 mins later than your usual average.',  impact: 'high',     icon: Moon,     tone: 'violet' },
-      { key: 'stress',   label: 'Stress',       reason: 'Stress levels have been elevated since yesterday afternoon.', impact: 'high', icon: Wind,     tone: 'teal'   },
-      { key: 'hrv',      label: 'HRV',          reason: 'Your 7-day average is slightly below your usual range.',  impact: 'moderate', icon: Heart,    tone: 'rose'   },
-      { key: 'activity', label: 'Activity',     reason: 'You moved less than usual today.',                        impact: 'low',      icon: Activity, tone: 'sky'    },
-    ]
+function todayDrivers(checkins: Checkin[], wm: WearableMetrics): TodayDriver[] {
+  if (checkins.length < 2 && wm.hrv == null && wm.steps == null && wm.recovery == null) {
+    return []
   }
-  const recent = checkins.slice(0, 3)
-  const older  = checkins.slice(3, 7)
-  const avg = (arr: Checkin[], k: keyof Checkin) =>
-    arr.length ? arr.reduce((s, c) => s + (c[k] as number), 0) / arr.length : 0
-  const dSleep  = avg(recent, 'sleep')  - avg(older, 'sleep')
-  const dStress = avg(recent, 'stress') - avg(older, 'stress')
-  const dEnergy = avg(recent, 'energy') - avg(older, 'energy')
-  const dMood   = avg(recent, 'mood')   - avg(older, 'mood')
 
-  const raw: TodayDriver[] = [
-    {
+  const drivers: TodayDriver[] = []
+
+  if (checkins.length >= 2) {
+    const recent = checkins.slice(0, 3)
+    const older = checkins.slice(3, 7)
+    const avg = (arr: Checkin[], k: keyof Checkin) =>
+      arr.length ? arr.reduce((s, c) => s + (c[k] as number), 0) / arr.length : 0
+    const dSleep = avg(recent, 'sleep') - (older.length ? avg(older, 'sleep') : avg(recent, 'sleep'))
+    const dStress = avg(recent, 'stress') - (older.length ? avg(older, 'stress') : avg(recent, 'stress'))
+    const dEnergy = avg(recent, 'energy') - (older.length ? avg(older, 'energy') : avg(recent, 'energy'))
+
+    drivers.push({
       key: 'sleep',
-      label: 'Sleep timing',
-      reason: dSleep < 0 ? 'You went to bed later than your usual average.' : 'Bedtime is consistent with your usual rhythm.',
-      impact: 'low',
+      label: 'Sleep',
+      reason:
+        dSleep < -0.3
+          ? 'Recent sleep ratings are below your earlier average.'
+          : dSleep > 0.3
+            ? 'Sleep ratings have been trending up versus earlier this week.'
+            : 'Sleep ratings are roughly in line with your recent baseline.',
+      impact: Math.abs(dSleep) >= 1.2 ? 'high' : Math.abs(dSleep) >= 0.5 ? 'moderate' : 'low',
       icon: Moon,
       tone: 'violet',
-    },
-    {
+    })
+    drivers.push({
       key: 'stress',
       label: 'Stress',
-      reason: dStress > 0 ? 'Stress levels have been elevated since yesterday.' : 'Stress has eased over the last few days.',
-      impact: 'low',
+      reason:
+        dStress > 0.3
+          ? 'Stress check-ins have been elevated versus earlier days.'
+          : dStress < -0.3
+            ? 'Stress ratings have eased compared with earlier this week.'
+            : 'Stress is close to your recent baseline.',
+      impact: Math.abs(dStress) >= 1.2 ? 'high' : Math.abs(dStress) >= 0.5 ? 'moderate' : 'low',
       icon: Wind,
       tone: 'teal',
-    },
-    {
-      key: 'hrv',
-      label: 'HRV',
-      reason: dEnergy < 0 ? 'Slightly below your usual range.' : 'Tracking inside your healthy range.',
-      impact: 'low',
-      icon: Heart,
-      tone: 'rose',
-    },
-    {
-      key: 'activity',
-      label: 'Activity',
-      reason: dMood < 0 ? 'You moved less than usual.' : 'Activity is on rhythm with your usual week.',
-      impact: 'low',
+    })
+    drivers.push({
+      key: 'energy',
+      label: 'Energy',
+      reason:
+        dEnergy < -0.3
+          ? 'Energy has dipped versus your earlier check-ins.'
+          : dEnergy > 0.3
+            ? 'Energy is trending higher than earlier this week.'
+            : 'Energy is holding near your recent average.',
+      impact: Math.abs(dEnergy) >= 1.2 ? 'high' : Math.abs(dEnergy) >= 0.5 ? 'moderate' : 'low',
       icon: Activity,
       tone: 'sky',
-    },
-  ]
+    })
+  }
 
-  // Magnitude → impact tag mapping
-  const withMags = raw.map((d) => {
-    const mag = Math.abs(
-      d.key === 'sleep'  ? dSleep * 6 :
-      d.key === 'stress' ? dStress * 5 :
-      d.key === 'hrv'    ? dEnergy * 3 :
-      d.key === 'activity' ? dMood * 4 : 0,
-    )
-    const impact: Impact = mag >= 8 ? 'high' : mag >= 4 ? 'moderate' : 'low'
-    return { ...d, impact }
-  })
-  return withMags
+  if (wm.hrv != null) {
+    drivers.push({
+      key: 'hrv',
+      label: 'HRV',
+      reason: `Latest wearable HRV ≈ ${Math.round(wm.hrv)} ms.`,
+      impact: wm.hrv < 40 ? 'high' : wm.hrv < 55 ? 'moderate' : 'low',
+      icon: Heart,
+      tone: 'rose',
+    })
+  }
+  if (wm.recovery != null) {
+    drivers.push({
+      key: 'recovery',
+      label: 'Recovery',
+      reason: `Latest recovery / readiness ≈ ${Math.round(wm.recovery)}.`,
+      impact: wm.recovery < 40 ? 'high' : wm.recovery < 60 ? 'moderate' : 'low',
+      icon: Activity,
+      tone: 'sage',
+    })
+  }
+  if (wm.steps != null) {
+    drivers.push({
+      key: 'steps',
+      label: 'Activity',
+      reason: `Latest step count ≈ ${Math.round(wm.steps).toLocaleString()}.`,
+      impact: wm.steps < 4000 ? 'moderate' : 'low',
+      icon: Activity,
+      tone: 'sky',
+    })
+  }
+
+  return drivers.slice(0, 5)
 }

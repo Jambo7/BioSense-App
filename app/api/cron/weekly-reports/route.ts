@@ -5,11 +5,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { generateWeeklyReport } from '@/lib/reports'
+import { isCronAuthorized } from '@/lib/cron-auth'
 
-export async function POST(req: NextRequest) {
-  // Verify cron secret
-  const secret = req.headers.get('x-cron-secret')
-  if (secret !== process.env.CRON_SECRET) {
+export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
+export const maxDuration = 300
+
+async function handle(req: NextRequest) {
+  if (!isCronAuthorized(req)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
@@ -37,6 +40,14 @@ export async function POST(req: NextRequest) {
   }
 
   return NextResponse.json({ generated, errors, period })
+}
+
+export async function GET(req: NextRequest) {
+  return handle(req)
+}
+
+export async function POST(req: NextRequest) {
+  return handle(req)
 }
 
 function getISOWeek(date: Date): number {

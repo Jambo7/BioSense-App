@@ -2,40 +2,56 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { aggregateWearableMetrics } from '@/lib/wearable-metrics'
+import {
+  getBioAgeUnlockStatus,
+  getLatestBiologicalAge,
+} from '@/lib/maturity'
 import { DashboardClient } from './dashboard-client'
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions)
   if (!session) return null
 
-  const [user, latestCheckin, latestScore, checkinStreak, recentCheckins, latestBlood, wearables] =
-    await Promise.all([
-      prisma.user.findUnique({ where: { id: session.user.id } }),
-      prisma.dailyCheckin.findFirst({
-        where: { userId: session.user.id },
-        orderBy: { date: 'desc' },
-      }),
-      prisma.healthScore.findFirst({
-        where: { userId: session.user.id },
-        orderBy: { date: 'desc' },
-      }),
-      // Streak: count consecutive days ending today
-      prisma.dailyCheckin.count({
-        where: { userId: session.user.id },
-      }),
-      prisma.dailyCheckin.findMany({
-        where: { userId: session.user.id },
-        orderBy: { date: 'desc' },
-        take: 7,
-      }),
-      prisma.bloodResult.findFirst({
-        where: { userId: session.user.id },
-        orderBy: { drawDate: 'desc' },
-      }),
-      prisma.wearableSync.findMany({
-        where: { userId: session.user.id },
-      }),
-    ])
+  const userId = session.user.id
+
+  const [
+    user,
+    latestCheckin,
+    latestScore,
+    checkinStreak,
+    recentCheckins,
+    latestBlood,
+    wearables,
+    bioUnlock,
+    latestBioAge,
+  ] = await Promise.all([
+    prisma.user.findUnique({ where: { id: userId } }),
+    prisma.dailyCheckin.findFirst({
+      where: { userId },
+      orderBy: { date: 'desc' },
+    }),
+    prisma.healthScore.findFirst({
+      where: { userId },
+      orderBy: { date: 'desc' },
+    }),
+    prisma.dailyCheckin.count({
+      where: { userId },
+    }),
+    prisma.dailyCheckin.findMany({
+      where: { userId },
+      orderBy: { date: 'desc' },
+      take: 7,
+    }),
+    prisma.bloodResult.findFirst({
+      where: { userId },
+      orderBy: { drawDate: 'desc' },
+    }),
+    prisma.wearableSync.findMany({
+      where: { userId },
+    }),
+    getBioAgeUnlockStatus(userId),
+    getLatestBiologicalAge(userId),
+  ])
 
   const today = new Date().toISOString().split('T')[0]
   const hasCheckinToday = latestCheckin
@@ -66,6 +82,14 @@ export default async function DashboardPage() {
       hasBlood={!!latestBlood}
       connectedWearables={wearables.map((w) => w.provider)}
       wearableMetrics={aggregateWearableMetrics(wearables)}
+      bioAge={{
+        unlocked: bioUnlock.unlocked,
+        trackingDays: bioUnlock.trackingDays,
+        unlockDays: bioUnlock.unlockDays,
+        value: latestBioAge?.bioAge ?? null,
+        deltaYears: latestBioAge?.delta ?? null,
+        calendarAge: latestBioAge?.calendarAge ?? user?.age ?? null,
+      }}
     />
   )
 }

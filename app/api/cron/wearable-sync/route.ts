@@ -25,26 +25,14 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { requestTerraUserData } from '@/lib/terra'
 import { storeTerraDataPayloads } from '@/lib/terra-store'
+import { isCronAuthorized } from '@/lib/cron-auth'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 export const maxDuration = 300
 
-function authorized(req: NextRequest): boolean {
-  // Vercel's platform sets this user-agent on genuine cron invocations. It lets
-  // the scheduled job run without a pre-configured secret.
-  const userAgent = req.headers.get('user-agent') ?? ''
-  if (userAgent.startsWith('vercel-cron/')) return true
-
-  const secret = process.env.CRON_SECRET
-  if (!secret) return false
-  if (req.headers.get('x-cron-secret') === secret) return true
-  if (req.headers.get('authorization') === `Bearer ${secret}`) return true
-  return false
-}
-
 async function handle(req: NextRequest) {
-  if (!authorized(req)) {
+  if (!isCronAuthorized(req)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
