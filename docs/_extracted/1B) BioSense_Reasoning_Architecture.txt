@@ -1,0 +1,344 @@
+
+centertop
+BioSense Reasoning Architecture
+The buildable specification of how the BioSense Intelligence Engine reasons
+Version  0.1 (Working Draft — for engineering ratification)
+Status  Subordinate to the BioSense Intelligence Constitution. Implements Level Four (Reasoning Architecture) of the hierarchy of authority defined in Constitution Ch 21.4.
+Authority  This document governs implementation. Where it conflicts with the Constitution, the Constitution prevails and this document is wrong and must be corrected. Where the Constitution is silent on implementation, this document is authoritative.
+Cadence  Expected to change frequently. Unlike the Constitution, revisions here do not require the constitutional amendment procedure — but every rule must cite the constitutional clause it implements, and no rule may weaken one.
+Document owner  Neil MacLaren  ·  Prepared by: Editorial / Architecture Review
+
+
+Contents
+ TOC \z \o "1-2" \u \h0.  How to read this document	 PAGEREF _Toc234486168 \h 3
+1.  The two blocking problems, stated plainly	 PAGEREF _Toc234486169 \h 4
+1.1  There are two different mandatory pipelines	 PAGEREF _Toc234486170 \h 4
+1.2  The Dynamic Health Model is the core of the design and is architecturally empty	 PAGEREF _Toc234486171 \h 4
+2.  The enforcement map: teaching vs constraining the AI	 PAGEREF _Toc234486172 \h 5
+3.  The canonical reasoning state machine	 PAGEREF _Toc234486173 \h 7
+4.  Compute tiers and reasoning triggers	 PAGEREF _Toc234486174 \h 9
+4.1  The significance gate (S0)	 PAGEREF _Toc234486175 \h 9
+4.2  Episodic, not per-point, reasoning	 PAGEREF _Toc234486176 \h 9
+4.3  Trigger taxonomy	 PAGEREF _Toc234486177 \h 9
+5.  Why this scales to millions of users	 PAGEREF _Toc234486178 \h 10
+6.  The Dynamic Health Model — data model and update semantics	 PAGEREF _Toc234486179 \h 11
+6.1  Two layers: event log and belief state	 PAGEREF _Toc234486180 \h 11
+6.2  Core entities	 PAGEREF _Toc234486181 \h 11
+6.3  Provenance and version pinning	 PAGEREF _Toc234486182 \h 12
+6.4  The update rule — “does this improve understanding?” as a function	 PAGEREF _Toc234486183 \h 12
+6.5  Thresholds are configuration, not model output	 PAGEREF _Toc234486184 \h 12
+6.6  Truth-maintenance: belief revision must propagate	 PAGEREF _Toc234486185 \h 12
+6.7  Consistency model	 PAGEREF _Toc234486186 \h 12
+7.  The deterministic subsystems (the system-enforced spine)	 PAGEREF _Toc234486187 \h 13
+7.1  Safety rule engine — the floor	 PAGEREF _Toc234486188 \h 13
+7.2  Grounding contract	 PAGEREF _Toc234486189 \h 13
+7.3  Confidence calculus and calibration	 PAGEREF _Toc234486190 \h 13
+7.4  Cold-start and baseline estimation	 PAGEREF _Toc234486191 \h 14
+7.5  Constitutional Review layer	 PAGEREF _Toc234486192 \h 14
+7.6  Structured reasoning trace (not deterministic replay)	 PAGEREF _Toc234486193 \h 14
+8.  Model conditioning: what the AI is actually 'taught'	 PAGEREF _Toc234486194 \h 15
+9.  Decisions requiring your sign-off	 PAGEREF _Toc234486195 \h 15
+		
+
+
+0.  How to read this document
+This is not a second constitution and not a restatement of the philosophy. It is the missing layer between principle and code. The Constitution answers what BioSense values and how it should reason in principle. This document answers how that reasoning is structured, triggered, stored and enforced so that a team can build it without inventing the unstated half themselves.
+It is organised around one idea that governs everything else: every constitutional principle is either taught to the model or enforced by the system around it, and confusing the two is the primary way this platform can fail.
+A principle that is model-taught lives in the reasoning, prompt and retrieval layers, where the model exercises judgment. A principle that is system-enforced lives in deterministic code the model cannot override. Treating a safety threshold, an evidence-grounding requirement or a confidence calculation as something you 'teach the AI' — rather than something you enforce around it — is a category error with clinical and legal consequences. Section 2 draws this line explicitly; the rest of the document builds the two halves.
+Each engineering rule is numbered ER-n and cites the constitutional clause it implements, so traceability runs both ways.
+
+Reading order for the team.  Sections 3 (state machine), 2 (enforcement map) and 6 (Dynamic Health Model) are the unblocking core — nothing solid gets built until these are settled. Sections 4–5 make it survivable at scale. Section 7 specifies the deterministic subsystems. Section 9 lists the decisions that need your sign-off before build.
+
+
+1.  The two blocking problems, stated plainly
+Before any rules, two issues in the current Constitution must be resolved because they prevent a coherent build. Everything else is improvement; these are blockers.
+1.1  There are two different mandatory pipelines
+Constitution Ch 8 defines a ten-stage interpretation sequence. Appendix B defines a fifteen-stage reasoning pipeline. They are not the same machine — Appendix B adds Canonical Translation, breaks the Dynamic Health Model update into its own stage, and inserts Recommendation and Learning as explicit steps, and the two order prioritisation, the model update and the communication decision differently. Both texts declare that no stage may be skipped. Two authoritative state machines of different length and ordering cannot both govern the same flow: an engineer picks one and silently ignores the other, and two engineers pick differently.
+Resolution (Section 3): this document defines one canonical reasoning state machine that subsumes both. On ratification, it becomes the operative specification; the Ch 8 and Appendix B sequences become explanatory views of it.
+1.2  The Dynamic Health Model is the core of the design and is architecturally empty
+The DHM is the richest idea in the Constitution and the thing every other engine reasons from — yet it is given no representation, no update semantics and no consistency model. The central operation of the whole platform, “does this observation improve our understanding?” (Ch 2.9, 11.4), is stated as a rhetorical question, never as a function. Until the DHM has a data model and an update rule, nothing downstream can be built.
+Resolution (Section 6): the DHM is specified as an event-sourced, provenance-tracked store with a derived, versioned belief state, a defined update rule, and truth-maintenance for belief revision.
+
+
+2.  The enforcement map: teaching vs constraining the AI
+This is the centrepiece. The Constitution states every principle in the same register, as though a prompt could carry all of them. It cannot. The map below sorts the principles into where they must actually live. Most of the architectural gaps close the moment a principle is placed in the correct column.
+ER-1 (Constitution Ch 21.4 hierarchy of authority).  Every constitutional principle must be classified as model-taught, system-enforced, or hybrid, and implemented in the corresponding layer. A principle classified as system-enforced must not depend on model compliance for its guarantee.
+2.1  Classification
+Principle (Constitution ref)
+Class
+Where it lives / how it is guaranteed
+Reason before responding (15.2, 1.10)
+System-enforced
+The stage order is the state machine (Section 3), not a prompt instruction. The model cannot emit a user-facing output before Review clears it.
+Evidence before confidence (1.6, 15.3)
+System-enforced
+Confidence is computed by the calculus (7.3) from graded inputs. The model never asserts a confidence value; it is derived downstream.
+Every scientific claim reflects current evidence (1.4, 8.5)
+System-enforced
+Grounding contract (7.2): user-facing scientific claims must resolve to a versioned Canonical Scientific Library entry. Parametric-memory assertions are blocked.
+Safety overrides optimisation (4.6, 5.2 L8)
+System-enforced
+Deterministic safety rule engine (7.1) sets an escalation floor the model may exceed but never lower.
+Least necessary intervention (5.3)
+System-enforced
+Recommendation hierarchy is an ordered gate (S9); higher tiers require the rule engine's evidence preconditions.
+Internal vs external intelligence (2.10, 8.11)
+System-enforced
+The communication-decision threshold (S11) is a deterministic gate; silence is the default unless value criteria are met.
+Interpretations pinned as evidence evolves (8.5, 21.3)
+System-enforced
+Version pinning: every interpretation records the Library version and belief-state version that produced it.
+Validation before reasoning (8.3, 9.x)
+System-enforced
+S1 plausibility, unit and OCR-confidence checks run before any interpretation and set data-confidence.
+Reason from relationships not thresholds (15.5)
+Model-taught
+Reasoning/prompt layer, operating over the DHM belief state provided to it per stage.
+Competing hypotheses; resist premature certainty (3.4, 8.6)
+Model-taught
+S5 prompt contract requires ≥ 2 explanations where plausible; Review checks the trace contains them.
+Think in narratives, not notifications (3.9)
+Model-taught
+S5/S11 rendering; narrative structure is taught, then quality-checked in Review.
+Calm before concern; humility; empathy (B: 3, 18, 12)
+Model-taught
+Communication layer tone; verified against a confidence-vs-language consistency check in Review (partly non-generative).
+Intelligent, purposeful curiosity (12.x)
+Model-taught
+S8/S11 question generation, gated by the same cognitive-respect budget as insights.
+Personalisation must be evidence-based, not speculative (20.7)
+Hybrid
+Model applies personalisation; Review deterministically checks each personalised claim cites a DHM node, not an assumption.
+Recommendations proportionate to evidence (5.8)
+Hybrid
+Model formulates; rule engine bounds tier by evidence; Review gates.
+Escalation to medical assessment (5.2 L8, 16.x)
+Hybrid
+Rule engine sets the floor (system); model may escalate above it (taught); Review confirms floor compliance.
+Constitutional Review before release (20.x)
+Hybrid
+Non-generative checks (grounding, safety floor, confidence-language, plausibility) plus a separate generative reviewer for tone/clarity — never the sole guarantee.
+Auditability of reasoning (8.14, 21.5)
+System-enforced
+Every stage emits a structured trace record (7.6); logging is mandatory and non-bypassable.
+The single most important row is grounding.  In a real build the reasoning substrate is a language model. “Reason from current scientific evidence” silently becomes “reason from whatever the model’s parameters happen to encode,” which is exactly the failure a health platform cannot tolerate. Grounding must be enforced, not taught.
+
+
+3.  The canonical reasoning state machine
+ER-2 (resolves Ch 8 + Appendix B).  BioSense has exactly one operative reasoning state machine, defined here. The Ch 8 sequence and the Appendix B pipeline are explanatory views of it and carry no independent authority once this is ratified.
+The machine is organised into three phases whose separation removes the ordering ambiguity between the two source pipelines: reason, then commit belief, then act. Understanding is produced first (S1–S6); the belief state is updated as a distinct, explicit write (S7); only then does the engine prioritise, recommend, review, communicate and learn (S8–S12). Nothing is written to the user's model during interpretation, and nothing reaches the user before Review.
+3.1  The stages
+Stage
+Name
+Function
+Phase
+S0
+Intake & Triage
+Cheap significance gate. Classifies every incoming observation and routes it to a path (3.3). Terminates the large majority of wearable datapoints without full reasoning. See Section 4.
+Gate
+S1
+Validation & Canonical Translation
+Ingest into the canonical schema; OCR/unit/range plausibility checks; assign data-confidence; write immutable Observation to the event log.
+Reason
+S2
+Biological & Scientific Understanding
+What was measured, biologically; grounded retrieval of population-level meaning from the Canonical Scientific Library (versioned).
+Reason
+S3
+Personal Contextualisation
+Interpret against this individual's baselines, history and biological identity from the DHM belief state.
+Reason
+S4
+Relationship Analysis
+Search the DHM for converging and contradicting evidence, existing hypotheses and narratives this observation touches.
+Reason
+S5
+Hypothesis Generation
+Construct or update competing explanations; require ≥ 2 where plausible; attach scientific basis and evidence pointers.
+Reason
+S6
+Confidence Assessment
+Compute reasoning-confidence via the calculus (7.3) from data, scientific and personal confidence, convergence and residual uncertainty.
+Reason
+S7
+DHM Update (Belief Commit)
+The single write stage. Apply the update rule (6.4); append belief-change events; run truth-maintenance; recompute affected belief state. Distinguishes changed understanding from strengthened confidence.
+Commit
+S8
+Prioritisation
+Select the primary insight under the cognitive-respect budget; decide what, if anything, is worth the user's attention.
+Act
+S9
+Recommendation Formulation
+If warranted, formulate a recommendation at the lowest sufficient tier of the hierarchy, bounded by the safety rule engine.
+Act
+S10
+Constitutional Review
+The release gate. Non-generative checks + generative tone/clarity review. Pass, revise, block, or escalate (7.5).
+Act
+S11
+Communication Decision & Rendering
+Apply the internal-vs-external threshold; if external, render the user-facing narrative. Silence is a valid, common terminal state.
+Act
+S12
+Learning & Trace Commit
+Write the structured reasoning trace; register outcome hooks for calibration (7.3); close the loop.
+Act
+3.2  Two invariants that hold for every path
+ER-3 (Ch 8.14, 21.5).  Every execution, on every path including the noise path, emits a trace record at S12. Reasoning that is not logged did not happen.
+ER-4 (Ch 20.x, 4.6).  No user-facing output is emitted without passing S10. There is no path from interpretation to the user that bypasses Review.
+3.3  Paths (not every observation runs every stage)
+Running all thirteen stages on every wearable datapoint is neither necessary nor affordable (Section 4). The machine defines four paths; S0 assigns one:
+Noise path.  Observation is within expected variation and touches no active hypothesis. Recorded to the Historical Record (S1) only; S12 trace; no belief change, no reasoning. The default for most telemetry.
+Confirmation path (fast).  Observation is consistent with an established hypothesis. Deterministic confidence nudge written at a lightweight S7; no S2–S6, no communication. Strengthens the model without a reasoning pass.
+Full reasoning path.  Material event — a completed upload, a genuinely changed trend, a scheduled review, or a user question. Runs S1–S12.
+Safety path.  Triggered when the safety rule engine (7.1) fires at S0 or S1. Skips optimisation stages but always runs S10 and forces the mandated escalation. Fail-safe: ambiguity routes here, not away from it.
+Constitutional basis: Ch 8 (interpretation sequence), Appendix B (reasoning pipeline), Ch 2.10 / 8.11 (internal vs external intelligence).
+
+
+4.  Compute tiers and reasoning triggers
+The Constitution says reason before responding, never skip a stage, integrate across all sources. Applied literally to wearable telemetry — thousands of datapoints per user per day across millions of users — a full DHM-consulting reasoning pass per datapoint is computationally ruinous and latency-infeasible. The Constitution already contains the fix and never promotes it: the internal-vs-external distinction (2.10) and “not every observation deserves a conversation” (8.11). This section makes it an engineering rule.
+4.1  The significance gate (S0)
+ER-5 (Ch 8.11, 2.10).  A cheap, deterministic significance-triage stage runs before the expensive pipeline. It must decide a path (3.3) using only bounded-cost checks: is the value within the individual's expected variation band; does it cross a safety rule; does it touch an active hypothesis; is it a completed dataset (e.g. a full lab panel) rather than a partial stream; is there a pending user question or scheduled review. Full reasoning is the exception the gate escalates to, not the default.
+4.2  Episodic, not per-point, reasoning
+ER-6 (Ch 3.9, 11.x).  Health reasoning is episodic. The engine reasons over an episode — a completed panel, a window of days, a detected trend — not over each datapoint. S0 must therefore support windowing and debouncing: telemetry accumulates into the Historical Record and into rolling baseline estimates continuously, but escalation to the full reasoning path is triggered by events, not by arrival. Absent an explicit trigger model, every team invents its own and the platform's behaviour becomes non-deterministic across services.
+4.3  Trigger taxonomy
+Trigger
+Path
+Datapoint within expected band, no active hypothesis touched
+Noise
+Datapoint consistent with an established hypothesis
+Confirmation (fast)
+Completed dataset ingested (lab panel, new device connected, questionnaire)
+Full reasoning
+Trend materially changes (baseline breach beyond a defined, per-metric delta)
+Full reasoning
+Scheduled longitudinal review (periodic, per user)
+Full reasoning
+User asks a question
+Full reasoning (synchronous)
+Safety rule fires
+Safety (pre-empts all others)
+Latency classes.  Two service-level tiers follow from the trigger: synchronous (user questions, target interactive latency) and asynchronous (ingestion, trend detection, scheduled reviews, run on the pipeline queue). Only the synchronous class is latency-bound; it is a small fraction of volume. This is what makes the architecture affordable.
+5.  Why this scales to millions of users
+Scalability is not an add-on here; it falls out of two structural choices, provided they are stated as rules.
+ER-7 (data-model consequence).  The DHM is per-user. There is no shared mutable reasoning state across users. The only shared resource is the Canonical Scientific Library, which is read-only and versioned. The system therefore shards embarrassingly by user id.
+ER-8 (consistency consequence).  Reasoning is serialised per user (single-writer per user's belief state) and parallel across users. This removes belief-state race conditions without global locking and preserves the Constitution's requirement that understanding evolve coherently rather than through concurrent, conflicting writes.
+Combined with the significance gate (Section 4), which keeps the expensive path rare, and the two latency classes, the cost model becomes: cheap continuous ingestion at telemetry scale, plus a comparatively small volume of episodic full-reasoning passes and an even smaller volume of synchronous user-driven passes. This is a shape that scales; the literal reading of the Constitution is not.
+
+
+6.  The Dynamic Health Model — data model and update semantics
+This section makes the DHM buildable. The Constitution's own language — evolves gradually, resists noise, welcomes contradiction, archives retired hypotheses, explains why it changed its mind — does not merely permit an architecture; it mandates one: an append-only, provenance-tracked event store with a derived, versioned belief state.
+6.1  Two layers: event log and belief state
+ER-9 (Ch 11.x memory, 8.14 auditability).  The DHM is stored as an append-only event log of two record types — Observations (what was measured) and BeliefChangeEvents (how understanding changed) — from which a materialised, versioned BeliefState is derived. Observations are immutable once written. Understanding is never edited in place; it is changed by appending events, so the model can always answer “why did we change our mind” by replay, and can be recomputed if the update logic improves.
+6.2  Core entities
+Observation            // immutable; the Historical Record
+  id, user_id, source, metric, canonical_value, unit,
+  collected_at, ingested_at,
+  data_confidence,               // set at S1
+  provenance { raw_ref, ocr_conf, validation_result }
+ 
+Baseline               // derived; per user, per metric
+  central_estimate, dispersion, n, window,
+  method, updated_at, confidence   // see 7.4 cold-start
+ 
+Hypothesis             // the unit of understanding
+  id, statement{subject, relation, object},
+  status,   // emerging | developing | established |
+            //          re-evaluation | retired
+  confidence,
+  supporting[]   -> Observation.id,
+  contradicting[] -> Observation.id,
+  scientific_basis[] -> LibraryEntry{id, version},
+  created_at, updated_at, lifecycle_history[]
+ 
+Narrative              // composed from hypotheses
+  id, statement, constituents[] -> Hypothesis.id,
+  confidence,   // composed, see 7.3
+  status, evidence_span
+ 
+BiologicalIdentity     // enduring, promoted knowledge
+  stable_characteristics[] -> Hypothesis.id | Baseline
+  // membership requires a durability threshold (6.5)
+ 
+BeliefState            // derived, versioned materialised view
+  version, as_of, hypotheses[], narratives[],
+  baselines[], identity
+6.3  Provenance and version pinning
+ER-10 (Ch 8.5, 21.3).  Every interpretation records the BeliefState.version and the Library versions it was produced from. “Interpretations evolve as science evolves” must never silently rewrite a user's past explanations; a past explanation is a fact about what BioSense believed then, pinned to the evidence it used.
+6.4  The update rule — “does this improve understanding?” as a function
+The Constitution's central rhetorical question becomes a defined branch. Given a validated Observation O and current BeliefState B, S7 computes belief-change events by cases:
+Creates or materially shifts a hypothesis (confidence change beyond threshold θ, or a new hypothesis): emit an understanding-changing event. Structural change to B.
+Consistent with an established hypothesis (within θ): emit a confidence-strengthening event. No structural change — this is the confirmation path.
+Contradicts an established hypothesis: emit a re-evaluation event, move the hypothesis to re-evaluation status, and run truth-maintenance (6.6). Contradiction is welcomed, not discarded.
+Matches no hypothesis and is not significant: record to the Historical Record only. No belief change.
+ER-11 (Ch 2.9, 11.4).  S7 must implement these four cases explicitly and emit the corresponding event type. The distinction between changed understanding and strengthened confidence is not cosmetic: it is what lets the Health Score / Biological Age move only on genuine change (Constitution 18.x) and what keeps the model stable against noise.
+6.5  Thresholds are configuration, not model output
+ER-12  The significance threshold θ, the durability threshold for biological identity, and per-metric expected-variation bands are versioned configuration owned by the medical/data-science function — not values the model produces at runtime. This keeps stability behaviour auditable and tunable.
+6.6  Truth-maintenance: belief revision must propagate
+Hypotheses strengthen, weaken and retire; narratives are built from hypotheses. When new evidence retires a hypothesis three narratives depend on, that retraction must reach the dependents, or the store silently accumulates orphaned, contradictory downstream beliefs over the multi-year horizon — the opposite of “wiser every year.”
+ER-13 (Ch 3.x hypotheses, 16.x evolution).  The DHM maintains a dependency graph (Narrative → Hypothesis → Observation). Weakening or retiring a node marks its dependents dirty and forces re-derivation of their status and confidence. No belief may remain asserted once the evidence it was derived from has been retracted.
+6.7  Consistency model
+Per-user single-writer (ER-8) gives a clean model: reasoning passes for one user are serialised, so the belief state each pass reads is coherent. The event log is the source of truth; the BeliefState is a cache that can be rebuilt. Concurrency exists only across users, where nothing is shared.
+Constitutional basis: Ch 2.9, 11.3–11.4 (memory / accumulated understanding), 3.4 (competing hypotheses), 8.5 (interpretation evolves), 16.x (evolution), 18.x (derived indicators move only on real change).
+
+
+7.  The deterministic subsystems (the system-enforced spine)
+These are the parts the model must not be solely responsible for. Each is a constitutional principle that the enforcement map (Section 2) placed in the system-enforced column.
+7.1  Safety rule engine — the floor
+The Constitution asserts “safety overrides optimisation” and refers to “constitutional safety thresholds established elsewhere” — but they are never established as concrete triggers. The highest escalation, prompting a medical assessment, must be driven by a deterministic, clinically-authored, auditable rule set (specific ranges, deltas, red-flag combinations). This is precisely the logic you do not want a language model improvising, for both safety and liability reasons.
+ER-14 (Ch 4.6, 5.2 L8).  Safety escalation is governed by a deterministic rule engine whose rules are versioned data reviewed by the medical advisory function (Constitution 21.7). The engine sets a floor: the model may escalate above the floor (a taught behaviour) but may never present anything below it. On engine error or ambiguous input, the fail-safe default is to escalate, never to suppress. 
+This engine is owned and specified by ENG-010 (Constitutional Safety, Clinical Governance & Risk Management). 1B mandates its existence and floor semantics; ENG-010 houses its rules, versioning and enforcement. ENG-001, ENG-004 and other engines may trigger or reference it but do not own it.
+Recommended stance for ratification (Section 9): the floor model above — deterministic minimum, model may only raise it. The alternative (model may also lower escalation with justification) is not recommended for a pre-clinical consumer platform.
+7.2  Grounding contract
+ER-15 (Ch 1.4, 8.5).  Every user-facing scientific claim must carry a grounding token resolving to a specific, versioned Canonical Scientific Library entry. A non-generative resolver in Review (7.5) verifies every flagged claim resolves; unresolved claims are blocked or downgraded to explicitly hedged, non-authoritative language. The model is not permitted to assert scientific fact from parametric memory. The Library is itself a curated, evidence-graded, versioned system — not a static file — and interpretations pin to the version used (ER-10).
+7.3  Confidence calculus and calibration
+Confidence is made load-bearing throughout the Constitution but is given no algebra and — the larger omission — no calibration mandate. Miscomposed or uncalibrated confidence is exactly how these systems become quietly, dangerously overconfident.
+ER-16 (Ch 1.6, 7.x).  Confidence is computed, never asserted by the model. A defined function composes data-confidence, scientific-confidence and personal-fit, with a convergence factor and an uncertainty penalty, bounded to [0,1] and monotonic. Convergence may increase confidence only when source independence is established; correlated physiological signals are treated as non-independent by default, because naive convergence-boosting manufactures overconfidence. Confidence composes up the dependency graph conjunctively (weakest-link / product), not by averaging.
+ER-17 (Ch 15.x humility).  A standing calibration loop records (stated confidence, observed outcome) wherever outcomes become observable (e.g. a later test confirms or refutes a hypothesis), computes calibration curves, and alerts on drift. A confidence-centric architecture that never checks its own calibration is trusting a number it has no reason to believe.
+7.4  Cold-start and baseline estimation
+The whole edifice leans on personal baselines and longitudinal trends, but on day one there are none — and for millions of users the sparse-data regime, not the mature ten-year relationship, is the dominant case. It is also where trust is won or the user churns.
+ER-18 (Ch 11.x, 14.x).  Until a metric's baseline reaches a defined minimum sample size, the engine reasons in population mode with explicitly low personal-confidence and communicates the “we don’t know you yet” stance rather than asserting personalised conclusions. Baseline estimation is outlier-robust (e.g. median / MAD or trimmed statistics), windowed, and seasonally adjusted where the metric warrants; per-metric-class defaults are specified in configuration (6.5), not left to each team.
+7.5  Constitutional Review layer
+Chapter 20 makes Review “the guardian of scientific integrity” and says it operates independent of whichever model generates the response. If the reviewer is the same class of generative model doing another pass, that independence is nominal — it shares the reasoner's blind spots and failure modes, and LLM self-critique is unreliable.
+ER-19 (Ch 20.x).  Review is partly non-generative. It must contain deterministic checks: grounding resolution (7.2), safety-floor compliance (7.1), confidence-versus-language consistency (does the hedging match the numeric band), plausibility/unit sanity, and scope/PII checks. A separate generative reviewer may assess tone, clarity and over-personalisation, but is never the sole integrity guarantee.
+ER-20  Review failure handling is defined, not left to callers. Safety-floor or grounding failure → block and emit a safe, generic fallback (and, for safety, force the mandated escalation). Tone/clarity failure → bounded revise-and-retry. Repeated failure → escalate to a human review queue. Review runs synchronously on every external output; low-risk internal-only paths may be pre-cleared to avoid a universal latency tax.
+7.6  Structured reasoning trace (not deterministic replay)
+Constitution 8.14 asks that reasoning be “reproducible by replaying the reasoning pathway.” With a language model in the loop this is not achievable in the strict, bit-for-bit sense: generation is non-deterministic and sensitive to model version and context. The achievable and genuinely valuable form is a structured trace.
+ER-21 (Ch 8.14, 21.5).  Every stage emits a structured, logged artifact — inputs, retrieved Library entries and versions, intermediate hypotheses, computed confidences, path taken, decisions — so that the decisions are fully auditable even though the prose is not regenerable. The Constitution should distinguish reproducible-audit-trail (build this) from deterministic-regeneration (do not promise this).
+
+
+8.  Model conditioning: what the AI is actually 'taught'
+A common and expensive mistake is to load the whole Constitution into the model's context and call it “teaching the AI.” The Constitution is a governance document for humans; the thing the model is conditioned on is a distilled operational derivative of it.
+ER-22 (Ch 21.4 prompt-engineering layer).  The model is conditioned per stage, not per document. Each stage of the state machine is a bounded call with: (a) a system-behaviour specification encoding only the model-taught principles relevant to that stage; (b) the retrieved Library entries needed for grounding; (c) the relevant slice of the user's BeliefState; and (d) a required structured output schema. No stage receives the full Constitution verbatim.
+ER-23  The operational derivative is generated from the Constitution and versioned against it. When the Constitution is amended, the derivative is regenerated and re-validated. This preserves the authority gradient: the Constitution remains the source of truth; the prompt is a compiled artifact, never an independent one.
+Decomposing the model's job into stages with input contracts and output schemas is also what makes the deterministic checks possible: you can only verify grounding, confidence-language consistency and hypothesis-count if each stage emits structured, checkable output rather than one free-form response.
+9.  Decisions requiring your sign-off
+These are the points where the architecture needs a human decision before build. Two are blocking.
+#
+Decision
+Recommendation
+1
+Ratify the merged canonical state machine (Section 3) as the operative spec, superseding the Ch 8 sequence and Appendix B pipeline. BLOCKING.
+Ratify. It is a strict superset of both and removes the two-pipeline conflict.
+2
+Adopt the DHM data model and update rule (Section 6). BLOCKING.
+Adopt as the baseline; data-science to confirm θ and confidence composition on real data.
+3
+Safety boundary: deterministic floor the model may only escalate above, vs. allowing model-justified de-escalation (7.1).
+Floor model. Do not allow de-escalation on a pre-clinical consumer platform.
+4
+Exact confidence-calculus form and independence test (7.3).
+Approve the shape; defer coefficients to data-science with the calibration loop live from day one.
+5
+Significance-gate thresholds and per-metric variation bands (4.1, 6.5).
+Set conservative initial values with medical input; tune against real telemetry.
+6
+Baseline minimum-N and estimation method per metric class (7.4).
+Clinical sign-off per metric class before launch.
+7
+Whether Review runs synchronously on all outputs or pre-clears internal-only paths (7.5).
+Synchronous on all external outputs; pre-clear internal-only.
+
+Bottom line.  Decisions 1 and 2 unblock the build. The remaining five are tuning and governance choices that can proceed in parallel once the two blockers are settled. Every rule in this document strengthens the constitutional design rather than diluting it: each one closes a place where the Constitution could be honoured in spirit while being violated in practice.
+End of working draft v0.1.

@@ -1,0 +1,4590 @@
+
+
+
+ENG-001: Dynamic Health Model
+Engineering Specification
+Document ID:  ENG-001
+Version:  1.0 (Draft)
+Status:  In Development
+Authority:  BioSense Intelligence Constitution (Documents 1A–1C)
+
+
+Contents
+ TOC \z \o "1-2" \u \hENG-001: Dynamic Health Model	 PAGEREF _Toc234485578 \h 1
+1. Purpose	 PAGEREF _Toc234485579 \h 12
+1.1 Objective	 PAGEREF _Toc234485580 \h 12
+1.2 Scope	 PAGEREF _Toc234485581 \h 12
+1.3 Authority	 PAGEREF _Toc234485582 \h 13
+2. Design Philosophy	 PAGEREF _Toc234485583 \h 13
+2.1 Core Principle	 PAGEREF _Toc234485584 \h 13
+2.2 Engineering Definition	 PAGEREF _Toc234485585 \h 13
+2.3 Why the DHM Exists	 PAGEREF _Toc234485586 \h 14
+3. Architectural Position	 PAGEREF _Toc234485587 \h 14
+4. Engineering Principles	 PAGEREF _Toc234485588 \h 15
+5. Acceptance Criteria (Chapter 1)	 PAGEREF _Toc234485589 \h 18
+Canonical Structure of the Dynamic Health Model	 PAGEREF _Toc234485590 \h 19
+2.1 Purpose	 PAGEREF _Toc234485591 \h 19
+2.2 Design Objectives	 PAGEREF _Toc234485592 \h 19
+2.3 Architectural Overview	 PAGEREF _Toc234485593 \h 19
+2.3a Object Specification Convention	 PAGEREF _Toc234485594 \h 20
+2.4 Identity Domain	 PAGEREF _Toc234485595 \h 20
+2.5 Observation Reference Domain	 PAGEREF _Toc234485596 \h 21
+2.5a Observation Reference Integrity	 PAGEREF _Toc234485597 \h 22
+2.6 Health Belief Domain	 PAGEREF _Toc234485598 \h 22
+2.7 Health Hypothesis Domain	 PAGEREF _Toc234485599 \h 23
+2.8 Health Narrative Domain	 PAGEREF _Toc234485600 \h 24
+2.9 Biological Identity Domain	 PAGEREF _Toc234485601 \h 25
+2.10 Goal Domain	 PAGEREF _Toc234485602 \h 26
+2.11 Confidence Domain	 PAGEREF _Toc234485603 \h 27
+2.11a Status of Health Score & Biological Age	 PAGEREF _Toc234485604 \h 27
+2.12 Recommendation History	 PAGEREF _Toc234485605 \h 28
+2.13 Learning History	 PAGEREF _Toc234485606 \h 28
+2.14 User Preference Domain	 PAGEREF _Toc234485607 \h 29
+2.15 Audit Domain	 PAGEREF _Toc234485608 \h 29
+2.16 Version Metadata	 PAGEREF _Toc234485609 \h 30
+2.17 Domain Relationships	 PAGEREF _Toc234485610 \h 30
+2.17a Relationship Ownership & History Boundaries	 PAGEREF _Toc234485611 \h 31
+2.18 Engineering Constraints	 PAGEREF _Toc234485612 \h 31
+2.19 Acceptance Criteria	 PAGEREF _Toc234485613 \h 32
+State Transitions & Update Lifecycle	 PAGEREF _Toc234485614 \h 33
+3.1 Purpose	 PAGEREF _Toc234485615 \h 33
+3.2 Design Philosophy	 PAGEREF _Toc234485616 \h 33
+3.3 Trigger Events	 PAGEREF _Toc234485617 \h 34
+3.3a Scheduled Review Trigger & Time-Based Decay	 PAGEREF _Toc234485618 \h 35
+3.4 The Update Pipeline	 PAGEREF _Toc234485619 \h 36
+3.5 Types of State Transition	 PAGEREF _Toc234485620 \h 37
+3.6 Belief Promotion	 PAGEREF _Toc234485621 \h 39
+3.6a Constitutional Thresholds Are Named Parameters	 PAGEREF _Toc234485622 \h 40
+3.7 Belief Demotion	 PAGEREF _Toc234485623 \h 40
+3.8 Contradictory Evidence	 PAGEREF _Toc234485624 \h 40
+3.9 Version Creation	 PAGEREF _Toc234485625 \h 41
+3.10 Immutable History	 PAGEREF _Toc234485626 \h 41
+3.11 Atomic Updates	 PAGEREF _Toc234485627 \h 42
+3.12 Concurrent Events	 PAGEREF _Toc234485628 \h 42
+3.12a Concurrency & Session Model	 PAGEREF _Toc234485629 \h 43
+3.13 Learning Without Communication	 PAGEREF _Toc234485630 \h 43
+3.14 Rollback	 PAGEREF _Toc234485631 \h 44
+3.15 Engineering Constraints	 PAGEREF _Toc234485632 \h 44
+3.16 Acceptance Criteria	 PAGEREF _Toc234485633 \h 44
+Belief Engine & Knowledge Representation	 PAGEREF _Toc234485634 \h 46
+4.1 Purpose	 PAGEREF _Toc234485635 \h 46
+4.2 Engineering Philosophy	 PAGEREF _Toc234485636 \h 46
+4.3 What Is A Health Belief?	 PAGEREF _Toc234485637 \h 47
+4.4 Canonical Belief Structure	 PAGEREF _Toc234485638 \h 47
+4.4a Worked Schema Example — Health Belief	 PAGEREF _Toc234485639 \h 49
+4.5 Belief Categories	 PAGEREF _Toc234485640 \h 50
+4.6 Belief Relationships	 PAGEREF _Toc234485641 \h 51
+4.7 Belief Dependencies	 PAGEREF _Toc234485642 \h 51
+4.8 Belief Conflict Resolution	 PAGEREF _Toc234485643 \h 52
+4.9 Belief Lifecycles	 PAGEREF _Toc234485644 \h 52
+4.10 Belief Review	 PAGEREF _Toc234485645 \h 53
+4.11 Belief Expiry	 PAGEREF _Toc234485646 \h 53
+4.12 Belief Explainability	 PAGEREF _Toc234485647 \h 54
+4.13 Belief Reuse	 PAGEREF _Toc234485648 \h 54
+4.14 Engineering Constraints	 PAGEREF _Toc234485649 \h 55
+4.15 Acceptance Criteria	 PAGEREF _Toc234485650 \h 55
+Belief Revision & Evidence Reconciliation	 PAGEREF _Toc234485651 \h 56
+5.1 Purpose	 PAGEREF _Toc234485652 \h 56
+5.2 Design Philosophy	 PAGEREF _Toc234485653 \h 56
+5.3 Triggers for Belief Review	 PAGEREF _Toc234485654 \h 57
+5.4 The Belief Revision Lifecycle	 PAGEREF _Toc234485655 \h 57
+5.5 Possible Revision Outcomes	 PAGEREF _Toc234485656 \h 58
+5.6 Competing Beliefs	 PAGEREF _Toc234485657 \h 60
+5.7 Contradictory Evidence	 PAGEREF _Toc234485658 \h 60
+5.8 Evidence Accumulation	 PAGEREF _Toc234485659 \h 61
+5.9 Scientific Revision	 PAGEREF _Toc234485660 \h 61
+5.10 User Corrections	 PAGEREF _Toc234485661 \h 62
+5.11 Confidence Drift	 PAGEREF _Toc234485662 \h 62
+5.12 Cascading Revision	 PAGEREF _Toc234485663 \h 63
+5.12a Cascade Traversal Rules	 PAGEREF _Toc234485664 \h 63
+5.13 Explainability	 PAGEREF _Toc234485665 \h 64
+5.14 Engineering Constraints	 PAGEREF _Toc234485666 \h 64
+5.15 Acceptance Criteria	 PAGEREF _Toc234485667 \h 65
+Memory Architecture & Knowledge Persistence	 PAGEREF _Toc234485668 \h 66
+6.1 Purpose	 PAGEREF _Toc234485669 \h 66
+6.2 Engineering Philosophy	 PAGEREF _Toc234485670 \h 66
+6.3 Memory Hierarchy	 PAGEREF _Toc234485671 \h 66
+6.4 Working Memory	 PAGEREF _Toc234485672 \h 67
+6.5 Active Knowledge	 PAGEREF _Toc234485673 \h 67
+6.6 Long-Term Identity	 PAGEREF _Toc234485674 \h 68
+6.7 Memory Classification	 PAGEREF _Toc234485675 \h 68
+6.7a Canonical Status Vocabulary & State Reconciliation	 PAGEREF _Toc234485676 \h 69
+6.8 Memory Promotion	 PAGEREF _Toc234485677 \h 69
+6.9 Memory Demotion	 PAGEREF _Toc234485678 \h 70
+6.10 Memory Retrieval	 PAGEREF _Toc234485679 \h 70
+6.11 Memory Reinforcement	 PAGEREF _Toc234485680 \h 71
+6.12 Memory Decay	 PAGEREF _Toc234485681 \h 72
+6.13 Forgetting	 PAGEREF _Toc234485682 \h 72
+6.14 User Memory	 PAGEREF _Toc234485683 \h 73
+6.15 Memory Provenance	 PAGEREF _Toc234485684 \h 73
+6.16 Memory Dependencies	 PAGEREF _Toc234485685 \h 74
+6.17 Memory Lifecycle	 PAGEREF _Toc234485686 \h 74
+6.18 Engineering Constraints	 PAGEREF _Toc234485687 \h 75
+6.19 Acceptance Criteria	 PAGEREF _Toc234485688 \h 75
+Engine Integration & System Orchestration	 PAGEREF _Toc234485689 \h 77
+7.1 Purpose	 PAGEREF _Toc234485690 \h 77
+7.2 Architectural Philosophy	 PAGEREF _Toc234485691 \h 77
+7.3 Canonical Architecture	 PAGEREF _Toc234485692 \h 77
+7.4 Observation Engine	 PAGEREF _Toc234485693 \h 78
+7.5 Confidence Engine	 PAGEREF _Toc234485694 \h 79
+7.6 Recommendation Engine	 PAGEREF _Toc234485695 \h 80
+7.7 Health Score Engine	 PAGEREF _Toc234485696 \h 80
+7.8 Biological Age Engine	 PAGEREF _Toc234485697 \h 81
+7.9 Conversation Engine	 PAGEREF _Toc234485698 \h 81
+7.10 Learning Engine	 PAGEREF _Toc234485699 \h 82
+7.11 Reporting Engine	 PAGEREF _Toc234485700 \h 82
+7.12 Notification Engine	 PAGEREF _Toc234485701 \h 83
+7.13 Prediction Engine	 PAGEREF _Toc234485702 \h 83
+7.14 Future Engines	 PAGEREF _Toc234485703 \h 84
+7.15 Engine Communication Rules	 PAGEREF _Toc234485704 \h 84
+7.16 Engine Independence	 PAGEREF _Toc234485705 \h 85
+7.17 Integration Sequence	 PAGEREF _Toc234485706 \h 85
+7.18 Engineering Constraints	 PAGEREF _Toc234485707 \h 86
+7.19 Acceptance Criteria	 PAGEREF _Toc234485708 \h 86
+8.1 Purpose	 PAGEREF _Toc234485709 \h 87
+8.2 Engineering Philosophy	 PAGEREF _Toc234485710 \h 87
+8.3 Types of Uncertainty	 PAGEREF _Toc234485711 \h 88
+8.4 Knowledge Gaps	 PAGEREF _Toc234485712 \h 89
+8.5 Gap Prioritisation	 PAGEREF _Toc234485713 \h 90
+8.6 Knowledge Coverage	 PAGEREF _Toc234485714 \h 91
+8.7 Learning Opportunities	 PAGEREF _Toc234485715 \h 91
+8.8 Evidence Value	 PAGEREF _Toc234485716 \h 92
+8.9 Uncertainty Reduction	 PAGEREF _Toc234485717 \h 92
+8.10 Persistent Unknowns	 PAGEREF _Toc234485718 \h 93
+8.11 User Transparency	 PAGEREF _Toc234485719 \h 93
+8.12 Knowledge Gap Lifecycle	 PAGEREF _Toc234485720 \h 93
+8.13 Engineering Constraints	 PAGEREF _Toc234485721 \h 94
+8.14 Acceptance Criteria	 PAGEREF _Toc234485722 \h 94
+Discovery Engine & Knowledge Formation	 PAGEREF _Toc234485723 \h 96
+9.1 Purpose	 PAGEREF _Toc234485724 \h 96
+9.2 Engineering Philosophy	 PAGEREF _Toc234485725 \h 96
+9.3 Definition of a Discovery	 PAGEREF _Toc234485726 \h 97
+9.4 Discovery Characteristics	 PAGEREF _Toc234485727 \h 97
+9.5 Discovery Lifecycle	 PAGEREF _Toc234485728 \h 98
+9.6 Candidate Discoveries	 PAGEREF _Toc234485729 \h 99
+9.7 Discovery Validation	 PAGEREF _Toc234485730 \h 99
+9.8 Discovery Categories	 PAGEREF _Toc234485731 \h 100
+9.9 Discovery Relationships	 PAGEREF _Toc234485732 \h 101
+9.10 Discovery Importance	 PAGEREF _Toc234485733 \h 101
+9.11 Discovery Persistence	 PAGEREF _Toc234485734 \h 101
+9.12 Discovery Communication	 PAGEREF _Toc234485735 \h 102
+9.13 Discovery Provenance	 PAGEREF _Toc234485736 \h 102
+9.14 Discovery Review	 PAGEREF _Toc234485737 \h 103
+9.15 Discovery Reuse	 PAGEREF _Toc234485738 \h 103
+9.16 Engineering Constraints	 PAGEREF _Toc234485739 \h 104
+9.17 Acceptance Criteria	 PAGEREF _Toc234485740 \h 104
+Confidence Engine & Confidence Architecture	 PAGEREF _Toc234485741 \h 105
+10.1 Purpose	 PAGEREF _Toc234485742 \h 105
+10.2 Engineering Philosophy	 PAGEREF _Toc234485743 \h 105
+10.3 Confidence Object	 PAGEREF _Toc234485744 \h 106
+10.4 Confidence Levels	 PAGEREF _Toc234485745 \h 107
+10.5 Confidence Inputs	 PAGEREF _Toc234485746 \h 108
+10.5a Confidence Computation Contract	 PAGEREF _Toc234485747 \h 109
+10.6 Confidence Propagation	 PAGEREF _Toc234485748 \h 109
+10.7 Confidence Inheritance	 PAGEREF _Toc234485749 \h 110
+10.8 Confidence Decay	 PAGEREF _Toc234485750 \h 111
+10.9 Confidence Reinforcement	 PAGEREF _Toc234485751 \h 111
+10.10 Confidence Reduction	 PAGEREF _Toc234485752 \h 111
+10.11 Confidence Conflict	 PAGEREF _Toc234485753 \h 112
+10.12 Confidence Calibration	 PAGEREF _Toc234485754 \h 112
+10.13 Confidence Explainability	 PAGEREF _Toc234485755 \h 113
+10.14 Confidence Consumers	 PAGEREF _Toc234485756 \h 113
+10.15 Engineering Constraints	 PAGEREF _Toc234485757 \h 114
+10.16 Acceptance Criteria	 PAGEREF _Toc234485758 \h 114
+Health Narrative Engine	 PAGEREF _Toc234485759 \h 115
+11.1 Purpose	 PAGEREF _Toc234485760 \h 115
+11.2 Engineering Philosophy	 PAGEREF _Toc234485761 \h 115
+11.3 Definition	 PAGEREF _Toc234485762 \h 116
+11.4 Narrative Domains	 PAGEREF _Toc234485763 \h 116
+11.5 Narrative Composition	 PAGEREF _Toc234485764 \h 117
+11.6 Narrative Formation	 PAGEREF _Toc234485765 \h 118
+11.7 Narrative Evolution	 PAGEREF _Toc234485766 \h 119
+11.8 Narrative Dependencies	 PAGEREF _Toc234485767 \h 119
+11.9 Narrative Conflict	 PAGEREF _Toc234485768 \h 120
+11.10 Narrative Prioritisation	 PAGEREF _Toc234485769 \h 120
+11.11 Narrative Persistence	 PAGEREF _Toc234485770 \h 121
+11.12 Narrative Consumers	 PAGEREF _Toc234485771 \h 121
+11.13 Narrative Explainability	 PAGEREF _Toc234485772 \h 122
+11.14 Narrative Revision	 PAGEREF _Toc234485773 \h 122
+11.15 Engineering Constraints	 PAGEREF _Toc234485774 \h 122
+11.16 Acceptance Criteria	 PAGEREF _Toc234485775 \h 123
+Biological Identity Engine	 PAGEREF _Toc234485776 \h 124
+12.1 Purpose	 PAGEREF _Toc234485777 \h 124
+12.2 Engineering Philosophy	 PAGEREF _Toc234485778 \h 124
+12.3 Definition	 PAGEREF _Toc234485779 \h 125
+12.4 Identity Domains	 PAGEREF _Toc234485780 \h 125
+12.5 Identity Objects	 PAGEREF _Toc234485781 \h 127
+12.6 Identity Formation	 PAGEREF _Toc234485782 \h 128
+12.7 Identity Stability	 PAGEREF _Toc234485783 \h 129
+12.8 Identity Revision	 PAGEREF _Toc234485784 \h 129
+12.9 Identity Relationships	 PAGEREF _Toc234485785 \h 130
+12.10 Identity Consumers	 PAGEREF _Toc234485786 \h 130
+12.11 Identity Explainability	 PAGEREF _Toc234485787 \h 131
+12.12 Identity Lifecycle	 PAGEREF _Toc234485788 \h 131
+12.13 Identity Persistence	 PAGEREF _Toc234485789 \h 131
+12.14 Engineering Constraints	 PAGEREF _Toc234485790 \h 132
+12.15 Acceptance Criteria	 PAGEREF _Toc234485791 \h 132
+Prioritisation Engine & Attention Management	 PAGEREF _Toc234485792 \h 133
+13.1 Purpose	 PAGEREF _Toc234485793 \h 133
+13.2 Engineering Philosophy	 PAGEREF _Toc234485794 \h 133
+13.3 Attention Objects	 PAGEREF _Toc234485795 \h 134
+13.4 Attention Profile	 PAGEREF _Toc234485796 \h 134
+13.5 Priority Levels	 PAGEREF _Toc234485797 \h 135
+13.6 Priority Factors	 PAGEREF _Toc234485798 \h 136
+13.7 Dynamic Prioritisation	 PAGEREF _Toc234485799 \h 136
+13.8 Competing Priorities	 PAGEREF _Toc234485800 \h 137
+13.9 Priority Cascades	 PAGEREF _Toc234485801 \h 137
+13.10 Opportunity Scoring	 PAGEREF _Toc234485802 \h 138
+13.11 Goal Interaction	 PAGEREF _Toc234485803 \h 138
+13.12 User Attention Budget	 PAGEREF _Toc234485804 \h 138
+13.13 Attention Persistence	 PAGEREF _Toc234485805 \h 139
+13.14 Explainability	 PAGEREF _Toc234485806 \h 139
+13.15 Engineering Constraints	 PAGEREF _Toc234485807 \h 140
+13.16 Acceptance Criteria	 PAGEREF _Toc234485808 \h 140
+DHM Query Engine & Knowledge Retrieval	 PAGEREF _Toc234485809 \h 141
+14.1 Purpose	 PAGEREF _Toc234485810 \h 141
+14.2 Engineering Philosophy	 PAGEREF _Toc234485811 \h 141
+14.3 Query Categories	 PAGEREF _Toc234485812 \h 142
+14.4 Query Response Object	 PAGEREF _Toc234485813 \h 144
+14.5 Context-Aware Retrieval	 PAGEREF _Toc234485814 \h 145
+14.6 Retrieval Principles	 PAGEREF _Toc234485815 \h 146
+14.7 Explainable Retrieval	 PAGEREF _Toc234485816 \h 147
+14.8 Query Optimisation	 PAGEREF _Toc234485817 \h 147
+14.8a Cache Scope & Invalidation	 PAGEREF _Toc234485818 \h 148
+14.9 Permission Boundaries	 PAGEREF _Toc234485819 \h 148
+14.9a Access-Control Model	 PAGEREF _Toc234485820 \h 149
+14.10 Failure Handling	 PAGEREF _Toc234485821 \h 149
+14.11 Engineering Constraints	 PAGEREF _Toc234485822 \h 149
+14.12 Acceptance Criteria	 PAGEREF _Toc234485823 \h 150
+Governance, Auditability & Version Control	 PAGEREF _Toc234485824 \h 151
+15.1 Purpose	 PAGEREF _Toc234485825 \h 151
+15.2 Engineering Philosophy	 PAGEREF _Toc234485826 \h 151
+15.3 Governance Objectives	 PAGEREF _Toc234485827 \h 152
+15.4 Versioning Strategy	 PAGEREF _Toc234485828 \h 152
+15.4a Version Identifier Scheme	 PAGEREF _Toc234485829 \h 154
+15.5 Audit Events	 PAGEREF _Toc234485830 \h 154
+15.6 Audit Record Structure	 PAGEREF _Toc234485831 \h 154
+15.7 Explainability Requirements	 PAGEREF _Toc234485832 \h 156
+15.8 Rollback Strategy	 PAGEREF _Toc234485833 \h 156
+15.9 Constitutional Compliance	 PAGEREF _Toc234485834 \h 157
+15.10 Scientific Evolution	 PAGEREF _Toc234485835 \h 157
+15.11 User Transparency	 PAGEREF _Toc234485836 \h 158
+15.12 Enterprise Governance	 PAGEREF _Toc234485837 \h 158
+15.13 Engineering Constraints	 PAGEREF _Toc234485838 \h 158
+15.14 Acceptance Criteria	 PAGEREF _Toc234485839 \h 159
+End-to-End Dynamic Health Model Lifecycle	 PAGEREF _Toc234485840 \h 160
+16.1 Purpose	 PAGEREF _Toc234485841 \h 160
+16.2 Introducing the User	 PAGEREF _Toc234485842 \h 160
+16.3 Week One	 PAGEREF _Toc234485843 \h 161
+16.4 Month One	 PAGEREF _Toc234485844 \h 162
+16.5 Month Three	 PAGEREF _Toc234485845 \h 163
+16.6 Month Six	 PAGEREF _Toc234485846 \h 163
+16.7 Year One	 PAGEREF _Toc234485847 \h 164
+16.8 Year Two	 PAGEREF _Toc234485848 \h 165
+16.9 Year Three	 PAGEREF _Toc234485849 \h 165
+16.10 Scientific Evolution	 PAGEREF _Toc234485850 \h 166
+16.11 User Correction	 PAGEREF _Toc234485851 \h 166
+16.12 Recommendation Evolution	 PAGEREF _Toc234485852 \h 167
+16.13 Health Score Evolution	 PAGEREF _Toc234485853 \h 167
+16.14 Biological Age Evolution	 PAGEREF _Toc234485854 \h 167
+16.15 Five Years Later	 PAGEREF _Toc234485855 \h 168
+16.16 What Happens If Alex Leaves?	 PAGEREF _Toc234485856 \h 168
+16.17 Engineering Validation	 PAGEREF _Toc234485857 \h 169
+		
+
+
+1. Purpose
+1.1 Objective
+This specification defines the engineering architecture of the Dynamic Health Model (DHM).
+The DHM is the central intelligence object of the BioSense platform.
+Every personalised decision made by BioSense shall ultimately originate from, update, or reference the Dynamic Health Model.
+Where the BioSense Intelligence Constitution defines the philosophy governing the Dynamic Health Model, this document defines the engineering requirements necessary to implement it.
+This specification is intended for software engineers, AI engineers, solution architects and future technical contributors responsible for building or maintaining the BioSense Intelligence Engine.
+
+1.2 Scope
+This document defines:
+The purpose of the DHM 
+Internal architecture 
+State management 
+Belief representation 
+Update mechanisms 
+Confidence storage 
+Versioning 
+Learning behaviour 
+Relationships with other BioSense engines 
+Engineering rules 
+Acceptance criteria 
+This document deliberately excludes:
+Database implementation 
+Programming language 
+Infrastructure 
+APIs 
+Prompt engineering 
+User Interface 
+Deployment architecture 
+Those subjects are covered by separate engineering specifications.
+
+1.3 Authority
+The Dynamic Health Model is governed by the BioSense Intelligence Constitution.
+If any implementation conflicts with the Constitution:
+The Constitution always takes precedence.
+
+2. Design Philosophy
+2.1 Core Principle
+The Dynamic Health Model is not a database.
+It is not a cache.
+It is not a patient record.
+It is BioSense's living representation of everything it currently believes about one individual.
+That distinction governs every engineering decision contained within this specification.
+
+2.2 Engineering Definition
+For engineering purposes, the Dynamic Health Model is defined as:
+A continuously evolving, version-controlled, evidence-backed belief system representing BioSense's current understanding of an individual's health.
+Every word matters.
+Continuously evolving
+The DHM is updated after every meaningful interaction.
+Version-controlled
+Historical understanding must remain recoverable.
+Evidence-backed
+Every belief must be traceable to supporting evidence.
+Belief system
+The DHM stores interpretations, not merely observations.
+Current understanding
+The DHM always represents BioSense's latest validated understanding.
+
+2.3 Why the DHM Exists
+Without a Dynamic Health Model, every interaction becomes independent.
+The AI would repeatedly analyse isolated observations without retaining meaningful understanding.
+The DHM prevents this.
+It enables BioSense to:
+remember, 
+learn, 
+personalise, 
+identify trends, 
+revise beliefs, 
+improve recommendations, 
+improve confidence, 
+become progressively more useful over time. 
+The DHM therefore transforms BioSense from a reactive analysis tool into a longitudinal health intelligence system.
+
+3. Architectural Position
+The DHM occupies the centre of the BioSense Intelligence Engine.
+Every subsystem contributes to it or consumes information from it.
+Conceptually:
+ Wearables ─────────────┐
+ Blood Analysis ────────┤
+ Nutrition ─────────────┤
+ Daily Check-In ────────┤
+ Medical Records ───────┤
+ Learning Mode ─────────┤
+ Conversation Engine ───┤
+                         ▼
+              Dynamic Health Model
+                         │
+         ┌───────────────┼────────────────┐
+         ▼               ▼                ▼
+ Health Score     Biological Age   Recommendation Engine
+         ▼               ▼                ▼
+       Reports      Notifications     AI Conversations
+The Dynamic Health Model is therefore the single source of personalised intelligence within BioSense.
+No subsystem should maintain its own independent interpretation of the user's health.
+
+4. Engineering Principles
+Every implementation of the Dynamic Health Model shall satisfy the following principles.
+
+Principle 1 — The DHM Stores Beliefs, Not Facts
+Observations are stored separately.
+The DHM stores BioSense's interpretation of those observations.
+Example:
+Observation
+Ferritin = 24 µg/L.
+Belief
+"The individual demonstrates a sustained decline in iron stores."
+These are fundamentally different.
+The Observation Store preserves objective truth.
+The DHM preserves interpreted understanding.
+
+Principle 2 — Every Belief Requires Evidence
+No belief may exist without supporting evidence.
+Every belief must maintain references to:
+originating observations, 
+supporting observations, 
+scientific rationale, 
+confidence, 
+creation date, 
+latest review, 
+revision history. 
+A belief without traceability is constitutionally invalid.
+
+Principle 3 — History Is Never Destroyed
+The DHM evolves.
+It never overwrites previous understanding.
+Whenever a belief changes:
+the previous version remains archived, 
+the reason for change is recorded, 
+the new belief becomes active. 
+This creates a complete audit trail.
+
+Principle 4 — Confidence Belongs to Beliefs
+Confidence is never attached to raw observations.
+Raw observations simply exist.
+Confidence describes BioSense's certainty in its interpretation.
+Example:
+Observation:
+Resting Heart Rate = 61 bpm.
+Confidence:
+None.
+Belief:
+"The individual's cardiovascular recovery has improved."
+Confidence:
+87%.
+
+Principle 5 — The DHM Learns Continuously
+Every meaningful interaction is evaluated.
+Possible outcomes include:
+Create a new belief. 
+Strengthen an existing belief. 
+Weaken an existing belief. 
+Retire an obsolete belief. 
+Increase confidence. 
+Decrease confidence. 
+Make no change. 
+"No change" is a valid engineering outcome.
+
+Principle 6 — Silence Is Valid
+Not every new observation changes understanding.
+For example:
+A single poor night's sleep may update the Observation Store but produce no change to the DHM because it does not materially alter BioSense's long-term understanding.
+This prevents unnecessary volatility.
+
+Principle 7 — One User, One Model
+Every user has exactly one Dynamic Health Model.
+All reasoning engines interact with this single model.
+No subsystem shall maintain competing versions of user understanding.
+This guarantees consistency across the platform.
+
+5. Acceptance Criteria (Chapter 1)
+This chapter shall be considered correctly implemented when:
+The DHM is recognised as a belief system rather than a data store. 
+Every engineer can distinguish observations from beliefs. 
+Every belief is evidence-backed and traceable. 
+Historical versions are preserved. 
+Confidence is associated only with interpreted understanding. 
+Every subsystem references the same Dynamic Health Model. 
+The Constitution remains the governing authority for all implementation decisions.
+Chapter 2
+Canonical Structure of the Dynamic Health Model
+
+2.1 Purpose
+The purpose of this chapter is to define the canonical internal structure of the Dynamic Health Model (DHM).
+The DHM represents BioSense's complete understanding of an individual at a given moment in time.
+Every subsystem interacting with BioSense shall read from, write to, or reference this structure.
+The DHM shall remain implementation-independent.
+Whether stored in relational databases, graph databases, document stores or future technologies, the logical structure defined within this specification shall remain unchanged.
+
+2.2 Design Objectives
+The structure of the DHM shall satisfy the following objectives:
+Represent current understanding. 
+Preserve historical evolution. 
+Support explainable reasoning. 
+Enable continuous learning. 
+Allow confidence tracking. 
+Separate observations from interpretation. 
+Support future expansion without redesign. 
+Remain understandable by engineers and clinicians. 
+
+2.3 Architectural Overview
+Conceptually, the Dynamic Health Model consists of multiple interconnected domains rather than one flat record.
+Dynamic Health Model
+│
+├── Identity
+├── Observation References
+├── Health Beliefs
+├── Health Hypotheses
+├── Health Narratives
+├── Biological Identity
+├── Goals
+├── Confidence Layer
+├── Recommendation History
+├── Learning History
+├── User Preferences
+├── Audit Trail
+└── Version Metadata
+Each domain serves a distinct engineering purpose.
+No domain should duplicate information already represented elsewhere.
+
+2.3a Object Specification Convention
+Every domain object in this chapter is described by attribute names only. Names are not an implementable schema. A normative Data Dictionary shall therefore accompany this specification and define, for every attribute of every object, its data type, cardinality (1:1 or 1:N), whether it is required, its permitted value set, and an example.
+Until that dictionary is ratified the following conventions are binding: identifiers are opaque strings; dates are ISO-8601 timestamps; any attribute named 'Evidence', 'Supporting …' or 'Related …' is a list of typed references, each carrying the referent's object type and version, never free text; and 'Confidence Score' denotes the structured Confidence Object of Chapter 10, not a bare number.
+Engineering Rule
+No object may be implemented from attribute names alone. An attribute with no Data Dictionary entry has no defined type and shall not be relied upon across engines.
+2.4 Identity Domain
+Purpose
+Stores immutable information required to uniquely identify the health model.
+Examples include:
+User ID 
+Date Created 
+Current Model Version 
+Chronological Age 
+Sex 
+Country / Region (where relevant) 
+Time Zone 
+Preferred Language 
+Identity information should rarely change.
+When changes occur, previous values should remain recoverable through version history.
+
+Engineering Rule
+Identity data shall not contain health interpretations.
+It exists solely to identify the owner of the model.
+
+2.5 Observation Reference Domain
+Purpose
+The DHM does not duplicate raw observations.
+Instead, it stores references to validated observations held within the Observation Store.
+Examples:
+Blood Results
+Wearable Data
+Nutrition Logs
+Questionnaire Responses
+Medical Documents
+Exercise Sessions
+Sleep Records
+Daily Check-ins
+Future integrations
+The Observation Store remains the source of objective truth.
+The DHM stores only the relationships required for reasoning.
+
+Constitutional Principle
+Facts live in the Observation Store. Understanding lives in the DHM.
+
+2.5a Observation Reference Integrity
+References into the Observation Store are pinned to an immutable observation version, so a belief's cited evidence cannot change silently beneath it. Observations are corrected by appending a new version, never by mutating an existing one.
+When an observation is corrected, superseded or withdrawn — including user correction (5.10) and any right-to-erasure deletion — every belief, hypothesis and narrative that references it shall automatically enter review (4.7, 5.12a). Erasure removes the referent's content while preserving a reference shell and an audit record that erasure occurred, so dependent reasoning is re-evaluated rather than left resting on evidence that no longer exists.
+Engineering Rule
+A belief may never reference an observation version that can change. If a referent is withdrawn, dependent beliefs are reviewed — never silently retained.
+2.6 Health Belief Domain
+Purpose
+The Health Belief Domain contains BioSense's current interpreted understanding of the individual's health.
+Examples:
+Recovery is improving. 
+Sleep consistency is poor. 
+Iron stores are gradually declining. 
+Cardiovascular fitness is improving. 
+Chronic stress appears elevated. 
+Each Health Belief represents BioSense's current best understanding.
+Health Beliefs are:
+evidence-backed, 
+explainable, 
+confidence-weighted, 
+continuously revisable. 
+
+Every Health Belief shall contain:
+Unique Identifier
+Current Status
+Description
+Supporting Evidence
+Scientific Rationale
+Confidence Score
+Creation Date
+Last Updated
+Revision History
+Current Reviewer (AI Version)
+Associated Health Narratives (many-to-many: a belief may participate in several narratives; see 2.17a)
+Associated Goals
+Associated Recommendations
+
+Engineering Rule
+Health Beliefs shall never exist without supporting evidence.
+
+2.7 Health Hypothesis Domain
+Purpose
+Stores explanations that remain under evaluation.
+Unlike Health Beliefs, hypotheses have not yet accumulated sufficient evidence to become accepted understanding.
+Examples:
+Possible iron deficiency developing.
+Potential sleep debt.
+Possible overtraining.
+Possible dehydration pattern.
+Each hypothesis shall contain:
+Hypothesis ID
+Current Confidence
+Supporting Evidence
+Conflicting Evidence
+Outstanding Questions
+Recommended Next Evidence
+Current Status
+Statuses include:
+Active
+Strengthening
+Weakening
+Rejected
+Confirmed as Belief
+Archived
+
+Engineering Rule
+A hypothesis shall never automatically become a belief.
+Promotion requires explicit evidence-based evaluation.
+
+2.8 Health Narrative Domain
+Purpose
+Health Narratives represent BioSense's integrated explanation of how multiple Health Beliefs relate to one another.
+Examples:
+Recovery Narrative
+Cardiovascular Narrative
+Metabolic Narrative
+Sleep Narrative
+Inflammation Narrative
+Mental Wellbeing Narrative
+Health Narratives exist to explain systems rather than isolated findings.
+
+Each narrative shall contain:
+Narrative ID
+Title
+Summary
+Supporting Beliefs
+Supporting Observations
+Confidence
+Scientific Explanation
+Current Direction
+Priority
+Historical Evolution
+
+Constitutional Principle
+Narratives explain biology. Beliefs explain observations.
+
+2.9 Biological Identity Domain
+Purpose
+Represents BioSense's long-term understanding of how this individual typically functions.
+Examples include:
+Typical HRV behaviour
+Exercise adaptation
+Stress resilience
+Sleep resilience
+Recovery characteristics
+Inflammatory profile
+Metabolic flexibility
+Nutrition response
+Supplement response
+Behavioural consistency
+Unlike Health Beliefs, Biological Identity evolves slowly.
+It represents enduring characteristics.
+
+Engineering Rule
+Biological Identity shall require prolonged evidence before modification.
+
+2.10 Goal Domain
+Purpose
+Stores the individual's declared objectives.
+Examples:
+Lose weight
+Increase muscle
+Improve cholesterol
+Improve fertility
+Complete marathon
+Reduce Biological Age
+Healthy ageing
+Goals influence:
+prioritisation,
+question generation,
+education,
+recommendations.
+Goals never alter scientific interpretation.
+
+2.11 Confidence Domain
+Purpose
+Centralises confidence information across the DHM.
+Confidence exists independently from observations.
+Confidence applies to:
+Beliefs
+Hypotheses
+Narratives
+Biological Identity
+Health Score
+Biological Age
+Recommendations
+The Confidence Engine shall maintain all confidence calculations.
+The DHM stores only the current state.
+
+2.11a Status of Health Score & Biological Age
+Recommended resolution, to be confirmed: Health Score and Biological Age are derived engine outputs, not stored DHM domains. They are computed on demand by their engines (7.7, 7.8) from DHM understanding, carry their own Confidence Object (hence their appearance in this section), and are cached under the Query Engine's version-keyed invalidation (14.8) rather than persisted as first-class beliefs. They may be recorded in history as computed snapshots for longitudinal reporting, but are never authored or revised directly — which is why they do not appear among the domains listed in 2.3.
+Engineering Rule
+Read all references to Health Score and Biological Age in 2.11, 5.12, 6.16, 7.7 and 7.8 consistently with this: derived and confidence-bearing — computed and cached, not stored and edited. Each computed snapshot additionally records its method version (7.7/7.8) so the derived value is reproducible.
+2.12 Recommendation History
+Purpose
+Records every recommendation ever generated.
+Including:
+Recommendation
+Supporting Belief
+Reason
+Evidence
+Date
+Outcome
+User Response
+Completion Status
+Clinical Escalation
+This enables BioSense to learn which interventions are effective for the individual.
+
+2.13 Learning History
+Purpose
+Maintains a chronological record of how the Dynamic Health Model has evolved.
+Every meaningful update shall record:
+Trigger
+Previous State
+New State
+Reason
+Evidence
+Confidence Change
+Affected Domains
+AI Version
+Timestamp
+This creates complete explainability.
+
+2.14 User Preference Domain
+Stores stable preferences relevant to personalisation.
+Examples:
+Communication style
+Preferred units
+Dietary preferences
+Exercise preferences
+Notification preferences
+Learning preferences
+Language
+Accessibility settings
+Preferences influence presentation.
+Never scientific reasoning.
+
+2.15 Audit Domain
+Every significant DHM modification shall be auditable.
+Audit records include:
+Timestamp
+Originating Engine
+Previous State
+New State
+Evidence Used
+Reviewer Version
+Constitution Version
+No modification shall occur without traceability.
+
+2.16 Version Metadata
+Every DHM shall maintain version metadata including:
+Current Version
+Previous Version
+Reason for Update
+AI Version
+Constitution Version
+Engineering Version
+Schema Version
+This enables historical reconstruction of any reasoning process.
+
+2.17 Domain Relationships
+The domains are not independent.
+Example:
+Observation
+↓
+Health Hypothesis
+↓
+Health Belief
+↓
+Health Narrative
+↓
+Biological Identity
+↓
+Recommendation
+↓
+Learning History
+↓
+Updated Dynamic Health Model
+This relationship represents the canonical evolution of understanding.
+
+2.17a Relationship Ownership & History Boundaries
+The 'no duplication' objective (2.3, 2.18) forbids two writable copies of the same fact, not relationships. For every relationship, exactly one side is authoritative (the owning side) and the inverse is derived, not independently edited. For belief↔narrative, the narrative's 'Supporting Beliefs' list is authoritative and a belief's 'Linked Narratives' is its derived inverse.
+The three historical records serve distinct, non-overlapping purposes and shall not copy one another: a per-object Revision History records how a single object changed; the Learning History (2.13) records DHM-level state transitions; the Audit Domain (2.15) records who, what and which versions performed each change for governance. Where they concern the same event they reference it, they do not duplicate it.
+Engineering Rule
+Every relationship names its owning side; inverse links are computed, never separately maintained.
+2.18 Engineering Constraints
+The Dynamic Health Model shall:
+avoid duplicated information, 
+separate observations from beliefs, 
+preserve version history, 
+support explainability, 
+support future domains, 
+remain extensible, 
+remain model-independent. 
+No subsystem may modify the DHM outside the update rules defined later in this specification.
+
+On Acceptance Criteria
+Acceptance criteria throughout this specification shall be expressed as objective, automatable assertions, not comprehension goals. 'Every engineer understands the structure' is an onboarding aim, not a test. Each criterion should be restated in verifiable form — for example, 'the schema validator accepts a conformant object and rejects one missing a state-required attribute', or 'a cascade over the dependency graph provably terminates within CASCADE_MAX_DEPTH'.
+Engineering Rule
+A criterion that cannot be checked by a test or a defined inspection is not an acceptance criterion. This applies to the acceptance sections of every chapter.
+2.19 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Every engineer understands the logical structure of the DHM.
+✓ Every domain has a clearly defined purpose.
+✓ No information is duplicated unnecessarily.
+✓ Raw observations remain separated from interpreted understanding.
+✓ The model supports continuous learning.
+✓ Every belief, narrative and recommendation is traceable.
+✓ Future domains can be added without redesigning the architecture.
+Chapter 3
+State Transitions & Update Lifecycle
+
+3.1 Purpose
+The purpose of this chapter is to define the constitutional lifecycle governing every modification made to the Dynamic Health Model (DHM).
+The DHM shall never be modified directly.
+Instead, every modification shall occur through a controlled update lifecycle that preserves:
+explainability, 
+traceability, 
+version history, 
+scientific integrity, 
+constitutional compliance. 
+This ensures every change to BioSense's understanding can be reconstructed, explained and audited.
+
+3.2 Design Philosophy
+The Dynamic Health Model is not edited.
+It evolves.
+Every new observation is treated as an opportunity to improve understanding rather than overwrite previous knowledge.
+Consequently, every update shall represent a transition between two clearly defined belief states.
+
+Constitutional Principle
+The DHM never jumps. It transitions.
+
+3.3 Trigger Events
+A DHM update may only begin following a recognised trigger event.
+Approved trigger events include:
+New Blood Test
+Laboratory biomarkers.
+
+Wearable Synchronisation
+Sleep.
+Recovery.
+HRV.
+Heart Rate.
+Activity.
+Temperature.
+Future wearable metrics.
+
+Learning Mode
+User answers new questions.
+
+Daily Check-In
+Mood.
+Symptoms.
+Energy.
+Stress.
+Recovery.
+
+Medical Documentation
+Medical letters.
+Diagnoses.
+Prescriptions.
+Imaging.
+
+Goal Update
+New goal.
+Goal completed.
+Goal removed.
+Priority changed.
+
+User Correction
+The user disputes previous understanding.
+
+Recommendation Outcome
+The user confirms whether a recommendation was successful.
+
+Manual Clinical Review
+Future clinician validation.
+
+Future Approved Sources
+The architecture intentionally remains extensible.
+
+Engineering Rule
+No DHM update may occur without a recognised trigger. This section is the single canonical trigger registry: every trigger referenced elsewhere in this specification — including Scientific Library updates (5.3, 5.9) and the Scheduled Review trigger (3.3a) — shall be listed here and shall not be introduced independently in another chapter.
+
+3.3a Scheduled Review Trigger & Time-Based Decay
+Confidence and memory decay over time without new evidence (5.11, 6.12, 10.8), so time itself is a recognised trigger. The canonical registry (3.3) therefore includes a Scheduled Review trigger: a periodic, system-generated event, per individual and per object class, under which the Confidence Engine re-evaluates ageing beliefs and confidence objects.
+Decay shall be implemented one way platform-wide, not mixed: either eagerly (the Scheduled Review trigger writes a new version when decay changes a value) or lazily (decay is computed at read time and materialised on the next genuine update). Decay rate is DECAY_HALF_LIFE per object class (value to be confirmed).
+Engineering Rule
+This reconciles 3.3 ('no update without a trigger') with time-based decay: the passage of time is expressed as the Scheduled Review trigger, never as an untriggered mutation.
+3.4 The Update Pipeline
+Every trigger event shall follow the same constitutional pipeline.
+Trigger Event
+      │
+      ▼
+Observation Validation
+      │
+      ▼
+Canonical Translation
+      │
+      ▼
+Scientific Interpretation
+      │
+      ▼
+Personal Context
+      │
+      ▼
+Relationship Analysis
+      │
+      ▼
+Hypothesis Evaluation
+      │
+      ▼
+Confidence Review
+      │
+      ▼
+State Transition Decision
+      │
+      ▼
+Constitutional Review
+      │
+      ▼
+Commit New DHM Version
+No stage may be skipped.
+
+3.5 Types of State Transition
+Every update shall result in one or more transition types, all committed together within a single reasoning session (see 3.12a). A session that merges several triggers, or that cascades across dependent beliefs, may legitimately produce several transition types within one atomic commit.
+
+Type 1 — No Change
+New evidence does not materially alter BioSense's understanding.
+Examples:
+One poor night's sleep.
+Small HRV fluctuation.
+Single workout.
+Temporary travel disruption.
+Outcome:
+Observation stored.
+DHM unchanged.
+
+Constitutional Principle
+New information does not always create new understanding.
+
+Type 2 — Confidence Strengthened
+Understanding remains unchanged.
+Confidence increases.
+Example:
+Existing belief:
+Recovery improves with 8+ hours of sleep.
+Three further observations support it.
+Belief unchanged.
+Confidence increases.
+
+Type 3 — Confidence Reduced
+Contradictory evidence weakens confidence.
+The belief remains active.
+Further evidence required.
+
+Type 4 — Belief Updated
+Existing understanding evolves.
+Example:
+Initial belief:
+Sleep consistency is improving.
+Updated belief:
+Sleep consistency has plateaued.
+
+Type 5 — New Belief Created
+New evidence supports an entirely new understanding.
+Example:
+Repeated blood tests reveal progressive iron depletion.
+A new Health Belief is created.
+
+Type 6 — Belief Retired
+Existing understanding is no longer supported.
+Example:
+A previously suspected inflammatory pattern disappears after twelve months of normal biomarkers.
+The belief is retired.
+Historical versions remain archived.
+
+Type 7 — Narrative Updated
+Multiple beliefs combine to alter a higher-level Health Narrative.
+Example:
+Recovery.
+Sleep.
+Training.
+Nutrition.
+Together produce a new Recovery Narrative.
+
+Type 8 — Biological Identity Updated
+The slowest transition.
+Requires prolonged evidence.
+Examples:
+Exercise resilience.
+Sleep chronotype.
+Stress resilience.
+Recovery profile.
+These should change rarely.
+
+3.6 Belief Promotion
+Not every hypothesis becomes a belief.
+Promotion requires:
+sufficient evidence, 
+scientific plausibility, 
+repeated validation, 
+constitutional review. 
+Only then may a hypothesis enter the Health Belief Domain.
+
+Engineering Rule
+Hypotheses shall never bypass promotion rules.
+
+3.6a Constitutional Thresholds Are Named Parameters
+Wherever this specification states a qualitative decision boundary — 'sufficient evidence', 'prolonged evidence', 'materially', 'significantly', 'overwhelming' — that boundary shall be implemented as a named, versioned configuration parameter owned by the clinical/data-science function, never hard-coded and never left to individual engineer judgement.
+Parameters requiring definition include PROMOTION_MIN_OBSERVATIONS and PROMOTION_MIN_TIMESPAN (hypothesis → belief, 3.6); IDENTITY_STABILITY_WINDOW (Biological Identity change, 2.9); DEPENDENT_REVIEW_DELTA (when a weakened supporting belief forces dependents into review, 4.7); and MATERIAL_CHANGE_THRESHOLD (Type 1 'No Change' versus a real transition, 3.5). The values are to be confirmed; the parameters themselves are binding now.
+Engineering Rule
+A qualitative threshold with no named parameter is unspecified behaviour and shall block implementation of the affected rule.
+3.7 Belief Demotion
+Beliefs may also weaken.
+Possible outcomes:
+Return to hypothesis.
+Reduce confidence.
+Archive.
+Retire.
+Replacement by superior explanation.
+BioSense should remain willing to revise previous understanding.
+
+Founder Principle
+Changing our mind in response to better evidence is intelligence, not inconsistency.
+
+3.8 Contradictory Evidence
+When new observations conflict with existing beliefs, the Intelligence Engine shall never immediately replace prior understanding.
+Instead it shall evaluate:
+Source quality.
+Evidence quality.
+Recency.
+Historical consistency.
+Supporting observations.
+Alternative explanations.
+Only after structured evaluation may state transition occur.
+
+Engineering Rule
+Contradictory evidence delays certainty.
+It never bypasses reasoning.
+
+3.9 Version Creation
+Every accepted state transition creates a new DHM version.
+Each version shall include:
+Version Number.
+Timestamp.
+Trigger Event.
+Updated Domains.
+Previous Version Reference.
+Reason for Change.
+AI Version.
+Constitution Version.
+Confidence Delta.
+This enables complete reconstruction of BioSense's reasoning history.
+
+3.10 Immutable History
+Previous versions shall never be modified.
+Historical reasoning remains permanently preserved.
+This supports:
+Explainability.
+Auditing.
+Clinical review.
+Future model comparison.
+Regulatory compliance.
+
+Constitutional Principle
+History should explain how understanding evolved.
+
+3.11 Atomic Updates
+A DHM update shall be atomic.
+Either:
+The complete update succeeds.
+Or:
+No update occurs.
+Partial updates are constitutionally prohibited.
+This prevents inconsistent belief states.
+
+3.12 Concurrent Events
+Multiple trigger events may occur simultaneously.
+Example:
+Blood test uploaded.
+Wearable synchronised.
+Learning Mode completed.
+The Intelligence Engine shall merge these into a single reasoning session before updating the DHM.
+The user should possess one coherent understanding.
+Not three independent updates.
+
+3.12a Concurrency & Session Model
+Concurrency is resolved per individual. All trigger events for one individual are processed by a single-writer reasoning session; sessions for different individuals run in parallel. This makes 'atomic' (3.11) well defined — the session is the transaction — and removes belief-state races without global locking.
+Triggers for an individual are enqueued. A session opens on the first queued trigger and admits further triggers arriving within a bounded merge window (SESSION_MERGE_WINDOW, value to be confirmed). Triggers arriving after the window are handled by the next session and never mutate a session already in progress.
+One session produces exactly one new DHM version (3.9), which may contain several transition types (3.5) together with the results of any cascade (5.12a). Either the whole session commits or none of it does (3.11).
+Engineering Rule
+No two sessions may write the same individual's DHM concurrently. Isolation is serialisable per individual. The session's atomicity is scoped to the DHM. Writes to stores owned by other engines (Decision, Prediction, Safety) occur outside this session and are coordinated by ENG-009 under its cross-store consistency boundary (ENG-009 §6.7a).
+3.13 Learning Without Communication
+Some updates shall remain invisible.
+Example:
+Confidence increases.
+Internal relationships strengthen.
+Biological Identity matures.
+No user-facing communication required.
+Learning and communication remain independent processes.
+
+Founder Principle
+The DHM may become wiser without becoming louder.
+
+3.14 Rollback
+If a critical implementation error is discovered, BioSense shall restore the previous DHM version without data loss.
+Rollback shall preserve:
+Original observations.
+Historical versions.
+Audit records.
+Reason for rollback.
+Rollback shall never delete historical reasoning.
+
+3.15 Engineering Constraints
+Every state transition shall:
+preserve history, 
+preserve traceability, 
+preserve explainability, 
+maintain constitutional compliance, 
+remain deterministic in retrieval, versioning and rule evaluation (generative summaries excepted),
+support future AI models, 
+remain implementation independent. 
+
+3.16 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Every DHM modification follows one recognised lifecycle.
+✓ Every update creates a traceable version.
+✓ Beliefs never change without evidence.
+✓ Contradictory evidence is evaluated rather than ignored.
+✓ Learning may occur without communication.
+✓ Historical reasoning remains recoverable.
+✓ Updates are atomic and auditable.
+Chapter 4
+Belief Engine & Knowledge Representation
+
+4.1 Purpose
+The purpose of the Belief Engine is to transform validated observations into structured, explainable knowledge that can be used consistently throughout the BioSense Intelligence Engine.
+The Dynamic Health Model does not store isolated observations.
+Nor does it store arbitrary AI-generated text.
+Instead, it stores a structured collection of Health Beliefs, each representing a specific element of BioSense's current understanding.
+The Belief Engine governs how these beliefs are created, strengthened, weakened, connected and retired.
+It is the core mechanism through which BioSense develops understanding over time.
+
+4.2 Engineering Philosophy
+The Intelligence Engine shall reason using explicit knowledge objects rather than transient conversations.
+Every important conclusion reached by the Intelligence Engine should exist as a reusable belief within the DHM.
+This ensures that understanding becomes persistent rather than being recreated every time the AI is queried.
+The Belief Engine therefore separates:
+reasoning, 
+storage, 
+communication. 
+Reasoning creates beliefs.
+The DHM stores beliefs.
+The Conversation Engine communicates beliefs.
+These responsibilities shall remain independent.
+
+Constitutional Principle
+Reason once. Reuse understanding everywhere.
+
+4.3 What Is A Health Belief?
+A Health Belief is the smallest reusable unit of understanding within the Dynamic Health Model.
+It represents an interpreted conclusion that has survived constitutional reasoning.
+Examples include:
+Sleep consistency is below the individual's long-term baseline. 
+Cardiovascular recovery has improved over the past three months. 
+Ferritin has shown a sustained downward trajectory. 
+Evening alcohol consistently reduces HRV. 
+Recovery improves when protein intake exceeds 140g/day. 
+Health Beliefs are not observations.
+They are not recommendations.
+They are BioSense's current understanding.
+
+4.4 Canonical Belief Structure
+Every Health Belief shall contain the following mandatory attributes.
+Identity
+Belief ID 
+Creation Date 
+Current Version 
+Current Status 
+
+Classification
+Physiological Domain 
+Belief Type 
+Importance Level 
+Priority Level 
+
+Description
+Canonical Description 
+Plain-English Description 
+Scientific Explanation 
+
+Evidence
+Supporting Observations 
+Supporting Beliefs 
+Contradicting Observations 
+Scientific References 
+Last Validation 
+
+Confidence
+Confidence Score 
+Evidence Quality 
+Confidence Trend 
+Confidence History 
+
+Relationships
+Linked Health Narratives 
+Linked Goals 
+Linked Recommendations 
+Related Beliefs 
+
+Lifecycle
+Date Created 
+Last Updated 
+Last Reviewed 
+Current State 
+Retirement Reason (if applicable) 
+
+Engineering Rule
+A belief missing an attribute that is mandatory for its current lifecycle state shall be considered invalid. Requiredness is conditional on state (see 4.4a and the Data Dictionary): a Candidate belief need not carry Confidence History, Last Reviewed or a Retirement Reason, whereas a Validated belief requires supporting evidence and a Retired belief requires a Retirement Reason.
+
+4.4a Worked Schema Example — Health Belief
+The Health Belief illustrates the Data Dictionary format (2.3a) every object shall follow — field, type, cardinality, requiredness:
+belief_id — string(uuid) — 1:1 — required.
+status — enum{Candidate, Hypothesis, Validated, Strengthened, Stable, Weakening, Retired} — 1:1 — required.
+canonical_description — string — 1:1 — required.
+supporting_observations — list<ObservationRef{id, version}> — 0:N — required (≥1 once status ≥ Validated).
+contradicting_observations — list<ObservationRef{id, version}> — 0:N — optional.
+confidence — ConfidenceObject (Ch 10) — 1:1 — required.
+linked_narratives — list<NarrativeRef{id}> — 0:N — derived inverse (see 2.17a).
+created_at / last_updated — ISO-8601 — 1:1 — required; last_reviewed — ISO-8601 — 0:1.
+retirement_reason — string — 0:1 — required only when status = Retired.
+Engineering Rule
+Every object in this specification shall be accompanied by a schema of this form before it is implemented.
+4.5 Belief Categories
+To ensure consistency, every belief shall belong to one primary category.
+Trend Beliefs
+Describe long-term physiological movement.
+Examples:
+Improving. 
+Declining. 
+Stable. 
+Fluctuating. 
+
+Behavioural Beliefs
+Describe relationships between behaviour and physiology.
+Examples:
+Sleep improves recovery. 
+Late caffeine delays sleep onset. 
+Resistance training improves glucose control. 
+
+Physiological Beliefs
+Describe the individual's current biological state.
+Examples:
+Low iron stores. 
+Elevated inflammatory profile. 
+High cardiovascular fitness. 
+
+Predictive Beliefs
+Represent expectations about future physiology.
+Examples:
+Recovery is likely to decline during travel. 
+Seasonal allergy patterns expected next month. 
+Predictive beliefs shall always carry explicit uncertainty.
+
+Identity Beliefs
+Describe stable characteristics of the individual.
+Examples:
+Morning chronotype. 
+High exercise responder. 
+Slow recovery following international travel. 
+Identity beliefs require the strongest evidence.
+
+4.6 Belief Relationships
+Health Beliefs shall not exist in isolation.
+They form a connected knowledge network.
+Example:
+Poor Sleep Consistency
+          │
+          ▼
+Reduced Recovery
+          │
+          ▼
+Lower HRV
+          │
+          ▼
+Reduced Training Quality
+Each belief may support, strengthen or weaken other beliefs.
+The DHM therefore represents a network rather than a list.
+
+Constitutional Principle
+Understanding emerges from connected beliefs, not isolated conclusions.
+
+4.7 Belief Dependencies
+Some beliefs depend upon others.
+Example:
+Belief:
+"Recovery is improving."
+Depends upon:
+Sleep consistency. 
+HRV. 
+Resting Heart Rate. 
+Training Load. 
+If supporting beliefs weaken significantly, dependent beliefs shall automatically enter review.
+This prevents outdated understanding from persisting.
+
+4.8 Belief Conflict Resolution
+Two active beliefs shall never directly contradict one another without explanation.
+If conflict occurs, the Belief Engine shall:
+Identify the conflict. 
+Assess evidence quality. 
+Generate alternative hypotheses. 
+Reduce confidence if required. 
+Escalate for constitutional review. 
+The DHM should never knowingly contain unresolved contradictions.
+
+Founder Principle
+Conflicting beliefs are signals for investigation, not errors to ignore.
+
+4.9 Belief Lifecycles
+Every belief shall progress through recognised lifecycle states.
+Candidate
+      │
+      ▼
+Hypothesis
+      │
+      ▼
+Validated Belief
+      │
+      ▼
+Strengthened
+      │
+      ▼
+Stable
+      │
+      ▼
+Weakening
+      │
+      ▼
+Retired
+The current lifecycle state shall always be visible within the DHM.
+
+4.10 Belief Review
+Every active belief shall undergo periodic review.
+Review frequency shall depend upon:
+Confidence. 
+Physiological domain. 
+New observations. 
+Age of supporting evidence. 
+Scientific updates. 
+Some beliefs may remain valid for years.
+Others may require daily review.
+The review schedule shall be determined by the Confidence Engine.
+
+4.11 Belief Expiry
+Not every belief should live forever.
+Examples:
+Temporary illness. 
+Jet lag. 
+Acute injury. 
+Short-term stress. 
+Once supporting evidence no longer exists, temporary beliefs shall expire or be archived.
+Long-term Biological Identity should not be influenced by temporary physiology.
+
+Constitutional Principle
+Temporary biology should not create permanent understanding.
+
+4.12 Belief Explainability
+Every belief shall answer five questions.
+What do we currently believe? 
+Why do we believe it? 
+What evidence supports it? 
+What evidence challenges it? 
+What would change our mind? 
+If any question cannot be answered, the belief is incomplete.
+
+4.13 Belief Reuse
+Once validated, beliefs become reusable across BioSense.
+They may be consumed by:
+Recommendation Engine. 
+Health Score Engine. 
+Biological Age Engine. 
+Learning Engine. 
+Conversation Engine. 
+Weekly Reports. 
+Monthly Reports. 
+Notification Engine. 
+Insights Dashboard. 
+No subsystem should independently recreate an existing belief.
+
+Founder Principle
+One belief. Many consumers.
+
+4.14 Engineering Constraints
+The Belief Engine shall:
+store structured knowledge, 
+support relationship mapping, 
+support explainability, 
+support versioning, 
+prevent contradictory active beliefs, 
+remain model-independent, 
+allow future belief categories without redesign. 
+
+4.15 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Every Health Belief has a standard structure.
+✓ Every belief is evidence-backed.
+✓ Beliefs are connected rather than isolated.
+✓ Dependencies are recognised.
+✓ Contradictions trigger structured review.
+✓ Beliefs can be reused across multiple BioSense engines.
+✓ Every belief is fully explainable.
+✓ The lifecycle of every belief is visible and auditable.
+Chapter 5
+Belief Revision & Evidence Reconciliation
+
+5.1 Purpose
+The purpose of this chapter is to define the engineering rules governing how the Dynamic Health Model revises its understanding when new evidence becomes available.
+The Dynamic Health Model shall never assume that its current understanding is permanently correct.
+Instead, every Health Belief shall remain open to revision throughout its lifecycle.
+The Belief Revision Engine exists to ensure that BioSense continuously improves its understanding while preserving scientific integrity, historical explainability and user trust.
+
+5.2 Design Philosophy
+Understanding is not static.
+It evolves.
+Every new observation should be treated as an opportunity to ask:
+"Does this change what we currently believe?"
+Sometimes the answer will be:
+No.
+Sometimes:
+Slightly.
+Occasionally:
+Completely.
+The purpose of the Belief Revision Engine is to determine which of these outcomes is constitutionally justified.
+
+Constitutional Principle
+Every belief remains provisional until supported by overwhelming long-term evidence.
+
+5.3 Triggers for Belief Review
+A belief review may be initiated by any event capable of materially changing BioSense's understanding.
+Examples include:
+New blood biomarkers. 
+Wearable trends. 
+Learning Mode responses. 
+Goal changes. 
+Medical records. 
+Repeat laboratory testing. 
+Recommendation outcomes. 
+User corrections. 
+Updates to the Canonical Scientific Library. 
+New scientific evidence. 
+Not every trigger will result in revision.
+Every trigger shall result in evaluation.
+
+Engineering Rule
+Belief review is mandatory.
+Belief revision is optional.
+
+5.4 The Belief Revision Lifecycle
+Every review shall follow the same constitutional sequence.
+Existing Belief
+       │
+       ▼
+Receive New Evidence
+       │
+       ▼
+Validate Evidence
+       │
+       ▼
+Assess Evidence Quality
+       │
+       ▼
+Compare Against Existing Belief
+       │
+       ▼
+Generate Alternative Explanations
+       │
+       ▼
+Review Confidence
+       │
+       ▼
+Select Outcome
+       │
+       ▼
+Update Dynamic Health Model
+No shortcut shall bypass this lifecycle.
+
+5.5 Possible Revision Outcomes
+Every review shall result in one of the following outcomes.
+
+Outcome A
+No Change
+Existing understanding remains the strongest explanation.
+The new observation is stored.
+Confidence remains unchanged.
+Example:
+One isolated poor night's sleep.
+
+Outcome B
+Confidence Increased
+New evidence strengthens an existing belief.
+The wording remains unchanged.
+Only confidence increases.
+Example:
+Another six months of improving ferritin.
+
+Outcome C
+Confidence Reduced
+The belief remains active.
+However:
+Competing evidence reduces certainty.
+Further evidence becomes desirable.
+
+Outcome D
+Belief Refined
+The underlying understanding remains valid.
+Its wording becomes more accurate.
+Example:
+Original:
+Recovery improves with longer sleep.
+Updated:
+Recovery improves primarily when sleep exceeds 7.5 hours for at least three consecutive nights.
+Understanding becomes more precise.
+
+Outcome E
+Belief Replaced
+A superior explanation emerges.
+The original belief is archived.
+A new belief becomes active.
+Historical traceability remains preserved.
+
+Outcome F
+Belief Retired
+Evidence no longer supports the belief.
+The belief remains visible historically.
+It is no longer active.
+
+Founder Principle
+Retiring a belief is evidence of learning, not failure.
+
+5.6 Competing Beliefs
+The Dynamic Health Model shall permit multiple competing explanations during periods of uncertainty.
+Example:
+Hypothesis A
+Reduced recovery due to insufficient sleep.
+Hypothesis B
+Reduced recovery due to iron deficiency.
+Hypothesis C
+Reduced recovery due to illness.
+Each hypothesis shall maintain independent confidence.
+As new evidence emerges, confidence changes until one explanation becomes dominant.
+
+Constitutional Principle
+Uncertainty should be represented explicitly rather than hidden.
+
+5.7 Contradictory Evidence
+Contradictory evidence shall never be discarded simply because it disagrees with current understanding.
+Instead, BioSense shall ask:
+Is the new evidence reliable? 
+Does it conflict with one belief or many? 
+Is the conflict temporary? 
+Has similar conflict occurred previously? 
+Does this reveal a limitation in our current understanding? 
+Contradiction should trigger investigation.
+Not immediate replacement.
+
+5.8 Evidence Accumulation
+Individual observations rarely justify major revision.
+Instead, the Belief Revision Engine shall evaluate cumulative evidence.
+Examples:
+One elevated CRP.
+↓
+Observation.
+Three elevated CRP results over twelve months.
+↓
+Pattern.
+Repeated elevation together with lifestyle and symptom changes.
+↓
+Belief revision.
+Time strengthens evidence.
+
+Founder Principle
+Patterns revise beliefs. Isolated observations usually do not.
+
+5.9 Scientific Revision
+The Dynamic Health Model shall remain capable of revising beliefs even when the user's data has not changed.
+Example:
+New scientific evidence changes the accepted interpretation of a biomarker.
+The Canonical Scientific Library updates.
+Existing beliefs are re-evaluated.
+This ensures BioSense evolves alongside modern medicine.
+
+Constitutional Principle
+Scientific progress should improve understanding without requiring new user data.
+
+5.10 User Corrections
+Users may challenge BioSense's understanding.
+Examples:
+"That wasn't iron deficiency."
+"I had influenza that week."
+"I wasn't wearing my wearable."
+"I stopped taking that medication."
+User corrections become evidence.
+They do not automatically replace existing beliefs.
+Instead they enter the revision process using the same constitutional rules as every other observation.
+
+Engineering Rule
+User feedback influences beliefs.
+It does not bypass reasoning.
+
+5.11 Confidence Drift
+Confidence shall naturally change over time.
+Without ongoing supporting evidence:
+Confidence may gradually weaken.
+With repeated confirmation:
+Confidence may strengthen.
+This prevents outdated understanding remaining permanently dominant.
+
+5.12 Cascading Revision
+Changing one belief may require reviewing others.
+Example:
+New evidence weakens:
+Iron Deficiency.
+This may also influence:
+Recovery Narrative.
+Fatigue Narrative.
+Supplement Recommendations.
+Health Score.
+Biological Age.
+The Belief Revision Engine shall automatically identify downstream dependencies.
+
+Constitutional Principle
+Beliefs exist within a network. Revision should respect that network.
+
+5.12a Cascade Traversal Rules 
+Belief dependencies form a directed graph. To make cascading revision (5.12, 4.7, 6.16) deterministic and terminating, the dependency graph shall be maintained as acyclic; any edge that would create a cycle is rejected and recorded for review rather than followed.
+A cascade is evaluated in topological order over affected dependents, within the same reasoning session (3.12a). Each object is visited at most once per session; re-entry of an object already visited does not re-open it. Cascade depth is bounded by CASCADE_MAX_DEPTH (value to be confirmed); reaching the bound halts the cascade and raises a review flag rather than looping. A cascade never crosses individuals and never escapes the session's atomic commit.
+Engineering Rule
+Cascading revision shall always terminate. A cascade that cannot terminate within the configured bound is a defect, not a valid state.
+5.13 Explainability
+Every revision shall permanently record:
+Previous belief.
+Updated belief.
+Reason for revision.
+Supporting evidence.
+Competing evidence.
+Confidence change.
+Trigger event.
+Reviewer version.
+Timestamp.
+Every revision should therefore answer:
+"Why did BioSense change its mind?"
+
+5.14 Engineering Constraints
+The Belief Revision Engine shall:
+never overwrite historical understanding, 
+preserve complete audit history, 
+permit competing explanations, 
+support scientific evolution, 
+remain deterministic in retrieval, versioning and rule evaluation (generative summaries excepted),
+remain explainable, 
+remain independent of any AI provider. 
+
+5.15 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Every belief can be reviewed.
+✓ Every belief can be revised.
+✓ Contradictory evidence is preserved.
+✓ Historical beliefs remain recoverable.
+✓ Confidence evolves naturally.
+✓ User corrections enter the reasoning process.
+✓ Scientific updates can trigger belief review.
+✓ All revisions remain fully explainable.
+Chapter 6
+Memory Architecture & Knowledge Persistence
+
+6.1 Purpose
+The purpose of the Memory Architecture is to define how the Dynamic Health Model retains, organises, retrieves and evolves knowledge throughout the lifetime of the individual.
+The Constitution establishes that BioSense should become progressively more valuable as it learns.
+This chapter defines the engineering rules that make lifelong learning possible.
+Memory is therefore treated as a first-class engineering component rather than an implementation detail.
+
+6.2 Engineering Philosophy
+The Dynamic Health Model shall not function as a conversation history.
+Nor shall it function as an unlimited archive.
+Instead, it shall behave as an intelligent memory system.
+The objective is not to remember everything.
+The objective is to remember what improves future understanding.
+Memory therefore exists to improve reasoning rather than preserve information.
+
+Constitutional Principle
+The purpose of memory is better judgement, not larger storage.
+
+6.3 Memory Hierarchy
+The DHM shall organise knowledge into multiple memory layers.
+Each layer serves a different engineering purpose.
+                    Dynamic Health Memory
+
+                           │
+     ┌─────────────────────┼─────────────────────┐
+     ▼                     ▼                     ▼
+
+ Working Memory      Active Knowledge      Long-Term Identity
+
+     ▼                     ▼                     ▼
+
+ Temporary         Current Health Beliefs   Biological Identity
+ Observations      Active Narratives        Stable Preferences
+ Session Context   Active Goals             Persistent Patterns
+Every memory layer possesses independent lifecycle rules.
+
+6.4 Working Memory
+Working Memory represents temporary information required during active reasoning.
+Examples include:
+current conversation context, 
+today's wearable sync, 
+uploaded blood report, 
+temporary reasoning objects, 
+active hypotheses under evaluation. 
+Working Memory exists only while reasoning is taking place.
+Once reasoning completes:
+information is discarded, 
+promoted, 
+or archived. 
+
+Engineering Rule
+Working Memory shall never become part of the DHM without completing the constitutional reasoning pipeline.
+
+6.5 Active Knowledge
+Active Knowledge contains BioSense's current understanding.
+Examples include:
+Active Health Beliefs.
+Current Health Narratives.
+Current Goals.
+Active Recommendations.
+Current Confidence.
+Recent Discoveries.
+This represents the knowledge BioSense uses every day.
+It is updated continuously.
+
+6.6 Long-Term Identity
+Long-Term Identity represents information that changes slowly.
+Examples include:
+Chronotype.
+Exercise responder profile.
+Stress resilience.
+Typical sleep behaviour.
+Travel adaptation.
+Typical inflammatory response.
+Nutrition preferences.
+Behavioural consistency.
+This layer should evolve cautiously.
+Significant evidence is required before modification.
+
+Founder Principle
+Identity should evolve more slowly than understanding.
+
+6.7 Memory Classification
+Every item stored within the DHM shall possess a Memory Classification.
+Possible classifications include:
+Temporary
+Emerging
+Active
+Persistent
+Historical
+Archived
+Superseded
+Retired
+Classification determines:
+review frequency, 
+retrieval priority, 
+revision behaviour, 
+expiry rules. 
+
+6.7a Canonical Status Vocabulary & State Reconciliation
+This specification defines several overlapping status vocabularies — hypothesis statuses (2.7), the eight transition types (3.5), the belief lifecycle (4.9), memory classification (6.7) and the memory lifecycle (6.17). These shall be reconciled into one canonical state model per object type, with a single glossary of status terms used verbatim everywhere and a mapping table showing how the vocabularies correspond.
+In particular, 'Archived', 'Retired' and 'Superseded' are distinct and shall not be used interchangeably: Retired = no longer supported by evidence but historically valid; Superseded = replaced by a better explanation; Archived = removed from active reasoning for lifecycle or storage reasons.
+Engineering Rule
+One object type, one state machine, one status vocabulary. A status value not in the canonical glossary is invalid.
+6.8 Memory Promotion
+Information shall move between memory layers through controlled promotion.
+Example:
+Observation
+
+↓
+
+Working Memory
+
+↓
+
+Validated Hypothesis
+
+↓
+
+Health Belief
+
+↓
+
+Health Narrative
+
+↓
+
+Biological Identity
+Promotion requires increasing levels of supporting evidence.
+No information shall bypass promotion rules.
+
+Constitutional Principle
+Knowledge must earn permanence.
+
+6.9 Memory Demotion
+Memory may also move in the opposite direction.
+Examples:
+Reduced confidence.
+Contradictory evidence.
+Temporary physiology.
+Outdated assumptions.
+Scientific revision.
+Demotion prevents obsolete understanding remaining active.
+
+6.10 Memory Retrieval
+Whenever BioSense reasons, the DHM shall retrieve only memory relevant to the current question.
+Examples:
+Iron discussion
+↓
+Iron beliefs
+Ferritin trends
+Nutrition
+Previous recommendations
+Related narratives
+Not:
+Travel history.
+Sleep chronotype.
+Hydration beliefs.
+The objective is intelligent retrieval rather than maximum retrieval.
+
+Engineering Rule
+Memory retrieval shall maximise relevance rather than volume.
+
+6.11 Memory Reinforcement
+Repeated confirmation strengthens memory.
+Examples:
+Alcohol repeatedly reduces HRV.
+↓
+Confidence increases.
+↓
+Review frequency decreases.
+↓
+Belief becomes increasingly stable.
+This mirrors human learning.
+Repeated experience creates stronger understanding.
+
+6.12 Memory Decay
+Not every memory should strengthen indefinitely.
+Without supporting evidence:
+Confidence may reduce.
+Review frequency may increase.
+Beliefs may return to hypothesis.
+Temporary knowledge may expire.
+Memory decay prevents outdated assumptions dominating future reasoning.
+
+Founder Principle
+Old knowledge should remain available without permanently controlling new understanding.
+
+6.13 Forgetting
+The DHM deliberately supports forgetting.
+Forgetting is appropriate when:
+Evidence becomes invalid.
+The user corrects previous understanding.
+Scientific knowledge changes.
+Temporary illness resolves.
+Behaviour changes permanently.
+Incorrect assumptions are identified.
+Forgetting represents refinement.
+Not loss.
+
+Constitutional Principle
+The ability to forget responsibly is a feature of intelligence.
+
+6.14 User Memory
+Certain information may be explicitly confirmed by the individual.
+Examples:
+Dietary preference.
+Exercise preference.
+Communication style.
+Known medical history.
+Preferred units.
+These user-confirmed memories should remain separate from inferred beliefs.
+The Intelligence Engine should always distinguish between:
+Observed
+Inferred
+User-confirmed
+
+6.15 Memory Provenance
+Every memory shall retain provenance.
+Required metadata includes:
+Origin.
+Creation date.
+Supporting evidence.
+Confidence.
+Last review.
+Current status.
+Related observations.
+Related beliefs.
+Review history.
+This ensures complete explainability.
+
+6.16 Memory Dependencies
+Memories rarely exist independently.
+Example:
+Iron Deficiency
+↓
+Fatigue Narrative
+↓
+Exercise Recommendations
+↓
+Health Score
+↓
+Biological Age
+Whenever memory changes, dependent knowledge shall automatically enter review.
+
+Constitutional Principle
+Memory is a connected network, not isolated records.
+
+6.17 Memory Lifecycle
+Every memory object shall progress through recognised lifecycle states.
+Created
+
+↓
+
+Validated
+
+↓
+
+Active
+
+↓
+
+Reinforced
+
+↓
+
+Stable
+
+↓
+
+Under Review
+
+↓
+
+Demoted
+
+↓
+
+Archived
+
+↓
+
+Retired
+Lifecycle progression shall be fully auditable.
+
+6.18 Engineering Constraints
+The Memory Architecture shall:
+distinguish temporary from permanent knowledge, 
+preserve provenance, 
+support promotion and demotion, 
+support memory decay, 
+support forgetting, 
+optimise retrieval, 
+remain independent of implementation technology, 
+remain explainable. 
+
+6.19 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ The DHM distinguishes working memory from long-term knowledge.
+✓ Memory promotion requires evidence.
+✓ Memory demotion is supported.
+✓ Memory retrieval is relevance-driven.
+✓ Provenance is preserved.
+✓ User-confirmed knowledge is separated from inferred knowledge.
+✓ Memory decay prevents obsolete understanding dominating future reasoning.
+✓ Every memory object possesses a complete lifecycle.
+Chapter 7
+Engine Integration & System Orchestration
+
+7.1 Purpose
+The purpose of this chapter is to define how every major subsystem within BioSense interacts with the Dynamic Health Model (DHM).
+The DHM is the constitutional source of personalised understanding.
+Every engine within BioSense shall either:
+contribute to the DHM, 
+consume information from the DHM, 
+or both. 
+No engine shall maintain an independent understanding of the individual outside the Dynamic Health Model.
+
+Constitutional Principle
+There is only one source of personalised truth within BioSense — the Dynamic Health Model.
+
+7.2 Architectural Philosophy
+The BioSense Intelligence Engine is composed of specialised engines.
+Each engine has a clearly defined responsibility.
+No engine should duplicate the responsibilities of another.
+The DHM exists to coordinate these engines through shared understanding rather than direct coupling.
+
+7.3 Canonical Architecture
+                 Observation Sources
+────────────────────────────────────────────────
+
+ Blood Tests
+ Wearables
+ Nutrition
+ Daily Check-ins
+ Medical Records
+ Learning Mode
+ User Feedback
+ Future Integrations
+
+                    │
+                    ▼
+
+        Observation & Validation Engine
+
+                    │
+                    ▼
+
+        Dynamic Health Model (DHM)
+
+────────────────────────────────────────────────
+
+        Confidence Engine
+        Recommendation Engine
+        Health Score Engine
+        Biological Age Engine
+        Conversation Engine
+        Notification Engine
+        Reporting Engine
+        Learning Engine
+        Prediction Engine
+        Future AI Engines
+
+                    │
+                    ▼
+
+               User Experience
+The DHM is the hub.
+Every other engine is a specialist.
+
+7.4 Observation Engine
+Responsibility
+The Observation Engine is responsible for receiving raw information.
+Examples include:
+Blood biomarkers 
+Wearable synchronisation 
+Uploaded documents 
+Questionnaire responses 
+Daily Check-ins 
+Nutrition logs 
+The Observation Engine shall:
+validate, 
+normalise, 
+canonicalise, 
+timestamp, 
+preserve provenance. 
+It shall never generate Health Beliefs.
+Its responsibility ends once validated observations enter the Observation Store.
+
+Engineering Rule
+Observation Engines collect facts.
+They do not create understanding.
+
+7.5 Confidence Engine
+Responsibility
+The Confidence Engine evaluates BioSense's certainty.
+It does not create beliefs.
+It evaluates beliefs.
+Responsibilities include:
+Confidence calculation 
+Confidence drift 
+Evidence weighting 
+Belief review scheduling 
+Confidence explanations 
+The Confidence Engine updates confidence values stored inside the DHM.
+It does not independently store confidence.
+
+7.6 Recommendation Engine
+Responsibility
+The Recommendation Engine converts understanding into action.
+It shall consume:
+Health Beliefs
+Health Narratives
+Goals
+Confidence
+Biological Identity
+Current context
+It shall not independently interpret raw observations.
+Every recommendation must originate from the DHM.
+
+Constitutional Principle
+Recommendations emerge from understanding, not data.
+
+7.7 Health Score Engine
+The Health Score Engine calculates the individual's long-term Health Score.
+Inputs include:
+Biological Identity
+Health Narratives
+Persistent Beliefs
+Longitudinal Trends
+Recovery
+Behaviour
+Biomarkers
+The Health Score Engine shall never analyse observations independently.
+It consumes understanding already established by the DHM.
+
+7.8 Biological Age Engine
+The age-estimation methodology shall be a named, versioned model (BIOLOGICAL_AGE_METHOD_VERSION) whose scientific basis is grounded in the Canonical Scientific Library (ENG-008) like any other scientific claim. The method version is recorded on every computed Biological Age snapshot and its Confidence Object, so that a given Biological Age value is always reproducible against the method and Scientific Knowledge versions that produced it. The same requirement applies to the Health Score Engine (7.7): HEALTH_SCORE_METHOD_VERSION, grounded in ENG-008, recorded on every snapshot. Inputs include:
+Longitudinal biomarkers
+Cardiovascular trends
+Recovery
+Inflammation
+Metabolic profile
+Exercise
+Sleep
+Behaviour
+Identity
+The DHM provides interpreted inputs.
+The Biological Age Engine performs age estimation.
+
+Engineering Rule
+Health Score and Biological Age are computed by named, versioned methods grounded in ENG-008. Every computed snapshot records its method version; no derived-metric value exists without a reproducible method+knowledge version pin.
+
+7.9 Conversation Engine
+The Conversation Engine is responsible for communication.
+It shall not generate new medical understanding.
+Instead it:
+retrieves,
+explains,
+clarifies,
+educates,
+questions,
+summarises,
+and personalises
+the understanding already stored within the DHM.
+
+Engineering Rule
+Conversation should communicate intelligence. Not create intelligence.
+
+7.10 Learning Engine
+The Learning Engine identifies uncertainty within the DHM.
+It asks:
+What do we not know?
+Which belief possesses low confidence?
+Which question would most improve understanding?
+It generates Learning Mode questions accordingly.
+The Learning Engine improves the DHM.
+It does not bypass it.
+
+7.11 Reporting Engine
+Weekly Reports.
+Monthly Reports.
+Annual Reports.
+The Reporting Engine shall consume:
+Health Beliefs
+Narratives
+Recommendations
+Confidence
+Goals
+Health Score
+Biological Age
+Reports summarise existing understanding.
+They do not perform fresh reasoning.
+
+7.12 Notification Engine
+Notifications shall originate from meaningful change within the DHM.
+Examples:
+New Discovery.
+Confidence increase.
+Goal milestone.
+Recommendation update.
+Health Narrative revision.
+No notification should be triggered solely because new data arrived.
+Notifications communicate changes in understanding.
+Not changes in observations.
+
+Founder Principle
+Notify because understanding changed—not because data changed.
+
+7.13 Prediction Engine
+Future capability.
+The Prediction Engine estimates future outcomes.
+Examples:
+Recovery tomorrow.
+Expected HRV.
+Weight trajectory.
+Ferritin depletion risk.
+Illness likelihood.
+Predictions shall always consume current DHM understanding.
+Predictions shall never become Health Beliefs until validated.
+
+7.14 Future Engines
+The architecture intentionally supports future engines.
+Examples:
+Longevity Engine.
+Genomics Engine.
+Medication Engine.
+Women's Health Engine.
+Mental Wellbeing Engine.
+Continuous Glucose Engine.
+Microbiome Engine.
+Future engines shall integrate through the DHM.
+Never around it.
+
+7.15 Engine Communication Rules
+Every engine shall follow three rules.
+Rule One
+Read from the DHM.
+
+Rule Two
+Contribute through the constitutional update pipeline.
+
+Rule Three
+Never maintain competing personalised intelligence.
+
+Constitutional Principle
+One individual. One Dynamic Health Model. One shared understanding.
+
+7.16 Engine Independence
+Every engine shall remain independently replaceable.
+Example:
+The Recommendation Engine may evolve.
+The Conversation Engine may change AI provider.
+The Prediction Engine may be redesigned.
+The DHM remains stable.
+This architecture reduces coupling.
+Improves maintainability.
+Supports future innovation.
+
+7.17 Integration Sequence
+A typical interaction follows this sequence:
+Wearable Sync
+
+↓
+
+Observation Engine
+
+↓
+
+Validation
+
+↓
+
+Canonical Translation
+
+↓
+
+Dynamic Health Model Update
+
+↓
+
+Confidence Review
+
+↓
+
+Belief Revision
+
+↓
+
+Recommendation Engine
+
+↓
+
+Notification Decision
+
+↓
+
+Conversation Engine
+
+↓
+
+User
+Every engine performs one specialised responsibility.
+No duplication occurs.
+
+7.18 Engineering Constraints
+Every engine shall:
+have a single responsibility, 
+remain loosely coupled, 
+interact through the DHM, 
+remain independently testable, 
+remain independently replaceable, 
+avoid duplicated intelligence, 
+support future expansion. 
+
+7.19 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Every engine has a clearly defined responsibility.
+✓ No engine duplicates reasoning performed elsewhere.
+✓ The DHM remains the single source of personalised understanding.
+✓ Every recommendation originates from the DHM.
+✓ Reports summarise existing understanding rather than creating new conclusions.
+✓ Future engines can be added without redesigning the architecture.
+✓ The overall system remains modular and extensible.
+hapter 8
+Uncertainty Management & Knowledge Gaps
+
+8.1 Purpose
+The purpose of this chapter is to define how the Dynamic Health Model represents, measures and manages uncertainty.
+The DHM shall not attempt to eliminate uncertainty.
+Instead, uncertainty shall be treated as an explicit component of intelligence.
+The Intelligence Engine should always understand:
+what it knows, 
+what it probably knows, 
+what it suspects, 
+what it does not know, 
+and what additional evidence would most improve understanding. 
+This chapter defines the engineering mechanisms required to achieve that behaviour.
+
+Constitutional Principle
+Intelligence is measured not only by what BioSense knows, but by how accurately it understands the limits of its own knowledge.
+
+8.2 Engineering Philosophy
+Most software stores answers.
+The DHM stores understanding.
+Understanding includes uncertainty.
+Every significant conclusion inside the DHM shall therefore possess an associated uncertainty profile.
+The objective is not maximum confidence.
+The objective is well-calibrated confidence.
+
+8.3 Types of Uncertainty
+The DHM recognises multiple forms of uncertainty.
+Each shall be represented independently.
+
+Type 1 — Missing Data
+Required observations do not yet exist.
+Examples:
+No ferritin measurement.
+No sleep history.
+No wearable connected.
+No nutrition records.
+
+Type 2 — Limited Evidence
+Evidence exists.
+There is simply not enough of it.
+Example:
+One blood test.
+Two weeks of wearable data.
+One questionnaire.
+
+Type 3 — Conflicting Evidence
+Multiple observations support competing conclusions.
+Example:
+Improving HRV.
+Declining recovery score.
+Normal ferritin.
+Increasing fatigue.
+
+Type 4 — Scientific Uncertainty
+Modern science has not reached consensus.
+Example:
+Novel biomarkers.
+Emerging longevity interventions.
+Experimental metrics.
+
+Type 5 — Personal Uncertainty
+Population science is understood.
+The individual's biology is not yet sufficiently characterised.
+Example:
+Unknown response to caffeine.
+Unknown supplement response.
+Unknown recovery pattern.
+
+Engineering Rule
+Different uncertainty types shall never be merged into a single score.
+
+8.4 Knowledge Gaps
+A Knowledge Gap represents information that would materially improve the Dynamic Health Model.
+Examples include:
+Missing biomarker.
+Unknown sleep behaviour.
+Unknown training history.
+Unknown medication.
+Unknown alcohol consumption.
+Unknown family history.
+Knowledge Gaps become first-class objects inside the DHM.
+
+Each Knowledge Gap shall contain:
+Gap ID
+Description
+Reason
+Importance
+Affected Beliefs
+Potential Impact
+Suggested Resolution
+Current Status
+Date Identified
+Last Reviewed
+
+8.5 Gap Prioritisation
+Not every Knowledge Gap deserves equal attention.
+Each gap shall be prioritised according to:
+Clinical importance.
+Expected improvement in understanding.
+Likelihood of resolution.
+User burden.
+Scientific relevance.
+Relationship to active goals.
+The DHM shall always know:
+Which unanswered question is most valuable to answer next?
+
+Founder Principle
+The best next question is the one that most improves understanding.
+
+8.6 Knowledge Coverage
+The DHM shall maintain an internal assessment of knowledge coverage across major physiological domains.
+Example domains include:
+Cardiovascular
+Sleep
+Recovery
+Inflammation
+Nutrition
+Hormonal
+Metabolic
+Mental Wellbeing
+Body Composition
+Longevity
+Coverage should describe:
+How well BioSense currently understands each domain.
+It should not describe health quality.
+
+Engineering Rule
+Coverage is not a health score.
+Coverage measures understanding.
+
+8.7 Learning Opportunities
+Every Knowledge Gap may generate Learning Opportunities.
+Examples:
+Learning Mode questions.
+Blood test suggestions.
+Questionnaires.
+Wearable integrations.
+Educational conversations.
+The Learning Engine consumes Knowledge Gaps.
+The DHM merely stores them.
+
+8.8 Evidence Value
+The DHM shall estimate the expected value of acquiring new evidence.
+Examples:
+Adding ferritin may greatly improve understanding.
+Adding another week's step count may provide minimal improvement.
+Future evidence collection should therefore maximise information gain.
+
+Constitutional Principle
+Collect the evidence that teaches the most—not simply the evidence that is easiest to obtain.
+
+8.9 Uncertainty Reduction
+Every successful observation should reduce one or more Knowledge Gaps.
+Possible outcomes include:
+Gap resolved.
+Gap partially reduced.
+Confidence improved.
+New uncertainty discovered.
+No meaningful change.
+Learning is therefore continuous.
+
+8.10 Persistent Unknowns
+Some uncertainty may remain indefinitely.
+Examples:
+Unavailable historical records.
+Unknown childhood health.
+Incomplete family history.
+Uncertain scientific evidence.
+The DHM shall represent these unknowns honestly.
+It shall never fabricate certainty.
+
+Founder Principle
+Some uncertainty should be accepted rather than hidden.
+
+8.11 User Transparency
+Where appropriate, BioSense may communicate uncertainty.
+Examples:
+"We currently have limited information about your iron status."
+"We are confident about your sleep patterns but have limited understanding of your nutrition."
+"The next blood test would significantly improve our understanding."
+Transparency should increase trust.
+Not anxiety.
+
+8.12 Knowledge Gap Lifecycle
+Every Knowledge Gap progresses through recognised stages.
+Identified
+
+↓
+
+Prioritised
+
+↓
+
+Learning Opportunity Generated
+
+↓
+
+Evidence Collected
+
+↓
+
+Gap Reviewed
+
+↓
+
+Resolved
+
+or
+
+Remains Active
+Every stage shall remain auditable.
+
+8.13 Engineering Constraints
+The Uncertainty Engine shall:
+explicitly represent uncertainty, 
+classify uncertainty, 
+prioritise knowledge gaps, 
+support Learning Mode, 
+estimate evidence value, 
+avoid artificial certainty, 
+remain explainable, 
+remain extensible. 
+
+8.14 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Every significant belief includes an uncertainty profile.
+✓ Knowledge Gaps are first-class engineering objects.
+✓ Gaps are prioritised.
+✓ Learning opportunities originate from uncertainty.
+✓ Knowledge Coverage is measurable.
+✓ Evidence collection is driven by information value.
+✓ Persistent unknowns remain visible.
+✓ BioSense communicates uncertainty honestly.
+Chapter 9
+Discovery Engine & Knowledge Formation
+
+9.1 Purpose
+The purpose of the Discovery Engine is to identify moments where BioSense's understanding of an individual has meaningfully improved.
+The Dynamic Health Model shall distinguish between:
+New observations. 
+Updated beliefs. 
+Increased confidence. 
+Genuine discoveries. 
+Not every observation creates understanding.
+Not every belief update represents new knowledge.
+The Discovery Engine exists to recognise and preserve those moments where BioSense learns something materially important about an individual.
+
+Constitutional Principle
+A Discovery represents a permanent increase in understanding—not simply the arrival of new information.
+
+9.2 Engineering Philosophy
+BioSense should not celebrate data collection.
+It should celebrate understanding.
+Examples:
+Uploading another night's sleep is not a discovery.
+Uploading a second ferritin result is not a discovery.
+However:
+Recognising that ferritin has declined consistently every winter for three consecutive years...
+...is a Discovery.
+The Discovery Engine therefore operates above the level of observations and individual beliefs.
+Its purpose is to recognise when those components combine to reveal new knowledge.
+
+9.3 Definition of a Discovery
+A BioSense Discovery is defined as:
+A validated, explainable and reusable piece of personalised understanding that materially improves BioSense's Dynamic Health Model.
+Every word carries engineering meaning.
+A Discovery must be:
+Personal. 
+Evidence-backed. 
+Explainable. 
+Reproducible. 
+Longitudinally relevant. 
+Useful for future reasoning. 
+
+Engineering Rule
+Discovery-the-object is defined and owned here (ENG-001 Chapter 9); the identically-named 'Discovery' confidence threshold in ENG-003 §7.4 is a distinct confidence gate, not this object, and is consumed as an input to §9.7 validation rather than as a definition.
+
+9.4 Discovery Characteristics
+Every Discovery shall satisfy all of the following characteristics.
+Novel
+Previously unknown.
+
+Evidence-backed
+Supported by sufficient evidence.
+
+Personal
+Specific to this individual.
+
+Stable
+Likely to remain useful beyond the current interaction.
+
+Actionable
+Improves future recommendations or reasoning.
+
+Explainable
+Can be clearly justified.
+
+9.5 Discovery Lifecycle
+Every Discovery progresses through a structured lifecycle.
+Potential Pattern
+
+↓
+
+Candidate Discovery
+
+↓
+
+Evidence Accumulation
+
+↓
+
+Validation
+
+↓
+
+Discovery Confirmed
+
+↓
+
+Integrated Into DHM
+
+↓
+
+Continuously Reviewed
+No Discovery may bypass validation.
+
+9.6 Candidate Discoveries
+Many observations will initially appear interesting.
+Examples:
+Possible alcohol sensitivity.
+Possible sleep chronotype.
+Possible seasonal inflammation.
+Possible delayed recovery.
+These remain Candidate Discoveries until sufficient evidence accumulates.
+The DHM shall actively track candidate discoveries.
+
+Constitutional Principle
+Interesting is not the same as true.
+
+9.7 Discovery Validation
+Before confirmation, every Candidate Discovery shall undergo constitutional review.
+Validation considers:
+Evidence quality.
+Evidence quantity.
+Scientific plausibility.
+Alternative explanations.
+Confidence (the confidence assessment computed by ENG-003, including whether the ENG-003 'Discovery' confidence threshold (ENG-003 §7.4) has been met).
+Longitudinal consistency.
+Personal relevance.
+Only after validation may a Discovery become permanent.
+
+9.8 Discovery Categories
+Every confirmed Discovery shall belong to one or more categories.
+Examples include:
+Behavioural Discoveries
+Relationships between behaviour and physiology.
+
+Physiological Discoveries
+Long-term biological characteristics.
+
+Lifestyle Discoveries
+Patterns relating to work, travel or routine.
+
+Nutritional Discoveries
+Food-related physiological responses.
+
+Exercise Discoveries
+Training adaptations.
+Recovery patterns.
+Performance responses.
+
+Biomarker Discoveries
+Longitudinal blood analysis.
+
+Predictive Discoveries
+Patterns useful for forecasting future physiology.
+
+Identity Discoveries
+Characteristics contributing to Biological Identity.
+
+9.9 Discovery Relationships
+A Discovery may strengthen:
+Health Beliefs.
+Health Narratives.
+Biological Identity.
+Confidence.
+Recommendations.
+Goals.
+Predictions.
+Every Discovery should therefore increase the overall intelligence of the DHM.
+
+9.10 Discovery Importance
+Not every Discovery deserves equal prominence.
+Each Discovery shall possess an Importance Rating.
+Possible levels include:
+Minor
+Moderate
+Major
+Transformational
+Importance shall depend upon:
+Long-term impact.
+Clinical relevance.
+Behavioural influence.
+Confidence.
+Future usefulness.
+
+9.11 Discovery Persistence
+Confirmed Discoveries remain part of the DHM until evidence suggests otherwise.
+Discoveries should generally persist longer than ordinary Health Beliefs.
+However, they remain open to future revision.
+No Discovery shall be permanently immutable.
+
+Founder Principle
+Today's Discovery should remain open to tomorrow's evidence.
+
+9.12 Discovery Communication
+Not every Discovery requires immediate communication.
+The Notification Engine shall determine whether the Discovery is:
+Worth communicating immediately.
+Included in a weekly report.
+Included in a monthly report.
+Reserved for future reasoning.
+The DHM simply records the Discovery.
+Communication remains a separate responsibility.
+
+9.13 Discovery Provenance
+Every Discovery shall permanently record:
+Discovery ID.
+Creation date.
+Supporting observations.
+Supporting beliefs.
+Supporting narratives.
+Evidence quality.
+Confidence.
+Alternative explanations considered.
+Review history.
+Current status.
+This ensures every Discovery remains fully explainable.
+
+9.14 Discovery Review
+Every confirmed Discovery shall undergo periodic review.
+Possible outcomes include:
+Confidence strengthened.
+Confidence weakened.
+Discovery refined.
+Discovery replaced.
+Discovery retired.
+The Discovery Engine therefore supports lifelong learning.
+
+9.15 Discovery Reuse
+Discoveries become reusable knowledge throughout BioSense.
+They may influence:
+Recommendations.
+Conversation.
+Learning Mode.
+Predictions.
+Health Score.
+Biological Age.
+Weekly Reports.
+Monthly Reports.
+Future AI reasoning.
+Every Discovery should therefore become a permanent intelligence asset.
+
+Constitutional Principle
+Learn once. Benefit everywhere.
+
+9.16 Engineering Constraints
+The Discovery Engine shall:
+distinguish discoveries from observations, 
+require structured validation, 
+support revision, 
+preserve provenance, 
+remain explainable, 
+remain longitudinal, 
+support future physiological domains. 
+
+9.17 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Every Discovery represents genuine new understanding.
+✓ Candidate Discoveries require validation.
+✓ Discoveries strengthen the Dynamic Health Model.
+✓ Every Discovery possesses provenance.
+✓ Discoveries remain reviewable.
+✓ Discoveries influence future reasoning.
+✓ Discoveries remain reusable across BioSense.
+✓ Discoveries are separated from communication.
+Chapter 10
+Confidence Engine & Confidence Architecture
+
+10.1 Purpose
+The purpose of the Confidence Engine is to quantify how strongly the Dynamic Health Model supports its current understanding.
+Confidence is a constitutional concept.
+It does not measure the confidence of a Large Language Model.
+It does not measure the certainty of a prompt.
+It measures the confidence BioSense has in its current interpretation of an individual's health, based upon all available evidence.
+The Confidence Engine therefore exists to ensure that every belief, narrative, recommendation and prediction is proportionate to the quality of supporting evidence.
+
+Constitutional Principle
+Confidence belongs to understanding, not to the language model generating the response.
+
+10.2 Engineering Philosophy
+Confidence is not a single number.
+It is a structured engineering object.
+Every confidence assessment shall explain:
+Why confidence exists. 
+What evidence supports it. 
+What evidence weakens it. 
+What evidence would increase it. 
+What evidence could reduce it. 
+Confidence should therefore be explainable rather than opaque.
+
+10.3 Confidence Object
+Every confidence object shall contain:
+Identity
+Confidence ID 
+Linked Object ID 
+Object Type 
+Creation Date 
+Last Updated 
+
+Current State
+Current Confidence 
+Confidence Trend 
+Confidence Classification 
+
+Evidence
+Supporting Evidence 
+Contradictory Evidence 
+Missing Evidence 
+
+Quality
+Evidence Quality 
+Evidence Quantity 
+Longitudinal Strength 
+Scientific Strength 
+
+Future
+Next Review Date 
+Confidence Improvement Opportunities 
+
+Audit
+Version 
+Revision History 
+
+Engineering Rule
+Every confidence object shall be independently versioned.
+Confidence history shall never be lost.
+
+10.4 Confidence Levels
+The Confidence Engine shall classify confidence into six constitutional levels.
+Level
+Classification
+Meaning
+C0
+Unknown
+Insufficient information to form an opinion
+C1
+Weak
+Early indication requiring substantial additional evidence
+C2
+Emerging
+Evidence suggests a plausible interpretation, but uncertainty remains significant
+C3
+Moderate
+Multiple independent observations support the interpretation
+C4
+Strong
+Longitudinal and converging evidence support the interpretation with few competing explanations
+C5
+Established
+Extensive, repeatedly validated understanding with minimal remaining uncertainty
+The numeric representation is for engineering purposes only.
+The user should not normally see these labels.
+
+Constitutional Principle
+Confidence should be communicated through language, not numbers.
+Example:
+Instead of:
+Confidence: 82%
+BioSense should say:
+"We have strong evidence to suggest..."
+or
+"Based on the information currently available..."
+
+10.5 Confidence Inputs
+Confidence shall be calculated using multiple independent factors.
+No single factor shall determine confidence.
+Inputs include:
+Evidence Quality
+How reliable is the evidence?
+
+Evidence Quantity
+How much evidence exists?
+
+Longitudinal Consistency
+Has this relationship persisted over time?
+
+Multi-Source Convergence
+Do multiple independent data sources support the same conclusion?
+
+Scientific Support
+How well established is the underlying science?
+
+Personal Consistency
+Has this repeatedly been observed in this individual?
+
+Contradictory Evidence
+Does credible evidence challenge the interpretation?
+
+Missing Information
+Are important data points unavailable?
+
+Freshness
+How recent is the evidence?
+
+Engineering Rule
+Confidence shall never depend on AI model certainty.
+
+10.5a Confidence Computation Contract
+Confidence is stored as a continuous score in the range 0 to 1 and is additionally classified into the six ordinal bands C0–C5 (10.4) by fixed, versioned thresholds. The continuous score is the source of truth; the band is a derived label for internal routing. 'Confidence Score' (4.4) refers to the continuous value; user-facing communication uses language, never either form (10.4).
+The score is produced by a single, versioned function owned by the Confidence Engine that combines the nine inputs of 10.5. The function shall be monotonic and bounded, shall never exceed the strongest justifiable confidence of its inputs (10.7), and shall treat correlated physiological signals as non-independent — 'multi-source convergence' may raise confidence only where source independence is established. The combination method, the input weights, and the C0–C5 thresholds are configuration parameters requiring data-science and clinical sign-off before implementation.
+Engineering Rule
+Confidence is computed by exactly one function in one engine. No consumer may derive its own confidence, and no value may be produced without a recorded explanation of the inputs that generated it (10.13).
+10.6 Confidence Propagation
+Confidence shall propagate through the Dynamic Health Model.
+Example:
+Observation
+
+↓
+
+Belief (C4)
+
+↓
+
+Narrative (C3)
+
+↓
+
+Recommendation (C3)
+
+↓
+
+Prediction (C2)
+Confidence should never increase as reasoning moves further away from direct evidence.
+Instead, uncertainty naturally accumulates.
+
+Constitutional Principle
+Confidence generally decreases as inference increases.
+
+10.7 Confidence Inheritance
+Higher-level objects inherit confidence from their dependencies.
+Examples:
+Health Narrative
+↓
+Derived from multiple Health Beliefs.
+Prediction
+↓
+Derived from Narratives.
+Recommendation
+↓
+Derived from Beliefs, Narratives and Goals.
+Inherited confidence shall never exceed the strongest justifiable confidence supported by underlying evidence.
+
+10.8 Confidence Decay
+Confidence naturally changes over time.
+Possible reasons include:
+Evidence becomes outdated.
+Behaviour changes.
+Scientific understanding evolves.
+Contradictory observations appear.
+Missing follow-up data.
+The Confidence Engine shall therefore periodically review every active confidence object.
+
+Founder Principle
+Confidence should age just as knowledge does.
+
+10.9 Confidence Reinforcement
+Repeated validation strengthens confidence.
+Examples:
+Repeated ferritin decline.
+Repeated improvement after dietary intervention.
+Repeated reduction in HRV following alcohol.
+The Confidence Engine shall recognise repeated confirmation and increase confidence accordingly.
+
+10.10 Confidence Reduction
+Confidence shall reduce when:
+Evidence becomes inconsistent.
+Evidence quality declines.
+Scientific understanding changes.
+New competing hypotheses emerge.
+The reduction shall be proportional.
+Confidence shall never collapse solely because one contradictory observation exists.
+
+10.11 Confidence Conflict
+Different evidence sources may produce different confidence levels.
+Example:
+Wearables strongly support improved recovery.
+Symptoms suggest ongoing fatigue.
+Blood biomarkers remain stable.
+The Confidence Engine shall preserve these conflicts until sufficient evidence exists to resolve them.
+Conflict reduces certainty.
+It does not invalidate reasoning.
+
+Constitutional Principle
+Conflicting confidence should encourage investigation rather than premature certainty.
+
+10.12 Confidence Calibration
+The Confidence Engine shall continuously evaluate whether previous confidence assessments were well calibrated.
+Examples:
+Recommendations succeeded.
+Predictions proved accurate.
+Discoveries remained valid.
+Confidence should therefore improve not only through new evidence but through better calibration of the reasoning process itself.
+
+Engineering Rule
+Calibration shall evaluate the quality of previous confidence decisions.
+It shall not rewrite history.
+
+10.13 Confidence Explainability
+Every confidence assessment shall answer:
+What is the current confidence? 
+Why is confidence at this level? 
+Which evidence supports it? 
+Which evidence weakens it? 
+What additional evidence would improve confidence? 
+What circumstances would reduce confidence? 
+If these questions cannot be answered, the confidence object is incomplete.
+
+10.14 Confidence Consumers
+Confidence is consumed throughout BioSense.
+Examples include:
+Recommendation Engine. 
+Health Score Engine. 
+Biological Age Engine. 
+Conversation Engine. 
+Reporting Engine. 
+Learning Engine. 
+Notification Engine. 
+Prediction Engine. 
+Each engine shall consume confidence.
+No engine shall independently calculate it.
+
+Founder Principle
+There should be one confidence engine—not eight different interpretations of confidence.
+
+10.15 Engineering Constraints
+The Confidence Engine shall:
+remain deterministic in retrieval, versioning and rule evaluation (generative summaries excepted),
+remain explainable, 
+support versioning, 
+support confidence propagation, 
+support confidence decay, 
+support calibration, 
+support future evidence sources, 
+remain independent of AI providers. 
+
+10.16 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Every belief possesses an independent confidence object.
+✓ Confidence is derived from multiple evidence factors.
+✓ Confidence propagates consistently through the Dynamic Health Model.
+✓ Confidence naturally strengthens and weakens over time.
+✓ Conflicting evidence is explicitly represented.
+✓ Confidence is explainable.
+✓ Confidence history is versioned.
+✓ Every BioSense engine consumes the same confidence architecture.
+Chapter 11
+Health Narrative Engine
+
+11.1 Purpose
+The purpose of the Health Narrative Engine is to transform multiple independent Health Beliefs into coherent, longitudinal explanations of an individual's biology.
+The Dynamic Health Model contains hundreds, and eventually thousands, of individual Health Beliefs.
+Humans cannot efficiently understand thousands of disconnected facts.
+Instead, they understand stories.
+The Health Narrative Engine exists to organise validated knowledge into meaningful physiological narratives that explain:
+what is happening, 
+why it is happening, 
+how systems interact, 
+what has changed, 
+what remains uncertain. 
+
+Constitutional Principle
+People understand stories better than isolated facts. The Intelligence Engine should therefore reason in systems, not lists.
+
+11.2 Engineering Philosophy
+Health Narratives are not summaries.
+A summary compresses information.
+A narrative explains information.
+Example:
+Summary:
+Ferritin ↓ 
+HRV ↓ 
+Fatigue ↑ 
+Narrative:
+"Over the past six months, BioSense has observed a gradual decline in iron stores. This coincides with increasing fatigue and reduced recovery, suggesting that iron status may now be contributing to the individual's reduced physiological resilience."
+That narrative becomes reusable throughout BioSense.
+
+Engineering Rule
+Narratives shall explain.
+They shall never simply list observations.
+
+11.3 Definition
+A Health Narrative is defined as:
+A structured, evidence-backed explanation describing how multiple validated Health Beliefs combine to explain one aspect of an individual's physiology.
+Narratives sit above Health Beliefs.
+They integrate understanding.
+They do not replace it.
+
+11.4 Narrative Domains
+Every narrative shall belong to one or more physiological domains.
+Initial domains include:
+Cardiovascular 
+Recovery 
+Sleep 
+Metabolic Health 
+Inflammation 
+Nutrition 
+Exercise Adaptation 
+Hormonal Health 
+Body Composition 
+Mental Wellbeing 
+Longevity 
+Future domains shall be supported without architectural redesign.
+
+11.5 Narrative Composition
+Each Health Narrative shall contain:
+Identity
+Narrative ID 
+Domain 
+Creation Date 
+Current Version 
+
+Understanding
+Title 
+Executive Summary 
+Scientific Explanation 
+Plain-English Explanation 
+
+Supporting Knowledge
+Linked Health Beliefs 
+Linked Discoveries 
+Supporting Observations 
+Supporting Hypotheses 
+
+Confidence
+Narrative Confidence 
+Confidence Trend 
+Sources of Uncertainty 
+
+Relationships
+Related Narratives 
+Related Goals 
+Related Recommendations 
+
+Lifecycle
+Current Status 
+Previous Versions 
+Review History 
+
+11.6 Narrative Formation
+Narratives shall only form when sufficient connected Health Beliefs exist.
+Example:
+Reduced Sleep Consistency
+
+↓
+
+Reduced Recovery
+
+↓
+
+Lower HRV
+
+↓
+
+Higher Perceived Fatigue
+
+↓
+
+Recovery Narrative
+The Narrative Engine shall detect these relationships automatically.
+
+Constitutional Principle
+Narratives emerge from connected understanding—not isolated evidence.
+
+11.7 Narrative Evolution
+Narratives are living objects.
+Possible lifecycle events include:
+Created 
+Expanded 
+Refined 
+Strengthened 
+Weakened 
+Split 
+Merged 
+Retired 
+Example:
+Initially:
+Recovery Narrative
+↓
+Later:
+Recovery Narrative
+
+Stress Narrative
+↓
+Merged into
+Recovery & Stress Interaction Narrative
+
+Founder Principle
+As understanding grows, the structure of understanding may also evolve.
+
+11.8 Narrative Dependencies
+Narratives depend upon underlying Health Beliefs.
+If a belief changes:
+The Narrative Engine shall determine whether:
+no update is required, 
+wording should change, 
+confidence should change, 
+structure should change, 
+the narrative should split, 
+the narrative should merge. 
+Narratives shall never become detached from their supporting beliefs.
+
+11.9 Narrative Conflict
+Different narratives may occasionally appear to compete.
+Example:
+Training Narrative suggests improving fitness.
+Recovery Narrative suggests increasing fatigue.
+Rather than forcing a single answer, the Narrative Engine shall explicitly represent the interaction between these systems.
+Human physiology frequently contains multiple simultaneous truths.
+
+Constitutional Principle
+Physiological systems interact. Narratives should reflect that interaction rather than eliminate it.
+
+11.10 Narrative Prioritisation
+At any point in time, the DHM shall identify:
+Primary Narrative
+Secondary Narratives
+Background Narratives
+Dormant Narratives
+The Primary Narrative represents BioSense's current highest-priority explanation of the individual's health.
+Only one Primary Narrative shall normally exist.
+This prevents cognitive overload.
+
+11.11 Narrative Persistence
+Narratives should generally persist longer than individual Health Beliefs.
+A narrative represents a broader physiological understanding.
+Minor changes to individual beliefs should not constantly rewrite the overall story.
+This provides stability while still allowing evolution.
+
+Founder Principle
+People should experience a stable understanding of their health, not a different story every day.
+
+11.12 Narrative Consumers
+Narratives become one of the most heavily reused objects within BioSense.
+Consumers include:
+Conversation Engine 
+Weekly Reports 
+Monthly Reports 
+Health Score Engine 
+Biological Age Engine 
+Recommendation Engine 
+Learning Engine 
+Prediction Engine 
+Insights Dashboard 
+Future AI Products 
+No consumer should independently recreate a narrative.
+
+11.13 Narrative Explainability
+Every narrative shall answer:
+What is the current story? 
+Which Health Beliefs support it? 
+What evidence created it? 
+What uncertainty remains? 
+What could change this narrative? 
+Which recommendations originate from it? 
+If these questions cannot be answered, the narrative is incomplete.
+
+11.14 Narrative Revision
+The Narrative Engine shall periodically review every active narrative.
+Review may result in:
+unchanged, 
+strengthened, 
+weakened, 
+refined, 
+merged, 
+split, 
+retired. 
+Narratives shall evolve alongside the Dynamic Health Model.
+
+11.15 Engineering Constraints
+The Health Narrative Engine shall:
+consume validated Health Beliefs, 
+preserve explainability, 
+maintain longitudinal stability, 
+support merging and splitting, 
+avoid unnecessary volatility, 
+remain independent of AI provider, 
+remain reusable across BioSense. 
+
+11.16 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Every narrative explains rather than summarises.
+✓ Narratives emerge from multiple connected Health Beliefs.
+✓ Only one Primary Narrative exists at a time.
+✓ Narratives remain stable while allowing gradual evolution.
+✓ Every narrative is fully explainable.
+✓ Every narrative is reusable across the BioSense platform.
+✓ Narrative revisions preserve historical traceability.
+✓ Narrative interactions accurately represent complex physiology.
+Chapter 12
+Biological Identity Engine
+
+12.1 Purpose
+The purpose of the Biological Identity Engine is to construct and continuously refine BioSense's long-term understanding of how an individual typically functions biologically.
+The Dynamic Health Model should distinguish between:
+Temporary physiological states. 
+Persistent biological characteristics. 
+This distinction is fundamental.
+Health changes daily.
+Identity changes slowly.
+The Biological Identity Engine exists to recognise those enduring characteristics that define how an individual consistently responds to the world.
+
+Constitutional Principle
+BioSense should understand who the individual is, not merely what happened today.
+
+12.2 Engineering Philosophy
+Most health platforms optimise for current status.
+BioSense should optimise for enduring understanding.
+Biological Identity is therefore not a diagnosis.
+It is not a health score.
+It is not a prediction.
+It is BioSense's accumulated understanding of the individual's stable physiological characteristics.
+Identity should emerge gradually through repeated observation.
+It should never be inferred from isolated measurements.
+
+Engineering Rule
+Identity requires repeated validation over time.
+No single observation shall modify Biological Identity.
+
+12.3 Definition
+A Biological Identity is defined as:
+A persistent, evidence-backed representation of an individual's characteristic physiological responses, behavioural tendencies and biological adaptations, accumulated through long-term observation.
+Identity exists above:
+observations, 
+beliefs, 
+discoveries, 
+narratives. 
+It represents BioSense's deepest level of personalised understanding.
+
+12.4 Identity Domains
+The Biological Identity Engine shall support multiple identity domains.
+Examples include:
+Recovery Identity
+Typical recovery behaviour.
+
+Sleep Identity
+Chronotype.
+Sleep resilience.
+Sleep consistency.
+Sleep debt recovery.
+
+Exercise Identity
+Training responder.
+Recovery profile.
+Aerobic adaptation.
+Strength adaptation.
+
+Metabolic Identity
+Glucose stability.
+Weight response.
+Energy regulation.
+Nutritional flexibility.
+
+Cardiovascular Identity
+Typical resting heart rate.
+HRV profile.
+Exercise adaptation.
+Recovery dynamics.
+
+Inflammatory Identity
+Baseline inflammatory tendency.
+Recovery from illness.
+Response to stress.
+
+Nutritional Identity
+Typical protein intake.
+Micronutrient vulnerabilities.
+Hydration behaviour.
+Food sensitivities.
+
+Behavioural Identity
+Consistency.
+Adherence.
+Routine stability.
+Lifestyle patterns.
+
+Psychological Identity (Future)
+Stress resilience.
+Motivation.
+Behavioural persistence.
+Only where constitutionally appropriate and supported by evidence.
+
+12.5 Identity Objects
+Every Biological Identity shall contain:
+Identity
+Identity ID 
+Domain 
+Version 
+Current Status 
+
+Description
+Canonical Description 
+Plain-English Description 
+Scientific Interpretation 
+
+Supporting Evidence
+Supporting Discoveries 
+Supporting Narratives 
+Supporting Beliefs 
+Supporting Observations 
+
+Stability
+Stability Score 
+Review Frequency 
+Last Reviewed 
+Review History 
+
+Confidence
+Identity Confidence 
+Confidence Trend 
+
+Relationships
+Related Identity Domains 
+Related Recommendations 
+Related Goals 
+
+12.6 Identity Formation
+Identity formation requires prolonged evidence accumulation.
+Minimum engineering requirements include:
+Repeated observations.
+Longitudinal consistency.
+Supporting discoveries.
+Supporting narratives.
+High confidence.
+Absence of stronger competing explanations.
+Identity should therefore emerge naturally from the Dynamic Health Model.
+It shall never be manually assigned.
+
+Founder Principle
+Identity is discovered, not declared.
+
+12.7 Identity Stability
+Identity objects possess greater stability than ordinary Health Beliefs.
+Examples:
+A temporary illness should not alter:
+Recovery Identity.
+Sleep Identity.
+Exercise Identity.
+Instead:
+Temporary physiology should influence narratives.
+Identity should remain stable until sufficient long-term evidence exists.
+
+Constitutional Principle
+Identity should resist temporary noise.
+
+12.8 Identity Revision
+Although stable, Biological Identity shall remain revisable.
+Possible triggers include:
+Long-term lifestyle change.
+Major weight loss.
+Ageing.
+Pregnancy.
+Medical intervention.
+Sustained exercise adaptation.
+Scientific revision.
+Identity revision should occur infrequently.
+When it does occur, complete historical traceability shall be preserved.
+
+12.9 Identity Relationships
+Identity domains interact.
+Example:
+Exercise Identity
+↓
+Recovery Identity
+↓
+Sleep Identity
+↓
+Cardiovascular Identity
+Changes in one domain may trigger review of related domains.
+Identity therefore forms a connected network.
+
+12.10 Identity Consumers
+Biological Identity shall influence:
+Health Score.
+Biological Age.
+Recommendations.
+Predictions.
+Learning Mode.
+Reports.
+Conversation Engine.
+Goal prioritisation.
+Future AI reasoning.
+No subsystem shall independently infer Biological Identity.
+
+12.11 Identity Explainability
+Every Biological Identity shall answer:
+What characteristic have we identified? 
+Which evidence supports it? 
+How long have we observed it? 
+How stable is it? 
+What evidence could change it? 
+Which BioSense features currently depend upon it? 
+Identity shall remain completely explainable.
+
+12.12 Identity Lifecycle
+Every identity object shall progress through recognised stages.
+Emerging
+
+↓
+
+Candidate Identity
+
+↓
+
+Validated Identity
+
+↓
+
+Stable Identity
+
+↓
+
+Periodic Review
+
+↓
+
+Revised (if required)
+
+↓
+
+Retired (rare)
+Identity should spend the majority of its lifecycle in the Stable state.
+
+12.13 Identity Persistence
+Biological Identity shall persist across years.
+Unlike observations or recommendations, identity becomes progressively more valuable over time.
+Older identity objects should generally become more reliable, provided they continue to receive supporting evidence.
+The age of an identity object should therefore strengthen—not weaken—its usefulness.
+
+Founder Principle
+Time should increase the value of understanding.
+
+12.14 Engineering Constraints
+The Biological Identity Engine shall:
+require longitudinal evidence, 
+remain resistant to temporary fluctuations, 
+preserve historical versions, 
+support gradual evolution, 
+remain explainable, 
+support multiple identity domains, 
+remain independent of AI provider. 
+
+12.15 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Biological Identity is clearly separated from temporary health states.
+✓ Identity requires sustained longitudinal evidence.
+✓ Identity objects remain stable while allowing gradual revision.
+✓ Every identity object is explainable and auditable.
+✓ Identity influences multiple BioSense engines through the DHM.
+✓ Temporary events do not disproportionately affect identity.
+✓ Identity grows more valuable as the relationship with the user matures.
+Chapter 13
+Prioritisation Engine & Attention Management
+
+13.1 Purpose
+The purpose of the Prioritisation Engine is to determine which elements of the Dynamic Health Model deserve attention at any given moment.
+The Dynamic Health Model contains a continually growing body of personalised knowledge.
+Not all knowledge is equally important.
+Not all understanding requires immediate action.
+The Prioritisation Engine exists to ensure that BioSense focuses on the understanding that is currently most valuable to the individual.
+
+Constitutional Principle
+Intelligence is demonstrated not only by what BioSense knows, but by what it chooses to focus on.
+
+13.2 Engineering Philosophy
+The Dynamic Health Model should never attempt to surface everything simultaneously.
+Excessive information reduces understanding.
+Instead, BioSense should continuously identify:
+what matters most, 
+why it matters, 
+why it matters now. 
+Prioritisation is therefore an active reasoning process.
+It is not a sorting algorithm.
+
+Engineering Rule
+Priority shall never be determined solely by recency.
+
+13.3 Attention Objects
+Every significant object within the DHM shall possess an Attention Profile.
+Examples include:
+Health Beliefs
+Health Narratives
+Discoveries
+Knowledge Gaps
+Goals
+Recommendations
+Biological Identity
+Predictions
+Each Attention Profile shall determine how visible that object should become throughout BioSense.
+
+13.4 Attention Profile
+Every Attention Profile shall contain:
+Identity
+Object ID 
+Object Type 
+
+Current Priority
+Current Priority Level 
+Previous Priority Level 
+Priority Trend 
+
+Reasoning
+Why currently important 
+Why not currently important 
+
+Dependencies
+Related objects 
+Downstream impact 
+
+Review
+Next review date 
+Escalation rules 
+
+Audit
+Priority history 
+Previous changes 
+
+13.5 Priority Levels
+The DHM shall classify every Attention Profile into one of five levels.
+Level
+Classification
+Meaning
+P0
+Dormant
+Stored understanding with no current need for attention
+P1
+Background
+Relevant but not currently important
+P2
+Active
+Worth considering during routine reasoning
+P3
+Important
+Should influence current recommendations and reporting
+P4
+Primary
+Represents the most important current area of understanding
+Only one object should normally occupy P4 within each major physiological domain.
+
+Constitutional Principle
+Everything cannot be equally important.
+
+13.6 Priority Factors
+Priority shall be determined through multiple independent factors.
+Examples include:
+Clinical significance.
+Relationship to current goals.
+Confidence.
+Evidence quality.
+Recent change.
+Longitudinal trend.
+User relevance.
+Impact on other beliefs.
+Opportunity for improvement.
+Outstanding uncertainty.
+Future risk.
+No single factor shall dominate priority calculation.
+
+13.7 Dynamic Prioritisation
+Priority shall change over time.
+Examples:
+Improving sleep may reduce the importance of recovery.
+Resolving iron deficiency may reduce the importance of fatigue.
+Achieving a weight goal may increase focus on cardiovascular fitness.
+The DHM shall therefore review priorities continuously.
+
+Founder Principle
+Priority should evolve as understanding evolves.
+
+13.8 Competing Priorities
+Multiple domains may simultaneously demand attention.
+Examples:
+Recovery.
+Nutrition.
+Mental wellbeing.
+Inflammation.
+Goal preparation.
+Rather than presenting everything equally, the Prioritisation Engine shall determine which area currently provides the greatest opportunity for meaningful improvement.
+
+Engineering Rule
+Competing priorities shall be explicitly resolved.
+
+13.9 Priority Cascades
+Changing one priority may influence many others.
+Example:
+Iron Deficiency becomes Primary.
+↓
+Fatigue Narrative increases.
+↓
+Recovery Narrative increases.
+↓
+Training Recommendations change.
+↓
+Learning Mode changes.
+↓
+Weekly Report changes.
+Priority therefore propagates through the Dynamic Health Model.
+
+13.10 Opportunity Scoring
+Priority should consider not only risk...
+...but opportunity.
+Examples:
+High probability of improving sleep.
+Excellent exercise adherence.
+Strong likelihood of increasing VO₂ max.
+Potential reduction in Biological Age.
+BioSense should recognise opportunities for optimisation as well as problems requiring attention.
+
+Constitutional Principle
+The Intelligence Engine should optimise for future potential, not merely current deficits.
+
+13.11 Goal Interaction
+Goals influence priority.
+They do not influence truth.
+Example:
+Preparing for a marathon may increase the priority of recovery and cardiovascular narratives.
+It shall not alter scientific interpretation of blood biomarkers.
+This distinction preserves constitutional integrity.
+
+Founder Principle
+Goals influence attention, not evidence.
+
+13.12 User Attention Budget
+BioSense recognises that users possess limited cognitive capacity.
+The DHM shall therefore limit simultaneous active priorities.
+Recommended engineering limits:
+Primary Priority:
+1
+Important Priorities:
+Maximum 3
+Active Priorities:
+Maximum 5
+Background understanding remains available but should not dominate communication.
+
+Constitutional Principle
+Reduce cognitive load to increase understanding.
+
+13.13 Attention Persistence
+Priority should not fluctuate excessively.
+Temporary observations should rarely alter long-term attention.
+Priority changes should generally require:
+meaningful evidence, 
+sustained trends, 
+constitutional review. 
+This provides stability.
+
+13.14 Explainability
+Every priority decision shall answer:
+Why is this currently important? 
+What evidence supports its importance? 
+What caused its priority level? 
+What would reduce its priority? 
+Which BioSense features currently depend upon this priority? 
+Every prioritisation decision shall remain explainable.
+
+13.15 Engineering Constraints
+The Prioritisation Engine shall:
+remain explainable, 
+avoid excessive volatility, 
+support opportunity-based prioritisation, 
+support risk-based prioritisation, 
+remain longitudinal, 
+minimise cognitive overload, 
+remain independent of AI provider. 
+
+13.16 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Every major DHM object possesses an Attention Profile.
+✓ Priority is determined through multiple evidence factors.
+✓ Goals influence priority without altering scientific interpretation.
+✓ The DHM limits active priorities to avoid overwhelming the individual.
+✓ Priority changes remain explainable and auditable.
+✓ Opportunity and risk are both represented.
+✓ Priority propagates consistently throughout the Dynamic Health Model.
+Chapter 14
+DHM Query Engine & Knowledge Retrieval
+
+14.1 Purpose
+The purpose of the DHM Query Engine is to define how every BioSense subsystem retrieves personalised understanding from the Dynamic Health Model.
+The Dynamic Health Model is not a passive data store.
+It is an active knowledge service.
+Every subsystem interacting with the DHM shall request understanding rather than raw observations.
+The Query Engine ensures that all consumers receive consistent, explainable and constitutionally compliant knowledge.
+
+Constitutional Principle
+Every BioSense engine should ask the Dynamic Health Model what it understands—not what data it possesses.
+
+14.2 Engineering Philosophy
+The DHM should never expose its internal complexity to consuming engines.
+Instead, every consumer should receive:
+validated understanding, 
+relevant context, 
+confidence, 
+uncertainty, 
+provenance. 
+This creates a clean separation between:
+knowledge formation, 
+knowledge storage, 
+knowledge consumption. 
+
+Engineering Rule
+The Query Engine shall expose understanding.
+It shall never expose incomplete internal reasoning objects unless explicitly authorised.
+
+14.3 Query Categories
+The DHM shall support multiple classes of knowledge requests.
+
+Category A
+Current Understanding
+Examples:
+"What do we currently understand about recovery?"
+"What do we understand about iron status?"
+"What is our current understanding of sleep?"
+The response shall include:
+Current Narrative
+Supporting Beliefs
+Confidence
+Key Discoveries
+Outstanding Uncertainty
+
+Category B
+Personal Identity
+Examples:
+"What do we know about this person's recovery profile?"
+"What type of responder are they?"
+"What is their Biological Identity?"
+
+Category C
+Recommendations Context
+Examples:
+"What information should the Recommendation Engine consider?"
+The Query Engine shall return:
+Relevant Beliefs
+Goals
+Narratives
+Identity
+Confidence
+Knowledge Gaps
+
+Category D
+Learning Context
+Examples:
+"What should we ask next?"
+The Query Engine shall identify:
+Knowledge Gaps
+Low-confidence beliefs
+Candidate Discoveries
+Outstanding uncertainty
+
+Category E
+Historical Understanding
+Examples:
+"How has recovery understanding changed over two years?"
+Historical responses shall preserve:
+Version history
+Confidence evolution
+Belief evolution
+Narrative evolution
+
+Category F
+Explainability
+Examples:
+"Why do we currently believe this?"
+The Query Engine shall reconstruct:
+Supporting evidence
+Supporting beliefs
+Supporting discoveries
+Revision history
+Alternative explanations
+
+14.4 Query Response Object
+Every DHM response shall contain a consistent structure.
+Context
+Query ID 
+Timestamp 
+Requesting Engine 
+
+Primary Understanding
+Current Narrative 
+Executive Summary 
+Confidence 
+
+Supporting Knowledge
+Health Beliefs 
+Discoveries 
+Biological Identity 
+Goals 
+
+Uncertainty
+Outstanding Knowledge Gaps 
+Missing Evidence 
+Competing Hypotheses 
+
+Provenance
+Supporting observations 
+Scientific references 
+Revision history 
+
+Metadata
+DHM Version 
+Constitution Version 
+Confidence Version 
+
+Engineering Rule
+Every response shall be reproducible.
+The same query against the same DHM version shall return the same retrieved knowledge: the same beliefs, narratives, confidence values, provenance and version metadata. Any natural-language summary generated within a response (for example an Executive Summary) is produced by a non-deterministic model and is not guaranteed to be byte-identical; what must be reproducible is the structured knowledge returned and the reasoning trace that produced it.
+
+14.5 Context-Aware Retrieval
+Different engines require different levels of detail.
+Examples:
+Conversation Engine
+↓
+Plain-English explanation.
+
+Recommendation Engine
+↓
+Structured knowledge.
+
+Reporting Engine
+↓
+Narratives and trends.
+
+Learning Engine
+↓
+Knowledge Gaps.
+
+Prediction Engine
+↓
+Identity, trends and confidence.
+The Query Engine shall optimise responses for the requesting engine while preserving a single underlying understanding.
+
+14.6 Retrieval Principles
+The Query Engine shall prioritise:
+Current relevance.
+Scientific importance.
+Narrative coherence.
+Confidence.
+Relationship strength.
+Recency where appropriate.
+Goal relevance.
+Retrieval shall never be based solely on keyword matching.
+It should reflect semantic understanding.
+
+Founder Principle
+Retrieve the understanding that best answers the question—not the largest amount of information.
+
+14.7 Explainable Retrieval
+Every retrieved object shall answer:
+Why was this returned? 
+Why was something else omitted? 
+Which beliefs influenced the response? 
+Which discoveries influenced the response? 
+Which uncertainty remains? 
+This allows complete transparency.
+
+14.8 Query Optimisation
+The Query Engine should minimise unnecessary computation.
+Frequently requested understanding may be cached.
+However:
+Cached understanding shall become invalid whenever:
+beliefs change, 
+narratives change, 
+discoveries change, 
+confidence changes, 
+Biological Identity changes. 
+Freshness shall always take priority over performance.
+
+Engineering Rule
+Performance optimisation shall never compromise correctness.
+
+14.8a Cache Scope & Invalidation
+Cached understanding is keyed to the DHM version and to the specific subgraph a query depends on — its beliefs, narratives, discoveries, confidence objects and identity — not to the whole model. A commit invalidates only cache entries whose dependency subgraph intersects the objects that changed, rather than flushing the entire cache.
+Engineering Rule
+Invalidation is dependency-scoped, not global. Correctness still takes priority (14.8): if the dependency set of an entry cannot be determined, that entry is invalidated.
+14.9 Permission Boundaries
+Different consumers may receive different knowledge.
+Examples:
+Recommendation Engine
+Full structured knowledge.
+
+Conversation Engine
+Human-readable understanding.
+
+Analytics Engine
+Aggregated anonymous insights only.
+
+Future Clinical Portal
+Extended explainability.
+The Query Engine shall enforce access rules independently of the DHM.
+
+14.9a Access-Control Model
+Because the DHM holds special-category health data, access control is a defined subsystem, not an implementation detail. Each consumer is bound to a scope specifying which object types it may read, at what granularity (full structured knowledge, human-readable understanding, or aggregated anonymous only) and which fields are redacted. The Analytics scope receives only de-identified aggregates and never row-level beliefs, observations or identity.
+Access is enforced at a single point — the Query Engine — before any knowledge leaves the DHM boundary, and every access is written to the Audit Domain (2.15). Scopes are versioned configuration; a consumer with no scope receives nothing.
+Engineering Rule
+No engine reads the DHM except through the Query Engine, and the Query Engine denies by default. Access rules are enforced independently of the reasoning that produced the knowledge.
+14.10 Failure Handling
+If required knowledge cannot be retrieved:
+The Query Engine shall:
+identify the missing dependency, 
+preserve existing understanding, 
+report the limitation, 
+avoid fabricating conclusions. 
+Incomplete retrieval shall reduce confidence.
+It shall never generate false certainty.
+
+Constitutional Principle
+Failure to retrieve knowledge should reduce confidence—not invent understanding.
+
+14.11 Engineering Constraints
+The Query Engine shall:
+expose understanding rather than raw data, 
+remain deterministic in retrieval, versioning and rule evaluation (generative summaries excepted),
+support explainability, 
+support engine-specific responses, 
+preserve provenance, 
+enforce permissions, 
+remain independent of AI provider. 
+
+14.12 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Every BioSense engine retrieves knowledge through the DHM.
+✓ The Query Engine returns structured understanding rather than observations.
+✓ Responses include confidence, uncertainty and provenance.
+✓ Retrieval is explainable and reproducible.
+✓ Different engines receive appropriately structured responses.
+✓ Cached knowledge remains constitutionally valid.
+✓ Permission boundaries are enforced consistently.
+Chapter 15
+Governance, Auditability & Version Control
+
+15.1 Purpose
+The purpose of this chapter is to define the governance framework for the Dynamic Health Model (DHM).
+The DHM represents the most valuable intellectual asset within BioSense.
+Every modification to the DHM shall therefore be:
+traceable, 
+explainable, 
+reproducible, 
+version controlled, 
+constitutionally compliant. 
+Governance exists to ensure that BioSense remains trustworthy as it grows in complexity over many years.
+
+Constitutional Principle
+Trust requires that every important decision can be explained, reconstructed and independently verified.
+
+15.2 Engineering Philosophy
+The DHM shall never behave as a mutable profile.
+Instead, it shall behave as a continuously versioned knowledge system.
+At any point in time BioSense shall be capable of answering:
+What did we believe? 
+Why did we believe it? 
+Which evidence supported it? 
+Which version of the Intelligence Engine reached that conclusion? 
+What changed since then? 
+Governance therefore applies not only to data, but also to reasoning.
+
+Engineering Rule
+No meaningful change to the DHM shall occur without leaving a permanent audit record.
+
+15.3 Governance Objectives
+The governance framework shall ensure:
+Full historical traceability. 
+Complete explainability. 
+Reproducible reasoning. 
+Constitutional compliance. 
+Safe evolution. 
+Engineering accountability. 
+Scientific transparency. 
+Governance shall support both technical debugging and future clinical confidence.
+
+15.4 Versioning Strategy
+The Dynamic Health Model shall maintain multiple independent version histories.
+These version histories shall evolve independently.
+
+DHM Version
+Represents the current state of the individual's understanding.
+Incremented whenever the individual's understanding changes.
+
+Constitution Version
+Represents the constitutional framework governing reasoning.
+Allows historical decisions to be interpreted within their original constitutional context.
+
+Engineering Specification Version
+Represents the engineering rules in force when reasoning occurred.
+Supports long-term platform evolution.
+
+Scientific Library Version
+Represents the scientific evidence base used during reasoning.
+Critical because scientific understanding evolves over time.
+
+AI Model Version
+Records the AI model(s) participating in reasoning.
+Examples:
+GPT-5.5 
+Claude 
+Gemini 
+Future internal BioSense reasoning models 
+The AI model shall never become the source of truth.
+It is simply one component of the reasoning process.
+
+Confidence Engine Version
+Records which confidence algorithm generated confidence assessments.
+
+Recommendation Engine Version
+Records which recommendation logic generated interventions.
+
+Engineering Rule
+Independent version histories shall never be merged into a single version number.
+
+15.4a Version Identifier Scheme
+Each independent history uses a monotonic version identifier. The DHM version is not a number that embeds the others; it is a manifest that references the exact version of every constituent object (beliefs, narratives, confidence objects, identity) together with the Constitution, Engineering, Scientific Library, AI Model and Confidence Engine versions in force. Reconstructing 'the DHM at version N' means resolving that manifest.
+Engineering Rule
+A DHM version shall be resolvable to the precise set of object and framework versions that produced it; independent histories are never collapsed into a single number (15.4).
+15.5 Audit Events
+The following events shall automatically create audit records.
+Creation of a Health Belief.
+Revision of a Health Belief.
+Retirement of a Health Belief.
+Creation of a Discovery.
+Narrative revision.
+Identity revision.
+Confidence recalculation.
+Recommendation generation.
+Goal modification.
+Knowledge Gap creation.
+Learning Mode completion.
+User correction.
+Scientific Library update.
+Rollback.
+Manual review.
+Every event affecting understanding shall remain permanently auditable.
+
+15.6 Audit Record Structure
+Every audit event shall contain:
+Identity
+Audit ID 
+Event Type 
+Timestamp 
+
+Origin
+Trigger Event 
+Responsible Engine 
+AI Version 
+
+Previous State
+Previous Object 
+Previous Confidence 
+Previous Dependencies 
+
+New State
+Updated Object 
+Updated Confidence 
+Updated Dependencies 
+
+Evidence
+Supporting Observations 
+Supporting Discoveries 
+Supporting Narratives 
+Scientific References 
+
+Reasoning
+Why the change occurred. 
+Why alternatives were rejected. 
+
+Governance
+Constitution Version 
+Engineering Version 
+Reviewer Version 
+
+15.7 Explainability Requirements
+Every significant decision within BioSense shall answer the following questions.
+What changed? 
+Why did it change? 
+Which evidence caused the change? 
+Which engine performed the reasoning? 
+Which version of the Intelligence Engine was used? 
+Which constitutional principles governed the decision? 
+What alternative explanations were considered? 
+What remaining uncertainty exists? 
+If these questions cannot be answered, the decision is not constitutionally valid.
+
+Founder Principle
+Explainability is a design requirement—not an afterthought.
+
+15.8 Rollback Strategy
+If an engineering defect or scientific issue is identified, BioSense shall support rollback without destroying historical knowledge.
+Rollback shall:
+restore previous active state, 
+preserve audit history, 
+preserve observations, 
+preserve reasoning history, 
+preserve version lineage. 
+Rollback shall never erase history.
+It simply changes which version is active.
+
+Constitutional Principle
+Mistakes should be reversible. History should not be erasable.
+
+15.9 Constitutional Compliance
+Every engine interacting with the DHM shall operate within the Constitution.
+Governance shall verify:
+prohibited reasoning has not occurred, 
+unsupported beliefs have not been created, 
+confidence rules have been followed, 
+explainability requirements have been satisfied. 
+Compliance should be automated wherever possible.
+
+15.10 Scientific Evolution
+Medical science evolves.
+The governance framework shall support:
+new biomarkers, 
+revised clinical evidence, 
+updated reference ranges, 
+changing scientific consensus. 
+Historical reasoning shall remain interpretable within its original scientific context.
+Future reasoning shall use updated science.
+
+Founder Principle
+BioSense should evolve with science without rewriting history.
+
+15.11 User Transparency
+Where appropriate, users should be able to understand:
+why recommendations exist, 
+why understanding changed, 
+what evidence supports conclusions, 
+what uncertainty remains. 
+Transparency should strengthen trust.
+Not overwhelm.
+Different audiences may receive different levels of explanation.
+
+15.12 Enterprise Governance
+Future enterprise deployments may require:
+Clinical review.
+Independent audit.
+Regulatory reporting.
+Research validation.
+Partner integrations.
+The governance framework shall support these capabilities without redesigning the DHM.
+
+15.13 Engineering Constraints
+The governance framework shall:
+preserve every meaningful change, 
+remain fully auditable, 
+remain explainable, 
+support rollback, 
+support multiple version histories, 
+support future scientific evolution, 
+remain independent of AI provider. 
+
+15.14 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Every significant change creates an audit record.
+✓ Every decision can be reconstructed.
+✓ Multiple version histories are preserved independently.
+✓ Rollback preserves historical knowledge.
+✓ Scientific evolution is supported.
+✓ Constitutional compliance can be verified.
+✓ Users receive transparent explanations appropriate to their audience.
+✓ Enterprise-grade governance is supported without redesign.
+Chapter 16
+End-to-End Dynamic Health Model Lifecycle
+
+16.1 Purpose
+The purpose of this chapter is to demonstrate the complete lifecycle of the Dynamic Health Model through the journey of a fictional BioSense user.
+Unlike previous chapters, which define engineering architecture in isolation, this chapter illustrates how every major component of the Dynamic Health Model interacts throughout a multi-year relationship.
+The objective is to demonstrate that the architecture defined within ENG-001 is internally consistent, scalable and capable of supporting lifelong personalised health intelligence.
+
+Constitutional Principle
+The value of the Dynamic Health Model is measured not by what it knows on Day One, but by how intelligently it evolves over a lifetime.
+
+16.2 Introducing the User
+For the purposes of this specification we introduce a fictional BioSense user.
+Name: Alex Carter
+Age: 36
+Sex: Male
+Primary Goal: Improve long-term health and reduce Biological Age.
+Current understanding:
+None.
+The Dynamic Health Model exists.
+It is empty.
+
+Day One
+Alex downloads BioSense.
+The DHM is created.
+Current contents:
+Identity
+
+Goals
+
+Empty Observation Store References
+
+No Health Beliefs
+
+No Narratives
+
+No Discoveries
+
+No Biological Identity
+
+Confidence Unknown
+BioSense knows almost nothing.
+And it should admit that.
+
+Engineering Principle
+Low knowledge should never produce false certainty.
+
+16.3 Week One
+Alex connects:
+WHOOP
+Apple Health
+MyFitnessPal
+Daily Check-ins
+BioSense receives:
+HRV 
+Resting Heart Rate 
+Sleep 
+Activity 
+Nutrition 
+Mood 
+These become observations.
+Nothing more.
+No Health Beliefs yet.
+No recommendations.
+No "AI magic."
+The system waits.
+
+Constitutional Principle
+Observation precedes interpretation.
+
+16.4 Month One
+Alex uploads comprehensive blood work.
+The Observation Engine validates:
+Ferritin 
+Vitamin D 
+HbA1c 
+Lipids 
+Testosterone 
+hs-CRP 
+These enter the Observation Store.
+The Belief Engine begins reasoning.
+Possible hypotheses emerge.
+Example:
+Possible Vitamin D insufficiency.
+Possible declining iron stores.
+Possible sleep inconsistency.
+Confidence remains low.
+No Discoveries created.
+
+16.5 Month Three
+Three months of longitudinal data now exist.
+The Belief Engine promotes several hypotheses.
+Examples:
+Sleep consistency is below baseline.
+Recovery improves following rest days.
+Ferritin has declined steadily.
+The Confidence Engine raises confidence.
+The Discovery Engine validates:
+Recovery consistently improves after three consecutive nights of 7.5+ hours sleep.
+This becomes Alex's first Discovery.
+
+16.6 Month Six
+The Health Narrative Engine now possesses sufficient understanding.
+Recovery Narrative:
+Alex's recovery is primarily influenced by sleep consistency rather than training load.
+Nutrition Narrative:
+Iron stores continue to decline despite adequate calorie intake.
+The Recommendation Engine produces:
+Increase dietary iron.
+Repeat ferritin in three months.
+Prioritise sleep consistency.
+Each recommendation references:
+Narratives.
+Beliefs.
+Confidence.
+Supporting evidence.
+Nothing is generated independently.
+
+Engineering Principle
+Recommendations are consequences of understanding.
+Not outputs of an LLM.
+
+16.7 Year One
+BioSense has accumulated:
+Over 300 wearable synchronisations.
+Four blood tests.
+Hundreds of Daily Check-ins.
+Multiple recommendation outcomes.
+Several Discoveries.
+The Biological Identity Engine activates.
+It now recognises:
+Exercise responder:
+High.
+Sleep resilience:
+Low.
+Travel recovery:
+Poor.
+Protein adherence:
+Excellent.
+These become components of Alex's Biological Identity.
+Identity confidence continues increasing.
+
+Constitutional Principle
+Identity emerges from repeated behaviour, not isolated events.
+
+16.8 Year Two
+Alex changes job.
+Stress increases.
+Sleep deteriorates.
+HRV declines.
+The Belief Revision Engine detects conflict.
+Rather than assuming permanent decline, it creates competing hypotheses:
+Occupational stress.
+Reduced exercise consistency.
+Seasonal illness.
+Over several months the evidence converges.
+The Stress Narrative expands.
+The Recovery Narrative is revised.
+The Biological Identity remains unchanged.
+Temporary physiology does not redefine long-term identity.
+
+16.9 Year Three
+Alex begins structured strength training.
+Within twelve months BioSense observes:
+Improved insulin sensitivity.
+Improved body composition.
+Reduced inflammation.
+Improved recovery.
+A new Discovery emerges.
+Alex demonstrates exceptional responsiveness to progressive resistance training.
+This strengthens:
+Exercise Identity.
+Longevity Narrative.
+Recommendation prioritisation.
+Future predictions.
+The Dynamic Health Model has learned something fundamentally new about Alex.
+
+16.10 Scientific Evolution
+Five years later...
+The Canonical Scientific Library is updated.
+New evidence changes interpretation of a biomarker.
+The Scientific Review Engine identifies:
+Three Health Beliefs requiring review.
+One Discovery requiring refinement.
+No observations change.
+The Dynamic Health Model changes because science evolved.
+Audit history preserves both interpretations.
+
+Founder Principle
+Scientific progress improves understanding without rewriting history.
+
+16.11 User Correction
+Alex informs BioSense:
+"I was taking corticosteroids during that blood test."
+This new observation enters the constitutional reasoning pipeline.
+Previous inflammatory beliefs reduce confidence.
+One Discovery is retired.
+Historical reasoning remains preserved.
+The Dynamic Health Model demonstrates intellectual humility.
+
+16.12 Recommendation Evolution
+Year One recommendation:
+Improve sleep consistency.
+Year Three recommendation:
+Optimise recovery around resistance training.
+Year Six recommendation:
+Focus on healthy ageing and maintaining muscle mass.
+The Recommendation Engine evolves because understanding evolves.
+Not because prompts changed.
+
+16.13 Health Score Evolution
+Health Score is recalculated periodically.
+It reflects:
+Current Biological Identity.
+Narratives.
+Beliefs.
+Discoveries.
+Longitudinal trends.
+Health Score changes gradually.
+Daily fluctuations rarely alter it significantly.
+
+16.14 Biological Age Evolution
+Biological Age evolves even more slowly.
+Meaningful movement requires:
+Months or years of evidence.
+Temporary illness.
+Travel.
+Poor sleep.
+Holiday periods.
+Do not materially affect Biological Age.
+This preserves trust.
+
+Constitutional Principle
+Long-term metrics should respond to long-term biology.
+
+16.15 Five Years Later
+BioSense now understands Alex in extraordinary depth.
+The Dynamic Health Model contains:
+Thousands of observations.
+Hundreds of validated Health Beliefs.
+Dozens of Discoveries.
+Multiple Health Narratives.
+A mature Biological Identity.
+Years of recommendation outcomes.
+Years of confidence history.
+Years of audit history.
+Years of scientific evolution.
+The system no longer simply analyses Alex.
+It understands Alex.
+
+16.16 What Happens If Alex Leaves?
+Alex exports his data.
+Observations remain portable.
+Reports remain portable.
+Blood tests remain portable.
+But something far more valuable exists.
+The Dynamic Health Model.
+Years of accumulated understanding.
+Years of Discoveries.
+Years of validated Biological Identity.
+Years of longitudinal narratives.
+This represents BioSense's unique intellectual contribution.
+It is not merely a copy of the user's wearable data.
+It is the product of years of structured reasoning.
+
+Founder Principle
+The longer the relationship, the more valuable the understanding becomes.
+
+16.17 Engineering Validation
+This example demonstrates that:
+✓ Observations remain separate from understanding.
+✓ Beliefs evolve gradually.
+✓ Confidence evolves independently.
+✓ Narratives explain systems.
+✓ Discoveries accumulate.
+✓ Biological Identity matures slowly.
+✓ Recommendations derive from understanding.
+✓ Scientific updates improve reasoning.
+✓ Historical understanding is preserved.
+✓ Every engine collaborates through the Dynamic Health Model.
+The architecture remains internally consistent throughout a multi-year relationship.
+
+Closing Statement
+The Dynamic Health Model is not a database.
+It is not a collection of AI prompts.
+It is not a conversation history.
+It is not a health dashboard.
+It is the persistent intelligence core of BioSense.
+Every observation contributes to it.
+Every Discovery strengthens it.
+Every recommendation originates from it.
+Every conversation is informed by it.
+Every year of interaction makes it more valuable.
+The Dynamic Health Model therefore represents the enduring relationship between BioSense and the individual—a continuously evolving, evidence-backed model of human health that grows wiser through time while remaining transparent, explainable and scientifically grounded.

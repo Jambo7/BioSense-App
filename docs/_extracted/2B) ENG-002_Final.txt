@@ -1,0 +1,3407 @@
+
+
+
+ENG-002: Observation Engine & Canonical Observation Store 
+Engineering Specification
+Document ID:  ENG-002
+Version:  1.0 (Draft)
+Status:  In Development
+Authority:  BioSense Intelligence Constitution (Documents 1A–1C)
+Depends Upon:
+ENG-001 — Dynamic Health Model Engineering Specification
+
+
+Contents
+ TOC \z \o "1-2" \u \hENG-002: Observation Engine & Canonical Observation Store  Engineering Specification	 PAGEREF _Toc234483099 \h 1
+Purpose & Design Philosophy	 PAGEREF _Toc234483100 \h 10
+1.1 Purpose	 PAGEREF _Toc234483101 \h 10
+1.2 Scope	 PAGEREF _Toc234483102 \h 10
+1.3 Authority	 PAGEREF _Toc234483103 \h 11
+2. Design Philosophy	 PAGEREF _Toc234483104 \h 11
+2.1 Core Principle	 PAGEREF _Toc234483105 \h 11
+2.2 Engineering Definition	 PAGEREF _Toc234483106 \h 12
+2.3 Why the Observation Store Exists	 PAGEREF _Toc234483107 \h 13
+2.4 Engineering Principles	 PAGEREF _Toc234483108 \h 13
+3. Architectural Position	 PAGEREF _Toc234483109 \h 15
+4. Acceptance Criteria (Chapter 1)	 PAGEREF _Toc234483110 \h 16
+Canonical Observation Model	 PAGEREF _Toc234483111 \h 17
+2.1 Purpose	 PAGEREF _Toc234483112 \h 17
+2.2 Engineering Philosophy	 PAGEREF _Toc234483113 \h 17
+2.3 Definition	 PAGEREF _Toc234483114 \h 18
+2.4 Observation Granularity	 PAGEREF _Toc234483115 \h 18
+2.5 Canonical Observation Object	 PAGEREF _Toc234483116 \h 19
+2.5a Object Specification Convention & ENG-001 Reference Contract	 PAGEREF _Toc234483117 \h 20
+2.6 Measurement	 PAGEREF _Toc234483118 \h 21
+98.6 °F	 PAGEREF _Toc234483119 \h 21
+37.0 °C	 PAGEREF _Toc234483120 \h 21
+5.2 mmol/L	 PAGEREF _Toc234483121 \h 21
+2.7 Validation	 PAGEREF _Toc234483122 \h 22
+2.8 Provenance	 PAGEREF _Toc234483123 \h 22
+2.9 Quality Assessment	 PAGEREF _Toc234483124 \h 23
+2.10 Relationships	 PAGEREF _Toc234483125 \h 23
+2.11 Observation Classification	 PAGEREF _Toc234483126 \h 24
+2.11a Enumerations Are Closed and Versioned	 PAGEREF _Toc234483127 \h 24
+2.12 Metadata	 PAGEREF _Toc234483128 \h 25
+2.13 Lifecycle	 PAGEREF _Toc234483129 \h 25
+2.14 Immutability	 PAGEREF _Toc234483130 \h 26
+2.15 Engineering Constraints	 PAGEREF _Toc234483131 \h 26
+2.16 Acceptance Criteria	 PAGEREF _Toc234483132 \h 27
+Observation Ingestion & Validation Pipeline	 PAGEREF _Toc234483133 \h 28
+3.1 Purpose	 PAGEREF _Toc234483134 \h 28
+3.2 Engineering Philosophy	 PAGEREF _Toc234483135 \h 28
+3.3 Approved Ingestion Sources	 PAGEREF _Toc234483136 \h 29
+3.4 Canonical Ingestion Pipeline	 PAGEREF _Toc234483137 \h 30
+3.4a External Data Trust → Ingestion Composition	 PAGEREF _Toc234483138 \h 31
+3.5 Stage One — Authentication	 PAGEREF _Toc234483139 \h 32
+3.6 Stage Two — Integrity Validation	 PAGEREF _Toc234483140 \h 32
+3.7 Stage Three — Schema Validation	 PAGEREF _Toc234483141 \h 33
+3.8 Stage Four — Canonical Translation	 PAGEREF _Toc234483142 \h 33
+3.9 Stage Five — Quality Assessment	 PAGEREF _Toc234483143 \h 34
+3.10 Stage Six — Duplicate Detection	 PAGEREF _Toc234483144 \h 34
+3.11 Stage Seven — Relationship Resolution	 PAGEREF _Toc234483145 \h 35
+3.12 Stage Eight — Version Assessment	 PAGEREF _Toc234483146 \h 35
+3.12a Canonical Ingestion Decision Procedure	 PAGEREF _Toc234483147 \h 36
+3.13 Stage Nine — Persistence	 PAGEREF _Toc234483148 \h 36
+3.13a Ingestion Concurrency & Ordering	 PAGEREF _Toc234483149 \h 37
+3.14 Notification	 PAGEREF _Toc234483150 \h 37
+3.14a Notification Delivery Guarantee — Transactional Outbox	 PAGEREF _Toc234483151 \h 38
+3.15 Failure Handling	 PAGEREF _Toc234483152 \h 38
+3.16 Retry Strategy	 PAGEREF _Toc234483153 \h 39
+3.16a Idempotency Key & Enforcement	 PAGEREF _Toc234483154 \h 39
+3.17 Engineering Constraints	 PAGEREF _Toc234483155 \h 39
+3.18 Acceptance Criteria	 PAGEREF _Toc234483156 \h 40
+Observation Quality, Reliability & Provenance	 PAGEREF _Toc234483157 \h 41
+4.1 Purpose	 PAGEREF _Toc234483158 \h 41
+4.2 Engineering Philosophy	 PAGEREF _Toc234483159 \h 41
+4.3 Observation Quality Model	 PAGEREF _Toc234483160 \h 42
+4.4 Source Reliability	 PAGEREF _Toc234483161 \h 43
+4.5 Measurement Reliability	 PAGEREF _Toc234483162 \h 43
+4.6 Completeness	 PAGEREF _Toc234483163 \h 44
+4.7 Temporal Quality	 PAGEREF _Toc234483164 \h 44
+4.8 Provenance	 PAGEREF _Toc234483165 \h 45
+4.9 Data Integrity	 PAGEREF _Toc234483166 \h 46
+4.10 Observation Authenticity	 PAGEREF _Toc234483167 \h 46
+4.11 Quality Classification	 PAGEREF _Toc234483168 \h 46
+4.11a Quality Scoring Contract & ENG-001 Mapping	 PAGEREF _Toc234483169 \h 47
+4.12 Observation Corrections	 PAGEREF _Toc234483170 \h 47
+4.12a Quality Versioning & the Reference Contract	 PAGEREF _Toc234483171 \h 48
+4.13 Downstream Consumption	 PAGEREF _Toc234483172 \h 48
+4.14 Explainability	 PAGEREF _Toc234483173 \h 49
+4.15 Engineering Constraints	 PAGEREF _Toc234483174 \h 49
+4.16 Acceptance Criteria	 PAGEREF _Toc234483175 \h 49
+Canonical Observation Store Architecture	 PAGEREF _Toc234483176 \h 51
+5.1 Purpose	 PAGEREF _Toc234483177 \h 51
+5.2 Engineering Philosophy	 PAGEREF _Toc234483178 \h 51
+5.3 Architectural Responsibilities	 PAGEREF _Toc234483179 \h 52
+5.4 Logical Structure	 PAGEREF _Toc234483180 \h 52
+5.5 Observation Objects	 PAGEREF _Toc234483181 \h 53
+5.6 Source Registry	 PAGEREF _Toc234483182 \h 53
+5.7 Canonical Dictionary	 PAGEREF _Toc234483183 \h 54
+5.8 Observation Relationships	 PAGEREF _Toc234483184 \h 55
+5.9 Observation Collections	 PAGEREF _Toc234483185 \h 56
+5.10 Version Repository	 PAGEREF _Toc234483186 \h 56
+5.11 Audit Repository	 PAGEREF _Toc234483187 \h 56
+5.12 Retrieval Architecture	 PAGEREF _Toc234483188 \h 57
+5.13 Scalability	 PAGEREF _Toc234483189 \h 57
+5.13a Partitioning, Indexing & Archival Latency	 PAGEREF _Toc234483190 \h 58
+5.14 Archival Strategy	 PAGEREF _Toc234483191 \h 58
+5.15 Observation Store Consumers	 PAGEREF _Toc234483192 \h 59
+5.16 Engineering Constraints	 PAGEREF _Toc234483193 \h 59
+5.17 Acceptance Criteria	 PAGEREF _Toc234483194 \h 60
+Observation Lifecycle, Synchronisation & State Management	 PAGEREF _Toc234483195 \h 61
+6.1 Purpose	 PAGEREF _Toc234483196 \h 61
+6.2 Engineering Philosophy	 PAGEREF _Toc234483197 \h 61
+6.3 Observation Lifecycle States	 PAGEREF _Toc234483198 \h 62
+6.3a Canonical Operational State Model	 PAGEREF _Toc234483199 \h 63
+6.4 State Definitions	 PAGEREF _Toc234483200 \h 63
+6.5 Synchronisation Model	 PAGEREF _Toc234483201 \h 65
+6.6 Incremental Synchronisation	 PAGEREF _Toc234483202 \h 65
+6.7 Historical Synchronisation	 PAGEREF _Toc234483203 \h 65
+6.8 Duplicate Synchronisation	 PAGEREF _Toc234483204 \h 66
+6.9 Observation Corrections	 PAGEREF _Toc234483205 \h 66
+6.9a Correction Correlation	 PAGEREF _Toc234483206 \h 67
+6.10 Late Arriving Evidence	 PAGEREF _Toc234483207 \h 67
+6.11 Observation Expiry	 PAGEREF _Toc234483208 \h 68
+6.12 Quarantine	 PAGEREF _Toc234483209 \h 68
+6.13 Manual Review	 PAGEREF _Toc234483210 \h 68
+6.13a Quarantine & Manual Review Operations	 PAGEREF _Toc234483211 \h 69
+6.14 Observation Notifications	 PAGEREF _Toc234483212 \h 69
+6.15 Engineering Constraints	 PAGEREF _Toc234483213 \h 69
+6.16 Acceptance Criteria	 PAGEREF _Toc234483214 \h 70
+Observation Context, Collections & Event Modelling	 PAGEREF _Toc234483215 \h 71
+7.1 Purpose	 PAGEREF _Toc234483216 \h 71
+7.2 Engineering Philosophy	 PAGEREF _Toc234483217 \h 71
+7.3 Observation Events	 PAGEREF _Toc234483218 \h 72
+7.4 Observation Collections	 PAGEREF _Toc234483219 \h 73
+7.5 Collection Hierarchy	 PAGEREF _Toc234483220 \h 74
+7.6 Temporal Context	 PAGEREF _Toc234483221 \h 74
+7.7 Clinical Context	 PAGEREF _Toc234483222 \h 75
+7.8 Device Context	 PAGEREF _Toc234483223 \h 75
+7.9 Observation Episodes	 PAGEREF _Toc234483224 \h 76
+7.10 Relationship Types	 PAGEREF _Toc234483225 \h 76
+7.11 Collection Versioning	 PAGEREF _Toc234483226 \h 77
+7.12 Retrieval Context	 PAGEREF _Toc234483227 \h 77
+7.13 Explainability	 PAGEREF _Toc234483228 \h 78
+7.14 Engineering Constraints	 PAGEREF _Toc234483229 \h 78
+7.15 Acceptance Criteria	 PAGEREF _Toc234483230 \h 78
+Source Connectors & Integration Framework	 PAGEREF _Toc234483231 \h 80
+8.1 Purpose	 PAGEREF _Toc234483232 \h 80
+8.2 Engineering Philosophy	 PAGEREF _Toc234483233 \h 80
+8.3 Connector Architecture	 PAGEREF _Toc234483234 \h 81
+8.4 Connector Responsibilities	 PAGEREF _Toc234483235 \h 81
+8.5 Connector Types	 PAGEREF _Toc234483236 \h 82
+8.6 Connector Registration	 PAGEREF _Toc234483237 \h 84
+8.7 Connector Lifecycle	 PAGEREF _Toc234483238 \h 84
+8.8 Connector Certification	 PAGEREF _Toc234483239 \h 85
+8.9 Version Management	 PAGEREF _Toc234483240 \h 85
+8.10 Failure Isolation	 PAGEREF _Toc234483241 \h 86
+8.11 Retry Strategy	 PAGEREF _Toc234483242 \h 86
+8.12 Connector Monitoring	 PAGEREF _Toc234483243 \h 87
+8.13 Connector Security	 PAGEREF _Toc234483244 \h 87
+8.14 Future Expansion	 PAGEREF _Toc234483245 \h 88
+8.15 Engineering Constraints	 PAGEREF _Toc234483246 \h 88
+8.16 Acceptance Criteria	 PAGEREF _Toc234483247 \h 89
+Canonical Translation Engine	 PAGEREF _Toc234483248 \h 90
+9.1 Purpose	 PAGEREF _Toc234483249 \h 90
+9.2 Engineering Philosophy	 PAGEREF _Toc234483250 \h 90
+9.3 Translation Responsibilities	 PAGEREF _Toc234483251 \h 91
+9.4 Canonical Metric Dictionary	 PAGEREF _Toc234483252 \h 92
+9.4a Dictionary Boundaries & Version Pinning	 PAGEREF _Toc234483253 \h 92
+9.5 Unit Translation	 PAGEREF _Toc234483254 \h 93
+9.5a Unit Conversion Governance	 PAGEREF _Toc234483255 \h 94
+9.6 Timestamp Translation	 PAGEREF _Toc234483256 \h 94
+9.6a Canonical Temporal Model	 PAGEREF _Toc234483257 \h 95
+9.7 Enumeration Translation	 PAGEREF _Toc234483258 \h 95
+9.8 Identifier Translation	 PAGEREF _Toc234483259 \h 95
+9.9 Metadata Translation	 PAGEREF _Toc234483260 \h 96
+9.10 Translation Validation	 PAGEREF _Toc234483261 \h 96
+9.11 Translation Rules	 PAGEREF _Toc234483262 \h 97
+9.12 Translation Failures	 PAGEREF _Toc234483263 \h 97
+9.13 Backward Compatibility	 PAGEREF _Toc234483264 \h 98
+9.14 Future Metric Expansion	 PAGEREF _Toc234483265 \h 98
+9.15 Engineering Constraints	 PAGEREF _Toc234483266 \h 98
+9.16 Acceptance Criteria	 PAGEREF _Toc234483267 \h 99
+Observation Retrieval & Evidence Query Framework	 PAGEREF _Toc234483268 \h 100
+10.1 Purpose	 PAGEREF _Toc234483269 \h 100
+10.2 Engineering Philosophy	 PAGEREF _Toc234483270 \h 100
+10.3 Retrieval Principles	 PAGEREF _Toc234483271 \h 101
+10.4 Query Categories	 PAGEREF _Toc234483272 \h 101
+10.5 Query Response Model	 PAGEREF _Toc234483273 \h 104
+10.6 Filtering	 PAGEREF _Toc234483274 \h 105
+10.7 Sorting	 PAGEREF _Toc234483275 \h 105
+10.8 Retrieval Context	 PAGEREF _Toc234483276 \h 106
+10.9 Relationship Expansion	 PAGEREF _Toc234483277 \h 106
+10.10 Retrieval Optimisation	 PAGEREF _Toc234483278 \h 107
+10.11 Permission Model	 PAGEREF _Toc234483279 \h 107
+10.12 Retrieval Failures	 PAGEREF _Toc234483280 \h 108
+10.13 Scalability	 PAGEREF _Toc234483281 \h 109
+10.14 Explainability	 PAGEREF _Toc234483282 \h 109
+10.15 Engineering Constraints	 PAGEREF _Toc234483283 \h 109
+10.16 Acceptance Criteria	 PAGEREF _Toc234483284 \h 110
+Governance, Security & Operational Controls	 PAGEREF _Toc234483285 \h 111
+11.1 Purpose	 PAGEREF _Toc234483286 \h 111
+11.2 Engineering Philosophy	 PAGEREF _Toc234483287 \h 111
+11.3 Evidence Ownership	 PAGEREF _Toc234483288 \h 112
+11.4 Access Control	 PAGEREF _Toc234483289 \h 112
+11.5 Authentication	 PAGEREF _Toc234483290 \h 113
+11.6 Encryption	 PAGEREF _Toc234483291 \h 114
+11.7 Audit Logging	 PAGEREF _Toc234483292 \h 114
+11.8 Data Residency	 PAGEREF _Toc234483293 \h 115
+11.9 Privacy Controls	 PAGEREF _Toc234483294 \h 115
+11.10 Backup & Disaster Recovery	 PAGEREF _Toc234483295 \h 115
+11.11 Retention & Archival	 PAGEREF _Toc234483296 \h 116
+11.11a Lawful Erasure and the ENG-001 Bridge	 PAGEREF _Toc234483297 \h 117
+11.12 Operational Monitoring	 PAGEREF _Toc234483298 \h 117
+11.13 Incident Management	 PAGEREF _Toc234483299 \h 118
+11.14 Regulatory Readiness	 PAGEREF _Toc234483300 \h 118
+11.15 Engineering Constraints	 PAGEREF _Toc234483301 \h 119
+11.16 Acceptance Criteria	 PAGEREF _Toc234483302 \h 119
+End-to-End Observation Lifecycle	 PAGEREF _Toc234483303 \h 120
+12.1 Purpose	 PAGEREF _Toc234483304 \h 120
+12.2 Introducing the User	 PAGEREF _Toc234483305 \h 120
+12.3 A New Observation Is Created	 PAGEREF _Toc234483306 \h 121
+12.4 Synchronisation Begins	 PAGEREF _Toc234483307 \h 121
+12.5 Validation Pipeline	 PAGEREF _Toc234483308 \h 122
+12.6 Canonical Translation	 PAGEREF _Toc234483309 \h 122
+12.7 Quality Assessment	 PAGEREF _Toc234483310 \h 123
+12.8 Duplicate Assessment	 PAGEREF _Toc234483311 \h 123
+12.9 Observation Event Creation	 PAGEREF _Toc234483312 \h 124
+12.10 Persistence	 PAGEREF _Toc234483313 \h 124
+12.11 Dynamic Health Model Notification	 PAGEREF _Toc234483314 \h 125
+12.12 Three Months Later	 PAGEREF _Toc234483315 \h 125
+12.13 One Year Later	 PAGEREF _Toc234483316 \h 126
+12.14 Provider Evolution	 PAGEREF _Toc234483317 \h 126
+12.15 Observation Correction	 PAGEREF _Toc234483318 \h 127
+12.16 Five Years Later	 PAGEREF _Toc234483319 \h 128
+12.17 Disaster Recovery	 PAGEREF _Toc234483320 \h 128
+12.18 End-to-End Validation	 PAGEREF _Toc234483321 \h 129
+		
+Chapter 1
+Purpose & Design Philosophy
+
+1.1 Purpose
+This specification defines the engineering architecture of the BioSense Observation Engine and the Canonical Observation Store.
+The Observation Engine is responsible for receiving, validating, normalising, versioning and preserving every observation used by BioSense.
+The Observation Store represents the constitutional source of objective truth within the BioSense platform.
+Unlike the Dynamic Health Model, which stores interpreted understanding, the Observation Store stores only validated observations.
+Every Health Belief, Discovery, Narrative, Biological Identity and Recommendation defined within ENG-001 ultimately depends upon the quality and integrity of the observations defined within this specification.
+The purpose of this document is therefore to ensure that BioSense reasons from trusted evidence rather than inconsistent or ambiguous data.
+
+1.2 Scope
+This specification defines:
+Observation Engine architecture 
+Canonical Observation Store 
+Observation lifecycle 
+Validation pipeline 
+Canonical translation 
+Version control 
+Provenance 
+Data quality 
+Observation relationships 
+Observation integrity 
+Source management 
+Engineering constraints 
+Acceptance criteria 
+This specification deliberately excludes:
+Health Beliefs 
+Confidence calculation 
+Recommendations 
+Conversation logic 
+Health Score 
+Biological Age 
+Dynamic Health Model reasoning 
+Those subjects are defined in separate engineering specifications.
+
+1.3 Authority
+The Observation Engine shall operate in accordance with:
+BioSense Intelligence Constitution (1A–1C) 
+ENG-001 Dynamic Health Model Engineering Specification 
+Where any implementation conflicts with those governing documents:
+The Constitution shall take precedence.
+The Dynamic Health Model specification shall take precedence over implementation decisions affecting personalised understanding.
+
+2. Design Philosophy
+
+2.1 Core Principle
+The Observation Store is not an intelligence system.
+It does not interpret.
+It does not diagnose.
+It does not recommend.
+It does not reason.
+Its responsibility is far simpler—and equally important.
+It preserves objective evidence.
+
+Constitutional Principle
+The Observation Store preserves facts. The Dynamic Health Model creates understanding.
+
+2.2 Engineering Definition
+For engineering purposes:
+An Observation is a timestamped, version-controlled, evidence-backed record describing something that was measured, reported or observed about an individual without adding interpretation.
+Every word is significant.
+Timestamped
+Every observation exists at a specific point in time.
+
+Version-controlled
+Observations are never overwritten.
+Corrections create new versions.
+
+Evidence-backed
+Every observation has identifiable provenance.
+
+Without Interpretation
+The Observation Store never concludes what an observation means.
+Interpretation belongs exclusively within the Dynamic Health Model.
+
+2.3 Why the Observation Store Exists
+Modern health data originates from many independent sources:
+Wearables 
+Blood laboratories 
+Medical records 
+User questionnaires 
+Nutrition apps 
+Manual entry 
+Future devices 
+Each source uses:
+different terminology, 
+different units, 
+different timestamps, 
+different confidence, 
+different quality standards. 
+Without a canonical Observation Store:
+duplicate observations would exist, 
+conflicting units would appear, 
+provenance would be lost, 
+reasoning would become inconsistent, 
+explainability would fail. 
+The Observation Store therefore creates a single constitutional representation of objective evidence before any reasoning begins.
+
+2.4 Engineering Principles
+Every implementation of the Observation Engine shall satisfy the following principles.
+Principle 1 — Observations Are Facts
+Observations represent measured or reported information.
+They shall never contain interpretation.
+Example:
+Observation:
+Ferritin = 24 µg/L
+Not:
+"Iron stores are declining."
+That conclusion belongs to the Dynamic Health Model.
+
+Principle 2 — Every Observation Has Provenance
+Every observation shall identify:
+where it originated, 
+how it was collected, 
+when it was collected, 
+how it entered BioSense. 
+Anonymous observations are constitutionally invalid.
+
+Principle 3 — Observations Are Immutable
+Observations are append-only objects.
+Errors are corrected through versioning.
+The original observation remains permanently recoverable.
+
+Principle 4 — Canonical Before Storage
+Every observation shall be transformed into BioSense's canonical format before entering the Observation Store.
+Internal reasoning engines should never require source-specific translation.
+
+Principle 5 — One Observation Exists Once
+Duplicate observations shall never create duplicate evidence.
+Repeated synchronisation should identify existing observations rather than inflate evidence.
+
+Principle 6 — Validation Before Persistence
+Every observation shall pass constitutional validation before it becomes eligible for storage.
+Invalid observations shall never influence the Dynamic Health Model.
+
+Principle 7 — Separation of Fact and Meaning
+The Observation Store never performs reasoning.
+The Dynamic Health Model never stores raw observations.
+These responsibilities shall remain permanently separated.
+
+3. Architectural Position
+The Observation Engine is the first permanent component within the BioSense Intelligence architecture.
+Conceptually:
+External Sources
+
+WHOOP
+Apple Health
+Garmin
+Oura
+Fitbit
+Polar
+Terra
+Laboratories
+Medical Records
+Nutrition
+Manual Entry
+Future Sources
+
+        │
+
+        ▼
+
+Observation Engine
+
+        │
+
+Validation
+
+Canonical Translation
+
+Version Control
+
+Provenance
+
+Quality Assessment
+
+Deduplication
+
+        │
+
+        ▼
+
+Canonical Observation Store
+
+        │
+
+        ▼
+
+Dynamic Health Model (ENG-001)
+The Observation Engine therefore acts as the constitutional gateway into the BioSense Intelligence Engine.
+No subsystem shall write observations directly into the Observation Store.
+
+4. Acceptance Criteria (Chapter 1)
+This chapter shall be considered correctly implemented when:
+The Observation Store is recognised as the constitutional source of objective evidence. 
+Observations remain permanently separated from interpreted understanding. 
+Every observation possesses provenance. 
+Every observation is immutable. 
+Canonical translation occurs before storage. 
+Validation precedes persistence. 
+Every downstream engine receives standardised observations. 
+The Observation Engine operates independently of the Dynamic Health Model.
+Chapter 2
+Canonical Observation Model
+
+2.1 Purpose
+The purpose of this chapter is to define the canonical engineering model used to represent every observation stored within BioSense.
+Regardless of origin, every observation shall ultimately be represented using a common structure.
+This enables every downstream subsystem to consume observations consistently without requiring source-specific logic.
+The Canonical Observation Model therefore becomes the universal language of evidence within the BioSense platform.
+
+Constitutional Principle
+Every source may speak differently. Every observation shall be stored in one canonical language.
+
+2.2 Engineering Philosophy
+Observation sources are heterogeneous.
+Examples include:
+WHOOP 
+Apple Health 
+Garmin 
+Oura 
+Fitbit 
+Polar 
+Laboratory Information Systems 
+PDF Blood Reports 
+Manual User Entry 
+Daily Check-ins 
+Nutrition Platforms 
+Medical Records 
+Future APIs 
+Each source possesses:
+different naming conventions, 
+different timestamps, 
+different measurement units, 
+different precision, 
+different metadata. 
+The Observation Engine shall normalise these differences before persistence.
+The Canonical Observation Store shall therefore remain completely source-independent.
+
+2.3 Definition
+A Canonical Observation is defined as:
+A validated, immutable, timestamped and version-controlled representation of a single objective fact concerning an individual's health, expressed using BioSense's standard internal schema.
+A Canonical Observation contains no interpretation.
+It contains only evidence.
+
+2.4 Observation Granularity
+Each Canonical Observation shall represent one measurable fact.
+Examples:
+✔ Ferritin = 24 µg/L
+✔ Resting Heart Rate = 49 bpm
+✔ Sleep Duration = 7h 18m
+✔ Body Weight = 81.4 kg
+✔ Energy Level = 6/10
+Not:
+✘ Blood Test
+✘ Daily Summary
+✘ Health Report
+Large documents shall be decomposed into multiple canonical observations.
+
+Engineering Rule
+One observation shall represent one fact.
+
+2.5 Canonical Observation Object
+Every observation shall contain the following mandatory attributes.
+
+Identity
+Observation ID 
+Individual ID 
+Observation Version 
+Observation Type 
+
+Source
+Source System 
+Source Object ID 
+Source Record Version 
+Source Collection Method 
+Examples:
+WHOOP API
+Apple Health
+PDF Extraction
+Manual Entry
+Clinician Portal
+Future Integration
+
+Timing
+Measurement Timestamp 
+Observation Timestamp 
+Ingestion Timestamp 
+Time Zone 
+Time Precision 
+The distinction between these timestamps is constitutionally important.
+
+Measurement Timestamp
+When the measurement actually occurred.
+
+Observation Timestamp
+When the source recorded it.
+
+Ingestion Timestamp
+When BioSense received it.
+
+2.5a Object Specification Convention & ENG-001 Reference Contract
+The Canonical Observation is defined here (2.5, 2.6) and again in 5.5 using different attribute lists. These shall be reconciled into one normative Data Dictionary that is the single definition of the object. Every attribute — here and in 5.5 — shall specify data type, cardinality (1:1 or 1:N), whether it is required, and its permitted value set. Attribute names alone are not an implementable schema.
+The Data Dictionary shall include, as required fields, the identifiers ENG-001 pins to: observation_id and observation_version. ENG-001 references an observation as ObservationRef{id, version}; this reference contract is binding and shall not change without a coordinated ENG-001 amendment.
+Engineering Rule
+One object, one schema. 2.5, 2.6 and 5.5 shall describe the same fields, and no engine may rely on an attribute that has no Data Dictionary entry.
+2.6 Measurement
+Every observation shall include:
+Metric Name 
+Canonical Metric ID 
+Raw Value 
+Canonical Value 
+Unit 
+Canonical Unit 
+Precision 
+Examples:
+Raw:
+98.6 °F
+Canonical:
+37.0 °C
+
+Raw:
+5.2 mmol/L
+Canonical:
+94 mg/dL
+(where clinically appropriate and according to BioSense's canonical standards)
+
+Engineering Rule
+Raw values shall always be preserved.
+Canonical values shall always be stored separately.
+
+2.7 Validation
+Every observation shall record its validation status.
+Examples:
+Validated
+Pending Review
+Rejected
+Estimated
+Incomplete
+Corrected
+Validation Status determines whether an observation may participate in reasoning.
+
+Constitutional Principle
+Unvalidated observations shall never influence the Dynamic Health Model.
+
+2.8 Provenance
+Every observation shall preserve complete provenance.
+Required attributes include:
+Original Source 
+Collection Method 
+Device 
+Laboratory 
+Parser Version 
+OCR Version (where applicable) 
+API Version 
+Import Method 
+Provenance shall never be removed.
+
+2.9 Quality Assessment
+Every observation shall possess a Quality Profile.
+Example attributes include:
+Source Reliability
+Measurement Precision
+Completeness
+Consistency
+Verification Status
+Data Integrity
+Quality Score
+The Observation Engine shall not interpret quality.
+It shall preserve it.
+
+2.10 Relationships
+Observations may possess relationships.
+Examples:
+Blood Sample
+↓
+Ferritin
+↓
+Iron
+↓
+Transferrin Saturation
+↓
+Haemoglobin
+These observations originate from the same laboratory event.
+Relationships shall preserve context without combining observations.
+
+Engineering Rule
+Relationships shall never merge independent observations.
+
+2.11 Observation Classification
+Every observation shall belong to one primary category.
+Examples include:
+Biomarker
+Wearable
+Nutrition
+Exercise
+Sleep
+Medication
+Symptom
+Lifestyle
+Anthropometric
+Questionnaire
+Clinical Record
+Environmental
+Future Categories
+Classification supports retrieval.
+It does not influence reasoning.
+
+2.11a Enumerations Are Closed and Versioned
+Several attributes are presented with 'Examples include' — Observation Type, Validation Status (2.7), Source Collection Method (2.5), Observation Classification (2.11), Quality Classification (4.11), Relationship Types (7.10) and the lifecycle states. Where a value gates behaviour (validation, retrieval, versioning, or ENG-001 consumption) the set shall be a closed, versioned enumeration, extended only through governed addition and never invented at implementation time.
+Engineering Rule
+Each such list shall be marked normative (a closed enumeration) or illustrative. A value outside the normative enumeration is invalid.
+2.12 Metadata
+Every observation shall preserve metadata.
+Examples include:
+Collection Device
+Sensor Firmware
+Sampling Rate
+Laboratory Accreditation
+File Format
+Import Method
+Region
+Country
+Language
+Metadata shall remain available for audit but shall not influence interpretation unless explicitly defined elsewhere.
+
+2.13 Lifecycle
+Every Canonical Observation shall progress through a recognised lifecycle.
+Collected
+
+↓
+
+Received
+
+↓
+
+Validated
+
+↓
+
+Canonicalised
+
+↓
+
+Stored
+
+↓
+
+Available for Reasoning
+
+↓
+
+Superseded (if corrected)
+
+↓
+
+Archived
+Observations shall never be silently deleted or overwritten; evidence changes only through versioning. Lawful, audited erasure is the single exception, defined in 11.11a.
+
+2.14 Immutability
+Once stored, a Canonical Observation shall become immutable.
+If correction is required:
+A new observation version shall be created.
+The previous version shall remain permanently accessible.
+
+Founder Principle
+Evidence should evolve through versioning, never through silent replacement.
+
+2.15 Engineering Constraints
+The Canonical Observation Model shall:
+represent one measurable fact, 
+remain immutable, 
+preserve raw values, 
+preserve canonical values, 
+preserve provenance, 
+preserve quality, 
+preserve relationships, 
+support unlimited future observation types. 
+
+On Acceptance Criteria
+Acceptance criteria in every chapter shall be objective, automatable assertions rather than aspirations. 'Supports future data sources without redesign' and 'scalable for decades' are design goals, not tests. Each should be restated verifiably — for example: 'an identical resynchronisation of N source records yields zero new observation versions'; 'a corrected record yields exactly one superseding version linked to its original'; 'a timestamp round-trips preserving both the canonical instant and the original timezone'.
+Engineering Rule
+A criterion that cannot be checked by a test or a defined inspection is not an acceptance criterion. This applies to the acceptance section of every chapter.
+2.16 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Every observation conforms to one canonical structure.
+✓ Every observation represents exactly one measurable fact.
+✓ Raw values are preserved alongside canonical values.
+✓ Multiple timestamps are distinguished correctly.
+✓ Provenance remains complete and immutable.
+✓ Observation quality is recorded independently of interpretation.
+✓ Relationships between observations are preserved without merging them.
+✓ The Canonical Observation Model supports future data sources without requiring structural redesign.
+Chapter 3
+Observation Ingestion & Validation Pipeline
+
+3.1 Purpose
+The purpose of this chapter is to define the constitutional lifecycle through which every external observation enters the BioSense platform.
+No observation shall enter the Canonical Observation Store directly.
+Every observation, regardless of origin, shall pass through a controlled ingestion and validation pipeline that ensures:
+authenticity, 
+structural integrity, 
+canonical consistency, 
+provenance, 
+version traceability, 
+data quality. 
+The pipeline represents the only approved entry point into the Observation Store.
+
+Constitutional Principle
+No evidence becomes BioSense evidence until it has passed constitutional validation.
+
+3.2 Engineering Philosophy
+External systems should never be trusted automatically.
+Even trusted providers may produce:
+duplicate records, 
+incomplete data, 
+delayed synchronisations, 
+corrupted payloads, 
+incompatible units, 
+ambiguous timestamps, 
+missing metadata. 
+The responsibility of the Observation Engine is not simply to import data.
+Its responsibility is to determine whether incoming information is suitable for long-term scientific reasoning.
+
+Engineering Rule
+Every observation shall be validated before it is stored.
+Storage is not validation.
+
+3.3 Approved Ingestion Sources
+The Observation Engine shall support multiple ingestion pathways.
+Approved sources include:
+Wearable APIs
+WHOOP
+Apple Health
+Garmin
+Fitbit
+Oura
+Polar
+Future integrations.
+
+Laboratory Systems
+Electronic laboratory interfaces.
+Structured laboratory exports.
+
+Document Processing
+Blood test PDFs.
+Medical letters.
+Clinical reports.
+Imaging reports.
+Future OCR pipelines.
+
+Manual Entry
+User-entered values.
+Clinician-entered values.
+Verified administrative updates.
+
+Connected Platforms
+Nutrition applications.
+Medication platforms.
+Continuous glucose monitors.
+Future health services.
+
+Engineering Rule
+Every ingestion pathway shall ultimately enter the same validation pipeline.
+
+3.4 Canonical Ingestion Pipeline
+Every observation shall pass through the following stages.
+External Source
+        │
+        ▼
+Constitutional Boundary
+        │
+        ▼
+External Data Trust (ENG-012 §4)
+        │
+        ▼
+Authentication
+        │
+        ▼
+Integrity Validation
+        │
+        ▼
+Schema Validation
+        │
+        ▼
+Canonical Translation
+        │
+        ▼
+Quality Assessment
+        │
+        ▼
+Duplicate Detection
+        │
+        ▼
+Relationship Resolution
+        │
+        ▼
+Version Assessment
+        │
+        ▼
+Persistence
+        │
+        ▼
+Observation Store
+        │
+        ▼
+Notify Dynamic Health Model
+No stage may be bypassed. The pipeline begins only after the dataset has passed the ENG-012 Constitutional Boundary and carries an External Data Trust Decision (ENG-012 §4.9); ingestion consumes that decision per §3.4a. No externally-sourced observation enters this pipeline without one.
+
+3.4a External Data Trust → Ingestion Composition
+ENG-012 owns the Constitutional Boundary and produces an External Data Trust Decision for every inbound dataset (ENG-012 §4.9); ENG-002 owns ingestion and observation quality. The two gates compose deterministically, so a limited-trust dataset is neither silently dropped nor silently promoted:
+Trusted — proceed through the full ingestion pipeline normally
+Trusted with Limitations — proceed through ingestion, and carry the limitation forward into the Observation Quality Profile (§4.3): the ENG-012 limitation degrades Source Reliability and/or Provenance Completeness rather than blocking ingestion. Trust limitations lower observation quality; they never silently raise it, and they are never discarded.
+Pending Review — defer ingestion; the dataset is held, not persisted, until ENG-012 resolves the trust decision. No belief-affecting observation is created from a pending dataset. 
+Retry Required — do not ingest; the dataset re-enters at the ENG-012 boundary under ENG-012's retry handling. 
+Rejected — do not ingest; no observation is created. The rejection is audited at the boundary.
+External Data Trust remains independent from observation quality and from Health Belief confidence (ENG-012 §4.3): it governs whether and how a dataset enters ingestion, mapped here to Quality Profile inputs, and never sets clinical meaning.
+
+Engineering Rule
+Every externally-sourced dataset carries an ENG-012 Trust Decision into ingestion. Trusted proceeds; Trusted-with-Limitations proceeds and degrades Quality Profile source/provenance fields; Pending defers; Retry re-enters the boundary; Rejected creates no observation. The mapping is deterministic and the two gates never silently override one another.
+
+3.5 Stage One — Authentication
+The Observation Engine shall first verify the origin of incoming observations.
+Authentication methods may include:
+API authentication. 
+OAuth. 
+Signed uploads. 
+Laboratory verification. 
+User authentication. 
+Administrative authentication. 
+Unauthenticated observations shall never reach the Observation Store.
+
+Constitutional Principle
+Unknown sources cannot create trusted evidence.
+
+3.6 Stage Two — Integrity Validation
+The engine shall confirm that the observation has not been corrupted.
+Examples include:
+malformed payload, 
+truncated document, 
+checksum mismatch, 
+unreadable file, 
+missing mandatory attributes, 
+incompatible encoding. 
+Failed observations shall enter quarantine.
+They shall not proceed further.
+
+3.7 Stage Three — Schema Validation
+Incoming observations shall be validated against BioSense's canonical schema.
+Validation includes:
+required fields, 
+supported observation type, 
+valid timestamps, 
+recognised units, 
+supported source, 
+valid identifiers. 
+Schema validation determines whether BioSense can understand the observation.
+
+Engineering Rule
+Unknown structures shall never be silently accepted.
+
+3.8 Stage Four — Canonical Translation
+Validated observations shall be translated into BioSense's canonical representation.
+Examples include:
+Different timestamp formats.
+Different naming conventions.
+Different units.
+Different device terminology.
+Different laboratory identifiers.
+After canonicalisation, downstream systems shall no longer require source-specific logic.
+
+Founder Principle
+Translate once. Reason forever.
+
+3.9 Stage Five — Quality Assessment
+Every observation shall receive an independent quality assessment.
+Factors may include:
+Source reliability.
+Completeness.
+Precision.
+Measurement method.
+Import confidence.
+Extraction confidence.
+Temporal accuracy.
+Quality assessment shall accompany the observation.
+It shall not determine its meaning.
+
+3.10 Stage Six — Duplicate Detection
+The Observation Engine shall identify duplicate observations before persistence.
+Potential duplicate indicators include:
+Identical source identifier.
+Identical measurement timestamp.
+Identical value.
+Identical laboratory accession number.
+Identical wearable event.
+Duplicate detection outcomes include:
+Duplicate confirmed.
+Possible duplicate.
+Independent observation.
+Only confirmed duplicates shall be prevented from creating additional evidence.
+
+Constitutional Principle
+Duplicate observations should not become duplicate evidence.
+
+3.11 Stage Seven — Relationship Resolution
+Some observations belong together.
+Examples:
+One blood sample.
+↓
+Twenty biomarkers.
+One sleep session.
+↓
+Sleep stages.
+One workout.
+↓
+Heart rate.
+Power.
+Cadence.
+Calories.
+Relationships shall be established before persistence.
+The observations remain independent.
+Their context is preserved.
+
+3.12 Stage Eight — Version Assessment
+The Observation Engine shall determine whether incoming information represents:
+A new observation.
+A corrected observation.
+A superseding observation.
+An identical observation.
+Versioning decisions shall occur before storage.
+
+3.12a Canonical Ingestion Decision Procedure
+Duplicate detection (3.10), version assessment (3.12), duplicate synchronisation (6.8), corrections (6.9) and late-arriving evidence (6.10) all decide the same question and shall be governed by one deterministic procedure defined here; those sections reference it rather than restating heuristics.
+Every incoming record is reduced to an Observation Identity Key: source_system + source_object_id + source_record_version + canonical_metric_id + measurement_timestamp. The Correction Correlation Key is the same tuple without source_record_version (see 6.9a).
+The decision is made in fixed order: (1) if an observation with the same Identity Key already exists, the record is identical and is ignored as an idempotent no-op; (2) else if the Correlation Key matches an existing observation and source_record_version is higher, it is a corrected, superseding version; (3) else if the Correlation Key matches and the measurement_timestamp is older than the individual's latest for that metric, it is late-arriving; (4) otherwise it is an independent new observation.
+The outcome is deterministic: the same record always yields the same outcome regardless of arrival path or retry.
+Engineering Rule
+There shall be exactly one ingestion decision procedure and one Identity Key. No stage may implement its own duplicate or version heuristic.
+3.13 Stage Nine — Persistence
+Only after successful completion of every previous stage may an observation enter the Canonical Observation Store.
+Persistence shall be:
+Atomic.
+Version-controlled.
+Immutable.
+Auditable.
+Every successful persistence event shall generate an audit record.
+
+Engineering Rule
+Partial persistence is constitutionally prohibited.
+
+3.13a Ingestion Concurrency & Ordering
+The pipeline is described per observation, but records for the same individual arrive concurrently. Duplicate and version assessment (3.10, 3.12, 3.12a) and persistence for a given individual and canonical metric shall be serialised, so two concurrent syncs cannot interleave a version decision or corrupt lineage. Serialisation is per (individual, canonical_metric); different individuals and metrics proceed in parallel, preserving scale.
+This is consistent with, and upstream of, ENG-001's per-individual single-writer reasoning. Observation notifications for one individual shall be delivered in a defined order (by observation_version, then ingestion timestamp) so the Dynamic Health Model can order its triggers.
+Engineering Rule
+Version and duplicate assessment for one (individual, canonical_metric) shall never run concurrently with itself. Notification ordering per individual shall be defined and preserved.
+3.14 Notification
+Successful persistence shall notify downstream systems.
+Notification does not trigger reasoning directly.
+It informs the Dynamic Health Model that new evidence is available for evaluation.
+The DHM independently determines whether reasoning should occur.
+
+Founder Principle
+New evidence requests attention. It does not demand new understanding.
+
+3.14a Notification Delivery Guarantee — Transactional Outbox
+Persistence (3.13) is atomic, but the notification to the Dynamic Health Model (3.14) is a separate step. If the process fails between commit and delivery, the observation is stored yet the DHM is never informed, so it is never reasoned upon. The canonical sequence is therefore: within the same atomic commit as persistence, write the outbound notification to a transactional outbox; a separate dispatcher then delivers it at-least-once.
+The DHM notification shall be idempotent, keyed on observation_id + observation_version, so redelivery is safe. This handoff is the ENG-001 interface: the notification is the trigger ENG-001's trigger registry expects, and it must be delivered exactly the once it is acted upon, or safely more than once.
+This canonical sequence — persist, commit outbox in the same transaction, dispatch — supersedes the minor ordering differences between the pipeline diagram (3.4), 3.13/3.14, and the lifecycle in 6.3.
+Engineering Rule
+No observation is persisted without its notification being committed in the same transaction. The DHM is notified at-least-once and processes notifications idempotently.
+3.15 Failure Handling
+Observations failing any validation stage shall enter controlled failure states.
+Examples include:
+Authentication failure.
+Integrity failure.
+Schema failure.
+Canonical translation failure.
+Duplicate uncertainty.
+Version conflict.
+Incomplete payload.
+Every failure shall:
+preserve diagnostic information, 
+generate an audit event, 
+avoid contaminating the Observation Store. 
+
+3.16 Retry Strategy
+Certain failures may be retried automatically.
+Examples:
+Temporary API outage.
+Interrupted upload.
+Delayed wearable synchronisation.
+Retries shall preserve idempotency.
+Repeated retries shall never create duplicate observations.
+
+3.16a Idempotency Key & Enforcement
+Idempotency (3.16, 6.8) requires a key. The ingestion idempotency key is the Observation Identity Key (3.12a). Persistence shall be conditional on it — an insert-if-absent operation — so re-processing the same source record, whether from a retry, a provider resend, or a bulk re-import, is a no-op that returns the already-stored version rather than creating a new one.
+Idempotency covers the whole effect, not just the stored row: a re-processed record shall not emit a second audit event or a second DHM notification.
+Engineering Rule
+Re-ingesting a record with an existing Identity Key shall create no new observation, no new audit event, and no new notification.
+3.17 Engineering Constraints
+The Observation Ingestion Pipeline shall:
+authenticate every source, 
+validate every observation, 
+canonicalise every structure, 
+assess quality, 
+prevent duplicate evidence, 
+preserve provenance, 
+support immutable persistence, 
+remain extensible for future ingestion methods. 
+
+3.18 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Every observation enters through a single constitutional pipeline.
+✓ Authentication precedes validation.
+✓ Schema validation precedes canonical translation.
+✓ Canonical translation precedes persistence.
+✓ Duplicate detection prevents duplicate evidence.
+✓ Observation relationships are preserved.
+✓ Persistence remains atomic and immutable.
+✓ Failure states never contaminate the Observation Store.
+✓ The Dynamic Health Model is notified only after successful persistence.
+Chapter 4
+Observation Quality, Reliability & Provenance
+
+4.1 Purpose
+The purpose of this chapter is to define how BioSense evaluates, preserves and communicates the quality of every observation entering the Canonical Observation Store.
+Not all observations possess equal evidential value.
+A laboratory assay performed in an accredited facility is fundamentally different from a manually entered value or an estimate derived from a wearable algorithm.
+The Observation Engine shall therefore preserve objective characteristics describing the quality and provenance of evidence without interpreting its meaning.
+This distinction enables downstream reasoning engines to make proportionate decisions based on evidence quality rather than treating all observations equally.
+
+Constitutional Principle
+Every observation deserves to be preserved. Not every observation deserves equal evidential weight.
+
+4.2 Engineering Philosophy
+Observation Quality answers:
+"How trustworthy is this piece of evidence?"
+It does not answer:
+"How important is this evidence?"
+Importance belongs to the Dynamic Health Model.
+Quality belongs to the Observation Store.
+This separation ensures that objective evidence remains independent from personalised reasoning.
+
+Engineering Rule
+Observation quality shall never contain medical interpretation.
+
+4.3 Observation Quality Model
+Every Canonical Observation shall possess an associated Quality Profile.
+The Quality Profile shall exist as an independent object linked to the observation.
+This allows quality assessment to evolve independently from the observation itself while preserving historical auditability.
+
+Each Quality Profile shall contain:
+Identity
+Quality Profile ID 
+Observation ID 
+Quality Version 
+Assessment Timestamp 
+
+Overall Assessment
+Overall Quality Classification 
+Overall Quality Score (internal) 
+Review Status 
+
+Evidence Characteristics
+Source Reliability 
+Measurement Reliability 
+Completeness 
+Temporal Accuracy 
+Structural Integrity 
+Provenance Completeness 
+
+Metadata
+Assessment Method 
+Engine Version 
+Audit History 
+
+Engineering Rule
+The Quality Profile shall be version-controlled independently from the observation.
+
+4.4 Source Reliability
+Source Reliability reflects BioSense's confidence in the origin of the observation.
+Example source categories may include:
+Accredited Clinical Laboratory 
+Hospital Information System 
+Connected Medical Device 
+Consumer Wearable 
+Validated Third-Party API 
+Manual User Entry 
+AI Extraction (OCR) 
+Administrative Entry 
+Source Reliability shall describe the origin only.
+It shall not evaluate the observation itself.
+
+Constitutional Principle
+The origin of evidence influences trust, not truth.
+
+4.5 Measurement Reliability
+Measurement Reliability evaluates how the measurement was obtained.
+Factors may include:
+Direct measurement 
+Calculated value 
+Estimated value 
+Self-reported value 
+Device-derived algorithm 
+Laboratory assay 
+Clinical observation 
+Measurement Reliability shall remain independent of source reliability.
+Example:
+A WHOOP-derived recovery score and a laboratory ferritin measurement may originate from trusted systems but represent fundamentally different measurement methodologies.
+
+4.6 Completeness
+Every observation shall be assessed for completeness.
+Examples include:
+Mandatory attributes present 
+Optional metadata available 
+Units supplied 
+Time zone available 
+Device metadata available 
+Supporting identifiers present 
+Incomplete observations may remain valid.
+However, completeness shall always be explicitly represented.
+
+4.7 Temporal Quality
+Health information is inherently time-sensitive.
+The Quality Profile shall therefore preserve temporal characteristics.
+Examples include:
+Exact timestamp available 
+Approximate timestamp 
+Unknown collection time 
+Delayed synchronisation 
+Historical import 
+Temporal uncertainty shall never be hidden.
+
+Founder Principle
+Knowing when something happened is often as important as knowing what happened.
+
+4.8 Provenance
+Every observation shall maintain complete provenance.
+Minimum provenance includes:
+Original source 
+Source identifier 
+Import pathway 
+Device or laboratory 
+Collection method 
+Parser version 
+Import timestamp 
+Original file reference (where applicable) 
+Provenance shall remain immutable.
+
+Constitutional Principle
+Evidence without provenance is incomplete evidence.
+
+4.9 Data Integrity
+The Observation Engine shall verify that stored observations remain internally consistent.
+Integrity checks may include:
+Hash verification 
+Structural validation 
+Referential integrity 
+Identifier consistency 
+Version continuity 
+Integrity assessments protect the Observation Store from corruption.
+
+4.10 Observation Authenticity
+Where technically possible, BioSense shall distinguish between:
+Verified observations 
+Authenticated observations 
+Imported observations 
+User-declared observations 
+Estimated observations 
+Authenticity describes the confidence that the observation genuinely originated from its claimed source.
+It does not imply clinical correctness.
+
+4.11 Quality Classification
+Every observation shall be assigned one Quality Classification.
+Suggested classifications include:
+Classification
+Description
+Verified
+Directly verified from a trusted source with complete provenance
+High Quality
+Reliable source with minor limitations
+Standard
+Suitable for reasoning but with known limitations
+Limited
+Missing important metadata or reduced reliability
+Unverified
+Origin or quality cannot be fully established
+Rejected
+Constitutionally unsuitable for reasoning
+The exact internal scoring mechanism shall be defined by the versioned Quality Scoring Contract (4.11a), owned by the data and clinical function; it shall not be left to individual implementations.
+The classification shall remain stable.
+
+Engineering Rule
+Quality classifications shall be explainable.
+
+4.11a Quality Scoring Contract & ENG-001 Mapping
+The Quality Profile (4.3), the internal Overall Quality Score, and the six-level Quality Classification (4.11) are consumed by downstream engines, including ENG-001's confidence calculus. Leaving the scoring 'implementation-specific' means each implementer produces a different, non-comparable score. The scoring shall instead be a single versioned function owned by the data/clinical function: defined inputs (source reliability, measurement reliability, completeness, temporal accuracy, structural integrity, provenance completeness), a defined combination method, and defined thresholds mapping the score to the six classifications. Values are to be confirmed; the contract is binding now.
+The mapping from this Quality Profile to the ENG-001 confidence input(s) it feeds shall be defined explicitly, so quality flows into confidence in one agreed way rather than being re-derived per engine.
+Engineering Rule
+Quality is computed by one versioned function. Every classification is explainable and reproducible, and its contribution to ENG-001 confidence is defined, not improvised.
+4.12 Observation Corrections
+Corrections shall never overwrite quality history.
+Instead:
+New observation version.
+New Quality Profile.
+New audit event.
+Historical quality remains preserved.
+
+4.12a Quality Versioning & the Reference Contract
+The Quality Profile is versioned independently of the observation (4.3, 4.12), but ENG-001 pins only ObservationRef{id, version}. A belief pinned to observation v1 could therefore see its quality assessment change beneath it, breaking reproducibility of past reasoning.
+Recommended resolution, to be confirmed: a quality-profile change emits a notification that places dependent Dynamic Health Model beliefs into review (consistent with ENG-001's revision model), rather than silently altering the evidence a past belief relied on. Alternatively the reference contract is extended to pin quality_version alongside observation_version. One approach shall be chosen and stated.
+Engineering Rule
+A change in quality after an observation is referenced shall never silently alter past reasoning; it either re-pins or triggers review.
+4.13 Downstream Consumption
+The Observation Store shall expose quality metadata to authorised engines.
+Examples:
+Dynamic Health Model
+Confidence Engine
+Recommendation Engine
+Scientific Review Engine
+Audit Engine
+Each engine decides how quality influences its own reasoning.
+The Observation Engine does not perform that reasoning.
+
+Founder Principle
+Provide evidence quality. Do not dictate how it is interpreted.
+
+4.14 Explainability
+Every Quality Profile shall answer:
+Where did this observation originate? 
+How was it measured? 
+Is the provenance complete? 
+What quality limitations exist? 
+Why was this quality classification assigned? 
+Has the quality assessment ever changed? 
+If these questions cannot be answered, the Quality Profile is incomplete.
+
+4.15 Engineering Constraints
+The Observation Quality framework shall:
+remain objective, 
+preserve provenance, 
+separate quality from interpretation, 
+support versioning, 
+support future observation types, 
+remain fully explainable, 
+remain independent of downstream reasoning engines. 
+
+4.16 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Every observation possesses an independent Quality Profile.
+✓ Source reliability is separated from measurement reliability.
+✓ Provenance remains complete and immutable.
+✓ Temporal quality is explicitly represented.
+✓ Observation authenticity is distinguishable from observation correctness.
+✓ Quality assessments remain version-controlled.
+✓ Downstream engines consume quality rather than recalculate it.
+✓ Every quality decision remains fully explainable.
+Chapter 5
+Canonical Observation Store Architecture
+
+5.1 Purpose
+The purpose of this chapter is to define the logical architecture of the Canonical Observation Store.
+The Observation Store is the constitutional repository for all validated evidence known to BioSense.
+It shall preserve observations exactly as they were received, together with their provenance, quality, relationships and version history.
+Unlike the Dynamic Health Model, which continuously evolves, the Observation Store functions as a permanent scientific record.
+Its purpose is preservation rather than interpretation.
+
+Constitutional Principle
+The Observation Store remembers evidence. The Dynamic Health Model remembers understanding.
+
+5.2 Engineering Philosophy
+The Observation Store should behave like a scientific archive.
+Every observation should remain:
+immutable, 
+traceable, 
+independently addressable, 
+permanently recoverable. 
+The Observation Store shall never optimise for convenience at the expense of scientific integrity.
+Historical evidence is often as valuable as recent evidence.
+
+Engineering Rule
+The Observation Store shall preserve history rather than overwrite it.
+
+5.3 Architectural Responsibilities
+The Observation Store is responsible for:
+storing canonical observations, 
+preserving provenance, 
+preserving relationships, 
+preserving versions, 
+preserving quality assessments, 
+supporting retrieval, 
+supporting audit, 
+supporting future observation types. 
+The Observation Store is not responsible for:
+reasoning, 
+confidence, 
+recommendations, 
+discoveries, 
+narratives, 
+Biological Identity. 
+Those responsibilities belong elsewhere.
+
+5.4 Logical Structure
+Conceptually the Observation Store contains several interconnected domains.
+Canonical Observation Store
+
+│
+
+├── Observation Objects
+├── Quality Profiles
+├── Provenance Records
+├── Source Registry
+├── Observation Relationships
+├── Version History
+├── Audit Records
+├── Canonical Dictionaries
+└── Retrieval Indexes
+Each domain has an independent lifecycle.
+
+5.5 Observation Objects
+Observation Objects form the core of the Observation Store.
+Each Observation Object represents exactly one canonical observation.
+Observation Objects shall remain immutable.
+Every Observation Object shall possess:
+globally unique identifier, 
+canonical metric, 
+canonical value, 
+timestamps, 
+provenance reference, 
+quality reference, 
+relationship reference, 
+version reference. 
+Observation Objects shall never contain interpreted health information.
+
+Constitutional Principle
+One Observation Object equals one measurable fact.
+
+5.6 Source Registry
+The Observation Store shall maintain a Source Registry describing every approved evidence source.
+Each source shall contain:
+Source ID, 
+Source Name, 
+Source Type, 
+Authentication Method, 
+Reliability Classification, 
+Supported Observation Types, 
+Current API Version, 
+Integration Status. 
+The Source Registry enables BioSense to evolve integrations without altering existing observations.
+
+5.7 Canonical Dictionary
+The Observation Store shall maintain a Canonical Dictionary defining every supported observation.
+Examples include:
+Ferritin
+Vitamin D
+HbA1c
+VO₂ Max
+Sleep Duration
+Resting Heart Rate
+Body Weight
+Temperature
+Mood Score
+Medication
+Symptoms
+Future observation types.
+Each dictionary entry shall define:
+canonical identifier, 
+canonical name, 
+canonical unit, 
+supported units, 
+valid ranges, 
+category, 
+engineering metadata. 
+The Canonical Dictionary represents BioSense's common language for evidence.
+
+Founder Principle
+Different systems may use different words. BioSense should always use one language internally.
+
+5.8 Observation Relationships
+Observations frequently exist within larger contexts.
+Examples include:
+Blood Collection Event
+↓
+Ferritin
+↓
+Iron
+↓
+Haemoglobin
+↓
+CRP
+or
+Workout Session
+↓
+Heart Rate
+↓
+Power
+↓
+Cadence
+↓
+Calories
+The Observation Store shall preserve these contextual relationships without merging observations.
+Relationships improve reasoning while preserving independence.
+
+5.9 Observation Collections
+Related observations may be grouped into Observation Collections.
+Examples:
+Single laboratory visit.
+Annual health screening.
+Workout session.
+Sleep session.
+Medical consultation.
+Nutrition diary.
+Observation Collections provide organisational context.
+They do not replace individual Observation Objects.
+
+5.10 Version Repository
+Every observation version shall remain permanently accessible.
+Version history shall include:
+Original observation.
+Corrected versions.
+Superseded versions.
+Retired versions.
+Version lineage.
+No observation shall lose its historical lineage.
+
+5.11 Audit Repository
+Every Observation Store modification shall create an audit event.
+Examples include:
+New observation stored.
+Observation corrected.
+Quality profile updated.
+Relationship created.
+Source metadata updated.
+Audit events remain immutable.
+
+Constitutional Principle
+Evidence history should never be lost.
+
+5.12 Retrieval Architecture
+The Observation Store shall support efficient retrieval.
+Retrieval shall be optimised by:
+Individual.
+Observation type.
+Time.
+Source.
+Collection.
+Relationship.
+Version.
+Quality.
+Retrieval optimisation shall never alter stored evidence.
+
+5.13 Scalability
+The Observation Store shall support:
+Millions of users.
+Billions of observations.
+Decades of longitudinal history.
+Future observation categories.
+Future storage technologies.
+Logical architecture shall remain implementation-independent.
+
+Engineering Rule
+Scalability shall be achieved without altering constitutional structure.
+
+5.13a Partitioning, Indexing & Archival Latency
+Scale is asserted (5.13, 10.13) but the strategy is not stated, and a small team needs it fixed to avoid incompatible choices. The logical partitioning key is the individual, time-bucketed (per-individual, per-period), which matches both the per-individual DHM model and the dominant query shapes. The index set shall cover the query categories of 10.4 — by individual and metric and time, by event and collection, by source, by version, and by quality.
+Archival (5.14) moves older observations to lower-cost storage, which has higher retrieval latency. That latency tier shall be stated, and reasoning that touches archived evidence shall tolerate asynchronous retrieval rather than assume primary-store latency. 'Available for reasoning' does not mean 'available at primary-store speed'.
+Engineering Rule
+The partitioning key, required indexes, and the archived-retrieval latency tier shall be specified. Optimisation shall never alter stored evidence.
+5.14 Archival Strategy
+Observations shall never be deleted due solely to age.
+Older observations may be archived into lower-cost storage.
+Archived observations shall remain:
+searchable,
+auditable,
+recoverable,
+available for future reasoning.
+Archival is a storage optimisation.
+Not a data loss mechanism.
+
+Founder Principle
+Old evidence often becomes more valuable as longitudinal history grows.
+
+5.15 Observation Store Consumers
+The Observation Store serves multiple authorised consumers.
+Examples include:
+Dynamic Health Model.
+Scientific Review Engine.
+Audit Engine.
+Clinical Review Portal.
+Analytics Platform.
+Future AI Engines.
+Consumers shall retrieve observations through approved interfaces.
+No consumer shall directly modify stored observations.
+
+5.16 Engineering Constraints
+The Observation Store shall:
+remain immutable, 
+preserve provenance, 
+preserve relationships, 
+preserve version history, 
+support unlimited scale, 
+remain implementation-independent, 
+support future observation types, 
+remain fully auditable. 
+
+5.17 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Every observation exists as an independent immutable object.
+✓ The Observation Store preserves complete historical evidence.
+✓ Source metadata remains independently managed.
+✓ Canonical dictionaries standardise every supported observation.
+✓ Relationships preserve context without merging evidence.
+✓ Version history remains complete.
+✓ Retrieval is efficient without compromising integrity.
+✓ The Observation Store remains scalable for decades of longitudinal health data.
+Chapter 6
+Observation Lifecycle, Synchronisation & State Management
+
+6.1 Purpose
+The purpose of this chapter is to define the complete operational lifecycle of every observation from initial detection through long-term archival.
+While previous chapters define what observations are and how they are validated, this chapter defines how observations behave throughout their existence within BioSense.
+The Observation Lifecycle ensures that every observation remains:
+traceable, 
+synchronised, 
+version-controlled, 
+recoverable, 
+constitutionally compliant. 
+
+Constitutional Principle
+Every observation has a lifecycle. No observation should exist without a clearly defined state.
+
+6.2 Engineering Philosophy
+Observations are not static records.
+They evolve operationally even though their scientific content remains immutable.
+Examples:
+A wearable sync may be delayed. 
+A PDF may require manual review. 
+A laboratory may issue a corrected result. 
+An API may resend historical observations. 
+A user may reconnect a wearable after several months. 
+The Observation Engine must manage these operational events without compromising the integrity of stored evidence.
+
+Engineering Rule
+Operational state shall remain independent from scientific meaning.
+
+6.3 Observation Lifecycle States
+Every observation shall exist in exactly one operational state.
+Detected
+
+↓
+
+Received
+
+↓
+
+Authenticating
+
+↓
+
+Validating
+
+↓
+
+Canonicalising
+
+↓
+
+Quality Assessment
+
+↓
+
+Duplicate Assessment
+
+↓
+
+Persisted
+
+↓
+
+Available for Reasoning
+
+↓
+
+Archived
+Additional exception states include:
+Rejected 
+Quarantined 
+Superseded 
+Awaiting Manual Review 
+
+Engineering Rule
+An observation shall never exist in multiple lifecycle states simultaneously.
+
+6.3a Canonical Operational State Model
+Two lifecycle state sequences are given for the same object — 2.13 and 6.3 — with different states. They shall be reconciled into one canonical operational state machine, defined here as authoritative; 2.13's list becomes an informal summary that references it.
+Operational state (an observation's position in the pipeline: Detected, Received, Authenticating, Validating, Canonicalising, Quality Assessment, Duplicate Assessment, Persisted, Available for Reasoning, Archived, with exception states Rejected, Quarantined, Awaiting Manual Review) is distinct from version relationship. 'Superseded' is not an operational state; it is a version-lineage property (7.10) of an observation that a newer version has replaced. An observation may be Persisted or Available and also superseded.
+Engineering Rule
+One object, one operational state machine. Superseded is a version relationship, not an operational state, resolving the 'exactly one state' rule (6.3).
+6.4 State Definitions
+Detected
+BioSense has become aware that an observation exists.
+The observation has not yet entered the platform.
+Example:
+WHOOP indicates new sleep data is available.
+
+Received
+The raw payload has been successfully received.
+No assumptions are made regarding validity.
+
+Authenticating
+The Observation Engine verifies the legitimacy of the source.
+
+Validating
+Schema validation.
+Integrity validation.
+Required fields.
+Timestamp verification.
+
+Canonicalising
+Source-specific representation is translated into BioSense's canonical model.
+
+Quality Assessment
+A Quality Profile is generated.
+
+Duplicate Assessment
+Potential duplicate observations are identified.
+
+Persisted
+The observation has entered the Canonical Observation Store.
+
+Available for Reasoning
+The Dynamic Health Model may now consider this observation during future reasoning cycles.
+
+Archived
+Observation remains permanently available but is no longer stored in primary operational storage.
+
+6.5 Synchronisation Model
+BioSense shall support multiple synchronisation strategies.
+Examples include:
+Real-time API push.
+Scheduled synchronisation.
+Manual refresh.
+Historical imports.
+Bulk migration.
+Offline recovery.
+Every synchronisation method shall produce identical Canonical Observation Objects.
+
+Founder Principle
+Different synchronisation methods must never produce different evidence.
+
+6.6 Incremental Synchronisation
+Whenever possible, BioSense shall retrieve only observations that have changed since the previous successful synchronisation.
+Benefits include:
+Reduced API usage.
+Reduced latency.
+Reduced duplicate detection workload.
+Improved scalability.
+Incremental synchronisation shall remain transparent to downstream engines.
+
+6.7 Historical Synchronisation
+Some integrations require historical imports.
+Examples:
+Connecting WHOOP after three years.
+Importing previous laboratory history.
+Uploading archived medical records.
+Historical observations shall preserve their original measurement timestamps.
+Import date shall never replace collection date.
+
+Constitutional Principle
+History should remain historical, regardless of when it enters BioSense.
+
+6.8 Duplicate Synchronisation
+Many providers resend historical observations.
+The Observation Engine shall recognise:
+Exact duplicates.
+Updated versions.
+Late-arriving observations.
+Independent new observations.
+Repeated synchronisation shall remain idempotent.
+Repeated imports shall never inflate evidence.
+
+Engineering Rule
+Repeated synchronisation shall never create duplicate scientific evidence.
+
+6.9 Observation Corrections
+External providers may correct previous observations.
+Examples:
+Laboratory amendment.
+Wearable recalculation.
+Manual correction.
+OCR improvement.
+Corrections shall create:
+New observation version.
+New audit event.
+New Quality Profile (where applicable).
+Original observations remain permanently recoverable.
+
+6.9a Correction Correlation
+Corrections create a new version (2.14, 4.12, 6.9) and are expressed as 'Correction Of' and 'Supersedes' relationships (7.10), but the rule for matching an incoming correction to the original it supersedes is unspecified. Matching uses the Correction Correlation Key (3.12a): the Identity Key without source_record_version. When a record arrives whose Correlation Key matches an existing observation and whose source_record_version is higher, it supersedes that observation, and the lineage link is recorded explicitly.
+Engineering Rule
+Corrections are correlated by a defined key and recorded as an explicit version-lineage link. A correction that cannot be correlated is quarantined for review, never stored as an orphan.
+6.10 Late Arriving Evidence
+Observations may arrive long after they occurred.
+Examples:
+Offline wearable.
+Delayed laboratory upload.
+Recovered backup.
+Historical import.
+The Observation Engine shall preserve original chronology.
+The Dynamic Health Model shall independently determine whether historical reasoning should be revisited.
+
+Founder Principle
+Late evidence may change understanding without changing history.
+
+6.11 Observation Expiry
+Observations do not expire.
+Operational importance may decrease.
+Scientific value remains.
+Example:
+A ferritin result from five years ago may still contribute to longitudinal trend analysis.
+Expiry shall therefore apply only to operational workflows.
+Not scientific evidence.
+
+6.12 Quarantine
+Observations entering quarantine shall remain isolated.
+Reasons include:
+Authentication failure.
+Corrupt payload.
+Schema failure.
+Parser uncertainty.
+Possible malicious input.
+Quarantined observations shall never become available for reasoning.
+
+6.13 Manual Review
+Certain observations may require human review.
+Examples:
+Unreadable laboratory report.
+Conflicting patient identifiers.
+Low OCR confidence.
+Ambiguous units.
+Manual review outcomes include:
+Approved.
+Corrected.
+Rejected.
+Escalated.
+Every manual action shall remain auditable.
+
+6.13a Quarantine & Manual Review Operations
+Quarantine (3.6, 3.15, 6.12) and Manual Review (6.13) are entered but never defined as operational states with exits. Each shall have defined entry reasons; allowed transitions (retry, approve, correct, reject, escalate); an owner; and a retention or SLA policy so items do not accumulate unbounded — all fully auditable. Items leave quarantine only by an explicit transition, never silently.
+Payloads suspected to be malicious (6.12) are handled differently: isolated, never auto-retried, and escalated to security rather than to data review.
+Engineering Rule
+Quarantine and Manual Review are defined states with explicit, audited exits and owners. Suspected-malicious input is isolated and escalated, never auto-retried.
+6.14 Observation Notifications
+Successful lifecycle transitions may generate internal events.
+Examples:
+Observation persisted.
+Correction received.
+Quality updated.
+Historical import completed.
+Notifications are internal engineering events.
+They do not imply user-facing notifications.
+
+Engineering Rule
+Internal lifecycle events shall remain separate from user communications.
+
+6.15 Engineering Constraints
+The Observation Lifecycle shall:
+support asynchronous synchronisation, 
+preserve chronology, 
+support historical imports, 
+support corrections, 
+prevent duplicate evidence, 
+support quarantine, 
+support manual review, 
+remain fully auditable. 
+
+6.16 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Every observation follows a recognised lifecycle.
+✓ Synchronisation remains idempotent.
+✓ Historical observations preserve original timestamps.
+✓ Corrections generate new observation versions.
+✓ Quarantined observations never influence reasoning.
+✓ Manual review remains auditable.
+✓ Internal lifecycle events remain distinct from user-facing notifications.
+✓ Observations remain scientifically permanent even when operationally archived.
+Chapter 7
+Observation Context, Collections & Event Modelling
+
+7.1 Purpose
+The purpose of this chapter is to define how BioSense preserves the contextual relationships between observations without compromising the constitutional principle that each Canonical Observation represents exactly one measurable fact.
+Observations rarely exist in isolation.
+Instead, they are frequently produced as part of larger real-world events.
+Examples include:
+Laboratory visits 
+Sleep sessions 
+Exercise sessions 
+Medical consultations 
+Nutrition events 
+Medication administration 
+Questionnaire completion 
+The Observation Engine shall preserve these relationships while maintaining observation independence.
+
+Constitutional Principle
+Individual observations create evidence. Collections create context.
+
+7.2 Engineering Philosophy
+A single laboratory appointment may produce:
+Ferritin 
+Iron 
+Transferrin Saturation 
+CRP 
+HbA1c 
+Vitamin D 
+Testosterone 
+Lipids 
+Each biomarker represents an independent observation.
+However, together they represent one laboratory event.
+The Observation Store must preserve both truths simultaneously.
+
+Engineering Rule
+Collections shall organise observations.
+They shall never replace observations.
+
+7.3 Observation Events
+An Observation Event represents the real-world activity that generated one or more observations.
+Examples include:
+Blood Collection Event
+Sleep Session
+Workout Session
+Medical Consultation
+Nutrition Log
+Medication Dose
+Daily Check-in
+Future observation events
+Observation Events exist independently of observations.
+
+Every Observation Event shall contain:
+Event ID 
+Event Type 
+Start Time 
+End Time 
+Source 
+Event Status 
+Related Observation IDs 
+Provenance 
+Version History 
+
+7.4 Observation Collections
+Observation Collections group observations that belong together for engineering purposes.
+Examples include:
+Annual blood panel.
+Weekly training block.
+Sleep episode.
+Medical assessment.
+Health screening.
+Observation Collections support:
+retrieval, 
+auditing, 
+reporting, 
+longitudinal analysis. 
+Collections shall never contain interpretation.
+
+Founder Principle
+Context improves understanding without changing evidence.
+
+7.5 Collection Hierarchy
+Collections may contain sub-collections.
+Example:
+Annual Health Assessment
+│
+├── Blood Collection
+│     ├── Ferritin
+│     ├── Vitamin D
+│     ├── HbA1c
+│     └── Lipids
+│
+├── Body Composition
+│
+├── Blood Pressure
+│
+└── ECG
+The hierarchy exists solely to preserve real-world organisation.
+
+7.6 Temporal Context
+Observations generated close together frequently possess important contextual relationships.
+Examples:
+Workout
+↓
+Elevated Heart Rate
+↓
+Elevated Temperature
+↓
+Increased Calories
+↓
+Higher Respiratory Rate
+These observations remain independent.
+However, temporal context shall remain preserved.
+
+Constitutional Principle
+Time creates context. Context should never overwrite evidence.
+
+7.7 Clinical Context
+Certain observations possess shared clinical context.
+Example:
+Hospital admission.
+↓
+Laboratory testing.
+↓
+Medication administration.
+↓
+Clinical diagnosis.
+↓
+Discharge summary.
+Each remains an independent observation.
+Their clinical relationship shall also remain visible.
+
+7.8 Device Context
+Wearables frequently generate observations continuously.
+Examples:
+WHOOP Recovery
+↓
+HRV
+↓
+Resting Heart Rate
+↓
+Sleep
+↓
+Respiratory Rate
+↓
+Skin Temperature
+↓
+Recovery Score
+These observations originate from the same measurement ecosystem.
+Device context shall remain available.
+
+7.9 Observation Episodes
+BioSense shall support Observation Episodes.
+Examples include:
+Influenza illness.
+Half-marathon training programme.
+Pregnancy.
+Post-operative recovery.
+Weight-loss intervention.
+Observation Episodes provide long-term context spanning multiple Observation Events.
+Episodes may last:
+Days.
+Weeks.
+Months.
+Years.
+
+Founder Principle
+Some health stories unfold over months rather than moments.
+
+7.10 Relationship Types
+Observation relationships shall be explicitly classified.
+Examples include:
+Generated During
+Measured With
+Derived From
+Part Of
+Occurred Before
+Occurred After
+Repeated Measurement
+Correction Of
+Supersedes
+Relationship classification supports future reasoning without introducing interpretation.
+
+7.11 Collection Versioning
+Observation Collections shall possess independent version histories.
+Example:
+Additional laboratory biomarkers received.
+↓
+Collection Version 2.
+Individual observations remain unchanged.
+Only the collection evolves.
+
+7.12 Retrieval Context
+The Observation Store shall allow retrieval by:
+Observation.
+Collection.
+Event.
+Episode.
+Source.
+Time.
+Relationship.
+Quality.
+Version.
+This enables future reasoning engines to retrieve evidence with appropriate context.
+
+7.13 Explainability
+Every Observation Collection shall answer:
+What real-world event does this represent? 
+Which observations belong to it? 
+When did it occur? 
+Which source generated it? 
+Has the collection changed? 
+Are any observations missing? 
+If these questions cannot be answered, the collection is incomplete.
+
+7.14 Engineering Constraints
+Observation Context shall:
+preserve observation independence, 
+preserve real-world relationships, 
+support nested collections, 
+support episodes, 
+support retrieval, 
+remain fully auditable, 
+remain independent of interpretation. 
+
+7.15 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Every observation may belong to one or more contextual collections.
+✓ Collections never replace individual observations.
+✓ Observation Events preserve real-world activities.
+✓ Observation Episodes support long-term health journeys.
+✓ Temporal, clinical and device context remain visible.
+✓ Relationship types are explicitly classified.
+✓ Collections possess independent version histories.
+✓ Context improves retrieval without altering evidence.
+Chapter 8
+Source Connectors & Integration Framework
+
+8.1 Purpose
+The purpose of this chapter is to define the architecture governing all external data integrations with the BioSense Observation Engine.
+The Integration Framework enables BioSense to ingest observations from an expanding ecosystem of health technologies while preserving constitutional consistency, engineering simplicity and long-term maintainability.
+Every external integration shall interact with the Observation Engine through a standardised connector architecture.
+No external provider shall communicate directly with the Canonical Observation Store or the Dynamic Health Model.
+
+Constitutional Principle
+External systems may evolve independently. BioSense's internal evidence model shall remain stable.
+
+8.2 Engineering Philosophy
+BioSense should never become tightly coupled to any individual technology provider.
+Today's integrations include:
+WHOOP 
+Apple Health 
+Garmin 
+Oura 
+Fitbit 
+Polar 
+Terra API 
+Laboratory systems 
+Tomorrow's integrations may include technologies that do not yet exist.
+The architecture shall therefore be designed around abstraction rather than provider-specific implementations.
+
+Engineering Rule
+Every connector shall translate provider-specific behaviour into BioSense's canonical integration model.
+No provider-specific logic shall exist beyond the connector boundary.
+
+8.3 Connector Architecture
+Every external integration shall consist of an independent Connector Module.
+Conceptually:
+External Provider
+
+↓
+
+Connector Module
+
+↓
+
+Connector Validation
+
+↓
+
+Canonical Translation
+
+↓
+
+Observation Engine
+
+↓
+
+Canonical Observation Store
+Each Connector Module acts as an adapter between the external provider and BioSense.
+
+8.4 Connector Responsibilities
+Each Connector Module shall be responsible for:
+Authentication 
+API communication 
+Rate limit management 
+Data retrieval 
+Payload validation 
+Source-specific error handling 
+Canonical mapping 
+Metadata extraction 
+Version compatibility 
+Retry logic 
+Connector Modules shall not:
+Create Health Beliefs 
+Perform reasoning 
+Generate recommendations 
+Calculate confidence 
+Modify the Dynamic Health Model 
+
+Constitutional Principle
+Connectors transport evidence. They never interpret evidence.
+
+8.5 Connector Types
+BioSense shall support multiple connector categories.
+API Connectors
+Examples:
+WHOOP
+Apple Health
+Garmin
+Fitbit
+Polar
+Terra API
+Future APIs
+
+File Connectors
+Examples:
+Blood test PDFs
+Medical reports
+CSV exports
+FHIR exports
+Future document formats
+
+Streaming Connectors
+Examples:
+Continuous Glucose Monitors
+Continuous ECG
+Continuous Blood Pressure
+Future real-time sensors
+
+Manual Connectors
+Examples:
+Manual biomarker entry
+Medication logging
+Daily Check-ins
+Clinician entry
+
+Enterprise Connectors
+Examples:
+Hospital Information Systems
+Electronic Medical Records
+Corporate wellness platforms
+Research databases
+
+8.6 Connector Registration
+Every Connector Module shall register with the Integration Framework.
+Registration shall include:
+Connector ID 
+Provider Name 
+Provider Version 
+Supported Observation Types 
+Authentication Method 
+Supported Regions 
+Connector Version 
+Operational Status 
+Only registered connectors may ingest observations.
+
+Engineering Rule
+Unregistered connectors shall be constitutionally prohibited.
+
+8.7 Connector Lifecycle
+Each connector shall possess its own lifecycle.
+Development
+
+↓
+
+Testing
+
+↓
+
+Certification
+
+↓
+
+Production
+
+↓
+
+Maintenance
+
+↓
+
+Deprecated
+
+↓
+
+Retired
+Deprecated connectors may continue to retrieve historical observations.
+Retired connectors shall preserve historical compatibility.
+
+8.8 Connector Certification
+Before deployment, every connector shall demonstrate:
+Successful authentication.
+Schema compliance.
+Canonical translation accuracy.
+Duplicate prevention.
+Audit compatibility.
+Performance compliance.
+Failure recovery.
+Version compatibility.
+Only certified connectors shall enter production.
+
+Founder Principle
+Every connector should earn trust before transporting evidence.
+
+8.9 Version Management
+External providers evolve.
+APIs change.
+Field names change.
+Units change.
+Authentication changes.
+Each Connector Module shall therefore support independent versioning.
+Connector upgrades shall never require changes to the Canonical Observation Store.
+
+Constitutional Principle
+Provider evolution should never break BioSense's internal architecture.
+
+8.10 Failure Isolation
+Connector failures shall remain isolated.
+Example:
+WHOOP API unavailable.
+↓
+WHOOP Connector fails.
+↓
+Apple Health continues.
+↓
+Laboratory uploads continue.
+↓
+Observation Store remains operational.
+No connector failure shall propagate into unrelated integrations.
+
+Engineering Rule
+Connector failures shall be isolated by design.
+
+8.11 Retry Strategy
+Connector Modules shall implement controlled retry behaviour.
+Suitable retry scenarios include:
+Temporary API outage.
+Rate limiting.
+Network interruption.
+Authentication renewal.
+Retries shall remain:
+Idempotent.
+Auditable.
+Bounded.
+Repeated retries shall never generate duplicate observations.
+
+8.12 Connector Monitoring
+Every connector shall continuously report operational metrics.
+Examples include:
+Availability.
+Authentication failures.
+Import latency.
+Duplicate rate.
+Validation failures.
+Translation failures.
+Average processing time.
+Version distribution.
+Monitoring shall support proactive maintenance.
+
+8.13 Connector Security
+Connectors shall:
+Store credentials securely.
+Encrypt communication.
+Validate provider identity.
+Rotate credentials where supported.
+Support least-privilege access.
+Avoid storing unnecessary personal information.
+Security responsibilities end at the connector boundary.
+
+8.14 Future Expansion
+The Integration Framework shall support future connector types without requiring architectural redesign.
+Examples include:
+Implantable sensors.
+Genomic providers.
+Microbiome platforms.
+Environmental monitoring.
+Medical imaging.
+Voice biomarkers.
+Digital therapeutics.
+Future AI-generated evidence.
+The connector architecture shall remain technology-agnostic.
+
+Founder Principle
+The framework should accommodate technologies that have not yet been invented.
+
+8.15 Engineering Constraints
+The Integration Framework shall:
+isolate provider-specific logic, 
+support independent versioning, 
+support connector certification, 
+remain provider agnostic, 
+support failure isolation, 
+support future integrations, 
+preserve constitutional consistency, 
+remain fully auditable. 
+
+8.16 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Every provider communicates through a Connector Module.
+✓ Connector responsibilities remain clearly separated from reasoning.
+✓ Provider-specific logic remains isolated.
+✓ Connector certification is mandatory before production deployment.
+✓ Connector failures remain isolated.
+✓ Connector versioning is independent.
+✓ New providers can be added without modifying the Observation Store.
+✓ Future technologies can be supported without architectural redesign.
+Chapter 9
+Canonical Translation Engine
+
+9.1 Purpose
+The purpose of this chapter is to define the Canonical Translation Engine responsible for converting provider-specific observations into BioSense's universal internal representation.
+External providers expose health information using different:
+metric names, 
+identifiers, 
+units, 
+structures, 
+timestamps, 
+metadata, 
+conventions. 
+The Canonical Translation Engine ensures that these differences are resolved before observations enter the Canonical Observation Store.
+The Dynamic Health Model shall therefore reason using one consistent language regardless of where observations originated.
+
+Constitutional Principle
+Different providers may describe the same reality in different ways. BioSense shall reason from one canonical representation of that reality.
+
+9.2 Engineering Philosophy
+The Translation Engine exists to eliminate provider-specific complexity.
+After canonical translation:
+The Dynamic Health Model should not know whether an observation originated from:
+WHOOP, 
+Apple Health, 
+Garmin, 
+Oura, 
+Fitbit, 
+Terra, 
+laboratory systems, 
+future providers. 
+Every downstream engine should interact only with BioSense's canonical model.
+
+Engineering Rule
+Canonical translation shall occur once, immediately after validation and before persistence.
+
+9.3 Translation Responsibilities
+The Canonical Translation Engine shall be responsible for:
+Metric mapping 
+Unit conversion 
+Timestamp normalisation 
+Metadata standardisation 
+Identifier mapping 
+Enumeration mapping 
+Relationship preservation 
+Canonical dictionary validation 
+The Translation Engine shall not:
+interpret observations, 
+calculate confidence, 
+infer Health Beliefs, 
+generate recommendations, 
+perform reasoning. 
+
+9.4 Canonical Metric Dictionary
+Every supported observation shall map to one Canonical Metric.
+Examples:
+Provider
+Provider Metric
+Canonical Metric
+WHOOP
+Recovery Score
+Recovery Score
+Apple Health
+HeartRate
+Heart Rate
+Garmin
+restingHeartRate
+Resting Heart Rate
+Laboratory PDF
+Ferritin
+Ferritin
+Oura
+readiness_score
+Readiness Score
+Multiple provider terms may map to a single canonical metric.
+A provider metric shall never map ambiguously to multiple canonical metrics.
+
+Founder Principle
+Many names. One meaning.
+
+9.4a Dictionary Boundaries & Version Pinning
+Three reference stores overlap and shall be delineated. The Provider Mapping Dictionary (9.4) maps provider terms to canonical metrics. The Canonical Metric & Unit Dictionary (5.7) defines canonical identifiers, names, units and supported units. The Canonical Scientific Library (ENG-001 and Document 1C) owns 'valid ranges' and evidence. To remove the current overlap, valid ranges shall be owned solely by the Scientific Library and referenced — not redefined — by 5.7. The naming shall be made consistent: the two ENG-002 dictionaries are distinct stores and shall not both be called 'Canonical Dictionary'.
+So that 9.13 and 9.14 (historical observations staying bound to their original canonical definition) are implementable, the observation schema (see 2.5a) shall carry a canonical_dictionary_version, and interpretations and translations pin to it.
+Engineering Rule
+Each dictionary has one owner and one name. Valid ranges live only in the Scientific Library. Every observation pins the dictionary version that defined it.
+9.5 Unit Translation
+Providers frequently expose identical measurements using different units.
+Examples include:
+Weight
+kg
+lb
+↓
+Canonical
+kg
+
+Temperature
+°F
+°C
+↓
+Canonical
+°C
+
+Glucose
+mg/dL
+mmol/L
+↓
+Canonical unit defined by BioSense.
+Raw values shall always remain preserved.
+Canonical values shall always be calculated independently.
+
+Engineering Rule
+Raw values shall never be discarded during translation.
+
+9.5a Unit Conversion Governance
+Canonical values are 'calculated independently' (2.6, 9.5) but with no conversion-factor source, rounding rule, or precision policy — yet the worked example (5.2 mmol/L to 94 mg/dL) already hides a rounding decision. Conversion factors shall be versioned dictionary data, not code. A rounding and significant-figure policy shall be defined per metric class (values to be confirmed by data/clinical), and each canonical value shall record the conversion-rule version that produced it.
+Raw values are always preserved (2.6), so canonical precision loss is recoverable; but because downstream range checks and trend reasoning use canonical values, the rounding policy shall be consistent and round-trip validated rather than left to each implementer.
+Engineering Rule
+Conversion factors are versioned data; rounding and precision are a defined per-metric policy; the conversion-rule version is recorded on every canonical value.
+9.6 Timestamp Translation
+Providers represent time differently.
+Examples:
+UTC
+Local Time
+Unix Epoch
+ISO 8601
+Relative Time
+Device Time
+The Translation Engine shall convert every timestamp into BioSense's canonical temporal model while preserving:
+original timestamp, 
+original timezone, 
+canonical timestamp. 
+
+Constitutional Principle
+Translation should simplify time without losing temporal truth.
+
+9.6a Canonical Temporal Model
+'Preserve temporal truth' (9.6) requires a concrete model. Each observation shall store a canonical UTC instant, the original local time, the original IANA timezone, and an explicit Time Precision (for example exact, minute, day, or unknown). The three timestamps of 2.5 — measurement, observation, ingestion — each follow this model.
+Rules currently unstated and to be defined: a timezone-naive source timestamp is resolved using the source or device timezone, and if none is known the observation is marked reduced temporal quality rather than assumed UTC; DST fall-back ambiguity resolves to a defined choice (for example the earlier instant) and is flagged; device clock skew beyond a defined tolerance routes the observation to review. Terminology shall be consistent: 'Observation Timestamp' (when the source recorded it) is distinct from the sort field 'Observation Time' (10.7) and from an 'Observation Event' (Chapter 7).
+Engineering Rule
+Time is stored as canonical UTC plus original local time plus IANA timezone plus explicit precision. Naive timestamps, DST ambiguity and clock skew have defined, audited handling; temporal uncertainty is never silently assumed away.
+9.7 Enumeration Translation
+Providers frequently use different categorical values.
+Examples:
+WHOOP
+"Asleep"
+Apple
+"Sleep"
+Garmin
+"SLEEPING"
+Internal representation:
+Sleep
+The Translation Engine shall maintain canonical enumerations.
+
+9.8 Identifier Translation
+External identifiers shall never become BioSense identifiers.
+Instead:
+External ID
+↓
+Canonical Observation ID
+↓
+Relationship preserved.
+This allows provider migration without affecting internal architecture.
+
+Engineering Rule
+Internal identifiers shall remain provider-independent.
+
+9.9 Metadata Translation
+Relevant provider metadata shall be translated into canonical metadata.
+Examples include:
+Device model
+Firmware version
+Sensor version
+Laboratory accreditation
+Parser version
+Region
+Language
+Unknown metadata shall remain available without disrupting canonical representation.
+
+9.10 Translation Validation
+Every translated observation shall undergo validation.
+Validation confirms:
+Canonical metric exists.
+Canonical unit valid.
+Enumeration recognised.
+Relationships preserved.
+Metadata complete.
+Translation successful.
+Observations failing translation validation shall enter controlled failure states.
+
+9.11 Translation Rules
+Translation rules shall be maintained independently from connector logic.
+Each rule shall define:
+Source Provider 
+Provider Version 
+Source Field 
+Canonical Field 
+Conversion Logic 
+Supported Units 
+Validation Rules 
+Rule Version 
+Translation rules shall be version-controlled.
+
+Founder Principle
+Providers evolve. Translation rules should evolve independently.
+
+9.12 Translation Failures
+Translation failures may occur when:
+Unknown metric received.
+Unsupported unit.
+Ambiguous timestamp.
+Unknown enumeration.
+Incomplete metadata.
+Provider schema changes.
+Translation failures shall:
+generate audit events, 
+preserve raw payload, 
+notify connector monitoring, 
+prevent persistence until resolved. 
+No failed translation shall silently enter the Observation Store.
+
+9.13 Backward Compatibility
+Translation rules shall preserve compatibility with historical observations.
+When providers change schemas:
+Historical observations remain unchanged.
+New observations use updated translation rules.
+Historical reasoning therefore remains reproducible.
+
+Constitutional Principle
+Provider evolution should never rewrite historical evidence.
+
+9.14 Future Metric Expansion
+New canonical metrics shall be introduced through the Canonical Dictionary.
+Existing metrics shall never be redefined in a way that changes historical meaning.
+Where scientific understanding evolves:
+New versions shall be introduced.
+Historical observations remain associated with their original canonical definitions.
+
+9.15 Engineering Constraints
+The Canonical Translation Engine shall:
+remain provider agnostic, 
+preserve raw data, 
+preserve original metadata, 
+support unlimited provider growth, 
+maintain version-controlled translation rules, 
+prevent ambiguous mappings, 
+remain fully auditable. 
+
+9.16 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Every provider metric maps to one canonical metric.
+✓ Raw values remain permanently preserved.
+✓ Canonical values are consistently generated.
+✓ Timestamp normalisation preserves temporal accuracy.
+✓ Enumeration mapping removes provider-specific terminology.
+✓ Translation rules remain independently version-controlled.
+✓ Translation failures prevent persistence.
+✓ Historical observations remain reproducible despite provider evolution.
+Chapter 10
+Observation Retrieval & Evidence Query Framework
+
+10.1 Purpose
+The purpose of this chapter is to define the framework through which authorised BioSense components retrieve observations from the Canonical Observation Store.
+The Observation Store exists to preserve objective evidence.
+The Retrieval Framework exists to provide efficient, consistent and explainable access to that evidence.
+Every authorised consumer shall retrieve observations through the Observation Retrieval Framework.
+No component shall directly interrogate the underlying storage architecture.
+
+Constitutional Principle
+Every BioSense engine should retrieve evidence through one consistent interface.
+
+10.2 Engineering Philosophy
+The Observation Store should behave as an Evidence Service, not simply a database.
+Consumers should ask for evidence in meaningful terms rather than constructing storage-specific queries.
+Examples include:
+"Retrieve the most recent ferritin observation." 
+"Retrieve all HRV observations from the last six months." 
+"Retrieve every observation associated with Blood Collection Event BC-2026-041." 
+"Retrieve all observations contributing to Discovery D-108." 
+The Retrieval Framework shall translate these requests into efficient evidence retrieval while preserving constitutional integrity.
+
+Engineering Rule
+Consumers shall request evidence.
+They shall never depend upon storage implementation.
+
+10.3 Retrieval Principles
+Every retrieval operation shall satisfy the following principles.
+Correctness
+Returned observations shall accurately represent stored evidence.
+
+Completeness
+Relevant observations shall not be omitted without explicit justification.
+
+Explainability
+Every retrieval shall be reproducible.
+
+Consistency
+Equivalent queries shall return equivalent evidence.
+
+Performance
+Retrieval shall remain efficient regardless of Observation Store scale.
+
+Security
+Consumers shall receive only evidence they are authorised to access.
+
+10.4 Query Categories
+The Retrieval Framework shall support multiple query classes.
+
+Observation Queries
+Examples:
+Retrieve observation by ID.
+Retrieve latest observation.
+Retrieve observation history.
+
+Metric Queries
+Examples:
+All ferritin observations.
+All resting heart rate observations.
+All VO₂ max observations.
+
+Time-Based Queries
+Examples:
+Past seven days.
+Past six months.
+Calendar year.
+Custom range.
+
+Event Queries
+Examples:
+Retrieve all observations from:
+Blood Collection Event.
+Workout Session.
+Sleep Session.
+Medical Consultation.
+
+Collection Queries
+Retrieve Annual Health Assessment.
+Retrieve Complete Blood Panel.
+Retrieve Nutrition Diary.
+
+Episode Queries
+Retrieve:
+Weight-loss programme.
+Pregnancy.
+Training block.
+Illness episode.
+
+Provenance Queries
+Retrieve observations from:
+WHOOP.
+Apple Health.
+Specific laboratory.
+Specific device.
+Manual entry.
+
+Quality Queries
+Retrieve:
+Verified observations.
+High-quality observations.
+Observations requiring manual review.
+
+Version Queries
+Retrieve:
+Current version.
+Historical version.
+Version lineage.
+
+10.5 Query Response Model
+Every retrieval response shall contain:
+Context
+Query ID 
+Timestamp 
+Requesting Engine 
+
+Results
+Observation Objects 
+Collection Context 
+Relationship Context 
+
+Metadata
+Result Count 
+Pagination Information 
+Query Duration 
+
+Provenance
+Source Summary 
+Quality Summary 
+
+Audit
+Retrieval ID 
+Retrieval Version 
+
+Engineering Rule
+Every retrieval shall be fully auditable.
+
+10.6 Filtering
+The Retrieval Framework shall support filtering by:
+Individual.
+Metric.
+Category.
+Date.
+Time.
+Source.
+Quality.
+Collection.
+Episode.
+Version.
+Relationship.
+Validation Status.
+Future filters.
+Filters may be combined without altering evidence.
+
+10.7 Sorting
+Supported sort operations include:
+Measurement Time.
+Observation Time.
+Ingestion Time.
+Quality.
+Source.
+Collection.
+Version.
+Canonical Metric.
+Sorting affects presentation only.
+Not evidence.
+
+10.8 Retrieval Context
+Evidence should rarely be retrieved without context.
+Example:
+Ferritin observation.
+↓
+Blood Collection Event.
+↓
+Associated biomarkers.
+↓
+Laboratory metadata.
+↓
+Quality Profile.
+↓
+Provenance.
+Consumers may request varying levels of contextual expansion.
+
+Founder Principle
+Evidence becomes more useful when accompanied by its context.
+
+10.9 Relationship Expansion
+Consumers may request relationship expansion.
+Example:
+Workout.
+↓
+Heart Rate.
+↓
+Cadence.
+↓
+Power.
+↓
+Calories.
+↓
+Temperature.
+↓
+Recovery.
+Relationship expansion shall remain optional.
+Individual observations remain independently retrievable.
+
+10.10 Retrieval Optimisation
+Frequently executed queries may be optimised through:
+Indexes.
+Caching.
+Materialised views.
+Partitioning.
+Optimisation techniques shall never alter stored evidence.
+
+Engineering Rule
+Performance optimisation shall remain invisible to consumers.
+
+10.11 Permission Model
+Different consumers possess different retrieval permissions.
+Examples:
+Dynamic Health Model
+Full evidence access.
+
+Recommendation Engine
+Evidence relevant to recommendations.
+
+Conversation Engine
+Evidence required for explanation.
+
+Analytics Platform
+Anonymous aggregated evidence.
+
+Clinical Portal
+Extended provenance.
+Permissions shall be enforced by the Retrieval Framework.
+Not individual consumers.
+
+10.12 Retrieval Failures
+Failures may include:
+Observation not found.
+Permission denied.
+Corrupt relationship.
+Version unavailable.
+Storage timeout.
+Archived retrieval delay.
+Failures shall:
+preserve audit history, 
+avoid partial evidence where inappropriate, 
+clearly report limitations, 
+never fabricate evidence. 
+
+Constitutional Principle
+Failure to retrieve evidence should never result in invented evidence.
+
+10.13 Scalability
+The Retrieval Framework shall support:
+Millions of users.
+Billions of observations.
+High-frequency wearable synchronisation.
+Longitudinal retrieval across decades.
+Future evidence categories.
+Scalability shall not alter constitutional behaviour.
+
+10.14 Explainability
+Every retrieval shall answer:
+Why were these observations returned? 
+Which filters were applied? 
+Were any observations excluded? 
+Were archived observations retrieved? 
+Which permissions governed retrieval? 
+Which version of the Retrieval Framework executed the query? 
+
+10.15 Engineering Constraints
+The Retrieval Framework shall:
+expose evidence rather than storage, 
+preserve observation integrity, 
+support contextual retrieval, 
+support scalable filtering, 
+remain provider-independent, 
+remain fully auditable, 
+enforce permissions centrally. 
+
+10.16 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Every authorised consumer retrieves evidence through one framework.
+✓ Evidence remains separated from understanding.
+✓ Retrieval supports observations, events, collections and episodes.
+✓ Contextual expansion remains optional.
+✓ Retrieval permissions are centrally enforced.
+✓ Retrieval remains explainable and auditable.
+✓ Performance optimisation does not alter evidence.
+✓ The Retrieval Framework remains scalable for decades of longitudinal health data.
+Chapter 11
+Governance, Security & Operational Controls
+
+11.1 Purpose
+The purpose of this chapter is to define the governance framework responsible for protecting the integrity, confidentiality, availability and long-term stewardship of the Canonical Observation Store.
+The Observation Store contains the complete objective evidence upon which BioSense builds personalised understanding.
+As such, it represents one of the platform's most sensitive and valuable assets.
+The governance framework ensures that evidence remains:
+trustworthy, 
+protected, 
+auditable, 
+recoverable, 
+constitutionally compliant. 
+
+Constitutional Principle
+Evidence is entrusted to BioSense. It shall be protected with the highest engineering standards.
+
+11.2 Engineering Philosophy
+Governance extends beyond cybersecurity.
+It includes:
+evidence integrity, 
+ownership, 
+access control, 
+auditability, 
+operational resilience, 
+long-term stewardship. 
+Every observation shall remain scientifically reliable while also remaining operationally secure.
+
+Engineering Rule
+Security shall protect evidence without altering evidence.
+
+11.3 Evidence Ownership
+Every observation shall have a clearly defined ownership model.
+Ownership shall distinguish between:
+Individual ownership of health information. 
+BioSense stewardship of the Canonical Observation Store. 
+Third-party source ownership where applicable. 
+BioSense does not claim ownership of externally generated observations.
+BioSense owns the engineering structures that preserve and organise those observations.
+
+Founder Principle
+Individuals own their health information. BioSense earns the privilege of safeguarding it.
+
+11.4 Access Control
+Every interaction with the Observation Store shall be authorised.
+Access shall follow the Principle of Least Privilege.
+Examples include:
+Dynamic Health Model
+Read-only evidence access.
+
+Connector Modules
+Write access through approved ingestion pipeline only.
+
+Clinical Portal
+Controlled evidence retrieval.
+
+Analytics Platform
+Aggregated, anonymised access only.
+
+Administrative Tools
+Operational metadata only unless explicitly authorised.
+Permissions shall be centrally managed.
+
+Constitutional Principle
+Access should always be intentional and justifiable.
+
+11.5 Authentication
+Every user, service and integration interacting with the Observation Store shall be authenticated.
+Supported mechanisms may include:
+OAuth 
+API Keys 
+Mutual TLS 
+Service Accounts 
+Role-Based Authentication 
+Future enterprise identity providers 
+Authentication establishes identity.
+Authorisation determines capability.
+
+11.6 Encryption
+Observations shall remain encrypted:
+In Transit
+Using industry-standard encrypted communication.
+
+At Rest
+Using strong encryption appropriate to the deployment environment.
+
+During Backup
+Backups shall preserve equivalent security controls.
+Encryption implementation may evolve without changing constitutional behaviour.
+
+11.7 Audit Logging
+Every significant interaction with the Observation Store shall create an audit record.
+Examples include:
+Observation creation.
+Observation correction.
+Observation retrieval.
+Manual review.
+Permission changes.
+Connector registration.
+Translation rule modification.
+Quality profile revision.
+Audit records shall themselves be immutable.
+
+Engineering Rule
+Every significant action shall leave a permanent audit trail.
+
+11.8 Data Residency
+BioSense deployments may operate in multiple jurisdictions.
+The Observation Store shall support jurisdiction-specific storage policies without changing the canonical observation model.
+Examples include:
+UAE 
+United Kingdom 
+European Union 
+United States 
+Future regulated markets 
+Data residency shall be configurable at deployment level.
+
+11.9 Privacy Controls
+Personally identifiable information (PII) shall remain logically separated from observation evidence wherever practical.
+Examples include:
+Identity service
+↓
+User identifiers
+↓
+Observation Store
+↓
+Canonical observations
+The Observation Store should minimise unnecessary exposure of personal identifiers.
+
+Founder Principle
+Evidence should identify health before it identifies people.
+
+11.10 Backup & Disaster Recovery
+The Observation Store shall support:
+Continuous backup. 
+Point-in-time recovery. 
+Geographic redundancy (where appropriate). 
+Disaster recovery testing. 
+Recovery verification. 
+Recovery procedures shall preserve:
+observations, 
+provenance, 
+quality profiles, 
+relationships, 
+version history, 
+audit records. 
+Recovery shall never compromise constitutional integrity.
+
+11.11 Retention & Archival
+Observations shall not be deleted solely because of age.
+Retention policies may differ by:
+jurisdiction, 
+contractual obligations, 
+user requests where legally applicable, 
+regulatory requirements. 
+Where deletion is required by law, deletion shall be:
+auditable, 
+controlled, 
+constitutionally documented. 
+Historical audit records shall be preserved where legally permissible.
+
+Constitutional Principle
+Retention policies should satisfy legal obligations without compromising scientific integrity.
+
+11.11a Lawful Erasure and the ENG-001 Bridge
+This specification states in several places that observations are never deleted (2.13, 5.14, 6.11) while 11.11 permits legally-required deletion, and ENG-001 requires right-to-erasure. These are reconciled as follows. Scientific immutability means no silent in-place mutation of evidence; it does not forbid lawful erasure. Lawful erasure is a distinct, audited operation implemented as per-user crypto-shredding (consistent with ENG-001 and Document 1C): the observation's content becomes unrecoverable while a content-free tombstone and an audit record that erasure occurred are retained.
+Erasure shall emit a withdrawal notification through the same transactional-outbox path as 3.14a, so that dependent Dynamic Health Model beliefs enter review rather than silently resting on evidence that no longer exists. This is the ENG-001 bridge and is mandatory.
+Because erased evidence must not be re-exposed through audit, audit records retained after erasure shall hold references and tombstones only, never the erased PII payload — reconciling 11.7 (audit immutability) with 11.11 (erasure).
+This erasure operation is one step of the User Erasure Workflow orchestrated by ENG-009; the withdrawal-notification bridge defined here is invoked as part of that workflow's sequence.
+Engineering Rule
+Immutability forbids silent mutation, not lawful erasure. Erasure is audited crypto-shred that withdraws evidence, triggers ENG-001 belief review, and leaves no PII in audit. Align 2.13, 5.14 and 6.11 with this.
+11.12 Operational Monitoring
+Operational governance shall continuously monitor:
+ingestion success rate, 
+connector health, 
+storage growth, 
+retrieval latency, 
+duplicate detection rate, 
+validation failures, 
+security events, 
+backup health. 
+Monitoring supports proactive reliability.
+It does not influence scientific reasoning.
+
+11.13 Incident Management
+Operational incidents may include:
+Storage failure. 
+Connector compromise. 
+Authentication failure. 
+Corrupted payload. 
+Security breach. 
+Unauthorised access attempt. 
+Every incident shall generate:
+Incident ID. 
+Timeline. 
+Root cause analysis. 
+Corrective actions. 
+Audit linkage. 
+Incidents affecting evidence integrity shall trigger constitutional review.
+
+11.14 Regulatory Readiness
+The Observation Store shall be designed to support future compliance requirements without architectural redesign.
+Potential frameworks include:
+GDPR 
+UAE Personal Data Protection Law 
+HIPAA (where applicable) 
+Future healthcare regulations 
+Compliance mechanisms shall remain implementation-specific.
+The constitutional architecture shall remain stable.
+
+Founder Principle
+Design for regulation before regulation demands it.
+
+11.15 Engineering Constraints
+The governance framework shall:
+protect evidence, 
+preserve integrity, 
+enforce least-privilege access, 
+support jurisdiction-specific deployments, 
+separate PII from observations where practical, 
+preserve immutable audit history, 
+remain technology agnostic. 
+
+11.16 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Every observation is protected through authenticated and authorised access.
+✓ Encryption protects observations at rest, in transit and during backup.
+✓ Every significant interaction is auditable.
+✓ Data residency can be configured independently of the observation model.
+✓ PII remains logically separated from evidence where practical.
+✓ Disaster recovery preserves constitutional integrity.
+✓ Operational monitoring supports long-term platform reliability.
+✓ The Observation Store is architecturally prepared for future regulatory environments.
+Chapter 12
+End-to-End Observation Lifecycle
+
+12.1 Purpose
+The purpose of this chapter is to demonstrate the complete lifecycle of an observation as it progresses through the Observation Engine and ultimately contributes to BioSense's long-term understanding of an individual.
+Previous chapters define the architecture of the Observation Engine in isolation.
+This chapter illustrates how those components interact within a realistic operational scenario.
+The objective is to demonstrate that the architecture defined throughout ENG-002 is internally consistent, operationally robust and capable of supporting decades of longitudinal health evidence.
+
+Constitutional Principle
+Evidence becomes valuable not because it is collected, but because it is preserved correctly from the moment it enters BioSense.
+
+12.2 Introducing the User
+For the purposes of this specification we introduce a fictional BioSense user.
+Name: Alex Carter
+Age: 36
+Alex has recently joined BioSense.
+He has already:
+Created an account. 
+Connected WHOOP through Terra. 
+Connected Apple Health. 
+Completed Learning Mode. 
+Established a Dynamic Health Model. 
+The Observation Store currently contains approximately:
+3,800 wearable observations. 
+220 nutrition observations. 
+190 daily check-ins. 
+Everything has been successfully validated and canonicalised.
+
+12.3 A New Observation Is Created
+Alex completes a morning interval run.
+WHOOP records:
+Heart Rate 
+Respiratory Rate 
+Recovery Score 
+Strain 
+Calories 
+Sleep Debt 
+HRV 
+Skin Temperature 
+These measurements exist initially only within the WHOOP ecosystem.
+BioSense knows nothing about them.
+
+Engineering Principle
+Observations do not exist inside BioSense until BioSense receives them.
+
+12.4 Synchronisation Begins
+Terra detects that new WHOOP data is available.
+The WHOOP Connector requests only observations created since the previous successful synchronisation.
+Incremental synchronisation minimises:
+bandwidth, 
+duplicate processing, 
+unnecessary API calls. 
+Authentication succeeds.
+The raw payload is received.
+
+12.5 Validation Pipeline
+The Observation Engine begins constitutional validation.
+The pipeline verifies:
+Authentication.
+Schema.
+Mandatory fields.
+Units.
+Timestamps.
+Integrity.
+Metadata.
+The payload successfully satisfies all validation requirements.
+
+Constitutional Principle
+Successful retrieval does not imply successful validation.
+
+12.6 Canonical Translation
+The Translation Engine converts WHOOP-specific terminology into BioSense's canonical language.
+Examples include:
+WHOOP Recovery
+↓
+Recovery Score
+WHOOP Strain
+↓
+Exercise Load
+WHOOP Sleep Performance
+↓
+Sleep Performance
+Every timestamp is normalised.
+Units are converted where required.
+Provider identifiers are mapped to BioSense identifiers.
+The raw payload remains permanently preserved.
+
+12.7 Quality Assessment
+Each observation receives an independent Quality Profile.
+Assessment includes:
+Source:
+WHOOP via Terra.
+Measurement method:
+Consumer wearable.
+Temporal accuracy:
+High.
+Metadata completeness:
+Complete.
+Provenance:
+Verified.
+Overall Quality Classification:
+High Quality.
+The observations remain un-interpreted.
+
+12.8 Duplicate Assessment
+The Observation Engine compares incoming observations against existing evidence.
+Matching criteria include:
+Provider identifier.
+Measurement timestamp.
+Metric.
+Value.
+Version.
+No duplicates are identified.
+The observations proceed.
+
+12.9 Observation Event Creation
+BioSense recognises that the observations belong to one real-world activity.
+An Observation Event is created.
+Workout Session
+Containing:
+HRV 
+Heart Rate 
+Exercise Load 
+Respiratory Rate 
+Calories 
+Temperature 
+Each remains an independent Canonical Observation.
+The Observation Event preserves contextual relationships.
+
+12.10 Persistence
+Each observation enters the Canonical Observation Store.
+Stored information includes:
+Canonical Observation.
+Raw value.
+Canonical value.
+Quality Profile.
+Provenance.
+Relationships.
+Version.
+Audit record.
+Observation Collection.
+Persistence is atomic.
+No partial storage occurs.
+
+Founder Principle
+Evidence should enter BioSense completely or not at all.
+
+12.11 Dynamic Health Model Notification
+Following successful persistence, the Observation Engine publishes an internal event.
+The Dynamic Health Model receives notification that new evidence is available.
+Importantly:
+The Dynamic Health Model is not instructed to create new understanding.
+It independently evaluates whether the observations materially affect existing Health Beliefs.
+In this scenario:
+No Health Beliefs change immediately.
+
+Constitutional Principle
+New evidence invites reasoning. It never demands it.
+
+12.12 Three Months Later
+Alex has completed over sixty similar workouts.
+The Dynamic Health Model now observes a consistent pattern.
+Recovery Score improves significantly following:
+three consecutive nights of quality sleep, 
+reduced alcohol intake, 
+lower evening training intensity. 
+The Confidence Engine increases confidence.
+The Discovery Engine validates a new Discovery.
+The Observation Store remains unchanged.
+Only understanding evolves.
+
+12.13 One Year Later
+Alex uploads a comprehensive laboratory report.
+The PDF Connector:
+Authenticates.
+Processes OCR.
+Extracts biomarkers.
+Validates extraction confidence.
+Creates forty-two independent Canonical Observations.
+A single Observation Collection:
+Annual Blood Assessment
+is created.
+These biomarkers later contribute to:
+new Health Beliefs, 
+updated Narratives, 
+Biological Identity refinement. 
+Again:
+The Observation Store itself remains objective.
+
+12.14 Provider Evolution
+WHOOP releases Version 12 of its API.
+Field names change.
+Metadata changes.
+Connector Version 5 is deployed.
+Translation Rules Version 8 is introduced.
+Historical observations remain unchanged.
+New observations continue entering the Observation Store without altering previous evidence.
+No changes are required within:
+Dynamic Health Model.
+Observation Store.
+Confidence Engine.
+Recommendation Engine.
+The connector absorbs provider evolution.
+
+Founder Principle
+External change should be absorbed at the edge of the platform.
+
+12.15 Observation Correction
+The laboratory identifies an error.
+Ferritin:
+24 µg/L
+↓
+Corrected to:
+42 µg/L
+The Observation Engine:
+Creates Version 2.
+Preserves Version 1.
+Creates new audit record.
+Updates Quality Profile.
+Maintains complete lineage.
+The Dynamic Health Model later reviews affected Health Beliefs.
+Scientific history remains preserved.
+
+12.16 Five Years Later
+Alex has remained a BioSense user.
+The Observation Store now contains:
+Over 2.4 million individual observations.
+Hundreds of Observation Events.
+Thousands of Collections.
+Multiple corrected versions.
+Complete provenance.
+Complete audit history.
+Despite enormous growth:
+The Observation Store architecture remains unchanged.
+Every observation remains retrievable.
+Every observation remains explainable.
+Every observation remains constitutionally valid.
+
+12.17 Disaster Recovery
+A regional infrastructure failure occurs.
+BioSense restores the Observation Store from replicated backups.
+Recovered information includes:
+Canonical Observations.
+Quality Profiles.
+Relationships.
+Collections.
+Version history.
+Audit history.
+No evidence is lost.
+No observations require reconstruction.
+Constitutional integrity remains intact.
+
+Constitutional Principle
+Recovery should restore evidence, not recreate it.
+
+12.18 End-to-End Validation
+This example demonstrates that:
+✓ Every observation enters through a controlled ingestion pipeline.
+✓ Canonical translation removes provider-specific complexity.
+✓ Quality and provenance remain permanently attached.
+✓ Observation Events preserve context.
+✓ Duplicate evidence is prevented.
+✓ The Observation Store remains immutable.
+✓ The Dynamic Health Model receives evidence without receiving interpretation.
+✓ Understanding evolves while evidence remains constant.
+✓ Provider evolution does not affect historical observations.
+✓ Long-term scientific integrity is preserved.
+
+Closing Statement
+The Observation Engine is not an integration platform.
+It is not a collection of APIs.
+It is not a document parser.
+It is not a database.
+It is the constitutional gateway through which objective evidence enters BioSense.
+Every observation is authenticated.
+Every observation is validated.
+Every observation is translated into a common language.
+Every observation preserves its provenance.
+Every observation remains immutable.
+Every observation becomes part of a permanent scientific record that may contribute to personalised understanding for decades.
+The Observation Engine therefore provides the evidence foundation upon which the entire BioSense Intelligence Platform is built.
+Without trusted observations there can be no trusted beliefs.
+Without trusted beliefs there can be no trusted recommendations.
+Without trusted evidence there can be no trusted intelligence.

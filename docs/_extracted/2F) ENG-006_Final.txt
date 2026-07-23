@@ -1,0 +1,2127 @@
+
+ENG-006: Personalisation & Adaptive Learning Engine 
+Engineering Specification
+Document ID:  ENG-006
+Version:  1.0 (Draft)
+Status:  In Development
+Authority:  BioSense Intelligence Constitution (Documents 1A–1C)
+Depends Upon:
+ENG-001 — Dynamic Health Model Engineering Specification
+ENG-002 — Observation Engine & Canonical Observation Store Engineering Specification
+ENG-003 — Confidence & Evidence Evaluation Engine Engineering Specification
+ENG-004 — Decision Intelligence & Intervention Engine Engineering Specification 
+ENG-005 — Conversation, Explanation & Intelligence Delivery Engine Engineering Specification
+Contents
+	 TOC \o "1-2" \h \z \u ENG-006: Personalisation & Adaptive Learning Engine  Engineering Specification	 PAGEREF _Toc234388666 \h 1
+	Purpose & Design Philosophy	 PAGEREF _Toc234388667 \h 7
+	1.1 Purpose	 PAGEREF _Toc234388668 \h 7
+	1.2 Scope	 PAGEREF _Toc234388669 \h 7
+	1.3 Authority	 PAGEREF _Toc234388670 \h 8
+	1.4 Engineering Philosophy	 PAGEREF _Toc234388671 \h 9
+	1.5 Constitutional Definition	 PAGEREF _Toc234388672 \h 9
+	1.6 Personalisation Is Not Reasoning	 PAGEREF _Toc234388673 \h 9
+	1.7 Personalisation Objects	 PAGEREF _Toc234388674 \h 10
+	1.8 Explainability	 PAGEREF _Toc234388675 \h 11
+	1.9 Human Autonomy	 PAGEREF _Toc234388676 \h 12
+	1.10 Acceptance Criteria	 PAGEREF _Toc234388677 \h 12
+	Adaptive Learning Architecture	 PAGEREF _Toc234388678 \h 13
+	2.1 Purpose	 PAGEREF _Toc234388679 \h 13
+	2.2 Engineering Philosophy	 PAGEREF _Toc234388680 \h 13
+	2.3 Learning Sources	 PAGEREF _Toc234388681 \h 14
+	2.4 Learning Pipeline	 PAGEREF _Toc234388682 \h 15
+	2.5 Preference Candidates	 PAGEREF _Toc234388683 \h 16
+	2.6 Learning Confidence	 PAGEREF _Toc234388684 \h 16
+	2.7 Preference Promotion	 PAGEREF _Toc234388685 \h 17
+	2.8 Preference Evolution	 PAGEREF _Toc234388686 \h 17
+	2.9 Preference Decay	 PAGEREF _Toc234388687 \h 18
+	2.10 Explainability	 PAGEREF _Toc234388688 \h 18
+	2.11 Engineering Constraints	 PAGEREF _Toc234388689 \h 19
+	2.12 Acceptance Criteria	 PAGEREF _Toc234388690 \h 19
+	Personalisation Model & Canonical Personalisation Objects	 PAGEREF _Toc234388691 \h 20
+	3.1 Purpose	 PAGEREF _Toc234388692 \h 20
+	3.2 Engineering Philosophy	 PAGEREF _Toc234388693 \h 20
+	3.3 Canonical Personalisation Domains	 PAGEREF _Toc234388694 \h 21
+	3.4 Personalisation Objects	 PAGEREF _Toc234388695 \h 22
+	3.5 Object Structure	 PAGEREF _Toc234388696 \h 24
+	3.6 Relationships Between Objects	 PAGEREF _Toc234388697 \h 24
+	3.7 Object Lifecycle	 PAGEREF _Toc234388698 \h 25
+	3.8 Consumer Engines	 PAGEREF _Toc234388699 \h 26
+	3.9 Explainability	 PAGEREF _Toc234388700 \h 27
+	3.10 Engineering Constraints	 PAGEREF _Toc234388701 \h 27
+	3.11 Acceptance Criteria	 PAGEREF _Toc234388702 \h 27
+	Behavioural Learning & Intervention Adaptation	 PAGEREF _Toc234388703 \h 29
+	4.1 Purpose	 PAGEREF _Toc234388704 \h 29
+	4.2 Engineering Philosophy	 PAGEREF _Toc234388705 \h 29
+	4.3 Behavioural Evidence Sources	 PAGEREF _Toc234388706 \h 30
+	4.4 Behavioural Learning Pipeline	 PAGEREF _Toc234388707 \h 30
+	4.5 Behavioural Characteristics	 PAGEREF _Toc234388708 \h 31
+	4.6 Adherence Learning	 PAGEREF _Toc234388709 \h 32
+	4.7 Behavioural Friction	 PAGEREF _Toc234388710 \h 32
+	4.8 Adaptive Intervention Support	 PAGEREF _Toc234388711 \h 33
+	4.9 Behavioural Stability	 PAGEREF _Toc234388712 \h 33
+	4.10 Explainability	 PAGEREF _Toc234388713 \h 34
+	4.11 Engineering Constraints	 PAGEREF _Toc234388714 \h 34
+	4.12 Acceptance Criteria	 PAGEREF _Toc234388715 \h 34
+	Communication Learning & Educational Progression	 PAGEREF _Toc234388716 \h 36
+	5.1 Purpose	 PAGEREF _Toc234388717 \h 36
+	5.2 Engineering Philosophy	 PAGEREF _Toc234388718 \h 36
+	5.3 Educational Evidence Sources	 PAGEREF _Toc234388719 \h 37
+	5.4 Communication Learning Pipeline	 PAGEREF _Toc234388720 \h 37
+	5.5 Communication Characteristics	 PAGEREF _Toc234388721 \h 38
+	5.6 Educational Progression	 PAGEREF _Toc234388722 \h 39
+	5.7 Knowledge Reinforcement	 PAGEREF _Toc234388723 \h 39
+	5.8 Adaptive Educational Pathways	 PAGEREF _Toc234388724 \h 40
+	5.9 Educational Stability	 PAGEREF _Toc234388725 \h 40
+	5.10 Explainability	 PAGEREF _Toc234388726 \h 41
+	5.11 Engineering Constraints	 PAGEREF _Toc234388727 \h 41
+	5.12 Acceptance Criteria	 PAGEREF _Toc234388728 \h 41
+	Motivation Learning & Adaptive Coaching	 PAGEREF _Toc234388729 \h 43
+	6.1 Purpose	 PAGEREF _Toc234388730 \h 43
+	6.2 Engineering Philosophy	 PAGEREF _Toc234388731 \h 43
+	6.3 Motivational Evidence Sources	 PAGEREF _Toc234388732 \h 44
+	6.4 Motivation Learning Pipeline	 PAGEREF _Toc234388733 \h 44
+	6.5 Motivational Characteristics	 PAGEREF _Toc234388734 \h 45
+	6.6 Coaching Adaptation	 PAGEREF _Toc234388735 \h 46
+	6.7 Motivation Stability	 PAGEREF _Toc234388736 \h 46
+	6.8 Adaptive Goal Support	 PAGEREF _Toc234388737 \h 47
+	6.9 Avoiding Behavioural Manipulation	 PAGEREF _Toc234388738 \h 48
+	6.10 Explainability	 PAGEREF _Toc234388739 \h 48
+	6.11 Engineering Constraints	 PAGEREF _Toc234388740 \h 49
+	6.12 Acceptance Criteria	 PAGEREF _Toc234388741 \h 49
+	Routine Recognition & Lifestyle Pattern Learning	 PAGEREF _Toc234388742 \h 50
+	7.1 Purpose	 PAGEREF _Toc234388743 \h 50
+	7.2 Engineering Philosophy	 PAGEREF _Toc234388744 \h 50
+	7.3 Routine Evidence Sources	 PAGEREF _Toc234388745 \h 51
+	7.4 Routine Learning Pipeline	 PAGEREF _Toc234388746 \h 51
+	7.5 Routine Characteristics	 PAGEREF _Toc234388747 \h 52
+	7.6 Lifestyle Context	 PAGEREF _Toc234388748 \h 53
+	7.7 Routine Stability	 PAGEREF _Toc234388749 \h 53
+	7.8 Adaptive Scheduling	 PAGEREF _Toc234388750 \h 54
+	7.9 Routine Evolution	 PAGEREF _Toc234388751 \h 54
+	7.10 Explainability	 PAGEREF _Toc234388752 \h 55
+	7.11 Engineering Constraints	 PAGEREF _Toc234388753 \h 55
+	7.12 Acceptance Criteria	 PAGEREF _Toc234388754 \h 56
+	Adaptive Personalisation & Cross-Engine Integration	 PAGEREF _Toc234388755 \h 57
+	8.1 Purpose	 PAGEREF _Toc234388756 \h 57
+	8.2 Engineering Philosophy	 PAGEREF _Toc234388757 \h 57
+	8.3 Cross-Engine Consumption	 PAGEREF _Toc234388758 \h 57
+	8.4 Adaptive Influence	 PAGEREF _Toc234388759 \h 58
+	8.5 Stability Before Adaptation	 PAGEREF _Toc234388760 \h 59
+	8.6 Controlled Adaptation	 PAGEREF _Toc234388761 \h 60
+	8.7 Personalisation Priority	 PAGEREF _Toc234388762 \h 60
+	8.8 User Override	 PAGEREF _Toc234388763 \h 61
+	8.9 Cross-Engine Consistency	 PAGEREF _Toc234388764 \h 61
+	8.10 Explainability	 PAGEREF _Toc234388765 \h 62
+	8.11 Engineering Constraints	 PAGEREF _Toc234388766 \h 63
+	8.12 Acceptance Criteria	 PAGEREF _Toc234388767 \h 63
+	Privacy, Consent & Constitutional Learning Boundaries	 PAGEREF _Toc234388768 \h 64
+	9.1 Purpose	 PAGEREF _Toc234388769 \h 64
+	9.2 Engineering Philosophy	 PAGEREF _Toc234388770 \h 64
+	9.3 Purpose Limitation	 PAGEREF _Toc234388771 \h 64
+	9.4 Consent	 PAGEREF _Toc234388772 \h 65
+	9.5 Constitutional Learning Boundaries	 PAGEREF _Toc234388773 \h 65
+	9.6 Data Minimisation	 PAGEREF _Toc234388774 \h 66
+	9.7 User Visibility	 PAGEREF _Toc234388775 \h 67
+	9.8 User Control	 PAGEREF _Toc234388776 \h 67
+	9.9 Privacy Preservation	 PAGEREF _Toc234388777 \h 68
+	9.10 Explainability	 PAGEREF _Toc234388778 \h 68
+	9.11 Engineering Constraints	 PAGEREF _Toc234388779 \h 68
+	9.12 Acceptance Criteria	 PAGEREF _Toc234388780 \h 69
+	Governance, Versioning & Personalisation Lifecycle Management	 PAGEREF _Toc234388781 \h 70
+	10.1 Purpose	 PAGEREF _Toc234388782 \h 70
+	10.2 Engineering Philosophy	 PAGEREF _Toc234388783 \h 70
+	10.3 Governance Responsibilities	 PAGEREF _Toc234388784 \h 71
+	10.4 Versioning	 PAGEREF _Toc234388785 \h 71
+	10.5 Configuration Management	 PAGEREF _Toc234388786 \h 72
+	10.6 Personalisation Engine Releases	 PAGEREF _Toc234388787 \h 73
+	10.7 Validation Before Deployment	 PAGEREF _Toc234388788 \h 73
+	10.8 Historical Reproducibility	 PAGEREF _Toc234388789 \h 74
+	10.9 Change Impact Assessment	 PAGEREF _Toc234388790 \h 74
+	10.10 Operational Monitoring	 PAGEREF _Toc234388791 \h 75
+	10.11 Auditability	 PAGEREF _Toc234388792 \h 75
+	10.12 Regulatory Readiness	 PAGEREF _Toc234388793 \h 76
+	10.13 Engineering Constraints	 PAGEREF _Toc234388794 \h 76
+	10.14 Acceptance Criteria	 PAGEREF _Toc234388795 \h 77
+	End-to-End Personalisation & Adaptive Learning Lifecycle	 PAGEREF _Toc234388796 \h 78
+	11.1 Purpose	 PAGEREF _Toc234388797 \h 78
+	11.2 Example Scenario	 PAGEREF _Toc234388798 \h 78
+	11.3 Behaviour Observation	 PAGEREF _Toc234388799 \h 79
+	11.4 Pattern Recognition	 PAGEREF _Toc234388800 \h 79
+	11.5 Confidence Assessment	 PAGEREF _Toc234388801 \h 80
+	11.6 Personalisation Object Promotion	 PAGEREF _Toc234388802 \h 81
+	11.7 Cross-Engine Consumption	 PAGEREF _Toc234388803 \h 82
+	11.8 Personalisation Evolution	 PAGEREF _Toc234388804 \h 82
+	11.9 User Override	 PAGEREF _Toc234388805 \h 83
+	11.10 Governance	 PAGEREF _Toc234388806 \h 83
+	11.11 End-to-End Validation	 PAGEREF _Toc234388807 \h 84
+
+Chapter 1
+Purpose & Design Philosophy
+
+1.1 Purpose
+The purpose of this specification is to define how BioSense learns from an individual's long-term interactions, behaviours and preferences in order to personalise the platform while preserving constitutional integrity, scientific accuracy and user autonomy. Unlike the upstream intelligence engines, which develop an understanding of the individual's health, the Personalisation & Adaptive Learning Engine develops an understanding of the individual as a person. Its responsibility is to identify stable patterns that improve how BioSense communicates, educates, prioritises and supports behaviour over time. The engine shall never alter the underlying health intelligence established elsewhere within the BioSense platform.
+
+Constitutional Principle
+Learn about the person without changing the truth about their health.
+
+1.2 Scope
+This specification governs:
+long-term personalisation, 
+communication preferences, 
+behavioural preferences, 
+educational progression, 
+intervention adherence, 
+coaching preferences, 
+routine recognition, 
+habit recognition, 
+engagement patterns, 
+notification preferences, 
+report preferences, 
+adaptive personalisation, 
+longitudinal user learning. 
+It deliberately excludes:
+Health Belief formation (ENG-001), 
+observation processing (ENG-002), 
+confidence evaluation (ENG-003), 
+Decision Object generation (ENG-004), 
+communication delivery (ENG-005). 
+Its responsibility begins only after trusted health intelligence has already been established.
+
+1.3 Authority
+The Personalisation & Adaptive Learning Engine consumes outputs from all preceding constitutional engines.
+It may consume:
+Health Beliefs, 
+Behavioural Identity, 
+User Goals, 
+Decision Objects, 
+Structured Explanations, 
+Conversation history, 
+intervention outcomes, 
+educational interactions, 
+user preferences, 
+behavioural engagement signals. 
+It shall not modify upstream intelligence. Instead, it produces governed Personalisation Objects that may be consumed by other engines.
+
+Engineering Rule
+The Personalisation Engine is a read-only consumer of health intelligence and a producer of personalisation intelligence.
+
+1.4 Engineering Philosophy
+No two individuals respond identically to the same health guidance.
+Over time, BioSense should become increasingly effective at understanding:
+how an individual learns, 
+what motivates them, 
+how they prefer information, 
+which interventions they adopt, 
+which educational approaches improve understanding, 
+how their routines influence success. 
+Learning exists to improve the user's experience of BioSense. It shall never distort scientific conclusions.
+
+Founder Principle
+Personalisation should improve relevance without compromising objectivity.
+
+1.5 Constitutional Definition
+For engineering purposes:
+The Personalisation & Adaptive Learning Engine is the constitutional system responsible for developing governed, explainable and longitudinal models of an individual's behavioural and communication preferences without altering the underlying health intelligence of the BioSense platform.
+The engine learns about the individual. It does not redefine the individual's health.
+
+Constitutional Principle
+Health intelligence and personalisation intelligence are separate constitutional domains.
+
+1.6 Personalisation Is Not Reasoning
+A strict architectural boundary exists between reasoning and personalisation.
+Reasoning occurs within:
+ENG-001 
+ENG-002 
+ENG-003 
+ENG-004 
+Communication occurs within:
+ENG-005 
+Personalisation occurs within:
+ENG-006 
+The Personalisation Engine shall never:
+create Health Beliefs, 
+modify observations, 
+alter confidence, 
+reprioritise Decision Objects, 
+reinterpret evidence. 
+It supplies personalisation signals to other engines. Those engines remain responsible for constitutional reasoning.
+
+Engineering Rule
+Personalisation informs behaviour.
+It does not determine truth.
+
+1.7 Personalisation Objects
+The primary output of this engine shall be governed Personalisation Objects.
+Examples include:
+Communication Preference Object 
+Coaching Preference Object 
+Educational Progress Object 
+Behavioural Adherence Object 
+Routine Profile Object 
+Notification Preference Object 
+Habit Stability Object 
+Engagement Pattern Object 
+Each Personalisation Object shall possess:
+provenance, 
+confidence, 
+version, 
+update history, 
+explainability, 
+audit history. 
+
+Founder Principle
+Personalisation should be engineered as structured intelligence, not hidden behaviour.
+
+1.8 Explainability
+Every Personalisation Object shall remain explainable.
+BioSense shall always be capable of explaining:
+what has been learned, 
+why it has been learned, 
+which evidence supports it, 
+how confident the platform is, 
+which engines consume it, 
+how it influences user experience. 
+If BioSense cannot explain a learned preference, that preference is constitutionally incomplete.
+
+Constitutional Principle
+Every learned preference should itself be explainable.
+
+1.9 Human Autonomy
+The purpose of personalisation is to improve understanding and usability.
+It shall never:
+manipulate behaviour, 
+reduce user autonomy, 
+optimise for engagement, 
+create dependency, 
+prioritise commercial outcomes. 
+Users shall remain free to override personalisation where appropriate. Personalisation exists to support the individual, not control them.
+
+Founder Principle
+Adapt to the individual without attempting to direct the individual.
+
+1.10 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ The Personalisation Engine is clearly separated from all reasoning engines.
+✓ Personalisation Objects are established as first-class constitutional objects.
+✓ Health intelligence and personalisation intelligence remain independent.
+✓ Personalisation is explicitly prohibited from altering scientific conclusions.
+✓ Human autonomy is preserved.
+✓ Every Personalisation Object remains explainable and auditable.
+✓ Architectural ownership boundaries remain unambiguous.
+Chapter 2
+Adaptive Learning Architecture
+
+2.1 Purpose
+The purpose of this chapter is to define the constitutional architecture through which BioSense develops, validates and maintains long-term personalisation knowledge. Learning within BioSense is a governed process. The platform shall not immediately convert individual interactions into permanent user preferences.
+Instead, learning shall occur progressively through repeated observation, validation and confidence assessment. The objective is to develop stable personalisation intelligence that improves the user experience while remaining transparent, explainable and reversible.
+
+Constitutional Principle
+Learning should emerge from consistent evidence rather than isolated behaviour.
+
+2.2 Engineering Philosophy
+Every interaction between the individual and BioSense may provide evidence about personal preferences. However, individual interactions are often noisy.
+A single behaviour may reflect:
+curiosity, 
+circumstance, 
+experimentation, 
+temporary need, 
+or genuine long-term preference. 
+The Adaptive Learning Architecture shall therefore distinguish between:
+observed behaviour, 
+emerging patterns, 
+validated preferences. 
+Only validated preferences shall influence future personalisation.
+
+Founder Principle
+Observe first. Learn second. Personalise third.
+
+2.3 Learning Sources
+The Personalisation Engine may learn from multiple categories of governed evidence.
+Examples include:
+Communication Behaviour
+preferred explanation depth, 
+request for additional detail, 
+summary selection, 
+reading completion. 
+
+Educational Behaviour
+completed educational content, 
+repeated learning topics, 
+requested scientific depth, 
+educational progression. 
+
+Behavioural Outcomes
+intervention adherence, 
+habit consistency, 
+routine stability, 
+goal persistence. 
+
+Interaction Behaviour
+conversation frequency, 
+clarification requests, 
+preferred delivery channels, 
+feature utilisation. 
+
+User Configuration
+explicitly selected preferences, 
+notification settings, 
+language preferences, 
+accessibility preferences. 
+Each learning source contributes evidence.
+None independently establish permanent preferences.
+
+Engineering Rule
+Every learning source contributes probabilistically rather than deterministically.
+
+2.4 Learning Pipeline
+Every learned preference shall progress through the same constitutional pipeline.
+Behaviour
+
+↓
+
+Evidence Collection
+
+↓
+
+Pattern Recognition
+
+↓
+
+Preference Candidate
+
+↓
+
+Confidence Assessment
+
+↓
+
+Personalisation Object
+
+↓
+
+Consumed by Other Engines
+Learning shall never bypass this process.
+
+Constitutional Principle
+Personalisation should be earned through evidence.
+
+2.5 Preference Candidates
+Potential preferences shall first exist as Preference Candidates.
+Examples include:
+"This individual may prefer concise explanations."
+"This individual may respond well to coaching."
+"This individual may prefer weekly reports."
+Preference Candidates remain provisional.
+They shall not influence platform behaviour until sufficiently validated.
+
+Founder Principle
+Potential preferences deserve observation before trust.
+
+2.6 Learning Confidence
+Every Preference Candidate shall possess its own confidence assessment.
+Confidence may increase through:
+repeated confirmation, 
+behavioural consistency, 
+longitudinal stability, 
+explicit user confirmation, 
+successful application. 
+Confidence may decrease through:
+contradictory behaviour, 
+inactivity, 
+inconsistent usage, 
+preference changes, 
+explicit user override. 
+Learning confidence shall remain independent from health confidence.
+
+Engineering Rule
+The certainty of a personal preference shall never be confused with the certainty of a health conclusion.
+
+2.7 Preference Promotion
+Only Preference Candidates meeting constitutional promotion criteria shall become Personalisation Objects.
+Promotion shall consider:
+confidence, 
+stability, 
+consistency, 
+duration, 
+behavioural evidence, 
+explicit user preferences where available. 
+Promotion shall remain fully explainable.
+
+Constitutional Principle
+Promotion from observation to preference requires sufficient longitudinal evidence.
+
+2.8 Preference Evolution
+Personal preferences naturally change over time. The Personalisation Engine shall therefore support gradual evolution.
+Examples include:
+A user initially prefers concise explanations.
+↓
+Requests increasingly detailed evidence.
+↓
+Preference confidence shifts gradually.
+↓
+Communication Profile adapts progressively.
+Learning shall favour continuity over abrupt change.
+
+Founder Principle
+People evolve. Personalisation should evolve with them.
+
+2.9 Preference Decay
+Preferences that are no longer supported shall gradually lose confidence.
+Examples include:
+unused communication styles, 
+abandoned routines, 
+obsolete coaching preferences, 
+inactive goals. 
+Decay shall occur gradually.
+Historical evidence shall remain available for audit.
+
+Constitutional Principle
+Learning should be reversible when behaviour genuinely changes.
+
+2.10 Explainability
+Every learned preference shall answer:
+What has been learned? 
+Which behaviours contributed? 
+How much evidence exists? 
+Why was confidence assigned? 
+When was the preference promoted? 
+Which engines consume this preference? 
+Could this preference change in future? 
+
+2.11 Engineering Constraints
+The Adaptive Learning Architecture shall:
+distinguish behaviour from preference, 
+require longitudinal evidence, 
+support reversible learning, 
+preserve learning confidence, 
+maintain explainability, 
+remain fully auditable, 
+preserve constitutional boundaries. 
+
+2.12 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Every learned preference follows the constitutional learning pipeline.
+✓ Preference Candidates remain distinct from Personalisation Objects.
+✓ Learning confidence remains independent from health confidence.
+✓ Promotion requires sufficient longitudinal evidence.
+✓ Preferences evolve gradually.
+✓ Unsupported preferences decay over time.
+✓ Every learned preference remains fully explainable and auditable.
+Chapter 3
+Personalisation Model & Canonical Personalisation Objects
+
+3.1 Purpose
+The purpose of this chapter is to define the canonical Personalisation Model used by BioSense to represent long-term knowledge about an individual's preferences, behaviours and interaction characteristics. The Personalisation Model provides a structured, governed representation of learned user preferences that may be consumed by other constitutional engines.
+It deliberately excludes health intelligence.
+Its responsibility is to model how BioSense should interact with the individual, not what BioSense believes about the individual's health.
+
+Constitutional Principle
+The Personalisation Model describes the individual, not the individual's health.
+
+3.2 Engineering Philosophy
+Personalisation should be represented using structured, explainable objects rather than hidden application settings or opaque machine learning outputs.
+Every learned characteristic shall exist as a governed Personalisation Object possessing:
+provenance, 
+confidence, 
+version, 
+history, 
+explainability, 
+auditability. 
+The Personalisation Model therefore becomes the single constitutional source of personalisation intelligence across the BioSense platform.
+
+Founder Principle
+If BioSense has learned something about the individual, it should exist as structured intelligence rather than hidden behaviour.
+
+3.3 Canonical Personalisation Domains
+The Personalisation Model shall consist of multiple independent domains. Each domain represents a distinct aspect of long-term user understanding.
+Domains may include:
+Communication
+How the individual prefers information to be presented.
+
+Education
+How the individual learns most effectively.
+
+Behaviour
+How the individual adopts behavioural change.
+
+Motivation
+What encourages sustained engagement with health improvement.
+
+Routine
+Recurring habits and predictable behavioural patterns.
+
+Coaching
+Preferred coaching and support style.
+
+Interaction
+How the individual naturally interacts with BioSense.
+
+Accessibility
+Preferred communication accessibility requirements.
+Each domain evolves independently.
+
+Engineering Rule
+No Personalisation Domain shall infer conclusions outside its constitutional responsibility.
+
+3.4 Personalisation Objects
+Each domain shall contain one or more Personalisation Objects.
+Illustrative examples include:
+Communication Preference Object
+Preferred explanation depth.
+Preferred report format.
+Preferred detail level.
+
+Educational Progress Object
+Health literacy progression.
+Completed learning topics.
+Concept mastery.
+
+Behavioural Adherence Object
+Intervention completion patterns.
+Consistency trends.
+Behavioural persistence.
+
+Routine Profile Object
+Preferred exercise timing.
+Sleep routine stability.
+Meal timing consistency.
+
+Motivation Profile Object
+Goal-oriented motivation.
+Data-driven motivation.
+Achievement motivation.
+Educational motivation.
+
+Coaching Preference Object
+Supportive.
+Analytical.
+Reflective.
+Action-focused.
+
+Interaction Pattern Object
+Preferred channels.
+Conversation frequency.
+Report usage.
+Notification responsiveness.
+
+Accessibility Preference Object
+Language.
+Reading complexity.
+Alternative presentation requirements.
+
+Constitutional Principle
+Every learned characteristic should belong to one clearly defined Personalisation Object.
+
+3.5 Object Structure
+Every Personalisation Object shall contain:
+Object Identifier, 
+Domain, 
+Current State, 
+Confidence, 
+Evidence Summary, 
+Supporting Behaviours, 
+Update History, 
+Version, 
+Explainability Metadata, 
+Consumer Engines. 
+The internal implementation remains platform-specific.
+The constitutional structure shall remain consistent.
+
+Founder Principle
+Every Personalisation Object should answer who, what, why, when and how confidently.
+
+3.6 Relationships Between Objects
+Personalisation Objects may influence one another.
+Examples include:
+Educational Progress
+↓
+Communication Preference
+↓
+Conversation Depth
+
+Behavioural Adherence
+↓
+Coaching Preference
+↓
+Intervention Delivery
+
+Routine Profile
+↓
+Notification Timing
+↓
+Intervention Success
+Relationships shall be explicitly defined.
+Implicit dependencies shall be avoided.
+
+Engineering Rule
+Relationships between Personalisation Objects shall remain transparent and auditable.
+
+3.7 Object Lifecycle
+Every Personalisation Object shall progress through a governed lifecycle.
+Illustrative stages include:
+Candidate
+↓
+Emerging
+↓
+Validated
+↓
+Active
+↓
+Declining
+↓
+Archived
+Lifecycle transitions shall be evidence-based and version-controlled.
+
+Constitutional Principle
+Personalisation should mature through evidence rather than assumption.
+
+3.8 Consumer Engines
+Personalisation Objects may be consumed by multiple constitutional engines.
+Examples include:
+ENG-004
+Decision Intelligence Engine
+Consumes:
+Behavioural Adherence.
+Routine Profile.
+Motivation Profile.
+
+ENG-005
+Conversation Engine
+Consumes:
+Communication Preferences.
+Educational Progress.
+Coaching Preferences.
+Accessibility Preferences.
+
+Future engines may consume Personalisation Objects through governed interfaces.
+Consumer engines remain read-only.
+
+Engineering Rule
+Only the Personalisation Engine owns Personalisation Objects.
+Other engines consume them.
+
+3.9 Explainability
+Every Personalisation Object shall answer:
+What has been learned? 
+Which evidence supports it? 
+Why does BioSense believe this preference exists? 
+How confident is the platform? 
+Which engines currently consume this object? 
+Has this preference changed over time? 
+
+3.10 Engineering Constraints
+The Personalisation Model shall:
+remain domain-based, 
+preserve object ownership, 
+support independent evolution, 
+maintain explainability, 
+preserve auditability, 
+support future extensibility, 
+remain constitutionally consistent. 
+
+3.11 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ The Personalisation Model is established as the canonical representation of user personalisation intelligence.
+✓ Every learned characteristic belongs to a governed Personalisation Domain.
+✓ Personalisation Objects possess structured metadata and lifecycle states.
+✓ Relationships between Personalisation Objects remain explicit.
+✓ Consumer engine ownership boundaries remain unambiguous.
+✓ Every Personalisation Object remains fully explainable and auditable.
+Chapter 4
+Behavioural Learning & Intervention Adaptation
+
+4.1 Purpose
+The purpose of this chapter is to define how BioSense learns from an individual's behavioural responses to interventions in order to improve future personalisation. The Personalisation Engine shall observe how the individual engages with recommendations over time, identifying stable behavioural characteristics that influence future communication, coaching and intervention delivery. Its objective is not to determine whether an intervention was clinically successful. Its objective is to understand how the individual responds to behavioural change.
+
+Constitutional Principle
+Learn how the individual responds to change without redefining the intervention itself.
+
+4.2 Engineering Philosophy
+Individuals respond differently to identical health recommendations.
+Examples include:
+some adopt changes immediately, 
+some require repeated education, 
+some succeed with gradual progression, 
+some prefer structured plans, 
+some respond better to autonomy. 
+These behavioural differences represent valuable personalisation intelligence. The Personalisation Engine shall therefore learn behavioural characteristics independently from clinical outcomes.
+
+Founder Principle
+Successful coaching begins with understanding how the individual changes, not simply what they should change.
+
+4.3 Behavioural Evidence Sources
+Behavioural learning may utilise evidence including:
+intervention acceptance, 
+intervention completion, 
+intervention abandonment, 
+behavioural persistence, 
+routine consistency, 
+goal progression, 
+voluntary engagement, 
+educational completion, 
+user-configured preferences, 
+longitudinal adherence patterns. 
+Behavioural evidence reflects user behaviour.
+It does not evaluate clinical effectiveness.
+
+Engineering Rule
+Behavioural evidence shall remain distinct from physiological evidence.
+
+4.4 Behavioural Learning Pipeline
+Behavioural learning shall follow a governed constitutional process.
+Decision Object
+
+↓
+
+Behavioural Response
+
+↓
+
+Behavioural Evidence
+
+↓
+
+Pattern Recognition
+
+↓
+
+Behavioural Preference Candidate
+
+↓
+
+Learning Confidence
+
+↓
+
+Behavioural Personalisation Object
+
+↓
+
+Consumed by Other Engines
+Behavioural Personalisation Objects shall never be created directly from individual interventions.
+
+Constitutional Principle
+Behavioural understanding should emerge from repeated experience rather than isolated outcomes.
+
+4.5 Behavioural Characteristics
+The Personalisation Engine may learn stable behavioural characteristics such as:
+Intervention adherence.
+Behavioural persistence.
+Routine flexibility.
+Goal commitment.
+Planning preference.
+Self-directed behaviour.
+Educational engagement.
+Reflection frequency.
+Preference for gradual change.
+Preference for structured programmes.
+Each characteristic represents a learned behavioural tendency rather than a permanent trait.
+
+Founder Principle
+People demonstrate tendencies rather than fixed behavioural identities.
+
+4.6 Adherence Learning
+Intervention adherence shall be evaluated longitudinally.
+Illustrative observations include:
+consistently completes low-effort interventions, 
+struggles with simultaneous behaviour changes, 
+adopts exercise recommendations rapidly, 
+delays dietary changes, 
+maintains routines successfully over extended periods. 
+Adherence learning informs future personalisation.
+It shall not influence the scientific validity of recommendations.
+
+Engineering Rule
+Low adherence does not reduce the importance of a recommendation.
+It changes how BioSense supports the individual.
+
+4.7 Behavioural Friction
+The Personalisation Engine shall identify recurring sources of behavioural friction.
+Examples include:
+complexity, 
+time requirements, 
+competing routines, 
+motivation decline, 
+information overload, 
+intervention fatigue, 
+environmental disruption. 
+Behavioural friction represents an opportunity for improved personalisation rather than a failure of the individual.
+
+Constitutional Principle
+Persistent friction should improve personalisation, not reduce expectations.
+
+4.8 Adaptive Intervention Support
+Behavioural learning may influence how future interventions are delivered.
+Examples include:
+An individual consistently succeeds with:
+one recommendation at a time. 
+Future interventions may therefore:
+reduce simultaneous recommendations, 
+simplify prioritisation, 
+increase educational support. 
+The underlying Decision Objects remain unchanged. Only their presentation and support adapt.
+
+Founder Principle
+Adapt the delivery before questioning the decision.
+
+4.9 Behavioural Stability
+Behavioural Personalisation Objects shall distinguish between:
+Temporary behaviour.
+↓
+Emerging tendency.
+↓
+Validated behavioural characteristic.
+Longitudinal stability shall always outweigh short-term variability.
+
+Constitutional Principle
+Stable behaviour deserves greater influence than temporary behaviour.
+
+4.10 Explainability
+Every Behavioural Personalisation Object shall answer:
+What behavioural characteristic has been learned? 
+Which interventions contributed? 
+Which behaviours supported the conclusion? 
+How confident is BioSense? 
+How does this influence future personalisation? 
+Could this behavioural understanding change? 
+
+4.11 Engineering Constraints
+The Behavioural Learning Framework shall:
+separate behavioural learning from clinical evaluation, 
+require longitudinal evidence, 
+preserve user autonomy, 
+adapt intervention support rather than intervention validity, 
+maintain explainability, 
+remain fully auditable, 
+preserve constitutional boundaries. 
+
+4.12 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Behavioural learning remains distinct from intervention outcome evaluation.
+✓ Behavioural evidence is collected longitudinally.
+✓ Behavioural Personalisation Objects require governed promotion.
+✓ Behavioural friction is recognised as a personalisation opportunity.
+✓ Intervention support adapts without altering Decision Objects.
+✓ Stable behavioural characteristics outweigh temporary behaviour.
+✓ Every Behavioural Personalisation Object remains fully explainable and auditable.
+Chapter 5
+Communication Learning & Educational Progression
+
+5.1 Purpose
+The purpose of this chapter is to define how the Personalisation & Adaptive Learning Engine learns an individual's preferred methods of communication, education and knowledge acquisition over time. Effective health communication extends beyond delivering accurate information. It requires presenting that information in a manner that the individual can understand, retain and apply. The Personalisation Engine shall therefore learn stable communication and educational preferences that improve future interactions while preserving the underlying scientific meaning.
+
+Constitutional Principle
+Learn how the individual understands health without changing the health intelligence itself.
+
+5.2 Engineering Philosophy
+Individuals differ significantly in how they consume health information.
+Examples include:
+preference for concise summaries, 
+preference for scientific depth, 
+preference for visual explanation, 
+preference for practical examples, 
+preference for progressive learning, 
+preference for structured education. 
+These characteristics should emerge through longitudinal observation rather than explicit configuration alone. Communication adaptation should become increasingly accurate as BioSense gains experience with the individual.
+
+Founder Principle
+Teach the individual in the way they learn best, not the way BioSense speaks best.
+
+5.3 Educational Evidence Sources
+Educational learning may utilise evidence including:
+explanation expansion requests, 
+summary selection, 
+educational article completion, 
+concept revisit frequency, 
+conversation depth, 
+follow-up questioning, 
+preferred report formats, 
+educational assessment outcomes (where implemented), 
+explicit user preferences. 
+Educational evidence reflects learning behaviour.
+It does not measure intelligence or health literacy directly.
+
+Engineering Rule
+Educational behaviour shall not be interpreted as cognitive ability.
+
+5.4 Communication Learning Pipeline
+Communication learning shall follow the constitutional learning architecture.
+Communication Interaction
+
+↓
+
+Educational Behaviour
+
+↓
+
+Evidence Collection
+
+↓
+
+Communication Preference Candidate
+
+↓
+
+Learning Confidence
+
+↓
+
+Communication Personalisation Object
+
+↓
+
+Consumed by Conversation Engine
+Every Communication Personalisation Object shall be supported by longitudinal evidence.
+
+Constitutional Principle
+Communication preferences should emerge from consistent learning behaviour rather than isolated interaction.
+
+5.5 Communication Characteristics
+The Personalisation Engine may learn characteristics including:
+Preferred explanation depth.
+Preferred report length.
+Preferred coaching style.
+Preferred scientific detail.
+Preferred pacing.
+Preferred educational sequencing.
+Preferred use of examples.
+Preferred balance between summary and detail.
+Preferred exploration style.
+Each characteristic represents a learned preference rather than a permanent attribute.
+
+Founder Principle
+Preferences describe how someone likes to learn today, not who they are permanently.
+
+5.6 Educational Progression
+The Personalisation Engine shall model educational progression over time.
+Examples include:
+Previously required introductory explanations.
+↓
+Progressively understands terminology.
+↓
+Requires less foundational education.
+↓
+Engages with increasingly advanced concepts.
+Educational progression allows BioSense to build upon established understanding while avoiding unnecessary repetition. Progression shall remain reversible if future interactions indicate a need for additional support.
+
+Engineering Rule
+Educational progression shall reflect demonstrated understanding rather than elapsed time.
+
+5.7 Knowledge Reinforcement
+The Personalisation Engine shall recognise concepts that may benefit from reinforcement.
+Examples include:
+Frequently revisited topics.
+Repeated clarification requests.
+Concepts associated with inconsistent understanding.
+Areas relevant to active health goals. Reinforcement should occur naturally through future communication rather than repetitive instruction.
+
+Constitutional Principle
+Reinforce understanding where evidence suggests it is beneficial.
+
+5.8 Adaptive Educational Pathways
+Educational learning may influence:
+explanation sequencing, 
+recommended educational content, 
+supporting examples, 
+concept ordering, 
+report structure, 
+tutorial progression. 
+Adaptive educational pathways shall optimise understanding. They shall not alter scientific content.
+
+Founder Principle
+Adapt the path to understanding, not the destination.
+
+5.9 Educational Stability
+Educational Personalisation Objects shall distinguish between:
+Temporary curiosity.
+↓
+Emerging preference.
+↓
+Validated educational preference.
+Longitudinal consistency shall carry greater weight than isolated learning behaviour.
+
+Constitutional Principle
+Repeated educational behaviour deserves greater confidence than occasional curiosity.
+
+5.10 Explainability
+Every Educational Personalisation Object shall answer:
+What communication preference has been learned? 
+Which interactions contributed? 
+How confident is BioSense? 
+How has the preference evolved? 
+Which communication channels consume this preference? 
+Could this understanding change? 
+
+5.11 Engineering Constraints
+The Communication Learning Framework shall:
+separate educational preference from health intelligence, 
+preserve scientific meaning, 
+support progressive educational adaptation, 
+avoid assumptions regarding cognitive ability, 
+require longitudinal evidence, 
+remain explainable, 
+remain fully auditable. 
+
+5.12 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Communication preferences are learned through longitudinal evidence.
+✓ Educational progression reflects demonstrated understanding rather than elapsed time.
+✓ Educational reinforcement is evidence-based.
+✓ Adaptive educational pathways influence presentation without altering scientific meaning.
+✓ Communication preferences remain distinct from health intelligence.
+✓ Educational Personalisation Objects evolve gradually over time.
+✓ Every learned communication preference remains fully explainable and auditable.
+Chapter 6
+Motivation Learning & Adaptive Coaching
+
+6.1 Purpose
+The purpose of this chapter is to define how the Personalisation & Adaptive Learning Engine develops a longitudinal understanding of an individual's motivational characteristics and preferred coaching approaches. Long-term health improvement depends not only upon evidence-based recommendations, but also upon presenting those recommendations in ways that encourage sustainable behavioural adoption. The Personalisation Engine shall therefore learn stable motivational and coaching preferences while preserving scientific integrity, constitutional authority and user autonomy.
+
+Constitutional Principle
+Learn what helps the individual succeed without attempting to manipulate the individual.
+
+6.2 Engineering Philosophy
+Individuals are motivated in different ways.
+Examples include:
+achievement, 
+curiosity, 
+education, 
+routine, 
+measurable progress, 
+accountability, 
+long-term outcomes, 
+immediate improvements. 
+No single coaching approach is universally effective. The Personalisation Engine shall therefore identify motivational tendencies through longitudinal behavioural evidence rather than predefined personality models.
+
+Founder Principle
+Support motivation through understanding rather than persuasion.
+
+6.3 Motivational Evidence Sources
+Motivational learning may utilise evidence including:
+intervention adoption, 
+goal completion, 
+response to milestone recognition, 
+engagement following educational content, 
+voluntary interaction frequency, 
+adherence persistence, 
+reaction to progress summaries, 
+user-configured goals, 
+coaching preference selection. 
+Motivational evidence reflects observed behavioural response. It shall not infer psychological characteristics beyond the scope of constitutional learning.
+
+Engineering Rule
+Observed motivation shall be derived from behaviour rather than speculative personality profiling.
+
+6.4 Motivation Learning Pipeline
+Motivational learning shall follow the constitutional learning architecture.
+Behavioural Outcome
+
+↓
+
+Motivational Evidence
+
+↓
+
+Pattern Recognition
+
+↓
+
+Motivation Preference Candidate
+
+↓
+
+Learning Confidence
+
+↓
+
+Motivation Personalisation Object
+
+↓
+
+Consumed by Other Engines
+Every Motivation Personalisation Object shall require sufficient longitudinal evidence before activation.
+
+Constitutional Principle
+Motivational understanding should emerge from sustained behaviour rather than isolated success.
+
+6.5 Motivational Characteristics
+The Personalisation Engine may learn characteristics including:
+Preference for measurable progress.
+Preference for educational understanding.
+Preference for structured coaching.
+Preference for autonomy.
+Preference for gradual progression.
+Preference for milestone recognition.
+Preference for reflective learning.
+Preference for long-term planning.
+Preference for simplified decision-making.
+Each characteristic represents a learned motivational tendency rather than a permanent behavioural identity.
+
+Founder Principle
+Motivation is dynamic. Personalisation should recognise that dynamism.
+
+6.6 Coaching Adaptation
+Motivational learning may influence:
+coaching style, 
+intervention sequencing, 
+educational emphasis, 
+celebration of progress, 
+reminder frequency, 
+explanation structure, 
+report presentation. 
+These adaptations shall influence how BioSense supports the individual.
+They shall never alter:
+Health Beliefs, 
+Confidence Objects, 
+Decision Objects, 
+constitutional safety. 
+
+Engineering Rule
+Coaching adapts communication rather than clinical judgement.
+
+6.7 Motivation Stability
+The Personalisation Engine shall distinguish between:
+Situational motivation.
+↓
+Emerging motivational tendency.
+↓
+Validated Motivation Personalisation Object.
+Examples include:
+Temporary enthusiasm following a new wearable.
+↓
+Not yet a stable motivational characteristic. Longitudinal consistency shall always outweigh short-term enthusiasm.
+
+Constitutional Principle
+Persistent behavioural patterns deserve greater influence than temporary enthusiasm.
+
+6.8 Adaptive Goal Support
+The Personalisation Engine may learn how the individual responds to different styles of goal support.
+Examples include:
+One long-term objective.
+↓
+Higher adherence.
+
+Multiple simultaneous objectives.
+↓
+Reduced completion.
+
+Visual progress summaries.
+↓
+Increased engagement.
+
+Educational milestones.
+↓
+Improved persistence.
+The engine shall adapt support strategies accordingly. The goals themselves remain governed elsewhere.
+
+Founder Principle
+Support goals in the way the individual succeeds best, not the way BioSense prefers to present them.
+
+6.9 Avoiding Behavioural Manipulation
+The Personalisation Engine shall explicitly prohibit learning strategies whose primary objective is:
+maximising engagement, 
+increasing application usage, 
+encouraging unnecessary interaction, 
+exploiting cognitive biases, 
+creating dependency, 
+commercial optimisation. 
+Motivational learning exists solely to improve sustainable health outcomes.
+
+Constitutional Principle
+Health optimisation takes precedence over engagement optimisation.
+
+6.10 Explainability
+Every Motivation Personalisation Object shall answer:
+What motivational tendency has been learned? 
+Which behaviours contributed? 
+Why does BioSense believe this tendency exists? 
+How confident is the platform? 
+How does it influence coaching? 
+Could this understanding change over time? 
+
+6.11 Engineering Constraints
+The Motivation Learning Framework shall:
+separate motivation from health intelligence, 
+avoid psychological profiling, 
+require longitudinal evidence, 
+preserve user autonomy, 
+prohibit engagement-driven optimisation, 
+remain explainable, 
+remain fully auditable. 
+
+6.12 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Motivational learning is based upon observed behaviour rather than assumed personality.
+✓ Motivation Personalisation Objects require longitudinal validation.
+✓ Coaching adapts without altering scientific recommendations.
+✓ Goal support is personalised independently from goal generation.
+✓ Engagement optimisation is constitutionally prohibited.
+✓ User autonomy is explicitly preserved.
+✓ Every Motivation Personalisation Object remains fully explainable and auditable.
+Chapter 7
+Routine Recognition & Lifestyle Pattern Learning
+
+7.1 Purpose
+The purpose of this chapter is to define how the Personalisation & Adaptive Learning Engine identifies, validates and maintains long-term understanding of an individual's routines and lifestyle patterns. Daily life strongly influences health behaviour. Recurring routines provide valuable context that enables BioSense to personalise communication, intervention support and educational delivery in ways that fit naturally within the individual's established lifestyle. Routine recognition shall therefore identify stable behavioural patterns while remaining distinct from physiological reasoning.
+
+Constitutional Principle
+Learn the rhythm of the individual's life without redefining their health.
+
+7.2 Engineering Philosophy
+Health behaviours do not occur in isolation.
+They are influenced by recurring routines including:
+work schedules, 
+family responsibilities, 
+exercise habits, 
+sleep timing, 
+travel, 
+seasonal changes, 
+social commitments. 
+Rather than viewing each observation independently, the Personalisation Engine shall identify stable behavioural rhythms that improve future personalisation. Routine learning exists to improve contextual relevance. It shall never become deterministic prediction.
+
+Founder Principle
+Understand the individual's routines before attempting to fit health into them.
+
+7.3 Routine Evidence Sources
+Routine recognition may utilise evidence including:
+sleep timing, 
+meal timing, 
+exercise timing, 
+wearable usage patterns, 
+intervention timing, 
+conversation timing, 
+notification interaction, 
+calendar-related behavioural consistency (where integrated), 
+travel patterns, 
+goal engagement cycles. 
+Routine evidence reflects behavioural regularity.
+It shall not infer intent beyond the available evidence.
+
+Engineering Rule
+Routine recognition shall remain evidence-based rather than assumption-based.
+
+7.4 Routine Learning Pipeline
+Routine learning shall follow the constitutional learning architecture.
+Longitudinal Behaviour
+
+↓
+
+Routine Evidence
+
+↓
+
+Pattern Recognition
+
+↓
+
+Routine Candidate
+
+↓
+
+Learning Confidence
+
+↓
+
+Routine Profile Object
+
+↓
+
+Consumed by Other Engines
+Routine recognition shall require repeated confirmation before promotion.
+
+Constitutional Principle
+A routine should be recognised only after demonstrating sustained consistency.
+
+7.5 Routine Characteristics
+The Personalisation Engine may recognise routines including:
+Morning activity patterns.
+Evening activity patterns.
+Sleep schedules.
+Meal timing consistency.
+Exercise frequency.
+Weekend behavioural changes.
+Travel-related disruption.
+Seasonal variation.
+Workday versus non-workday behaviour.
+Habit stacking.
+Each recognised routine represents a learned behavioural tendency rather than a fixed schedule.
+
+Founder Principle
+Routines describe recurring behaviour, not rigid rules.
+
+7.6 Lifestyle Context
+Routine recognition shall support broader lifestyle understanding.
+Examples include:
+Regular business travel.
+↓
+Future interventions acknowledge travel disruption.
+
+Consistent early exercise.
+↓
+Exercise recommendations favour morning scheduling.
+
+Weekend sleep variability.
+↓
+Educational content may address sleep consistency.
+Lifestyle context informs personalisation.
+It shall never independently generate recommendations.
+
+Engineering Rule
+Lifestyle context supports decisions but does not create them.
+
+7.7 Routine Stability
+Routine Profile Objects shall distinguish between:
+Temporary schedule.
+↓
+Emerging routine.
+↓
+Validated routine.
+↓
+Established lifestyle pattern.
+Longitudinal stability shall always outweigh short-term consistency. Routine changes shall require evidence before promotion or retirement.
+
+Constitutional Principle
+Stable routines deserve greater influence than temporary schedules.
+
+7.8 Adaptive Scheduling
+Routine learning may influence:
+notification timing, 
+educational delivery, 
+report publication timing, 
+coaching opportunities, 
+intervention reminders, 
+conversation suggestions. 
+Adaptation shall optimise relevance while respecting user autonomy. Routine recognition shall never become intrusive or overly prescriptive.
+
+Founder Principle
+Meet the individual within their routine rather than attempting to reshape it unnecessarily.
+
+7.9 Routine Evolution
+Life circumstances naturally change.
+Examples include:
+New employment.
+Parenthood.
+Retirement.
+Shift work.
+Relocation.
+Seasonal sport.
+Major travel commitments.
+The Personalisation Engine shall recognise genuine routine evolution through sustained behavioural evidence. Historical Routine Profile Objects shall remain available for audit and longitudinal understanding.
+
+Constitutional Principle
+Personalisation should recognise that lives evolve as well as health.
+
+7.10 Explainability
+Every Routine Profile Object shall answer:
+Which routine has been recognised? 
+Which evidence supports it? 
+How consistent is the observed behaviour? 
+How confident is BioSense? 
+Which engines consume this routine? 
+Has the routine changed over time? 
+
+7.11 Engineering Constraints
+The Routine Recognition Framework shall:
+require longitudinal behavioural evidence, 
+distinguish routines from isolated events, 
+support gradual evolution, 
+preserve user autonomy, 
+maintain explainability, 
+remain fully auditable, 
+preserve constitutional boundaries. 
+
+7.12 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Routine recognition is based upon sustained behavioural evidence.
+✓ Routine Candidates remain distinct from validated Routine Profile Objects.
+✓ Lifestyle context informs personalisation without generating recommendations.
+✓ Adaptive scheduling changes presentation rather than health intelligence.
+✓ Routine evolution requires longitudinal evidence.
+✓ Historical routines remain reproducible.
+✓ Every Routine Profile Object remains fully explainable and auditable.
+Chapter 8
+Adaptive Personalisation & Cross-Engine Integration
+
+8.1 Purpose
+The purpose of this chapter is to define how Personalisation Objects are applied across the BioSense Intelligence Platform in a controlled, transparent and constitutionally governed manner. Learning has no value unless it improves future interactions. However, personalisation must remain predictable, explainable and subordinate to the constitutional intelligence generated by upstream engines. The Adaptive Personalisation Framework therefore governs how learned user preferences influence platform behaviour while preserving scientific consistency and architectural separation of responsibilities.
+
+Constitutional Principle
+Personalisation should improve the experience without changing the underlying intelligence.
+
+8.2 Engineering Philosophy
+Personalisation exists to improve relevance, usability and long-term engagement with healthy behaviours. It does not exist to create different versions of the truth. Every constitutional engine should therefore consume Personalisation Objects only within its own defined responsibilities.
+Adaptive personalisation shall influence presentation, sequencing and support. It shall never influence scientific reasoning or health conclusions.
+
+Founder Principle
+Adapt the experience, never the evidence.
+
+8.3 Cross-Engine Consumption
+Personalisation Objects may be consumed by multiple constitutional engines.
+Examples include:
+ENG-004 — Decision Intelligence Engine
+May consume:
+Behavioural Adherence Objects, 
+Motivation Objects, 
+Routine Profile Objects. 
+Purpose:
+Optimise intervention sequencing and support.
+It shall not alter Decision Object validity.
+
+ENG-005 — Conversation & Intelligence Delivery Engine
+May consume:
+Communication Preference Objects, 
+Educational Progress Objects, 
+Accessibility Objects, 
+Coaching Preference Objects. 
+Purpose:
+Personalise communication.
+It shall not alter Structured Explanations.
+
+Future constitutional engines may consume Personalisation Objects through governed interfaces.
+Ownership always remains with ENG-006.
+
+Engineering Rule
+Consumer engines shall treat Personalisation Objects as read-only constitutional inputs.
+
+8.4 Adaptive Influence
+Adaptive personalisation may influence:
+communication style, 
+explanation depth, 
+educational sequencing, 
+notification timing, 
+intervention presentation, 
+report structure, 
+coaching approach, 
+feature prioritisation, 
+onboarding progression. 
+It shall not influence:
+Health Beliefs, 
+Canonical Observations, 
+Confidence Objects, 
+Decision Objects, 
+constitutional safety pathways. 
+
+Constitutional Principle
+Personalisation influences delivery, not truth.
+
+8.5 Stability Before Adaptation
+The Adaptive Personalisation Framework shall prioritise stability over responsiveness. A single behavioural change shall not immediately alter the user experience.
+Instead:
+Preference Candidate
+↓
+Evidence accumulation
+↓
+Confidence growth
+↓
+Validated Personalisation Object
+↓
+Gradual platform adaptation
+This protects users from inconsistent or unpredictable behaviour.
+
+Founder Principle
+A stable personal experience builds greater trust than an overly reactive one.
+
+8.6 Controlled Adaptation
+When Personalisation Objects change, adaptation shall occur progressively.
+Examples include:
+Communication becoming gradually more concise.
+↓
+Notification timing slowly shifting towards preferred hours.
+↓
+Educational content becoming progressively more advanced. Abrupt platform-wide changes shall be avoided unless initiated explicitly by the user.
+
+Engineering Rule
+Adaptive behaviour should evolve continuously rather than change suddenly.
+
+8.7 Personalisation Priority
+Multiple Personalisation Objects may influence the same interaction.
+Example:
+Communication Preference
+
+Educational Progress
+
+Accessibility Preference
+
+Motivation Profile
+↓
+Conversation Response
+The Adaptive Personalisation Framework shall resolve competing influences using governed priority rules. Priority resolution shall remain deterministic, explainable and version-controlled.
+
+Constitutional Principle
+When preferences compete, resolution should follow governed rules rather than unpredictable behaviour.
+
+8.8 User Override
+Users shall retain ultimate control over personalisation.
+Where appropriate, users may:
+override learned preferences, 
+select alternative communication styles, 
+disable adaptive behaviour, 
+reset selected Personalisation Objects, 
+explicitly configure preferences. 
+Explicit user choices shall take precedence over inferred preferences unless constitutional safety requires otherwise.
+
+Founder Principle
+The individual remains the final authority over their personal experience.
+
+8.9 Cross-Engine Consistency
+Adaptive personalisation shall remain consistent across all BioSense experiences.
+Examples include:
+Health AI.
+↓
+Weekly Report.
+↓
+Monthly Report.
+↓
+Latest Intelligence.
+↓
+Biomarker Pages.
+↓
+Notifications.
+↓
+Future clinician exports.
+Equivalent Personalisation Objects shall produce materially consistent experiences across every delivery channel.
+
+Engineering Rule
+One Personalisation Model.
+Many constitutional consumers.
+
+8.10 Explainability
+Every adaptive behaviour shall answer:
+Which Personalisation Objects influenced this interaction? 
+Which consumer engine applied them? 
+Why was this adaptation selected? 
+Could the user override it? 
+Did personalisation alter any health conclusions? 
+The answer to the final question shall always be:
+No.
+
+8.11 Engineering Constraints
+The Adaptive Personalisation Framework shall:
+preserve engine ownership, 
+support deterministic adaptation, 
+prioritise stability, 
+support user override, 
+maintain consistency across channels, 
+remain explainable, 
+remain fully auditable. 
+
+8.12 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Personalisation Objects are consumed through governed interfaces.
+✓ Consumer engines remain read-only.
+✓ Personalisation influences experience without altering health intelligence.
+✓ Platform adaptation occurs gradually.
+✓ Competing Personalisation Objects are resolved deterministically.
+✓ User overrides take precedence over inferred preferences where constitutionally appropriate.
+✓ Adaptive behaviour remains fully explainable and auditable.
+Chapter 9
+Privacy, Consent & Constitutional Learning Boundaries
+
+9.1 Purpose
+The purpose of this chapter is to define the constitutional boundaries governing what the Personalisation & Adaptive Learning Engine may learn, how learning is authorised and the limits placed upon adaptive personalisation.
+Long-term personalisation requires trust.
+Trust can only exist when individuals understand that BioSense learns solely for the purpose of improving their health experience and never for manipulation, commercial optimisation or behavioural exploitation. This chapter establishes the immutable engineering principles governing responsible adaptive learning.
+
+Constitutional Principle
+Personalisation exists to serve the individual, never to exploit the individual.
+
+9.2 Engineering Philosophy
+The ability to learn about an individual is one of the most powerful capabilities within the BioSense platform. That capability shall therefore be exercised with restraint. Every Personalisation Object shall exist because it demonstrably improves the individual's health experience. Learning shall never occur simply because data is available.
+
+Founder Principle
+The ability to learn does not create the right to learn.
+
+9.3 Purpose Limitation
+The Personalisation Engine shall learn only characteristics that improve one or more of the following:
+communication, 
+education, 
+behavioural support, 
+intervention delivery, 
+accessibility, 
+long-term health engagement, 
+user experience directly related to health. 
+The engine shall not learn characteristics unrelated to these constitutional purposes.
+
+Engineering Rule
+Every Personalisation Object shall have a clearly defined constitutional purpose.
+
+9.4 Consent
+Personalisation shall operate only within the permissions granted by the individual. Where explicit consent is required by applicable regulation or platform policy, learning shall commence only after valid consent has been obtained.
+Users shall be able to:
+understand that personalisation occurs, 
+understand why learning occurs, 
+review personalisation where appropriate, 
+modify supported preferences, 
+withdraw consent where constitutionally and legally appropriate. 
+Withdrawal of consent shall prevent future learning while preserving legal and regulatory obligations relating to historical records.
+
+Constitutional Principle
+Learning requires informed participation, not silent assumption.
+
+9.5 Constitutional Learning Boundaries
+The Personalisation Engine shall never learn or optimise for:
+maximising application usage, 
+increasing conversation duration, 
+increasing notification interaction, 
+increasing subscription retention at the expense of health, 
+psychological dependency, 
+emotional manipulation, 
+addictive engagement patterns, 
+commercial influence unrelated to health, 
+persuasive optimisation designed to override user autonomy. 
+These prohibitions are constitutional.
+They shall not be overridden by product configuration.
+
+Founder Principle
+BioSense measures success through better health, not greater dependence.
+
+9.6 Data Minimisation
+The Personalisation Engine shall retain only the information necessary to support governed Personalisation Objects.
+Learning pipelines shall avoid unnecessary duplication of:
+observations, 
+health intelligence, 
+conversation content, 
+Decision Objects. 
+Where possible, Personalisation Objects shall reference existing constitutional intelligence rather than replicate it.
+
+Engineering Rule
+Personalisation should store understanding rather than duplicate data.
+
+9.7 User Visibility
+Where appropriate, BioSense should provide transparency into learned personalisation.
+Illustrative examples include:
+"I've learned that you usually prefer concise explanations."
+"You tend to complete one intervention at a time."
+"You generally respond better to weekly summaries than daily notifications."
+Transparency shall improve user understanding without overwhelming the individual with implementation detail.
+
+Constitutional Principle
+Individuals should understand what BioSense has learned about them.
+
+9.8 User Control
+Where supported by platform capabilities and constitutional safety, users may:
+update explicit preferences, 
+reset selected Personalisation Objects, 
+disable adaptive communication, 
+review supported learning categories, 
+restart personalisation learning. 
+Resetting Personalisation Objects shall not alter historical health intelligence or audit records.
+
+Founder Principle
+Personalisation should be easy to change and easy to leave behind.
+
+9.9 Privacy Preservation
+Personalisation learning shall preserve the same privacy principles that govern the wider BioSense platform.
+Examples include:
+secure storage, 
+governed access, 
+encryption, 
+audit logging, 
+least-privilege access, 
+lawful processing, 
+regulatory compliance. 
+Personalisation data shall never receive weaker protection than health intelligence.
+
+Constitutional Principle
+The protection of personalisation intelligence should equal the protection of health intelligence.
+
+9.10 Explainability
+Every Personalisation Object shall answer:
+Why was this learned? 
+Which evidence supports it? 
+Which consent enabled this learning? 
+Which constitutional purpose does it serve? 
+Can the individual modify or remove it? 
+Which engines consume it? 
+
+9.11 Engineering Constraints
+The Constitutional Learning Framework shall:
+enforce purpose limitation, 
+preserve informed consent, 
+prohibit engagement optimisation, 
+minimise retained data, 
+support transparency, 
+preserve user control, 
+maintain privacy, 
+remain fully explainable and auditable. 
+
+9.12 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Every Personalisation Object has a defined constitutional purpose.
+✓ Learning occurs only within authorised consent boundaries.
+✓ Engagement-driven optimisation is constitutionally prohibited.
+✓ Data minimisation is explicitly required.
+✓ Users retain meaningful control over supported personalisation.
+✓ Personalisation intelligence receives the same privacy protections as health intelligence.
+✓ Every learning decision remains fully explainable and auditable.
+Chapter 10
+Governance, Versioning & Personalisation Lifecycle Management
+
+10.1 Purpose
+The purpose of this chapter is to define the governance framework responsible for the long-term stewardship, evolution and auditability of the Personalisation & Adaptive Learning Engine. Personalisation influences how BioSense communicates, educates and supports individuals over many years. Changes to personalisation behaviour shall therefore be governed with the same constitutional discipline applied to health intelligence, evidence, confidence and decision-making. The objective is continuous improvement while preserving explainability, reproducibility and user trust.
+
+Constitutional Principle
+Personalisation should evolve through governed learning rather than uncontrolled adaptation.
+
+10.2 Engineering Philosophy
+The Personalisation Engine should improve continuously as BioSense evolves.
+However, improvements shall never compromise:
+user autonomy, 
+constitutional boundaries, 
+historical reproducibility, 
+explainability, 
+auditability, 
+scientific integrity, 
+platform consistency. 
+Learning algorithms may evolve.
+The constitutional meaning of Personalisation Objects shall remain stable.
+
+Founder Principle
+Improve how BioSense learns without rewriting what BioSense has already learned.
+
+10.3 Governance Responsibilities
+Personalisation Governance shall oversee:
+Personalisation Domains, 
+Personalisation Object definitions, 
+learning pipelines, 
+promotion criteria, 
+confidence thresholds, 
+preference decay policies, 
+adaptive behaviour rules, 
+user override behaviour, 
+consent management, 
+privacy controls, 
+lifecycle management. 
+Governance defines how personalisation operates.
+It does not directly personalise individual users.
+
+Engineering Rule
+Governance establishes learning policy.
+The Personalisation Engine executes it.
+
+10.4 Versioning
+Every Personalisation Object shall reference:
+Personalisation Engine Version, 
+Learning Pipeline Version, 
+Promotion Rule Version, 
+Confidence Model Version, 
+Behavioural Learning Version, 
+Communication Learning Version, 
+Routine Recognition Version, 
+Governance Policy Version. 
+These references shall enable historical reconstruction of every Personalisation Object exactly as it existed at any point in time.
+
+Constitutional Principle
+Every learned preference shall remain permanently reproducible.
+
+10.5 Configuration Management
+Certain personalisation behaviours may evolve without requiring architectural redesign.
+Examples include:
+promotion thresholds, 
+confidence weighting, 
+routine recognition parameters, 
+behavioural decay rates, 
+educational progression rules, 
+communication adaptation rules, 
+coaching adaptation strategies. 
+Configuration changes shall remain:
+version-controlled, 
+documented, 
+validated, 
+independently auditable. 
+
+Founder Principle
+Configuration should evolve through governance rather than hidden implementation changes.
+
+10.6 Personalisation Engine Releases
+Every engine release shall preserve:
+Release Version, 
+Release Date, 
+Engineering rationale, 
+Behavioural impact assessment, 
+Validation results, 
+Migration guidance, 
+Compatibility notes. 
+Historical Personalisation Objects shall remain interpretable regardless of future engine versions.
+
+Engineering Rule
+Engine evolution shall preserve historical understanding.
+
+10.7 Validation Before Deployment
+No personalisation update shall enter production without structured validation.
+Validation may include:
+learning consistency, 
+preference promotion accuracy, 
+confidence calibration, 
+behavioural stability, 
+routine recognition validation, 
+cross-engine compatibility, 
+explainability testing, 
+historical replay testing. 
+Validation shall demonstrate improved learning behaviour without altering constitutional boundaries.
+
+Constitutional Principle
+Every improvement should strengthen learning while preserving trust.
+
+10.8 Historical Reproducibility
+At any future point, BioSense shall be capable of reconstructing:
+Personalisation Objects, 
+supporting evidence, 
+learning confidence, 
+promotion decisions, 
+routine profiles, 
+behavioural characteristics, 
+communication preferences, 
+governance policies, 
+exactly as they existed when consumed by the platform. Historical reconstruction shall remain independent of the current engine implementation.
+
+10.9 Change Impact Assessment
+Before deployment, governance shall evaluate:
+Which Personalisation Domains are affected? 
+Which consumer engines may change? 
+Will communication behaviour change? 
+Will adaptive coaching change? 
+Could user expectations change? 
+Will historical compatibility remain preserved? 
+Are consent implications affected? 
+Potential impacts shall be documented prior to deployment.
+
+Founder Principle
+Understand the consequences of learning changes before users experience them.
+
+10.10 Operational Monitoring
+Personalisation Governance shall monitor:
+preference promotion rates, 
+preference decay rates, 
+adaptive behaviour consistency, 
+user override frequency, 
+learning confidence stability, 
+routine recognition accuracy, 
+explainability performance, 
+validation failures, 
+governance exceptions. 
+Operational monitoring informs future governance.
+It shall never automatically modify Personalisation Objects or learning policies.
+
+Engineering Rule
+Observation informs governance.
+Governance controls change.
+
+10.11 Auditability
+Every governance activity shall generate an immutable audit record.
+Examples include:
+Personalisation Object schema revisions, 
+promotion rule changes, 
+confidence model updates, 
+consent policy revisions, 
+behavioural learning improvements, 
+governance approvals, 
+deployment history. 
+Audit records shall remain permanently available.
+
+10.12 Regulatory Readiness
+Personalisation Governance shall support future regulatory expectations concerning:
+AI transparency, 
+explainable personalisation, 
+user rights, 
+consent management, 
+algorithm governance, 
+adaptive AI oversight, 
+healthcare AI regulation. 
+The governance framework shall remain adaptable without compromising constitutional principles.
+
+10.13 Engineering Constraints
+Personalisation Governance shall:
+preserve constitutional learning boundaries, 
+preserve user autonomy, 
+support controlled evolution, 
+preserve historical reproducibility, 
+maintain explainability, 
+remain fully auditable, 
+support future regulatory frameworks. 
+
+10.14 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Every Personalisation Object is version-controlled.
+✓ Learning policies evolve only through governed change.
+✓ Historical personalisation remains reproducible.
+✓ Deployment requires structured validation.
+✓ Governance changes remain fully auditable.
+✓ Operational monitoring informs improvement without automatically changing learning behaviour.
+✓ The Personalisation Engine remains prepared for future regulatory expectations.
+Chapter 11
+End-to-End Personalisation & Adaptive Learning Lifecycle
+
+11.1 Purpose
+The purpose of this chapter is to demonstrate the complete operational lifecycle of the Personalisation & Adaptive Learning Engine within the BioSense Intelligence Platform. Previous chapters define the constitutional architecture governing adaptive learning, Personalisation Objects, behavioural learning, communication learning, motivation, routine recognition, adaptive personalisation and governance. This chapter illustrates how these components interact to produce stable, explainable and governed personalisation over months and years while preserving scientific integrity and user autonomy. The objective is to demonstrate that every Personalisation Object follows a complete constitutional lifecycle from observation to governed adaptation.
+
+Constitutional Principle
+Every learned preference should be traceable from observed behaviour to adaptive experience through one continuous and explainable learning lifecycle.
+
+11.2 Example Scenario
+For the purposes of this example we introduce a fictional BioSense user.
+Name: Alex Carter
+Age: 37
+Alex has used BioSense continuously for three years.
+Throughout this period BioSense has accumulated:
+longitudinal wearable observations, 
+intervention history, 
+conversation history, 
+educational interactions, 
+report engagement, 
+routine observations, 
+behavioural outcomes. 
+No assumptions have yet been promoted without constitutional validation.
+
+Founder Principle
+Long-term understanding is earned through sustained experience.
+
+11.3 Behaviour Observation
+Over several months BioSense observes that Alex consistently:
+requests concise summaries first, 
+expands detailed explanations only when interested, 
+completes educational content relating to sleep, 
+ignores lengthy nutrition articles, 
+consistently completes one intervention at a time, 
+exercises before work, 
+reviews weekly reports on Sunday evenings. 
+Each observation is stored as governed behavioural evidence. No personalisation occurs at this stage.
+
+Engineering Rule
+Observation precedes learning.
+
+11.4 Pattern Recognition
+The Adaptive Learning Architecture identifies recurring behavioural patterns.
+Examples include:
+Repeated preference for concise communication.
+↓
+Stable morning exercise routine.
+↓
+Higher intervention completion when recommendations are prioritised individually.
+↓
+Strong engagement with weekly summaries.
+These observations become Preference Candidates.
+They remain provisional.
+
+Constitutional Principle
+Patterns should emerge naturally before influencing behaviour.
+
+11.5 Confidence Assessment
+Each Preference Candidate receives an independent learning confidence assessment.
+Illustrative outcomes include:
+Communication Preference Candidate
+↓
+High confidence.
+
+Routine Candidate
+↓
+Very high confidence.
+
+Educational Progress Candidate
+↓
+Moderate confidence.
+
+Motivation Candidate
+↓
+Emerging confidence.
+Promotion thresholds have not yet been reached for every candidate.
+
+Founder Principle
+Confidence governs learning just as it governs health intelligence.
+
+11.6 Personalisation Object Promotion
+Following continued longitudinal evidence:
+Communication Preference Candidate
+↓
+Communication Preference Object.
+
+Routine Candidate
+↓
+Routine Profile Object.
+
+Behavioural Candidate
+↓
+Behavioural Adherence Object.
+Each promoted object receives:
+version, 
+provenance, 
+confidence, 
+supporting evidence, 
+lifecycle history, 
+governance metadata. 
+The Personalisation Model expands accordingly.
+
+Engineering Rule
+Promotion creates governed personalisation rather than hidden application behaviour.
+
+11.7 Cross-Engine Consumption
+Consumer engines begin using the newly promoted Personalisation Objects.
+Examples include:
+ENG-005
+Conversation Engine
+↓
+Concise explanations become the default.
+Educational detail remains available through progressive disclosure.
+
+ENG-004
+Decision Intelligence Engine
+↓
+Future interventions are presented individually rather than simultaneously.
+
+Notification Framework
+↓
+Weekly summaries are prioritised over daily reminders. The underlying health intelligence remains unchanged.
+Only the individual's experience adapts.
+
+Constitutional Principle
+Adaptive behaviour reflects learned preferences rather than modified health intelligence.
+
+11.8 Personalisation Evolution
+Eighteen months later Alex's behaviour changes.
+BioSense observes:
+greater interest in scientific explanations, 
+increased educational completion, 
+higher engagement with biomarker detail, 
+improved adherence to multiple concurrent interventions. 
+Learning confidence gradually shifts.
+Communication Preference Objects evolve.
+Routine Profile Objects remain unchanged.
+Behavioural Adherence Objects strengthen.
+No abrupt changes occur.
+The platform evolves progressively.
+
+Founder Principle
+Personalisation should mature with the individual rather than react to temporary change.
+
+11.9 User Override
+Alex explicitly selects:
+"Detailed explanations by default."
+This explicit preference immediately becomes the active communication preference. The previously learned Communication Preference Object remains within the historical audit trail. Future behavioural observations may confirm or challenge the explicit preference over time. Governance records the override and its rationale.
+
+Engineering Rule
+Explicit user choice temporarily supersedes inferred preference while preserving historical learning.
+
+11.10 Governance
+Five years later:
+Personalisation Engine Version 6.3 introduces:
+improved routine recognition, 
+refined promotion thresholds, 
+enhanced educational progression modelling. 
+Historical Personalisation Objects remain reproducible under Version 6.2.
+New learning follows Version 6.3.
+No historical preferences are rewritten.
+Governance validates compatibility before deployment.
+
+Constitutional Principle
+Learning systems may improve without changing historical truth.
+
+11.11 End-to-End Validation
+This example demonstrates that:
+✓ Behaviour is observed before learning occurs.
+✓ Learning confidence governs promotion.
+✓ Personalisation Objects remain structured and explainable.
+✓ Consumer engines remain read-only.
+✓ Personalisation improves delivery without altering health intelligence.
+✓ Explicit user preferences override inferred learning where appropriate.
+✓ Governance preserves historical reproducibility.
+✓ Every stage of learning remains constitutionally auditable.

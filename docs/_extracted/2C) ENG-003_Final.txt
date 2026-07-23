@@ -1,0 +1,3134 @@
+
+
+ENG-003: Confidence & Evidence Evaluation Engine 
+Engineering Specification
+Document ID:  ENG-003
+Version:  1.0 (Draft)
+Status:  In Development
+Authority:  BioSense Intelligence Constitution (Documents 1A–1C)
+Depends Upon:
+ENG-001 — Dynamic Health Model Engineering Specification
+ENG-002 — Observation Engine & Canonical Observation Store Engineering Specification
+
+
+Contents
+ TOC \z \o "1-2" \u \hENG-003: Confidence & Evidence Evaluation Engine  Engineering Specification	 PAGEREF _Toc234485858 \h 1
+Purpose & Design Philosophy	 PAGEREF _Toc234485859 \h 10
+1.1 Purpose	 PAGEREF _Toc234485860 \h 10
+1.2 Scope	 PAGEREF _Toc234485861 \h 10
+1.3 Authority	 PAGEREF _Toc234485862 \h 11
+1.4 Engineering Philosophy	 PAGEREF _Toc234485863 \h 12
+1.5 Constitutional Definition of Confidence	 PAGEREF _Toc234485864 \h 12
+1.6 Confidence Is Not Observation Quality	 PAGEREF _Toc234485865 \h 13
+1.7 The Nature of Scientific Confidence	 PAGEREF _Toc234485866 \h 13
+1.8 Confidence Is Continuous	 PAGEREF _Toc234485867 \h 14
+1.8a Continuous Means Triggered, Not Constant	 PAGEREF _Toc234485868 \h 14
+1.9 Explainability	 PAGEREF _Toc234485869 \h 15
+1.10 Epistemic Humility	 PAGEREF _Toc234485870 \h 15
+1.11 Engineering Constraints	 PAGEREF _Toc234485871 \h 16
+1.12 Acceptance Criteria	 PAGEREF _Toc234485872 \h 17
+Evidence Evaluation Framework	 PAGEREF _Toc234485873 \h 18
+2.1 Purpose	 PAGEREF _Toc234485874 \h 18
+2.2 Engineering Philosophy	 PAGEREF _Toc234485875 \h 18
+2.3 Evidence Evaluation Domains	 PAGEREF _Toc234485876 \h 19
+2.3a Reconciliation with ENG-001 Confidence Inputs	 PAGEREF _Toc234485877 \h 19
+2.4 Domain One — Evidence Quality	 PAGEREF _Toc234485878 \h 20
+2.5 Domain Two — Evidence Quantity	 PAGEREF _Toc234485879 \h 20
+2.6 Domain Three — Evidence Consistency	 PAGEREF _Toc234485880 \h 21
+2.7 Domain Four — Longitudinal Stability	 PAGEREF _Toc234485881 \h 21
+2.8 Domain Five — Evidence Diversity	 PAGEREF _Toc234485882 \h 22
+2.9 Domain Six — Temporal Relevance	 PAGEREF _Toc234485883 \h 22
+2.10 Domain Seven — Evidence Independence	 PAGEREF _Toc234485884 \h 23
+2.11 Domain Eight — Scientific Alignment	 PAGEREF _Toc234485885 \h 23
+2.12 Domain Interaction	 PAGEREF _Toc234485886 \h 24
+2.13 Domain Evolution	 PAGEREF _Toc234485887 \h 24
+2.14 Explainability	 PAGEREF _Toc234485888 \h 24
+2.15 Engineering Constraints	 PAGEREF _Toc234485889 \h 25
+2.16 Acceptance Criteria	 PAGEREF _Toc234485890 \h 25
+Confidence Formation & Confidence Lifecycle	 PAGEREF _Toc234485891 \h 26
+3.1 Purpose	 PAGEREF _Toc234485892 \h 26
+3.2 Engineering Philosophy	 PAGEREF _Toc234485893 \h 26
+3.3 Confidence Formation Process	 PAGEREF _Toc234485894 \h 27
+3.4 Confidence Candidates	 PAGEREF _Toc234485895 \h 27
+3.5 Domain Evaluation	 PAGEREF _Toc234485896 \h 28
+3.6 Cross-Domain Balancing	 PAGEREF _Toc234485897 \h 28
+3.6a Domain Combination Contract	 PAGEREF _Toc234485898 \h 29
+3.7 Confidence Validation	 PAGEREF _Toc234485899 \h 30
+3.8 Confidence Assignment	 PAGEREF _Toc234485900 \h 30
+3.8a Engine Interface Contracts	 PAGEREF _Toc234485901 \h 31
+3.9 Confidence States	 PAGEREF _Toc234485902 \h 31
+3.9a Canonical Confidence Representation & Crosswalk	 PAGEREF _Toc234485903 \h 32
+3.10 Confidence Lifecycle	 PAGEREF _Toc234485904 \h 33
+3.11 Confidence Stability	 PAGEREF _Toc234485905 \h 33
+3.12 Confidence Revision	 PAGEREF _Toc234485906 \h 34
+3.13 Confidence History	 PAGEREF _Toc234485907 \h 34
+3.13a Ownership of the Stored Confidence Object	 PAGEREF _Toc234485908 \h 35
+3.14 Explainability	 PAGEREF _Toc234485909 \h 35
+3.15 Engineering Constraints	 PAGEREF _Toc234485910 \h 35
+3.16 Acceptance Criteria	 PAGEREF _Toc234485911 \h 36
+Confidence Propagation & Dependency Management	 PAGEREF _Toc234485912 \h 37
+4.1 Purpose	 PAGEREF _Toc234485913 \h 37
+4.2 Engineering Philosophy	 PAGEREF _Toc234485914 \h 37
+4.3 Confidence Dependency Graph	 PAGEREF _Toc234485915 \h 38
+4.3a Single Dependency Graph & Ownership	 PAGEREF _Toc234485916 \h 39
+4.4 Dependency Types	 PAGEREF _Toc234485917 \h 39
+4.5 Propagation Triggers	 PAGEREF _Toc234485918 \h 40
+4.6 Propagation Process	 PAGEREF _Toc234485919 \h 41
+4.6a Scope of Determinism	 PAGEREF _Toc234485920 \h 41
+4.7 Propagation Strength	 PAGEREF _Toc234485921 \h 42
+4.8 Confidence Attenuation	 PAGEREF _Toc234485922 \h 42
+4.9 Multiple Evidence Paths	 PAGEREF _Toc234485923 \h 43
+4.10 Propagation Limits	 PAGEREF _Toc234485924 \h 43
+4.11 Circular Dependency Prevention	 PAGEREF _Toc234485925 \h 44
+4.12 Conflict During Propagation	 PAGEREF _Toc234485926 \h 44
+4.12a Propagation Direction & Evidence Provenance	 PAGEREF _Toc234485927 \h 45
+4.13 Explainability	 PAGEREF _Toc234485928 \h 45
+4.14 Engineering Constraints	 PAGEREF _Toc234485929 \h 46
+4.15 Acceptance Criteria	 PAGEREF _Toc234485930 \h 46
+Conflicting Evidence Resolution & Contradiction Management	 PAGEREF _Toc234485931 \h 47
+5.1 Purpose	 PAGEREF _Toc234485932 \h 47
+5.2 Engineering Philosophy	 PAGEREF _Toc234485933 \h 47
+5.3 Types of Contradiction	 PAGEREF _Toc234485934 \h 48
+5.4 Contradiction Detection	 PAGEREF _Toc234485935 \h 49
+5.5 Contradiction Assessment	 PAGEREF _Toc234485936 \h 50
+5.6 Resolution Strategies	 PAGEREF _Toc234485937 \h 50
+5.6a Ownership — the Dynamic Health Model Creates Beliefs	 PAGEREF _Toc234485938 \h 51
+5.7 Competing Hypotheses	 PAGEREF _Toc234485939 \h 51
+5.8 Contradiction Impact on Confidence	 PAGEREF _Toc234485940 \h 52
+5.9 Evidence Requests	 PAGEREF _Toc234485941 \h 53
+5.10 Scientific Curiosity	 PAGEREF _Toc234485942 \h 53
+5.11 Explainability	 PAGEREF _Toc234485943 \h 54
+5.12 Engineering Constraints	 PAGEREF _Toc234485944 \h 54
+5.13 Acceptance Criteria	 PAGEREF _Toc234485945 \h 54
+Confidence Decay, Reinforcement & Temporal Dynamics	 PAGEREF _Toc234485946 \h 56
+6.1 Purpose	 PAGEREF _Toc234485947 \h 56
+6.2 Engineering Philosophy	 PAGEREF _Toc234485948 \h 56
+6.3 Temporal Behaviour Categories	 PAGEREF _Toc234485949 \h 57
+6.3a Location of the Temporal Behaviour Profile	 PAGEREF _Toc234485950 \h 59
+6.4 Confidence Decay	 PAGEREF _Toc234485951 \h 59
+6.5 Confidence Reinforcement	 PAGEREF _Toc234485952 \h 59
+6.6 Confidence Stability	 PAGEREF _Toc234485953 \h 60
+6.7 Evidence Freshness	 PAGEREF _Toc234485954 \h 60
+6.8 Observation Gaps	 PAGEREF _Toc234485955 \h 61
+6.9 Behavioural Drift	 PAGEREF _Toc234485956 \h 61
+6.10 Abrupt Physiological Change	 PAGEREF _Toc234485957 \h 62
+6.11 Longitudinal Reinforcement	 PAGEREF _Toc234485958 \h 62
+6.12 Scientific Change	 PAGEREF _Toc234485959 \h 63
+6.13 Temporal Explainability	 PAGEREF _Toc234485960 \h 63
+6.14 Engineering Constraints	 PAGEREF _Toc234485961 \h 64
+6.15 Acceptance Criteria	 PAGEREF _Toc234485962 \h 64
+Confidence Thresholds & Decision Gates	 PAGEREF _Toc234485963 \h 65
+7.1 Purpose	 PAGEREF _Toc234485964 \h 65
+7.2 Engineering Philosophy	 PAGEREF _Toc234485965 \h 65
+7.3 Decision Gate Architecture	 PAGEREF _Toc234485966 \h 66
+7.4 Threshold Categories	 PAGEREF _Toc234485967 \h 66
+7.5 Threshold Ownership	 PAGEREF _Toc234485968 \h 67
+7.6 Context-Specific Thresholds	 PAGEREF _Toc234485969 \h 68
+7.7 Progressive Disclosure	 PAGEREF _Toc234485970 \h 69
+7.8 Threshold Stability	 PAGEREF _Toc234485971 \h 69
+7.9 Escalation Thresholds	 PAGEREF _Toc234485972 \h 70
+7.10 Suppression Thresholds	 PAGEREF _Toc234485973 \h 70
+7.11 Threshold Review	 PAGEREF _Toc234485974 \h 71
+7.12 Explainability	 PAGEREF _Toc234485975 \h 71
+7.13 Engineering Constraints	 PAGEREF _Toc234485976 \h 71
+7.14 Acceptance Criteria	 PAGEREF _Toc234485977 \h 72
+Belief Revision, Confidence Evolution & Knowledge Change	 PAGEREF _Toc234485978 \h 73
+8.1 Purpose	 PAGEREF _Toc234485979 \h 73
+8.2 Engineering Philosophy	 PAGEREF _Toc234485980 \h 73
+8.1a Ownership Boundary — Belief Revision	 PAGEREF _Toc234485981 \h 74
+8.3 Belief Revision Triggers	 PAGEREF _Toc234485982 \h 74
+8.4 Belief Revision Cycle	 PAGEREF _Toc234485983 \h 74
+8.5 Revision Outcomes	 PAGEREF _Toc234485984 \h 75
+8.6 Competing Beliefs	 PAGEREF _Toc234485985 \h 77
+8.7 Belief Stability	 PAGEREF _Toc234485986 \h 77
+8.8 Discovery Evolution	 PAGEREF _Toc234485987 \h 78
+8.9 Biological Identity Evolution	 PAGEREF _Toc234485988 \h 78
+8.10 Scientific Revision	 PAGEREF _Toc234485989 \h 79
+8.11 Revision Audit Trail	 PAGEREF _Toc234485990 \h 79
+8.12 Explainability	 PAGEREF _Toc234485991 \h 80
+8.13 Engineering Constraints	 PAGEREF _Toc234485992 \h 80
+8.14 Acceptance Criteria	 PAGEREF _Toc234485993 \h 81
+Confidence Calibration & Reliability Assurance	 PAGEREF _Toc234485994 \h 82
+9.1 Purpose	 PAGEREF _Toc234485995 \h 82
+9.2 Engineering Philosophy	 PAGEREF _Toc234485996 \h 82
+9.3 Confidence Calibration	 PAGEREF _Toc234485997 \h 83
+9.4 Calibration Objectives	 PAGEREF _Toc234485998 \h 83
+9.5 Calibration Inputs	 PAGEREF _Toc234485999 \h 84
+9.5a Calibration Read Interface & Population Governance	 PAGEREF _Toc234486000 \h 84
+9.6 Overconfidence Detection	 PAGEREF _Toc234486001 \h 84
+9.7 Underconfidence Detection	 PAGEREF _Toc234486002 \h 85
+9.8 Calibration Feedback	 PAGEREF _Toc234486003 \h 85
+9.9 Reliability Monitoring	 PAGEREF _Toc234486004 \h 86
+9.10 Human Review	 PAGEREF _Toc234486005 \h 86
+9.11 Calibration Governance	 PAGEREF _Toc234486006 \h 87
+9.12 Calibration Explainability	 PAGEREF _Toc234486007 \h 87
+9.13 Engineering Constraints	 PAGEREF _Toc234486008 \h 88
+9.14 Acceptance Criteria	 PAGEREF _Toc234486009 \h 88
+Confidence Explainability & Reasoning Transparency	 PAGEREF _Toc234486010 \h 89
+10.1 Purpose	 PAGEREF _Toc234486011 \h 89
+10.2 Engineering Philosophy	 PAGEREF _Toc234486012 \h 89
+10.3 Explainability Model	 PAGEREF _Toc234486013 \h 90
+10.4 Core Explanation Questions	 PAGEREF _Toc234486014 \h 91
+10.5 Evidence Attribution	 PAGEREF _Toc234486015 \h 91
+10.6 Confidence Timeline	 PAGEREF _Toc234486016 \h 92
+10.7 Human-Readable Reasoning	 PAGEREF _Toc234486017 \h 93
+10.8 Machine Explainability	 PAGEREF _Toc234486018 \h 94
+10.9 Explainability Versioning	 PAGEREF _Toc234486019 \h 94
+10.10 Uncertainty Representation	 PAGEREF _Toc234486020 \h 94
+10.11 Recommendation Explainability	 PAGEREF _Toc234486021 \h 95
+10.12 Audit & Regulatory Transparency	 PAGEREF _Toc234486022 \h 95
+10.13 Engineering Constraints	 PAGEREF _Toc234486023 \h 96
+10.14 Acceptance Criteria	 PAGEREF _Toc234486024 \h 96
+Operational Safeguards, Bias Prevention & Confidence Integrity	 PAGEREF _Toc234486025 \h 98
+11.1 Purpose	 PAGEREF _Toc234486026 \h 98
+11.2 Engineering Philosophy	 PAGEREF _Toc234486027 \h 98
+11.3 Evidence Primacy	 PAGEREF _Toc234486028 \h 99
+11.4 Confirmation Bias Prevention	 PAGEREF _Toc234486029 \h 99
+11.5 Self-Reinforcement Prevention	 PAGEREF _Toc234486030 \h 99
+11.6 Circular Reasoning Detection	 PAGEREF _Toc234486031 \h 100
+11.6a Relationship Between Integrity Mechanisms	 PAGEREF _Toc234486032 \h 101
+11.7 Confidence Inflation Detection	 PAGEREF _Toc234486033 \h 101
+11.8 Hidden Assumption Monitoring	 PAGEREF _Toc234486034 \h 102
+11.9 Novelty Protection	 PAGEREF _Toc234486035 \h 102
+11.10 Recommendation Independence	 PAGEREF _Toc234486036 \h 102
+11.11 Human Oversight	 PAGEREF _Toc234486037 \h 103
+11.12 Engine Isolation	 PAGEREF _Toc234486038 \h 104
+11.13 Integrity Monitoring	 PAGEREF _Toc234486039 \h 104
+11.14 Engineering Constraints	 PAGEREF _Toc234486040 \h 105
+11.15 Acceptance Criteria	 PAGEREF _Toc234486041 \h 105
+Governance, Versioning & Confidence Lifecycle Management	 PAGEREF _Toc234486042 \h 106
+12.1 Purpose	 PAGEREF _Toc234486043 \h 106
+12.2 Engineering Philosophy	 PAGEREF _Toc234486044 \h 106
+12.3 Governance Responsibilities	 PAGEREF _Toc234486045 \h 107
+12.4 Confidence Versioning	 PAGEREF _Toc234486046 \h 107
+12.5 Configuration Management	 PAGEREF _Toc234486047 \h 108
+12.6 Engine Releases	 PAGEREF _Toc234486048 \h 108
+12.7 Scientific Governance	 PAGEREF _Toc234486049 \h 109
+12.8 Validation Before Deployment	 PAGEREF _Toc234486050 \h 109
+12.9 Historical Reproducibility	 PAGEREF _Toc234486051 \h 110
+12.9a Confidence Reproducibility Manifest	 PAGEREF _Toc234486052 \h 110
+12.10 Change Impact Assessment	 PAGEREF _Toc234486053 \h 111
+12.11 Auditability	 PAGEREF _Toc234486054 \h 111
+12.12 Regulatory Readiness	 PAGEREF _Toc234486055 \h 111
+12.13 Operational Monitoring	 PAGEREF _Toc234486056 \h 112
+12.14 Engineering Constraints	 PAGEREF _Toc234486057 \h 112
+12.15 Acceptance Criteria	 PAGEREF _Toc234486058 \h 113
+End-to-End Confidence Lifecycle	 PAGEREF _Toc234486059 \h 114
+13.1 Purpose	 PAGEREF _Toc234486060 \h 114
+13.2 Introducing the User	 PAGEREF _Toc234486061 \h 114
+13.3 New Evidence Arrives	 PAGEREF _Toc234486062 \h 115
+13.4 Confidence Candidate Formation	 PAGEREF _Toc234486063 \h 115
+13.5 Evidence Evaluation	 PAGEREF _Toc234486064 \h 116
+13.6 Contradiction Assessment	 PAGEREF _Toc234486065 \h 116
+13.7 Confidence Formation	 PAGEREF _Toc234486066 \h 117
+13.8 Confidence Propagation	 PAGEREF _Toc234486067 \h 118
+13.9 Decision Gates	 PAGEREF _Toc234486068 \h 118
+13.10 User Communication	 PAGEREF _Toc234486069 \h 119
+13.11 Six Months Later	 PAGEREF _Toc234486070 \h 119
+13.12 Two Years Later	 PAGEREF _Toc234486071 \h 120
+13.13 Scientific Advancement	 PAGEREF _Toc234486072 \h 120
+13.14 Confidence Integrity	 PAGEREF _Toc234486073 \h 121
+13.15 End-to-End Validation	 PAGEREF _Toc234486074 \h 121
+		
+Chapter 1
+Purpose & Design Philosophy
+
+1.1 Purpose
+The purpose of this specification is to define the architecture governing how BioSense evaluates evidence, forms confidence, manages uncertainty and determines the reliability of its understanding.
+The Confidence & Evidence Evaluation Engine is responsible for transforming objective observations into quantified confidence that can safely support Health Beliefs, Discoveries, Narratives, Recommendations and future intelligence capabilities.
+Unlike the Observation Engine, which determines whether evidence is valid, the Confidence Engine determines how strongly BioSense should trust the conclusions derived from that evidence.
+It is therefore responsible for ensuring that BioSense expresses certainty only where certainty has been earned.
+
+Constitutional Principle
+Confidence is not generated by intelligence. Confidence is earned through evidence.
+
+1.2 Scope
+This specification defines:
+Evidence evaluation 
+Confidence formation 
+Confidence propagation 
+Evidence weighting 
+Confidence decay 
+Confidence recovery 
+Conflict resolution 
+Belief promotion 
+Belief retirement 
+Scientific calibration 
+Explainability 
+Confidence governance 
+Confidence auditing 
+Operational safeguards 
+This specification deliberately excludes:
+Observation ingestion 
+Canonical observation modelling 
+Dynamic Health Model architecture 
+Recommendation generation 
+Conversation generation 
+User interface behaviour 
+Those responsibilities are defined within other engineering specifications.
+
+1.3 Authority
+This specification operates under:
+BioSense Constitution (1A–1C)
+↓
+ENG-001 Dynamic Health Model
+↓
+ENG-002 Observation Engine
+↓
+ENG-003 Confidence Engine
+Where conflicts occur:
+The Constitution shall prevail.
+The Dynamic Health Model defines what BioSense may understand.
+The Observation Engine defines what BioSense may observe.
+The Confidence Engine defines how strongly BioSense may believe those understandings.
+
+1.4 Engineering Philosophy
+Health intelligence should never confuse information with certainty.
+Large quantities of data do not automatically produce reliable conclusions.
+Similarly, a single high-quality observation may not justify a strong Health Belief.
+Confidence should emerge gradually through the accumulation, consistency and quality of evidence over time.
+The Confidence Engine therefore exists to quantify the strength of BioSense's understanding while preserving appropriate scientific uncertainty.
+
+Founder Principle
+Confidence should grow more slowly than evidence.
+
+1.5 Constitutional Definition of Confidence
+For engineering purposes:
+Confidence represents BioSense's quantified assessment of the reliability of its current understanding, based upon the quality, quantity, consistency and longitudinal behaviour of all relevant evidence currently available.
+Confidence is therefore:
+dynamic, 
+evidence-dependent, 
+explainable, 
+reversible, 
+continuously recalculated. 
+Confidence is not:
+a probability of disease, 
+a diagnosis, 
+a prediction, 
+a recommendation, 
+a measure of user risk. 
+
+Engineering Rule
+Confidence shall always describe BioSense's confidence in its own understanding.
+Never confidence in future outcomes.
+
+1.6 Confidence Is Not Observation Quality
+Observation Quality was defined in ENG-002.
+Observation Quality answers:
+"How trustworthy is this individual observation?"
+Confidence answers:
+"How trustworthy is the understanding produced after evaluating all available evidence?"
+These concepts shall remain permanently separated.
+Example:
+A laboratory ferritin result may possess extremely high Observation Quality.
+However:
+If only one ferritin result exists across six years of history, BioSense's confidence in any long-term iron trend may remain limited.
+Conversely:
+Thousands of consistent wearable observations may individually possess moderate Observation Quality while collectively producing high confidence in a behavioural pattern.
+
+Constitutional Principle
+Evidence quality contributes to confidence. It does not define confidence.
+
+1.7 The Nature of Scientific Confidence
+Confidence shall behave more like scientific consensus than machine certainty.
+As additional evidence accumulates:
+Confidence may:
+Increase.
+Remain stable.
+Decrease.
+Reverse completely.
+BioSense therefore treats every understanding as provisional rather than permanent.
+Understanding evolves continuously as new evidence enters the platform.
+
+Founder Principle
+Every belief remains open to revision.
+
+1.8 Confidence Is Continuous
+Confidence shall exist as a continuously evolving property.
+It is not recalculated only when users open the application.
+Confidence may change whenever:
+new observations arrive, 
+observations are corrected, 
+evidence expires operationally, 
+conflicting evidence emerges, 
+discoveries evolve, 
+scientific knowledge changes. 
+The Confidence Engine shall ensure confidence is never acted upon while stale. ‘Always-current’ means recomputed in response to a recognised trigger (see 1.8a) and, where not yet recomputed, evaluated lazily on read. It does not mean every belief is recomputed continuously for every user.
+
+1.8a Continuous Means Triggered, Not Constant
+This reconciles 'continuous confidence' with ENG-001's rule that no Dynamic Health Model update occurs without a recognised trigger. Confidence is recomputed only in response to a trigger: new or corrected observations, evidence expiry, contradiction, discovery or narrative change, scientific-library change, calibration change, or the ENG-001 Scheduled-Review trigger for time-based decay. Between triggers, a value may be evaluated lazily on read.
+'Always-current' therefore describes the effect — confidence is never acted upon while stale — not a mechanism of constant recomputation. Recomputing every belief for every user continuously is infeasible at platform scale; event-triggered plus scheduled plus lazy evaluation delivers the same guarantee affordably.
+Engineering Rule
+Confidence changes only in response to a recognised trigger, aligned to ENG-001's trigger registry. Continuous does not mean constant.
+1.9 Explainability
+Every confidence value produced by BioSense shall be explainable.
+The platform shall always be capable of answering:
+Why is confidence this high? 
+Why is confidence this low? 
+Which observations contributed? 
+Which observations reduced confidence? 
+When did confidence last change? 
+What additional evidence would increase confidence? 
+If these questions cannot be answered, the confidence calculation is constitutionally incomplete.
+
+Engineering Rule
+Every confidence value shall possess a complete evidential explanation.
+
+1.10 Epistemic Humility
+The Confidence Engine shall embody the principle of epistemic humility.
+BioSense shall explicitly recognise uncertainty rather than concealing it.
+Examples include:
+"Current evidence moderately supports this conclusion."
+"Additional blood testing would significantly improve confidence."
+"Existing observations are insufficient to establish a stable long-term pattern."
+The platform shall never exaggerate certainty for the purpose of improving user confidence.
+
+Constitutional Principle
+Admitting uncertainty increases trust.
+
+1.11 Engineering Constraints
+The Confidence Engine shall:
+remain evidence-driven, 
+remain explainable, 
+remain reversible, 
+support longitudinal reasoning, 
+separate observation quality from confidence, 
+preserve scientific humility, 
+avoid deterministic certainty, 
+remain fully auditable. 
+
+On Acceptance Criteria
+Acceptance criteria throughout this specification shall be objective, automatable assertions rather than aspirations. 'The Confidence Engine is positioned as the constitutional authority' is a design statement, not a test. Each should be restated verifiably — for example: 'recomputing a belief's confidence at a pinned engine and configuration version reproduces the recorded value'; 'an edge that would create a graph cycle is rejected'; 'a recommendation outcome changes no confidence value (11.10)'; 'confidence is written only through the DHM single-writer path'.
+Engineering Rule
+A criterion that cannot be checked by a test or a defined inspection is not an acceptance criterion. This applies to every chapter's acceptance section.
+1.12 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Confidence is formally distinguished from observation quality.
+✓ Confidence represents understanding rather than raw evidence.
+✓ Confidence remains dynamic and continuously revisable.
+✓ Every confidence value is fully explainable.
+✓ Scientific uncertainty is explicitly represented.
+✓ Confidence never represents diagnosis, prediction or clinical certainty.
+✓ The architecture preserves epistemic humility.
+✓ The Confidence Engine is positioned as the constitutional authority governing how strongly BioSense trusts its own understanding.
+Chapter 2
+Evidence Evaluation Framework
+
+2.1 Purpose
+The purpose of this chapter is to define the Evidence Evaluation Framework used by the Confidence Engine to assess the evidential strength of information available within the Dynamic Health Model.
+The framework establishes the constitutional rules governing how BioSense evaluates evidence before confidence is calculated.
+Rather than treating every observation equally, the Evidence Evaluation Framework recognises that confidence emerges through the interaction of multiple evidential characteristics over time.
+These characteristics collectively determine the reliability of BioSense's understanding.
+
+Constitutional Principle
+Confidence is earned through the evaluation of evidence, not merely the accumulation of data.
+
+2.2 Engineering Philosophy
+Evidence possesses many characteristics.
+Examples include:
+quality, 
+quantity, 
+consistency, 
+recency, 
+diversity, 
+longitudinal stability, 
+independence, 
+reproducibility. 
+No single characteristic shall determine confidence independently.
+Instead, confidence shall emerge through balanced evaluation across multiple dimensions.
+
+Engineering Rule
+No individual observation shall independently establish high confidence unless explicitly permitted elsewhere within the constitutional architecture.
+
+2.3 Evidence Evaluation Domains
+The Confidence Engine shall evaluate evidence across eight constitutional domains.
+These domains are intentionally separated to maximise explainability and future extensibility.
+The domains are:
+Evidence Quality 
+Evidence Quantity 
+Evidence Consistency 
+Longitudinal Stability 
+Evidence Diversity 
+Temporal Relevance 
+Evidence Independence 
+Scientific Alignment 
+Each domain contributes independently to confidence formation.
+
+2.3a Reconciliation with ENG-001 Confidence Inputs
+ENG-001 enumerates the inputs to confidence; this chapter enumerates eight evaluation domains. These shall be one canonical set, not two. The eight domains of 2.3 are the authoritative realisation of ENG-001's confidence inputs; where ENG-001 lists inputs and ENG-003 lists domains, they refer to the same evidential characteristics under one governed vocabulary.
+Engineering Rule
+There is one canonical set of confidence inputs and domains, referenced by both ENG-001 and ENG-003. Neither introduces an independent list.
+2.4 Domain One — Evidence Quality
+Evidence Quality represents the overall trustworthiness of the observations supporting a particular understanding.
+This domain consumes the Observation Quality Profiles defined in ENG-002.
+Factors may include:
+Source reliability 
+Measurement methodology 
+Provenance completeness 
+Validation status 
+Structural integrity 
+Authenticity 
+The Confidence Engine consumes these characteristics.
+It does not redefine them.
+
+Constitutional Principle
+Confidence inherits evidence quality. It does not replace it.
+
+2.5 Domain Two — Evidence Quantity
+Evidence Quantity describes the amount of relevant evidence supporting a Health Belief.
+Quantity includes:
+number of observations, 
+number of independent events, 
+number of observation collections, 
+observation frequency, 
+observation density. 
+Large quantities of evidence may increase confidence.
+However:
+Quantity alone shall never justify high confidence.
+
+Founder Principle
+Many observations are valuable. Repeated observations are more valuable.
+
+2.6 Domain Three — Evidence Consistency
+Evidence Consistency evaluates whether independent observations support a coherent understanding.
+Examples include:
+Repeated elevated resting heart rate.
+Consistent improvements in sleep duration.
+Repeated ferritin decline across multiple laboratory visits.
+Consistency strengthens confidence.
+Contradictory evidence reduces confidence.
+Consistency is assessed across observations rather than within individual observations.
+
+Engineering Rule
+Confidence shall increase more readily from consistent evidence than from isolated observations.
+
+2.7 Domain Four — Longitudinal Stability
+Health patterns become more reliable when they persist over time.
+Examples include:
+Three years of stable HRV.
+Multiple annual blood tests showing gradual improvement.
+Long-term weight stability.
+Longitudinal Stability evaluates persistence rather than magnitude.
+Short-lived trends shall not be treated as stable patterns.
+
+Constitutional Principle
+Time transforms repeated observations into reliable understanding.
+
+2.8 Domain Five — Evidence Diversity
+Independent sources supporting the same conclusion strengthen confidence.
+Examples:
+WHOOP.
+Apple Health.
+Blood biomarkers.
+Nutrition logs.
+Daily Check-ins.
+Clinical records.
+If multiple independent sources converge upon the same understanding, confidence shall increase.
+
+Founder Principle
+Agreement between independent sources is stronger than repetition from one source.
+
+2.9 Domain Six — Temporal Relevance
+Not all evidence remains equally relevant indefinitely.
+Recent evidence may be more representative of current physiology.
+Historical evidence remains valuable for longitudinal understanding.
+Temporal Relevance evaluates the relationship between observation age and the question being considered.
+The weighting mechanism shall be defined in later chapters.
+
+Engineering Rule
+Recency influences confidence differently depending on the type of understanding being evaluated.
+
+2.10 Domain Seven — Evidence Independence
+The Confidence Engine shall recognise that observations are not always statistically independent.
+Example:
+HRV.
+Recovery Score.
+Readiness Score.
+These may all originate from the same wearable algorithm.
+Evidence generated from the same underlying calculation shall not be treated as multiple independent confirmations.
+
+Constitutional Principle
+Correlated evidence should not masquerade as independent evidence.
+
+2.11 Domain Eight — Scientific Alignment
+BioSense's understanding shall remain aligned with the Canonical Scientific Library.
+Evidence supporting well-established scientific principles may strengthen confidence.
+Evidence suggesting novel or unexpected relationships shall require proportionately stronger supporting evidence before confidence increases.
+Scientific Alignment influences the burden of evidence.
+It does not prohibit novel discoveries.
+
+Founder Principle
+Extraordinary conclusions require proportionately stronger evidence.
+
+2.12 Domain Interaction
+The evaluation domains shall remain logically independent.
+For example:
+High-quality evidence with low quantity.
+↓
+Moderate confidence.
+
+Large quantity with poor quality.
+↓
+Limited confidence.
+
+Long-term stability with poor consistency.
+↓
+Reduced confidence.
+The Confidence Engine shall evaluate all domains collectively rather than sequentially.
+
+2.13 Domain Evolution
+Additional evaluation domains may be introduced in future versions of BioSense.
+Existing domains shall remain backwards compatible.
+Historical confidence calculations shall remain reproducible using the evaluation framework that existed at the time.
+
+Engineering Rule
+Confidence history shall remain reproducible across engine versions.
+
+2.14 Explainability
+Every confidence assessment shall be capable of identifying:
+Which evaluation domains contributed positively. 
+Which domains reduced confidence. 
+Which domains lacked sufficient evidence. 
+Which domains were not applicable. 
+This enables BioSense to explain confidence transparently.
+
+2.15 Engineering Constraints
+The Evidence Evaluation Framework shall:
+evaluate evidence across multiple domains, 
+remain explainable, 
+remain extensible, 
+preserve independence between evaluation domains, 
+support future scientific evolution, 
+avoid deterministic scoring from any single characteristic. 
+
+2.16 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Confidence is evaluated across multiple independent evidence domains.
+✓ Observation Quality remains distinct from confidence.
+✓ Quantity alone cannot create high confidence.
+✓ Longitudinal stability is explicitly recognised.
+✓ Independent evidence sources strengthen confidence appropriately.
+✓ Correlated evidence is not incorrectly treated as independent.
+✓ Scientific alignment influences confidence without preventing novel discoveries.
+✓ Every confidence assessment remains fully explainable through its contributing domains.
+Chapter 3
+Confidence Formation & Confidence Lifecycle
+
+3.1 Purpose
+The purpose of this chapter is to define how the Confidence Engine transforms evaluated evidence into measurable confidence within the Dynamic Health Model.
+Confidence is not assigned.
+Confidence is not estimated.
+Confidence is not guessed.
+Confidence emerges through the structured evaluation of evidence according to the constitutional principles defined within this specification.
+This chapter defines the lifecycle through which confidence is established, strengthened, weakened, revised and, where necessary, retired.
+
+Constitutional Principle
+Confidence is an emergent property of accumulated evidence rather than a manually assigned attribute.
+
+3.2 Engineering Philosophy
+Confidence should behave like scientific understanding.
+When evidence is scarce:
+Confidence should remain cautious.
+When evidence accumulates:
+Confidence should strengthen gradually.
+When contradictory evidence appears:
+Confidence should reduce appropriately.
+When evidence becomes overwhelming:
+Confidence may become very strong.
+At no point should confidence become absolute.
+
+Founder Principle
+The absence of doubt is not the presence of certainty.
+
+3.3 Confidence Formation Process
+Every confidence assessment shall progress through a common constitutional process.
+Relevant Evidence Identified
+
+↓
+
+Evidence Evaluation
+
+↓
+
+Evidence Domain Assessment
+
+↓
+
+Cross-Domain Balancing
+
+↓
+
+Confidence Formation
+
+↓
+
+Confidence Validation
+
+↓
+
+Confidence Assignment
+
+↓
+
+Dynamic Health Model Updated
+Each stage shall remain independently explainable.
+No stage may be bypassed.
+
+3.4 Confidence Candidates
+Whenever the Dynamic Health Model evaluates a Health Belief, Discovery or Narrative, the Confidence Engine shall generate a Confidence Candidate.
+A Confidence Candidate represents a provisional confidence assessment.
+It is not yet accepted.
+It exists solely for evaluation.
+Each Confidence Candidate shall contain:
+Target object (Health Belief, Discovery, Narrative, etc.) 
+Supporting observations 
+Supporting evidence domains 
+Conflicting evidence 
+Evaluation timestamp 
+Engine version 
+Only after validation may a Confidence Candidate become an active confidence assessment.
+
+Engineering Rule
+Every confidence value shall begin as a Confidence Candidate.
+
+3.5 Domain Evaluation
+Each evidence domain defined in Chapter 2 shall be evaluated independently.
+The Confidence Engine shall determine:
+How strongly each domain supports the understanding. 
+Whether any domain weakens the understanding. 
+Whether any domain lacks sufficient evidence. 
+Whether any domain should be excluded. 
+Domains shall never overwrite one another.
+Each contributes independently.
+
+3.6 Cross-Domain Balancing
+Following independent evaluation, the Confidence Engine shall balance all evidence domains collectively.
+Examples:
+High Observation Quality.
+Low Quantity.
+↓
+Moderate confidence.
+
+High Quantity.
+Poor Consistency.
+↓
+Limited confidence.
+
+Strong Longitudinal Stability.
+Weak Evidence Diversity.
+↓
+Moderately High confidence.
+No individual domain may dominate unless constitutionally authorised.
+
+Constitutional Principle
+Confidence should emerge from balance rather than domination.
+
+3.6a Domain Combination Contract
+Cross-domain balancing (3.6) is described qualitatively. Because confidence is the platform's central quantity, the combination shall be a single versioned function owned by the data and clinical function: each domain is normalised to a defined scale; the domains are combined by a defined method (not simple averaging) that is monotonic and bounded; correlated evidence is handled per Domain Seven (2.10) so convergence raises confidence only where independence is established; and the result maps to the continuous confidence score and the C0–C5 bands defined in ENG-001. Weights and thresholds are to be confirmed; the contract is binding now.
+This realises the confidence-computation contract ENG-001 delegated to the Confidence Engine. 'No domain dominates' (3.6) is expressed as bounds within this function, not left to implementation.
+Engineering Rule
+Confidence is produced by one versioned combination function that maps the eight domains to ENG-001's score and C0–C5. No implementation may invent its own weighting.
+3.7 Confidence Validation
+Before confidence is assigned to the Dynamic Health Model, the Confidence Engine shall perform validation.
+Validation confirms:
+sufficient evidence exists, 
+evaluation completed successfully, 
+contradictions have been considered, 
+engine rules were followed, 
+explainability requirements are satisfied, 
+audit records are complete. 
+If validation fails:
+The Confidence Candidate shall be rejected.
+No confidence update occurs.
+
+3.8 Confidence Assignment
+Once validated, confidence becomes associated with the relevant Dynamic Health Model object.
+Examples include:
+Health Belief
+Discovery
+Narrative
+Biological Identity
+Prediction
+Future intelligence objects.
+Confidence shall remain attached to the understanding rather than the underlying observations.
+
+Engineering Rule
+Confidence belongs to understanding, not evidence.
+
+3.8a Engine Interface Contracts
+The Confidence Engine sits between ENG-002 and ENG-001, and its seams shall be explicit. Three contracts are defined. First, ENG-002 to Confidence Engine: the Observation Quality Profile maps to named confidence inputs through a defined mapping (the counterpart of ENG-002's quality-scoring contract), not re-derived per engine. Second, Dynamic Health Model to Confidence Engine: the DHM invokes the engine on a revision or evaluation trigger, supplying the target object and its evidence; the engine returns a confidence assessment and explanation.
+Third, and critical for concurrency: confidence is written to the Dynamic Health Model through the DHM's per-individual single-writer path (ENG-001), never by the Confidence Engine writing the DHM directly. The DHM invokes the engine and commits the result within its own reasoning session, preserving ENG-001's serialisation guarantee.
+Engineering Rule
+The Confidence Engine computes and returns confidence; it does not write the DHM. All confidence writes go through the DHM's single-writer path.
+3.9 Confidence States
+Every active confidence assessment shall exist in one recognised state.
+Proposed states include:
+Emerging
+Evidence is beginning to accumulate.
+
+Developing
+Evidence supports a plausible understanding.
+
+Established
+Evidence consistently supports the understanding.
+
+Strong
+Longitudinal evidence demonstrates reliable support.
+
+Under Review
+Conflicting or newly arrived evidence requires reassessment.
+
+Declining
+Confidence is decreasing due to changing evidence.
+
+Retired
+The understanding is no longer supported.
+
+Founder Principle
+Confidence should evolve through recognised stages rather than abrupt transitions.
+
+3.9a Canonical Confidence Representation & Crosswalk
+Confidence is represented in one canonical form: the continuous score in the range 0 to 1 and the C0–C5 bands defined in ENG-001. The confidence states of 3.9 (Emerging, Developing, Established, Strong, Under Review, Declining, Retired) and the threshold categories of 7.4 (Insufficient, Emerging, Informational, Actionable, Established, Discovery) are derived labels over that one representation, not independent scales. 
+The threshold category 'Discovery' (7.4) is a confidence gate only; it is distinct from Discovery-the-object, whose definition, lifecycle and provenance are owned by ENG-001 (Chapter 9). Crossing the 'Discovery' confidence threshold is at most a precondition consumed by ENG-001 Discovery validation (ENG-001 §9.7); it does not itself create, promote or define a Discovery.
+A single crosswalk shall map score and band ranges to states and to threshold categories, and no term shall carry two meanings: where 'Emerging' and 'Established' appear in both 3.9 and 7.4, the crosswalk fixes one meaning each, or the colliding label is renamed. A confidence state is a property of the assessment; it is not a second belief lifecycle — the belief's lifecycle is owned by ENG-001, and the crosswalk shows how confidence state relates to it.
+Engineering Rule
+One canonical confidence representation (ENG-001 score plus C0–C5). States and thresholds are derived views defined by one crosswalk; no label means two things.
+3.10 Confidence Lifecycle
+Confidence is expected to evolve continuously.
+Candidate
+
+↓
+
+Emerging
+
+↓
+
+Developing
+
+↓
+
+Established
+
+↓
+
+Strong
+
+↓
+
+Under Review
+
+↓
+
+Declining
+
+↓
+
+Retired
+Not every confidence assessment reaches Strong.
+Some remain Emerging indefinitely.
+Others may be retired rapidly if contradictory evidence appears.
+
+3.11 Confidence Stability
+Confidence should demonstrate inertia.
+Minor evidence changes should not produce dramatic confidence fluctuations.
+The Confidence Engine shall therefore favour stability over volatility.
+Confidence should move gradually unless:
+major contradictory evidence appears, 
+critical observations are corrected, 
+scientific knowledge changes significantly. 
+
+Constitutional Principle
+Confidence should be difficult to earn and equally difficult to lose without meaningful evidence.
+
+3.12 Confidence Revision
+Confidence shall be recalculated whenever:
+new observations arrive, 
+observations are corrected, 
+observations are retired, 
+evidence quality changes, 
+scientific reviews occur, 
+Health Beliefs change, 
+Narratives evolve. 
+Recalculation shall always preserve historical confidence values for audit purposes.
+
+3.13 Confidence History
+Every confidence assessment shall preserve complete historical lineage.
+History shall include:
+Previous confidence state. 
+Evaluation timestamp. 
+Triggering event. 
+Supporting evidence summary. 
+Engine version. 
+Reason for change. 
+Confidence history shall never be overwritten.
+
+Founder Principle
+Understanding should remember how certain it once was.
+
+3.13a Ownership of the Stored Confidence Object
+ENG-001 already defines the stored Confidence Object attached to Dynamic Health Model objects, independently versioned and carrying its history. To avoid two schemas, ENG-001 owns the stored Confidence Object's structure; ENG-003 owns how confidence is computed and what each history entry must contain (previous state, trigger, evidence summary, engine version, reason for change). Confidence history is written once, through the DHM (3.8a).
+Engineering Rule
+The stored Confidence Object schema is ENG-001's. ENG-003 defines its computation and the content of history entries, not a parallel store.
+3.14 Explainability
+Every confidence assessment shall answer:
+Why did confidence increase? 
+Why did confidence decrease? 
+Which evidence domains contributed most? 
+Which evidence weakened confidence? 
+What additional evidence would increase confidence? 
+Has confidence previously been higher or lower? 
+What event caused the most recent change? 
+
+3.15 Engineering Constraints
+The Confidence Formation framework shall:
+evaluate evidence consistently, 
+preserve explainability, 
+support gradual evolution, 
+prevent abrupt volatility, 
+preserve historical confidence, 
+remain fully auditable, 
+support future evidence domains. 
+
+3.16 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Every confidence assessment begins as a Confidence Candidate.
+✓ Evidence domains are evaluated independently before being balanced.
+✓ Confidence is validated before assignment.
+✓ Confidence is attached to understanding rather than observations.
+✓ Every confidence assessment progresses through recognised lifecycle states.
+✓ Confidence changes remain gradual unless justified by significant new evidence.
+✓ Historical confidence values remain permanently recoverable.
+✓ Every confidence assessment is fully explainable and auditable.
+Chapter 4
+Confidence Propagation & Dependency Management
+
+4.1 Purpose
+The purpose of this chapter is to define how confidence changes propagate throughout the Dynamic Health Model when new evidence alters BioSense's understanding.
+Health understanding is inherently interconnected.
+A change in one Health Belief may influence numerous related beliefs, discoveries, narratives and recommendations.
+The Confidence Engine shall therefore manage confidence as a connected network rather than a collection of isolated values.
+This chapter defines the constitutional rules governing that propagation.
+
+Constitutional Principle
+Confidence may spread through understanding, but it shall never spread without evidence.
+
+4.2 Engineering Philosophy
+Health systems rarely operate independently.
+Examples include:
+Improved sleep
+↓
+Improved recovery
+↓
+Improved training capacity
+↓
+Improved energy
+↓
+Improved mood
+↓
+Improved productivity
+Similarly:
+Declining ferritin
+↓
+Reduced oxygen transport
+↓
+Reduced endurance
+↓
+Reduced exercise capacity
+↓
+Reduced recovery
+↓
+Reduced perceived wellbeing
+BioSense should therefore recognise interconnected understanding while avoiding uncontrolled propagation.
+
+Engineering Rule
+Confidence shall propagate only through defined relationships within the Dynamic Health Model.
+
+4.3 Confidence Dependency Graph
+The Confidence Engine shall maintain a logical Confidence Dependency Graph.
+This graph represents how confidence relationships exist between Dynamic Health Model objects.
+Examples include:
+Health Beliefs
+↓
+Discoveries
+↓
+Narratives
+↓
+Biological Identity
+↓
+Recommendations
+↓
+Predictions
+Confidence relationships shall never be inferred dynamically without constitutional support.
+
+4.3a Single Dependency Graph & Ownership
+There is one dependency graph in the platform: the belief dependency graph owned by the Dynamic Health Model (ENG-001 truth-maintenance). The 'Confidence Dependency Graph' named here is a view of that same graph, not a second structure. Confidence propagation is confidence recomputation performed as the DHM traverses its graph; ENG-003 defines how much confidence changes along an edge (attenuation, limits), while the DHM owns the graph, its edges, and the traversal order.
+The graph is a strict directed acyclic graph maintained under ENG-001's cascade rules (topological traversal, bounded depth, cycle rejection). ENG-003 does not define a separate graph, a separate traversal, or a separate cycle policy.
+Engineering Rule
+One graph, owned by the DHM. ENG-003 supplies confidence deltas along its edges; it does not maintain a second graph or a different cycle policy.
+4.4 Dependency Types
+Confidence relationships shall be explicitly classified.
+Suggested dependency types include:
+Direct Dependency
+One understanding directly influences another.
+Example:
+Sleep Consistency
+↓
+Recovery Quality
+
+Supporting Dependency
+One understanding contributes to another but is not solely responsible.
+Example:
+Nutrition Quality
+↓
+Exercise Recovery
+
+Contextual Dependency
+Confidence provides context but should not materially alter downstream confidence.
+Example:
+Seasonal Behaviour
+↓
+Activity Narrative
+
+Independent
+No confidence propagation occurs.
+
+Founder Principle
+Not every relationship should carry confidence.
+
+4.5 Propagation Triggers
+Confidence propagation may occur following:
+New observations.
+Observation corrections.
+Health Belief revision.
+Discovery creation.
+Discovery retirement.
+Narrative evolution.
+Scientific Library updates.
+Confidence recalibration.
+Manual clinical review.
+Each propagation event shall generate a new propagation cycle.
+
+4.6 Propagation Process
+Every propagation cycle shall follow the same constitutional workflow.
+Evidence Change
+
+↓
+
+Affected Understanding Identified
+
+↓
+
+Confidence Recalculated
+
+↓
+
+Dependency Graph Evaluated
+
+↓
+
+Eligible Relationships Identified
+
+↓
+
+Propagation Impact Calculated
+
+↓
+
+Secondary Confidence Updated
+
+↓
+
+Validation
+
+↓
+
+Dynamic Health Model Updated
+Propagation shall remain deterministic and reproducible.
+
+4.6a Scope of Determinism
+Where this specification requires propagation, revision or calibration to be 'deterministic and reproducible', that requirement applies to the numeric confidence function and to graph traversal, which are deterministic given pinned inputs. Steps that involve model-assisted reasoning — for example assessing why a contradiction exists, or proposing competing hypotheses — are not bit-for-bit reproducible; for those, a structured reasoning trace is recorded so the decision is auditable even though the prose is not regenerable.
+Engineering Rule
+Deterministic applies to the confidence calculation and graph traversal; model-assisted reasoning is captured by an auditable trace, not regenerated. Determinism claims elsewhere are read with this scope.
+4.7 Propagation Strength
+Confidence propagation shall not behave as an all-or-nothing process.
+Instead, propagation strength shall reflect:
+relationship strength, 
+evidence relevance, 
+dependency type, 
+existing confidence, 
+competing evidence, 
+longitudinal stability. 
+Small changes should generally produce proportionately small downstream effects.
+
+Constitutional Principle
+Confidence should weaken as it travels further from its originating evidence.
+
+4.8 Confidence Attenuation
+Propagation shall naturally attenuate.
+Example:
+Laboratory Ferritin
+↓
+Iron Status Belief
+↓
+Exercise Capacity
+↓
+Training Narrative
+↓
+Performance Prediction
+Each successive layer should generally receive a smaller confidence adjustment unless reinforced by independent evidence.
+Attenuation prevents unrealistic amplification.
+
+Founder Principle
+Understanding becomes less certain the further it moves from direct evidence.
+
+4.9 Multiple Evidence Paths
+Some understandings may receive confidence through multiple independent pathways.
+Example:
+Recovery
+may be influenced by:
+Sleep
+HRV
+Resting Heart Rate
+Nutrition
+Training Load
+Stress
+Illness
+Each pathway shall contribute independently.
+Confidence shall emerge through balanced evaluation rather than simple accumulation.
+
+4.10 Propagation Limits
+The Confidence Engine shall impose constitutional limits on propagation.
+Limits may include:
+Maximum propagation depth.
+Maximum confidence adjustment.
+Maximum propagation duration.
+Maximum dependency chain.
+Circular propagation prevention.
+These limits shall remain configurable while preserving constitutional behaviour.
+
+Engineering Rule
+Propagation shall always terminate.
+
+4.11 Circular Dependency Prevention
+The Confidence Engine shall detect and prevent circular confidence propagation.
+Example:
+Sleep
+↓
+Recovery
+↓
+Training Quality
+↓
+Sleep
+Without safeguards, confidence could reinforce itself indefinitely.
+Circular propagation shall be prohibited.
+The confidence dependency graph is the belief dependency graph owned by the Dynamic Health Model (ENG-001) and is maintained as a strict directed acyclic graph.
+Any edge that would create a cycle is rejected and recorded for review rather than bounded, adopting ENG-001’s cycle policy exactly (see 4.3a).
+
+Constitutional Principle
+Confidence must never become self-validating.
+
+4.12 Conflict During Propagation
+Propagation may encounter conflicting understandings.
+Example:
+Improved sleep.
+↓
+Improved recovery.
+However:
+Blood biomarkers indicate acute illness.
+The Confidence Engine shall:
+evaluate competing evidence, 
+avoid automatic propagation, 
+prioritise direct evidence over inferred confidence, 
+preserve explainability. 
+Propagation shall never override stronger contradictory evidence.
+
+4.12a Propagation Direction & Evidence Provenance
+This makes Chapter 4 consistent with the anti-circularity rule of 11.6. Confidence propagates strictly downstream — from evidence to belief to narrative to identity to recommendation to prediction — and never upstream into the evidence of an ancestor. A derived object's confidence may inform objects further downstream, but a derived object never becomes evidence for an object upstream of it. Only observations entering through the Observation Engine are evidence.
+Engineering Rule
+Propagation is downstream-only. A derived object never becomes evidence for an ancestor; only Observation-Engine observations are evidence (11.6).
+4.13 Explainability
+Every propagated confidence adjustment shall answer:
+What initiated the propagation? 
+Which understanding changed? 
+Which dependency was followed? 
+Why was this relationship considered valid? 
+How much attenuation occurred? 
+Which competing evidence limited propagation? 
+Which downstream understandings changed? 
+
+4.14 Engineering Constraints
+Confidence propagation shall:
+follow explicit dependency relationships, 
+attenuate naturally, 
+prevent circular reasoning, 
+remain deterministic, 
+remain explainable, 
+preserve auditability, 
+support future dependency types. 
+
+4.15 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Confidence propagates only through authorised dependency relationships.
+✓ Propagation weakens appropriately with increasing distance from direct evidence.
+✓ Multiple evidence pathways are evaluated independently.
+✓ Circular confidence propagation is prevented.
+✓ Conflicting evidence limits inappropriate propagation.
+✓ Every propagation event remains fully explainable and auditable.
+✓ Propagation produces stable, deterministic outcomes.
+Chapter 5
+Conflicting Evidence Resolution & Contradiction Management
+
+5.1 Purpose
+The purpose of this chapter is to define how the Confidence Engine identifies, evaluates and resolves conflicting evidence without compromising scientific integrity.
+Contradictory evidence is an expected characteristic of real-world health data.
+The objective of the Confidence Engine is not to eliminate contradiction.
+Its objective is to understand it.
+Rather than treating disagreement as an engineering failure, BioSense shall treat it as an opportunity to refine its understanding.
+
+Constitutional Principle
+Contradictory evidence reduces certainty. It does not invalidate evidence.
+
+5.2 Engineering Philosophy
+Human physiology is complex.
+Different evidence sources frequently disagree.
+Examples include:
+Wearables indicating excellent recovery despite poor subjective wellbeing. 
+Blood biomarkers improving while symptoms worsen. 
+Increased exercise performance despite declining sleep quality. 
+Manual reports conflicting with automated measurements. 
+Two laboratories producing slightly different values. 
+Device recalculations changing historical observations. 
+These disagreements should not be ignored or arbitrarily resolved.
+Instead, they should become explicit inputs into BioSense's reasoning process.
+
+Founder Principle
+The goal is not to remove contradiction. The goal is to understand why contradiction exists.
+
+5.3 Types of Contradiction
+The Confidence Engine shall distinguish between different forms of contradiction.
+Each type has different implications.
+Observation Contradiction
+Two observations measuring the same phenomenon disagree.
+Example:
+Two laboratories report materially different ferritin values collected within a short interval.
+
+Source Contradiction
+Independent providers report conflicting measurements.
+Example:
+Apple Health indicates six hours of sleep.
+WHOOP reports seven and a half hours.
+
+Temporal Contradiction
+Historical evidence conflicts with recent evidence.
+Example:
+Five years of improving HRV followed by a sustained decline.
+
+Behavioural Contradiction
+Observed behaviour conflicts with reported behaviour.
+Example:
+The user reports excellent sleep quality.
+Wearable data consistently indicates fragmented sleep.
+
+Physiological Contradiction
+Different physiological systems appear inconsistent.
+Example:
+Excellent cardiovascular fitness.
+Rapid deterioration in inflammatory biomarkers.
+
+Scientific Contradiction
+A conclusion conflicts with the Canonical Scientific Library.
+Example:
+Evidence appears to support a relationship that is currently weakly supported or not yet established in scientific literature.
+
+Engineering Rule
+Contradictions shall be classified before they are evaluated.
+
+5.4 Contradiction Detection
+The Confidence Engine shall continuously monitor for conflicting evidence.
+Detection may be triggered by:
+New observations. 
+Corrected observations. 
+Confidence recalculation. 
+Discovery revision. 
+Scientific Library updates. 
+Manual clinical review. 
+Contradiction detection shall operate continuously rather than only during user interactions.
+
+5.5 Contradiction Assessment
+When a contradiction is detected, the engine shall evaluate:
+Which evidence disagrees? 
+How significant is the disagreement? 
+Which evidence possesses higher quality? 
+Are the observations independent? 
+Is the disagreement temporary or persistent? 
+Could the disagreement represent normal biological variation? 
+Does the disagreement suggest a previously unknown relationship? 
+The objective is understanding rather than immediate resolution.
+
+Constitutional Principle
+BioSense should investigate contradiction before attempting to resolve it.
+
+5.6 Resolution Strategies
+Not every contradiction should be handled in the same way.
+Possible outcomes include:
+Preserve Both Interpretations
+Both explanations remain plausible.
+Confidence decreases.
+Further evidence requested.
+
+Prefer Stronger Evidence
+Higher-quality or more reliable evidence is provisionally favoured.
+Lower-quality evidence remains preserved.
+
+Await Additional Evidence
+No conclusion is reached.
+The understanding remains under review.
+
+Create Competing Hypotheses
+Multiple Health Beliefs may temporarily coexist.
+Each maintains its own confidence assessment.
+
+Retire Existing Understanding
+New evidence overwhelmingly invalidates the previous understanding.
+Historical confidence remains preserved.
+
+Founder Principle
+Sometimes the correct answer is: we don't know yet.
+
+5.6a Ownership — the Dynamic Health Model Creates Beliefs
+Creating, merging, retiring or maintaining competing Health Beliefs (5.6, 5.7, 8.6) is a Dynamic Health Model operation (ENG-001). The Confidence Engine detects and assesses contradiction and supplies an independent confidence assessment for each hypothesis; the DHM decides whether to instantiate competing beliefs, which to make dominant, and when to retire them. ENG-003 informs; the DHM acts.
+Likewise, an evidence request (5.9) is signalled by the Confidence Engine as 'specific additional evidence would raise confidence', but the decision to request it and the act of requesting belong to the recommendation and conversation layers, not the Confidence Engine.
+Engineering Rule
+The Confidence Engine assesses contradiction and confidence per hypothesis; the DHM creates and retires beliefs, and downstream engines act on evidence requests.
+5.7 Competing Hypotheses
+The Confidence Engine shall support multiple competing hypotheses when evidence is genuinely inconclusive.
+Example:
+Hypothesis A
+Reduced recovery caused by insufficient sleep.
+Confidence:
+Developing.
+
+Hypothesis B
+Reduced recovery caused by early illness.
+Confidence:
+Emerging.
+
+Hypothesis C
+Reduced recovery caused by excessive training load.
+Confidence:
+Developing.
+The Dynamic Health Model may maintain multiple concurrent explanations until sufficient evidence allows one to become dominant.
+
+Constitutional Principle
+Multiple plausible explanations are preferable to one unsupported certainty.
+
+5.8 Contradiction Impact on Confidence
+Contradictions shall not automatically reduce confidence to zero.
+Instead, they may:
+reduce confidence, 
+pause confidence growth, 
+trigger re-evaluation, 
+initiate manual review, 
+create competing hypotheses, 
+request additional evidence. 
+The magnitude of confidence change shall remain proportionate to the significance of the contradiction.
+
+5.9 Evidence Requests
+Certain contradictions may justify requesting additional evidence.
+Examples include:
+New blood testing. 
+Additional wearable data. 
+Daily check-ins. 
+Symptom questionnaire. 
+Medication update. 
+The Confidence Engine may recommend evidence collection.
+It shall never require it.
+
+Founder Principle
+The best response to uncertainty is often better evidence.
+
+5.10 Scientific Curiosity
+Persistent contradictions may represent:
+data quality issues, 
+measurement limitations, 
+previously unknown relationships, 
+genuine biological individuality. 
+The Confidence Engine shall preserve contradictory evidence for future longitudinal analysis rather than discarding it.
+Contradictions may eventually become Discoveries.
+
+Constitutional Principle
+Today's contradiction may become tomorrow's discovery.
+
+5.11 Explainability
+Every contradiction assessment shall answer:
+What evidence conflicts? 
+Why is it considered contradictory? 
+Which evidence is stronger? 
+Which hypotheses currently exist? 
+Why has confidence changed? 
+What evidence would resolve the contradiction? 
+Has this contradiction occurred previously? 
+
+5.12 Engineering Constraints
+The Contradiction Framework shall:
+preserve all evidence, 
+avoid premature conclusions, 
+support competing hypotheses, 
+remain explainable, 
+remain fully auditable, 
+distinguish temporary from persistent contradiction, 
+preserve scientific curiosity. 
+
+5.13 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Contradictions are detected continuously.
+✓ Different contradiction types are explicitly recognised.
+✓ Contradictions reduce certainty without discarding evidence.
+✓ Multiple competing hypotheses can coexist.
+✓ Confidence adjusts proportionately to the significance of conflicting evidence.
+✓ Additional evidence may be requested but never required.
+✓ Contradictions remain explainable and auditable.
+✓ Persistent contradictions can contribute to future discoveries.
+Chapter 6
+Confidence Decay, Reinforcement & Temporal Dynamics
+
+6.1 Purpose
+The purpose of this chapter is to define how the Confidence Engine manages the influence of time on BioSense's understanding.
+Health is inherently dynamic.
+Individuals change.
+Physiology changes.
+Behaviour changes.
+Scientific knowledge changes.
+The Confidence Engine shall therefore continuously evaluate whether existing confidence remains justified as time progresses.
+This chapter defines how confidence:
+strengthens, 
+weakens, 
+stabilises, 
+expires, 
+recovers, 
+through longitudinal evidence.
+
+Constitutional Principle
+Confidence should evolve as time changes the relevance of evidence.
+
+6.2 Engineering Philosophy
+Evidence does not possess permanent influence.
+Some observations rapidly lose relevance.
+Others become increasingly valuable with age.
+Examples:
+Yesterday's sleep quality.
+↓
+Highly relevant today.
+↓
+Minimal relevance two years later.
+
+Annual HbA1c trend.
+↓
+Increasingly valuable over several years.
+The Confidence Engine shall therefore evaluate evidence according to its temporal behaviour rather than applying one universal decay model.
+
+Founder Principle
+Time changes the meaning of evidence.
+
+6.3 Temporal Behaviour Categories
+Every Health Belief shall possess an associated Temporal Behaviour Profile.
+Suggested categories include:
+Rapidly Changing
+Examples:
+Sleep
+Recovery
+Training Load
+Mood
+Symptoms
+Stress
+These require recent evidence.
+
+Moderately Dynamic
+Examples:
+Body Weight
+Blood Pressure
+Resting Heart Rate
+Nutrition Behaviour
+Exercise Capacity
+
+Slowly Changing
+Examples:
+Vitamin D
+Ferritin
+HbA1c
+Body Composition
+Hormones
+
+Longitudinal Identity
+Examples:
+Biological Identity
+Habit Formation
+Behavioural Tendencies
+Genetic Characteristics
+Long-term physiological patterns
+These generally strengthen through time rather than decay.
+
+Engineering Rule
+Temporal behaviour shall be defined per understanding rather than per observation.
+
+6.3a Location of the Temporal Behaviour Profile
+The Temporal Behaviour Profile (6.3) is Confidence-Engine configuration keyed by canonical metric class, not a new field on the ENG-001 Health Belief object; the Health Belief schema is owned by ENG-001 and is not extended here. The engine looks up the profile by the belief's canonical metric when evaluating temporal behaviour.
+Time-based decay driven by this profile uses ENG-001's Scheduled-Review trigger (no untriggered mutation), reconciling this chapter with ENG-001's decay model and ENG-002's evidence-freshness inputs.
+Engineering Rule
+The Temporal Behaviour Profile is engine configuration keyed by metric class, not a belief field. Decay runs through ENG-001's Scheduled-Review trigger.
+6.4 Confidence Decay
+Confidence may gradually decrease when supporting evidence becomes progressively less representative of the individual's current state.
+Examples include:
+No recent sleep observations.
+No wearable data for six months.
+No blood testing for three years.
+Significant gaps in behaviour tracking.
+Decay reflects increasing uncertainty.
+Not decreasing evidence quality.
+
+Constitutional Principle
+Old evidence remains true. It may no longer remain representative.
+
+6.5 Confidence Reinforcement
+Confidence may strengthen without new observation types when existing evidence demonstrates continued consistency.
+Example:
+Five years of stable resting heart rate.
+↓
+Confidence gradually increases.
+Similarly:
+Ten consecutive blood panels demonstrating stable ferritin.
+↓
+Higher confidence.
+Reinforcement emerges through longitudinal consistency rather than repetition alone.
+
+Founder Principle
+Repeated consistency earns trust.
+
+6.6 Confidence Stability
+Some understandings should become increasingly resistant to small evidence fluctuations.
+Example:
+Three years of consistently excellent sleep behaviour.
+One poor night's sleep.
+↓
+Confidence should remain largely unchanged.
+Similarly:
+A decade of stable body weight should not be overturned by a one-week fluctuation.
+Long-term stability shall introduce appropriate confidence inertia.
+
+Constitutional Principle
+Established understanding should not oscillate because of short-term variation.
+
+6.7 Evidence Freshness
+The Confidence Engine shall continuously evaluate evidence freshness.
+Freshness considers:
+Observation age.
+Observation frequency.
+Evidence density.
+Observation continuity.
+Collection regularity.
+Freshness influences current-state confidence.
+It does not erase historical understanding.
+
+6.8 Observation Gaps
+Periods without observations shall be explicitly recognised.
+Examples:
+Disconnected wearable.
+Missed laboratory testing.
+Travel.
+Illness.
+Device replacement.
+Data gaps increase uncertainty.
+They do not imply physiological change.
+
+Founder Principle
+Absence of evidence should not become evidence of absence.
+
+6.9 Behavioural Drift
+Individuals evolve.
+Habits change.
+Fitness changes.
+Nutrition changes.
+Stress changes.
+The Confidence Engine shall recognise gradual behavioural drift.
+Historical understanding shall remain available.
+Current confidence shall increasingly reflect recent behaviour where constitutionally appropriate.
+
+6.10 Abrupt Physiological Change
+Certain events may rapidly invalidate previous confidence.
+Examples:
+Major illness.
+Pregnancy.
+Surgery.
+Significant injury.
+Medication initiation.
+Substantial weight change.
+Major lifestyle intervention.
+Such events may trigger accelerated confidence reassessment.
+Historical evidence remains preserved.
+Current understanding may change rapidly.
+
+Constitutional Principle
+Major physiological transitions justify rapid confidence re-evaluation.
+
+6.11 Longitudinal Reinforcement
+Some conclusions become stronger simply because they continue to remain true.
+Example:
+A decade of:
+consistent exercise, 
+healthy blood biomarkers, 
+stable body composition, 
+improving cardiovascular fitness. 
+The Confidence Engine shall recognise enduring patterns as increasingly reliable components of the individual's Biological Identity.
+Long-term consistency should therefore reinforce confidence.
+
+6.12 Scientific Change
+Confidence may also evolve when the Canonical Scientific Library changes.
+Examples:
+New evidence published.
+Clinical guidelines updated.
+Reference ranges revised.
+Scientific relationships strengthened.
+Scientific relationships weakened.
+BioSense may re-evaluate confidence even when user observations remain unchanged.
+Scientific evolution shall remain fully auditable.
+
+Founder Principle
+Knowledge evolves. Confidence should evolve with it.
+
+6.13 Temporal Explainability
+Every temporal confidence adjustment shall answer:
+Why did confidence change? 
+Which observations became less representative? 
+Which observations reinforced confidence? 
+Were data gaps detected? 
+Was behavioural drift identified? 
+Did scientific knowledge contribute? 
+Would additional observations improve confidence? 
+
+6.14 Engineering Constraints
+Temporal confidence management shall:
+distinguish evidence age from evidence quality, 
+support multiple temporal behaviours, 
+reinforce long-term stability, 
+recognise behavioural drift, 
+preserve historical evidence, 
+remain explainable, 
+remain reproducible, 
+remain fully auditable. 
+
+6.15 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Confidence evolves according to temporal behaviour rather than fixed decay rules.
+✓ Longitudinal consistency strengthens confidence.
+✓ Evidence gaps increase uncertainty without implying physiological deterioration.
+✓ Rapid physiological transitions trigger accelerated reassessment.
+✓ Historical evidence remains preserved while current confidence adapts.
+✓ Scientific knowledge changes may trigger confidence re-evaluation.
+✓ Every temporal confidence adjustment remains fully explainable.
+✓ Temporal dynamics preserve both current relevance and longitudinal understanding.
+Chapter 7
+Confidence Thresholds & Decision Gates
+
+7.1 Purpose
+The purpose of this chapter is to define the confidence thresholds governing when BioSense may create, modify, promote, retire or communicate understanding.
+Confidence is a continuous property.
+Operational decisions, however, require discrete decision points.
+Confidence Thresholds convert continuously evolving confidence into consistent, explainable platform behaviour.
+These thresholds ensure that BioSense behaves predictably, conservatively and in accordance with the constitutional principles established throughout the Intelligence Platform.
+
+Constitutional Principle
+Confidence should influence decisions only after appropriate evidence thresholds have been reached.
+
+7.2 Engineering Philosophy
+Confidence should not merely describe understanding.
+It should govern platform behaviour.
+Examples include:
+Should a Health Belief be created? 
+Should a Discovery be recognised? 
+Should a recommendation be generated? 
+Should the user be informed? 
+Should BioSense remain silent? 
+The Confidence Engine shall provide consistent decision gates for every downstream intelligence component.
+
+Founder Principle
+BioSense should speak only when its confidence has earned the right to be heard.
+
+7.3 Decision Gate Architecture
+Every significant intelligence action shall pass through a Confidence Decision Gate.
+Conceptually:
+Evidence
+
+↓
+
+Confidence Formation
+
+↓
+
+Confidence Assessment
+
+↓
+
+Decision Gate
+
+↓
+
+Platform Behaviour
+Decision Gates determine whether confidence is sufficient for the requested action.
+They do not modify confidence itself.
+
+7.4 Threshold Categories
+The Confidence Engine shall support multiple threshold categories.
+These categories represent operational behaviour rather than numerical confidence values.
+Suggested categories include:
+Insufficient
+Evidence exists.
+No meaningful conclusion should be reached.
+
+Emerging
+A plausible understanding exists.
+BioSense continues monitoring.
+No significant user communication unless explicitly requested.
+
+Informational
+Understanding is sufficiently reliable to inform low-risk narratives and educational content.
+
+Actionable
+Confidence supports personalised recommendations or coaching.
+Recommendations remain proportionate to confidence.
+
+Established
+The understanding forms part of the individual's stable Dynamic Health Model.
+It may influence Biological Identity.
+
+Discovery
+Evidence supports recognition as a validated BioSense Discovery.
+Discoveries remain subject to ongoing review.
+
+Engineering Rule
+Threshold names shall remain stable even if scoring methodology evolves.
+
+7.5 Threshold Ownership
+Threshold enforcement shall be owned by the Confidence Engine, which is the single runtime authority that applies thresholds. Threshold values, however, are versioned configuration authored by the clinical and data-science function (per ENG-001), not defined by the engine. Enforcement owner and authoring owner are distinct.
+Downstream engines may consume threshold outcomes.
+They shall not independently redefine them.
+Examples:
+Recommendation Engine
+↓
+Consumes threshold outcome.
+Does not calculate threshold.
+Conversation Engine
+↓
+Consumes threshold outcome.
+Does not calculate threshold.
+This ensures consistent platform behaviour.
+
+Constitutional Principle
+There shall be one constitutional authority governing confidence thresholds.
+
+7.6 Context-Specific Thresholds
+Not every understanding requires the same threshold.
+Examples:
+Educational insight.
+↓
+Lower threshold.
+
+Lifestyle recommendation.
+↓
+Moderate threshold.
+
+Biological Identity update.
+↓
+Higher threshold.
+
+Novel Discovery.
+↓
+Very high threshold.
+Thresholds shall therefore remain context-sensitive while preserving constitutional consistency.
+
+7.7 Progressive Disclosure
+BioSense shall progressively disclose understanding as confidence increases.
+Example:
+Early stage:
+"We're beginning to observe a possible relationship."
+Later:
+"This pattern appears consistently."
+Later still:
+"This has become a well-established characteristic of your health."
+The Confidence Engine shall support graduated communication.
+
+Founder Principle
+Understanding should mature before it becomes certainty.
+
+7.8 Threshold Stability
+Small fluctuations around a threshold shall not cause repeated behavioural changes.
+Example:
+Recommendation appears.
+↓
+Disappears tomorrow.
+↓
+Reappears next week.
+↓
+Disappears again.
+Such oscillation damages trust.
+The Confidence Engine shall therefore incorporate stability mechanisms that prevent unnecessary threshold crossing due to minor confidence changes.
+
+Constitutional Principle
+Platform behaviour should remain more stable than individual confidence calculations.
+
+7.9 Escalation Thresholds
+Certain observations or confidence changes may justify accelerated escalation.
+Examples include:
+Rapid physiological deterioration.
+Critical laboratory findings.
+Persistent contradiction requiring review.
+Significant reduction in previously established confidence.
+Escalation thresholds shall remain independent from ordinary recommendation thresholds.
+They support constitutional safety behaviour.
+
+7.10 Suppression Thresholds
+The Confidence Engine may deliberately suppress communication when confidence remains insufficient.
+Suppression does not imply that BioSense ignores evidence.
+Instead, it recognises that:
+the evidence is incomplete, 
+multiple hypotheses remain plausible, 
+additional observations are required. 
+The underlying understanding continues to evolve internally.
+
+Founder Principle
+Silence is preferable to unsupported certainty.
+
+7.11 Threshold Review
+Thresholds shall remain subject to periodic scientific review.
+Changes may occur due to:
+new scientific evidence, 
+platform validation studies, 
+clinical evaluation, 
+engineering refinement. 
+Threshold changes shall:
+preserve audit history, 
+remain version-controlled, 
+avoid altering historical confidence calculations retrospectively. 
+
+7.12 Explainability
+Every threshold decision shall answer:
+Which threshold was evaluated? 
+Was the threshold reached? 
+Which evidence contributed? 
+Which evidence prevented progression? 
+Has this threshold previously been crossed? 
+What additional evidence would change the outcome? 
+
+7.13 Engineering Constraints
+Confidence thresholds shall:
+remain centrally governed, 
+support multiple operational contexts, 
+prevent behavioural oscillation, 
+support progressive disclosure, 
+remain version-controlled, 
+preserve explainability, 
+remain fully auditable. 
+
+7.14 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Every significant platform action passes through a Confidence Decision Gate.
+✓ Threshold ownership remains centralised within the Confidence Engine.
+✓ Different contexts support different confidence requirements.
+✓ Minor confidence fluctuations do not cause unstable platform behaviour.
+✓ Progressive disclosure is supported.
+✓ Suppression is recognised as a valid outcome.
+✓ Threshold decisions remain explainable and auditable.
+✓ Threshold evolution does not invalidate historical confidence assessments.
+Chapter 8
+Belief Revision, Confidence Evolution & Knowledge Change
+
+8.1 Purpose
+The purpose of this chapter is to define how the Confidence Engine manages the evolution of understanding throughout the lifetime of an individual's Dynamic Health Model.
+Understanding is not static.
+As new evidence becomes available, BioSense shall continuously evaluate whether existing Health Beliefs remain supported, require refinement, or should be retired.
+Rather than replacing previous understanding, the Confidence Engine shall preserve a complete history of belief evolution.
+This ensures that BioSense remains both scientifically adaptive and historically accountable.
+
+Constitutional Principle
+Changing one's mind in response to better evidence is a strength, not a weakness.
+
+8.2 Engineering Philosophy
+Human understanding evolves.
+Scientific understanding evolves.
+BioSense should evolve in exactly the same way.
+Every Health Belief should therefore be regarded as provisional.
+No Health Belief shall be considered permanently correct.
+Instead, each belief continuously competes against newly arriving evidence.
+Understanding should improve over time through revision rather than replacement.
+
+Founder Principle
+BioSense should never defend an old belief against better evidence.
+
+8.1a Ownership Boundary — Belief Revision
+Belief revision is owned by the Dynamic Health Model (ENG-001, Belief Revision). This chapter defines the Confidence Engine's part in it, not a second revision engine. When the DHM revises a belief — refine, expand, narrow, merge, split, suspend, retire — it invokes the Confidence Engine to recompute confidence and to record the confidence history entry. The belief mutations themselves, Discovery evolution (8.8) and Biological-Identity evolution (8.9) are DHM operations that the Confidence Engine informs through confidence, and does not perform.
+Engineering Rule
+The DHM orchestrates belief revision and owns belief mutations, Discovery and Identity evolution. ENG-003 recomputes confidence during revision; it does not mutate beliefs.
+8.3 Belief Revision Triggers
+Belief revision may be initiated by:
+New observations.
+Observation corrections.
+Longitudinal trend changes.
+Contradictory evidence.
+Confidence recalculation.
+Scientific Library updates.
+Manual review.
+Discovery validation.
+Discovery retirement.
+Biological Identity recalculation.
+Each trigger shall initiate a structured Belief Revision Cycle.
+
+8.4 Belief Revision Cycle
+Every revision shall follow a common constitutional workflow.
+Current Health Belief
+
+↓
+
+Revision Trigger
+
+↓
+
+Evidence Re-evaluation
+
+↓
+
+Confidence Recalculation
+
+↓
+
+Alternative Hypotheses Considered
+
+↓
+
+Revision Decision
+
+↓
+
+Dynamic Health Model Updated
+
+↓
+
+Belief History Preserved
+The workflow shall remain deterministic and reproducible.
+
+Engineering Rule
+Belief revision shall always preserve historical lineage.
+
+8.5 Revision Outcomes
+A Health Belief may experience several possible outcomes.
+Unchanged
+New evidence supports the existing understanding.
+Confidence may increase or decrease.
+The belief itself remains unchanged.
+
+Refined
+The belief remains valid but becomes more specific.
+Example:
+Original:
+Sleep appears to influence recovery.
+Refined:
+Sleep duration above 7.5 hours appears to improve recovery following high training loads.
+
+Expanded
+Additional evidence broadens the scope of the belief.
+
+Narrowed
+The applicability of the belief becomes more limited.
+
+Merged
+Two previously independent Health Beliefs are recognised as representing one underlying understanding.
+
+Split
+One Health Belief separates into multiple independent understandings.
+
+Suspended
+Evidence becomes insufficient.
+The belief remains in the Dynamic Health Model but is temporarily inactive.
+
+Retired
+The belief is no longer supported.
+Historical records remain permanently preserved.
+
+Founder Principle
+Understanding should evolve through refinement rather than deletion.
+
+8.6 Competing Beliefs
+During revision, multiple competing Health Beliefs may temporarily coexist.
+Example:
+Belief A
+↓
+Reduced energy primarily relates to poor sleep.
+
+Belief B
+↓
+Reduced energy primarily relates to declining ferritin.
+
+Belief C
+↓
+Reduced energy primarily relates to increased psychological stress.
+Each belief maintains:
+independent confidence, 
+independent evidence, 
+independent revision history. 
+Only sufficient evidence may allow one belief to become dominant.
+
+Constitutional Principle
+BioSense may temporarily believe multiple plausible explanations simultaneously.
+
+8.7 Belief Stability
+Established Health Beliefs should exhibit appropriate stability.
+Minor evidence changes should not repeatedly revise well-established understanding.
+Revision shall therefore consider:
+confidence inertia, 
+longitudinal consistency, 
+evidence quality, 
+competing evidence. 
+This prevents unnecessary oscillation.
+
+Engineering Rule
+Revision should become increasingly conservative as confidence matures.
+
+8.8 Discovery Evolution
+Validated Discoveries shall also remain subject to revision.
+Possible outcomes include:
+Strengthened.
+Expanded.
+Refined.
+Reclassified.
+Merged.
+Retired.
+Discoveries are therefore living scientific entities rather than permanent achievements.
+
+8.9 Biological Identity Evolution
+Revision of Health Beliefs may influence Biological Identity.
+Examples:
+Long-term sleep resilience.
+Exercise responsiveness.
+Inflammatory tendencies.
+Metabolic flexibility.
+Biological Identity shall evolve gradually.
+Revision shall require proportionately stronger evidence than ordinary Health Beliefs.
+
+Founder Principle
+Identity should change more slowly than behaviour.
+
+8.10 Scientific Revision
+Changes to the Canonical Scientific Library may trigger widespread review.
+Examples:
+New clinical guidelines.
+Improved biomarker interpretation.
+Updated scientific relationships.
+Novel evidence.
+Scientific revision shall never overwrite historical reasoning.
+Instead:
+Historical conclusions remain reproducible.
+Current understanding reflects current knowledge.
+
+Constitutional Principle
+BioSense should remember what it once knew and why it now knows something different.
+
+8.11 Revision Audit Trail
+Every revision shall preserve:
+Previous belief.
+New belief.
+Supporting evidence.
+Rejected evidence.
+Confidence history.
+Revision trigger.
+Engine version.
+Scientific Library version.
+Timestamp.
+Reviewer (where applicable).
+The revision audit shall remain immutable.
+
+8.12 Explainability
+Every belief revision shall answer:
+What changed? 
+Why did it change? 
+Which evidence caused the revision? 
+Which evidence no longer supports the previous belief? 
+Which competing explanations were considered? 
+Why was the chosen revision preferred? 
+How has confidence changed? 
+Could future evidence reverse this revision? 
+
+8.13 Engineering Constraints
+Belief revision shall:
+preserve historical understanding, 
+remain evidence-driven, 
+support competing beliefs, 
+avoid unnecessary oscillation, 
+remain fully explainable, 
+preserve complete audit history, 
+support future scientific evolution. 
+
+8.14 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Every Health Belief supports structured revision.
+✓ Historical beliefs remain permanently recoverable.
+✓ Multiple competing beliefs may coexist during uncertainty.
+✓ Discoveries and Biological Identity evolve through the same constitutional principles.
+✓ Scientific knowledge updates may trigger revision without rewriting history.
+✓ Every revision remains explainable and auditable.
+✓ Revision favours refinement over replacement.
+✓ Understanding continuously improves without losing its historical lineage.
+Chapter 9
+Confidence Calibration & Reliability Assurance
+
+9.1 Purpose
+The purpose of this chapter is to define the mechanisms through which the Confidence Engine continuously calibrates its own confidence assessments against observed outcomes, longitudinal evidence and scientific review.
+Confidence should not merely be internally consistent.
+It should also be appropriately calibrated.
+Calibration ensures that BioSense's expressed confidence reflects the actual reliability of its understanding rather than an arbitrary numerical estimate.
+The objective is to ensure that confidence remains both scientifically meaningful and operationally trustworthy.
+
+Constitutional Principle
+Confidence should be proportional to demonstrated reliability, not computational certainty.
+
+9.2 Engineering Philosophy
+A confidence value has little value unless it accurately reflects reality.
+If BioSense repeatedly expresses high confidence in understandings that later prove unstable, then the confidence model itself requires refinement.
+Conversely, if BioSense consistently understates well-supported conclusions, it becomes unnecessarily conservative.
+The Confidence Engine shall therefore continuously evaluate whether its confidence behaviour remains appropriately calibrated.
+
+Founder Principle
+Confidence should be earned twice: first from evidence, then from experience.
+
+9.3 Confidence Calibration
+Calibration compares:
+Expected reliability
+↓
+Observed reliability
+Examples include:
+Health Beliefs that remained stable.
+Discoveries later validated.
+Beliefs later retired.
+Contradictions resolved.
+Scientific reviews.
+Calibration operates across populations as well as individual users where constitutionally appropriate.
+
+Engineering Rule
+Confidence shall remain subject to continuous calibration.
+
+9.4 Calibration Objectives
+The Confidence Engine shall seek to minimise:
+Overconfidence.
+Underconfidence.
+Unstable confidence.
+Inconsistent confidence.
+Poor reproducibility.
+Calibration does not seek to maximise confidence.
+It seeks to maximise reliability.
+
+Constitutional Principle
+Reliable confidence is preferable to optimistic confidence.
+
+9.5 Calibration Inputs
+Calibration may consider:
+Historical confidence evolution.
+Belief revision frequency.
+Discovery longevity.
+Contradiction frequency.
+Evidence stability.
+Scientific review outcomes.
+Observation corrections.
+Manual review outcomes.
+Population-level validation studies (where constitutionally permitted).
+Each input contributes independently.
+
+9.5a Calibration Read Interface & Population Governance
+Calibration inputs (9.5) such as belief-revision frequency, Discovery longevity and contradiction frequency are read from the Dynamic Health Model through a defined read interface of aggregated revision and outcome events, not by the Confidence Engine reaching into DHM internals directly.
+Population-level calibration shall operate only on de-identified, consented data and shall respect the no-training-on-Connected-Service-data boundary established in Document 1C. 'Where constitutionally permitted' (9.5) is made concrete by that boundary, not left to interpretation.
+Engineering Rule
+Calibration reads DHM outcomes through a defined interface; population calibration uses only de-identified, consented data within the 1C data boundary.
+9.6 Overconfidence Detection
+The Confidence Engine shall identify situations where confidence has historically exceeded justified reliability.
+Indicators may include:
+Frequent belief retirement.
+Repeated confidence reductions.
+High contradiction rates.
+Rapid confidence reversals.
+Unexpected scientific revision.
+Persistent recommendation withdrawal.
+Detected overconfidence shall trigger calibration review.
+
+Founder Principle
+Overconfidence is an engineering defect, not a personality trait.
+
+9.7 Underconfidence Detection
+The Confidence Engine shall also recognise excessive caution.
+Indicators include:
+Long-standing beliefs that never progress.
+Highly consistent evidence producing only modest confidence.
+Validated discoveries remaining permanently classified as emerging.
+Repeated manual confirmation of existing conclusions.
+Persistent underconfidence may reduce the usefulness of BioSense.
+
+Constitutional Principle
+Excessive caution can be as misleading as excessive certainty.
+
+9.8 Calibration Feedback
+Calibration shall influence future confidence formation.
+It shall not retrospectively rewrite historical confidence values.
+Instead:
+Engine Version 6
+↓
+Produces confidence.
+↓
+Calibration identifies systematic bias.
+↓
+Engine Version 7
+↓
+Improved confidence behaviour.
+Historical evaluations remain reproducible under Version 6.
+Future evaluations use Version 7.
+
+Engineering Rule
+Calibration improves future reasoning without rewriting historical reasoning.
+
+9.9 Reliability Monitoring
+The Confidence Engine shall continuously monitor:
+Confidence distribution.
+Confidence stability.
+Threshold crossing frequency.
+Belief revision rate.
+Discovery validation rate.
+Contradiction frequency.
+Scientific consistency.
+Explainability completeness.
+Operational metrics shall support continuous improvement.
+
+9.10 Human Review
+Certain confidence behaviours may justify expert review.
+Examples include:
+Unexpected confidence spikes.
+Large-scale recalibration.
+Scientific inconsistency.
+Novel discovery patterns.
+Persistent contradiction.
+Human review informs calibration.
+It does not replace evidence-based reasoning.
+
+Founder Principle
+Expert judgement should refine the engine, not override it.
+
+9.11 Calibration Governance
+Calibration changes shall remain governed.
+Every calibration revision shall preserve:
+Calibration Version.
+Supporting evidence.
+Scientific justification.
+Expected behavioural changes.
+Validation testing.
+Deployment approval.
+Calibration history.
+Calibration becomes part of the constitutional audit trail.
+
+9.12 Calibration Explainability
+Every calibration change shall answer:
+Why was calibration required? 
+Which confidence behaviours were affected? 
+Which evidence demonstrated the need? 
+Which engine version introduced the change? 
+Which historical assessments remain unchanged? 
+Which future assessments will behave differently? 
+
+9.13 Engineering Constraints
+Confidence calibration shall:
+improve future reliability, 
+preserve historical reproducibility, 
+minimise systematic bias, 
+remain explainable, 
+remain fully auditable, 
+support continuous scientific refinement, 
+avoid retrospective modification of historical confidence. 
+
+9.14 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Confidence calibration continuously evaluates the reliability of the Confidence Engine.
+✓ Both overconfidence and underconfidence are explicitly monitored.
+✓ Calibration influences future reasoning without altering historical reasoning.
+✓ Calibration changes remain version-controlled.
+✓ Human review supports, but does not replace, evidence-based calibration.
+✓ Calibration remains fully explainable and auditable.
+✓ The Confidence Engine continuously improves its own reliability over time.
+Chapter 10
+Confidence Explainability & Reasoning Transparency
+
+10.1 Purpose
+The purpose of this chapter is to define how the Confidence Engine explains every confidence assessment in a transparent, reproducible and scientifically understandable manner.
+Confidence shall never exist as an opaque numerical value.
+Every confidence assessment must be supported by an explanation describing:
+why confidence exists, 
+why it changed, 
+what evidence contributed, 
+what uncertainty remains, 
+what evidence could increase or decrease confidence. 
+The Confidence Engine therefore treats explainability as a constitutional requirement rather than a user interface feature.
+
+Constitutional Principle
+If BioSense cannot explain its confidence, it should not express that confidence.
+
+10.2 Engineering Philosophy
+Explainability serves multiple audiences.
+Each audience requires different levels of detail.
+Examples include:
+Individual users. 
+Clinicians. 
+Engineers. 
+Auditors. 
+Researchers. 
+Regulatory reviewers. 
+The Confidence Engine shall therefore generate one canonical explanation from which multiple presentation formats may be derived.
+The underlying explanation shall remain consistent regardless of audience.
+
+Engineering Rule
+Explainability shall be generated once and presented many ways.
+
+10.3 Explainability Model
+Every confidence assessment shall generate a corresponding Confidence Explanation Object.
+The Explanation Object becomes part of the Dynamic Health Model.
+It is version-controlled.
+It is auditable.
+It evolves alongside confidence itself.
+
+Each Explanation Object shall contain:
+Explanation ID 
+Target Health Belief 
+Confidence Version 
+Engine Version 
+Timestamp 
+Supporting Evidence Summary 
+Contradictory Evidence Summary 
+Contributing Evaluation Domains 
+Remaining Uncertainty 
+Suggested Next Evidence 
+Audit References 
+
+10.4 Core Explanation Questions
+Every explanation shall answer the following constitutional questions.
+Why does BioSense currently believe this?
+
+Which observations support this understanding?
+
+Which evidence most strongly influenced confidence?
+
+Which evidence weakened confidence?
+
+Which contradictions remain unresolved?
+
+What assumptions currently exist?
+
+What additional evidence would increase confidence?
+
+What evidence could reduce confidence?
+
+Founder Principle
+Understanding is incomplete until it can explain itself.
+
+10.5 Evidence Attribution
+Every confidence assessment shall preserve evidence attribution.
+The Confidence Engine shall identify:
+Primary Evidence
+Evidence that materially established the understanding.
+
+Supporting Evidence
+Evidence that reinforced confidence.
+
+Contextual Evidence
+Evidence that provided context without materially influencing confidence.
+
+Contradictory Evidence
+Evidence that reduced confidence.
+
+Ignored Evidence
+Evidence excluded from confidence formation and the reason for exclusion.
+
+Engineering Rule
+Every observation shall have an explainable role within confidence formation.
+
+10.6 Confidence Timeline
+The Confidence Engine shall preserve a complete timeline describing confidence evolution.
+Example:
+March 2026
+
+↓
+
+Emerging
+
+↓
+
+May 2026
+
+↓
+
+Developing
+
+↓
+
+September 2026
+
+↓
+
+Established
+
+↓
+
+February 2027
+
+↓
+
+Strong
+
+↓
+
+August 2027
+
+↓
+
+Under Review
+
+↓
+
+October 2027
+
+↓
+
+Established
+Each transition shall include:
+Trigger. 
+Supporting evidence. 
+Confidence change. 
+Revision reason. 
+
+10.7 Human-Readable Reasoning
+The Confidence Engine shall produce a structured reasoning summary suitable for translation into natural language.
+Example:
+"Confidence increased because six consecutive months of wearable data consistently demonstrated improved recovery following nights with more than 7.5 hours of sleep. This relationship has now been observed across multiple training cycles and is supported by improvements in resting heart rate and HRV. Confidence remains below the highest level because recent travel introduced several weeks of incomplete observations."
+This reasoning is generated from structured evidence rather than created independently by a language model.
+
+Constitutional Principle
+Language should explain reasoning, not invent reasoning.
+
+10.8 Machine Explainability
+Explainability shall also remain machine-readable.
+Every explanation shall support:
+deterministic replay, 
+audit, 
+API consumption, 
+scientific review, 
+automated testing, 
+future AI engines. 
+Machine-readable explanations become the constitutional source of truth.
+Human-readable narratives are derived from them.
+
+10.9 Explainability Versioning
+Explanations evolve.
+Confidence evolves.
+Scientific knowledge evolves.
+Every Explanation Object shall therefore preserve:
+Explanation Version. 
+Confidence Version. 
+Engine Version. 
+Scientific Library Version. 
+Historical explanations shall remain reproducible.
+
+10.10 Uncertainty Representation
+Explainability shall explicitly identify remaining uncertainty.
+Examples include:
+Limited longitudinal evidence.
+Conflicting observations.
+Recent physiological change.
+Insufficient blood biomarkers.
+Disconnected wearable.
+Incomplete behavioural history.
+Unknown causal mechanism.
+Uncertainty should be described positively rather than hidden.
+
+Founder Principle
+Knowing what remains uncertain is part of understanding.
+
+10.11 Recommendation Explainability
+When confidence contributes to a recommendation, the explanation shall distinguish between:
+Evidence.
+↓
+Understanding.
+↓
+Confidence.
+↓
+Recommendation.
+This causal chain shall remain visible.
+Recommendations shall therefore remain explainable through the confidence architecture rather than independent recommendation logic.
+
+10.12 Audit & Regulatory Transparency
+Explainability shall support:
+Clinical audit.
+Engineering audit.
+Regulatory inspection.
+Scientific validation.
+User requests.
+Internal quality assurance.
+Every explanation shall remain reproducible years after its creation.
+
+Engineering Rule
+Every explanation shall survive future engine revisions.
+
+10.13 Engineering Constraints
+The Explainability Framework shall:
+remain deterministic, 
+preserve evidence attribution, 
+preserve uncertainty, 
+support multiple audiences, 
+remain machine-readable, 
+remain human-readable, 
+remain fully auditable, 
+remain version-controlled. 
+
+10.14 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Every confidence assessment generates a structured Explanation Object.
+✓ Every explanation identifies supporting and contradictory evidence.
+✓ Confidence evolution is fully traceable through time.
+✓ Human-readable reasoning is derived from structured explanations.
+✓ Machine-readable explanations remain the constitutional source of truth.
+✓ Remaining uncertainty is explicitly represented.
+✓ Recommendation explainability preserves the complete causal chain.
+✓ Historical explanations remain reproducible across future engine versions.
+Chapter 11
+Operational Safeguards, Bias Prevention & Confidence Integrity
+
+11.1 Purpose
+The purpose of this chapter is to define the operational safeguards that preserve the integrity of the Confidence Engine throughout the lifetime of the BioSense Intelligence Platform.
+The Confidence Engine continuously influences the Dynamic Health Model.
+Without appropriate safeguards, confidence may become progressively biased, self-reinforcing or detached from objective evidence.
+This chapter establishes the constitutional mechanisms that prevent such behaviour.
+
+Constitutional Principle
+Confidence shall remain accountable to evidence throughout its entire lifecycle.
+
+11.2 Engineering Philosophy
+Every intelligent system develops assumptions.
+Those assumptions become dangerous when they begin influencing future reasoning without continued evidential support.
+BioSense shall therefore continuously distinguish between:
+evidence, 
+understanding, 
+confidence, 
+assumptions. 
+Each layer shall remain independently verifiable.
+Confidence shall never become its own source of evidence.
+
+Founder Principle
+Confidence should influence decisions. It should never become evidence itself.
+
+11.3 Evidence Primacy
+Objective observations shall always remain the highest authority within the BioSense Intelligence Platform.
+If confidence conflicts with new objective evidence:
+Objective evidence shall prevail.
+The Confidence Engine shall immediately initiate structured belief review.
+No confidence assessment may override validated observations.
+
+Constitutional Principle
+Evidence always outranks confidence.
+
+11.4 Confirmation Bias Prevention
+The Confidence Engine shall actively prevent confirmation bias.
+New observations shall always be evaluated independently.
+The engine shall not preferentially interpret evidence that supports existing Health Beliefs while discounting contradictory observations.
+Evidence shall enter the evaluation process without prior confidence weighting.
+Only after objective evaluation may confidence influence understanding.
+
+Engineering Rule
+Incoming evidence shall be evaluated before existing beliefs are considered.
+
+11.5 Self-Reinforcement Prevention
+Confidence shall never increase solely because it was previously high.
+Example of prohibited behaviour:
+High confidence
+↓
+Recommendation generated
+↓
+User follows recommendation
+↓
+Recommendation existence increases confidence
+↓
+Confidence grows further
+This creates an artificial feedback loop.
+Confidence may increase only through newly acquired objective evidence.
+
+Founder Principle
+Confidence should grow because reality supports it, not because BioSense repeats it.
+
+11.6 Circular Reasoning Detection
+The Confidence Engine shall continuously detect circular reasoning.
+Examples include:
+Health Belief
+↓
+Narrative
+↓
+Recommendation
+↓
+Recommendation cited as supporting evidence
+↓
+Health Belief strengthened
+This is constitutionally prohibited.
+Only observations entering through the Observation Engine may create new evidence.
+Derived intelligence objects shall never become evidence.
+
+Constitutional Principle
+Derived understanding must never validate itself.
+
+11.6a Relationship Between Integrity Mechanisms
+Several safeguards address related risks and shall be understood as one layered scheme rather than duplicate mechanisms. Circular-dependency prevention (4.11 and 4.3a) prevents cycles in the graph; circular-reasoning detection (11.6) prevents a derived object from becoming evidence for an ancestor (a provenance rule, per 4.12a). Self-reinforcement (11.5) and confidence-inflation detection (11.7) are calibration monitors and are implemented within the Chapter 9 calibration loop, which is the single home for detecting systematic bias.
+Engineering Rule
+Graph-cycle prevention, evidence-provenance circularity, and inflation/self-reinforcement are distinct, named layers with defined relationships; inflation and self-reinforcement live in the Chapter 9 calibration monitors.
+11.7 Confidence Inflation Detection
+The Confidence Engine shall monitor for systematic confidence inflation.
+Indicators may include:
+unusually rapid confidence growth, 
+excessive threshold crossings, 
+persistent high-confidence assignments, 
+reduced contradiction rates without evidential explanation, 
+unusually low belief retirement. 
+Detected inflation shall trigger calibration review.
+
+Founder Principle
+Confidence should become harder—not easier—to earn as understanding matures.
+
+11.8 Hidden Assumption Monitoring
+Every Health Belief contains implicit assumptions.
+Examples include:
+Sufficient wearable coverage.
+Representative laboratory history.
+Stable lifestyle.
+Accurate manual reporting.
+These assumptions shall remain explicit within the Confidence Engine.
+Where assumptions become invalid:
+Confidence shall be re-evaluated.
+
+11.9 Novelty Protection
+Unexpected evidence shall not be rejected merely because it conflicts with established understanding.
+Instead:
+Novel evidence shall:
+undergo additional evaluation, 
+remain preserved, 
+contribute to competing hypotheses where appropriate, 
+support future Discovery formation. 
+Novelty shall increase scrutiny.
+Not automatic rejection.
+
+Constitutional Principle
+BioSense should remain sceptical of novelty without becoming resistant to it.
+
+11.10 Recommendation Independence
+The Recommendation Engine shall consume confidence.
+It shall never modify confidence.
+Recommendation performance shall not directly alter confidence.
+Example:
+A user follows a recommendation.
+↓
+Outcome improves.
+↓
+New observations demonstrate improvement.
+↓
+Confidence increases.
+Not:
+Recommendation issued
+↓
+Confidence increases.
+This preserves causal integrity.
+
+11.11 Human Oversight
+Certain confidence behaviours shall support optional expert review.
+Examples include:
+Persistent contradictions.
+Repeated belief reversals.
+Unexpected calibration drift.
+Novel Discovery formation.
+Large-scale confidence recalibration.
+Human oversight shall:
+Review.
+Validate.
+Refine.
+It shall not replace evidence-based confidence formation.
+
+Founder Principle
+Human expertise strengthens governance, not day-to-day reasoning.
+
+11.12 Engine Isolation
+The Confidence Engine shall remain operationally independent from:
+Recommendation Engine.
+Conversation Engine.
+User Interface.
+Notification System.
+Marketing systems.
+Commercial incentives.
+Confidence formation shall never be influenced by commercial objectives or engagement optimisation.
+
+Constitutional Principle
+Confidence exists to reflect evidence, not to maximise engagement.
+
+11.13 Integrity Monitoring
+Operational integrity monitoring shall continuously evaluate:
+Confidence distribution.
+Propagation behaviour.
+Revision frequency.
+Calibration stability.
+Bias indicators.
+Engine performance.
+Unexpected behavioural drift.
+Monitoring supports early identification of systemic issues.
+
+11.14 Engineering Constraints
+Operational safeguards shall:
+preserve evidence primacy, 
+prevent self-reinforcing confidence, 
+prevent circular reasoning, 
+detect confidence inflation, 
+preserve novelty, 
+maintain engine independence, 
+remain fully auditable, 
+support future safeguard mechanisms. 
+
+11.15 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Objective observations always remain the highest authority.
+✓ Confirmation bias is actively mitigated.
+✓ Confidence never becomes evidence.
+✓ Circular reasoning is detected and prevented.
+✓ Confidence inflation is continuously monitored.
+✓ Novel evidence is evaluated without prejudice.
+✓ Commercial systems cannot influence confidence formation.
+✓ Operational safeguards remain explainable and auditable.
+Chapter 12
+Governance, Versioning & Confidence Lifecycle Management
+
+12.1 Purpose
+The purpose of this chapter is to define the governance framework responsible for the long-term stewardship of the BioSense Confidence Engine.
+Confidence is one of the most influential components of the BioSense Intelligence Platform.
+It governs:
+Health Beliefs, 
+Discoveries, 
+Biological Identity, 
+Recommendations, 
+Narratives, 
+Future reasoning. 
+Changes to confidence behaviour therefore require rigorous governance to preserve scientific integrity, reproducibility and trust.
+
+Constitutional Principle
+Confidence should evolve through governed improvement rather than uncontrolled change.
+
+12.2 Engineering Philosophy
+The Confidence Engine should continuously improve.
+However:
+Improvement must never compromise reproducibility.
+A confidence assessment generated today should remain explainable years later, even if future versions of the Confidence Engine behave differently.
+The platform shall therefore preserve both:
+historical confidence, 
+historical reasoning. 
+Confidence evolution shall always be traceable.
+
+Founder Principle
+Improvement should never erase history.
+
+12.3 Governance Responsibilities
+The governance framework shall oversee:
+confidence methodology, 
+calibration, 
+threshold management, 
+evaluation domains, 
+propagation rules, 
+contradiction handling, 
+temporal behaviour, 
+explainability, 
+version management, 
+scientific alignment. 
+Operational governance shall remain independent from day-to-day confidence formation.
+
+12.4 Confidence Versioning
+Every confidence assessment shall reference:
+Confidence Engine Version.
+Evaluation Framework Version.
+Calibration Version.
+Threshold Version.
+Scientific Library Version.
+Dynamic Health Model Version.
+This enables complete reconstruction of historical reasoning.
+
+Engineering Rule
+Every confidence assessment shall remain permanently reproducible.
+
+12.5 Configuration Management
+Certain aspects of the Confidence Engine may evolve without architectural redesign.
+Examples include:
+Evaluation weightings.
+Threshold values.
+Calibration parameters.
+Propagation attenuation.
+Temporal behaviour profiles.
+Scientific mappings.
+These configuration changes shall remain:
+version-controlled, 
+documented, 
+auditable, 
+scientifically justified. 
+
+12.6 Engine Releases
+Each Confidence Engine release shall preserve:
+Release Version.
+Release Date.
+Scientific rationale.
+Engineering rationale.
+Validation results.
+Expected behavioural changes.
+Compatibility notes.
+Migration guidance.
+Historical engine versions shall remain reproducible.
+
+Founder Principle
+Every new version should explain why it deserves to exist.
+
+12.7 Scientific Governance
+Changes affecting confidence behaviour shall undergo scientific review where appropriate.
+Examples include:
+Updated clinical evidence.
+Revised biomarker interpretation.
+Improved causal understanding.
+Population validation studies.
+Scientific governance strengthens confidence methodology.
+It does not replace engineering governance.
+
+12.8 Validation Before Deployment
+No Confidence Engine revision shall enter production without validation.
+Validation may include:
+Regression testing.
+Historical replay.
+Synthetic datasets.
+Longitudinal simulation.
+Bias evaluation.
+Calibration assessment.
+Explainability verification.
+Validation demonstrates that proposed improvements genuinely improve confidence behaviour.
+
+Constitutional Principle
+Confidence should be tested before it is trusted.
+
+12.9 Historical Reproducibility
+At any future point, BioSense shall be capable of reconstructing:
+the observations, 
+the Health Beliefs, 
+the evaluation domains, 
+the confidence assessment, 
+the explanation, 
+the engine version, 
+the calibration state, 
+that existed at the time a confidence decision was originally made.
+Historical reconstruction shall not depend upon the current engine.
+
+12.9a Confidence Reproducibility Manifest
+Historical reproducibility (2.13, 9.8, 12.9) requires pinning everything a past confidence value depended on. A confidence assessment shall record a manifest referencing: the engine version, the domain-combination and threshold configuration versions, the calibration version, the Canonical Scientific Library version, and an evidence-as-of reference to the exact observation versions used. Reproducing a historical value means resolving that manifest.
+This manifest is consistent with, and references, ENG-001's version manifest and ENG-002's canonical-dictionary versioning, so a single 'as-of' state can be reconstructed across all three engines.
+Engineering Rule
+Every confidence value pins engine, configuration, calibration, Scientific-Library and evidence-as-of versions. Reproducibility means resolving that manifest, aligned to ENG-001 and ENG-002 versioning.
+12.10 Change Impact Assessment
+Before deploying changes, BioSense shall assess:
+Which Health Beliefs are likely to change?
+Which thresholds may behave differently?
+Which recommendations may be affected?
+Which Discoveries may require review?
+Potential impacts shall be documented before deployment.
+
+12.11 Auditability
+Every governance action shall generate an immutable audit record.
+Examples include:
+Threshold modification.
+Calibration revision.
+Scientific update.
+Engine release.
+Configuration change.
+Manual review.
+Governance approval.
+Audit records shall remain permanently available.
+
+Founder Principle
+Governance decisions deserve the same traceability as scientific decisions.
+
+12.12 Regulatory Readiness
+The Confidence Engine shall support future regulatory expectations concerning:
+AI transparency, 
+explainability, 
+reproducibility, 
+algorithm governance, 
+auditability, 
+model lifecycle management. 
+Compliance mechanisms may evolve.
+The constitutional architecture shall remain stable.
+
+12.13 Operational Monitoring
+Governance shall continuously monitor:
+Calibration quality.
+Threshold stability.
+Confidence distribution.
+Bias indicators.
+Revision frequency.
+Engine performance.
+Unexpected behavioural drift.
+Monitoring supports responsible evolution.
+It does not alter confidence automatically.
+
+12.14 Engineering Constraints
+Confidence governance shall:
+preserve reproducibility, 
+preserve explainability, 
+support controlled evolution, 
+remain scientifically accountable, 
+remain fully auditable, 
+support future regulatory frameworks, 
+maintain historical compatibility. 
+
+12.15 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Every confidence assessment is version-controlled.
+✓ Configuration changes remain independently governed.
+✓ Engine releases preserve complete historical traceability.
+✓ Scientific and engineering governance remain distinct but complementary.
+✓ Confidence behaviour is validated before deployment.
+✓ Historical reasoning remains reproducible.
+✓ Governance decisions are fully auditable.
+✓ The Confidence Engine is architecturally prepared for future AI governance requirements.
+Chapter 13
+End-to-End Confidence Lifecycle
+
+13.1 Purpose
+The purpose of this chapter is to demonstrate the complete operational lifecycle of confidence within the BioSense Intelligence Platform.
+Previous chapters define the architecture governing evidence evaluation, confidence formation, propagation, calibration and governance.
+This chapter illustrates how those components interact during a realistic longitudinal health journey.
+The objective is to demonstrate that the Confidence Engine behaves as a coherent, explainable and scientifically accountable system.
+
+Constitutional Principle
+Confidence is earned continuously throughout the lifetime of evidence, not at the moment evidence arrives.
+
+13.2 Introducing the User
+For the purposes of this example we introduce a fictional BioSense user.
+Name: Alex Carter
+Age: 36
+Alex has used BioSense consistently for eighteen months.
+The Dynamic Health Model currently contains:
+68 active Health Beliefs 
+11 validated Discoveries 
+4 Behavioural Identity traits 
+3 Biological Identity characteristics 
+The Observation Store contains:
+approximately 1.3 million observations, 
+complete wearable history, 
+three annual blood panels, 
+continuous daily check-ins. 
+All confidence assessments are currently stable.
+
+13.3 New Evidence Arrives
+Alex uploads a new annual blood panel.
+The Observation Engine (ENG-002):
+authenticates the source, 
+validates the observations, 
+canonicalises each biomarker, 
+generates Quality Profiles, 
+stores forty-three new Canonical Observations. 
+The Observation Store publishes an internal notification.
+The Dynamic Health Model becomes aware that new evidence exists.
+At this stage:
+No confidence has changed.
+Only evidence has changed.
+
+Constitutional Principle
+New evidence creates the opportunity for confidence. It does not create confidence itself.
+
+13.4 Confidence Candidate Formation
+The Confidence Engine evaluates every Health Belief potentially affected by the new observations.
+Examples include:
+Iron Status
+Recovery Capacity
+Inflammatory Activity
+Exercise Adaptation
+Metabolic Health
+Each affected understanding generates a new Confidence Candidate.
+The candidates contain:
+relevant observations, 
+evidence domains, 
+supporting history, 
+contradictory evidence, 
+current confidence, 
+proposed confidence. 
+Nothing has yet been accepted.
+
+13.5 Evidence Evaluation
+Each Confidence Candidate undergoes structured evaluation.
+The engine assesses:
+Evidence Quality.
+Evidence Quantity.
+Evidence Consistency.
+Longitudinal Stability.
+Evidence Diversity.
+Temporal Relevance.
+Evidence Independence.
+Scientific Alignment.
+Each domain contributes independently.
+The engine records both supporting and limiting factors.
+
+13.6 Contradiction Assessment
+During evaluation, the engine detects an unexpected finding.
+Ferritin has improved considerably.
+However:
+Alex's reported fatigue has increased.
+WHOOP Recovery has declined.
+This contradiction is classified as:
+Physiological Contradiction.
+Rather than rejecting either explanation, the engine creates competing hypotheses.
+Hypothesis A:
+Recovery decline primarily reflects increased training load.
+Hypothesis B:
+Recovery decline reflects early illness.
+Hypothesis C:
+Recovery decline reflects factors unrelated to iron status.
+Confidence is temporarily moderated.
+
+Founder Principle
+Conflicting evidence should create curiosity before certainty.
+
+13.7 Confidence Formation
+Following domain evaluation and contradiction analysis, the Confidence Engine balances all available evidence.
+The revised Iron Status Health Belief demonstrates:
+High-quality laboratory evidence.
+Three consecutive annual improvements.
+Strong longitudinal consistency.
+Independent confirmation through symptom improvement over the preceding year.
+The belief progresses from:
+Developing
+↓
+Established
+A complete Confidence Explanation Object is generated.
+
+13.8 Confidence Propagation
+The updated Iron Status Health Belief influences related understandings.
+Examples include:
+Exercise Capacity.
+↓
+Recovery Narrative.
+↓
+Biological Identity.
+↓
+Future Recommendations.
+Propagation attenuates naturally.
+No downstream confidence exceeds the confidence of its originating evidence.
+All propagated changes remain explainable.
+
+13.9 Decision Gates
+The revised confidence reaches several operational thresholds.
+The Confidence Engine authorises:
+Updated Health Belief.
+Updated Narrative.
+Updated Recommendation.
+However:
+The threshold for a validated Discovery is not reached.
+BioSense deliberately withholds promotion.
+The platform continues monitoring.
+
+Constitutional Principle
+Not every improvement in confidence justifies a new conclusion.
+
+13.10 User Communication
+The Conversation Engine requests an explanation.
+The Confidence Engine provides the structured Explanation Object.
+The Conversation Engine translates this into user-friendly language.
+Example:
+"Over the past three annual blood tests, your iron status has shown consistent improvement. This conclusion is supported by high-quality laboratory evidence collected over a prolonged period. Confidence has increased because the improvement has remained stable over time, although we continue to monitor your recovery as recent wearable data suggests additional factors may also be influencing your performance."
+The explanation reflects the underlying reasoning exactly.
+It introduces no new conclusions.
+
+Founder Principle
+The Conversation Engine communicates confidence. It does not create confidence.
+
+13.11 Six Months Later
+Alex develops influenza.
+Sleep deteriorates.
+Recovery falls sharply.
+Inflammatory biomarkers rise.
+The Confidence Engine initiates structured belief review.
+Temporary physiological changes are recognised.
+Long-term Health Beliefs remain largely stable.
+Short-term understandings adapt rapidly.
+Confidence adjusts proportionately.
+Historical confidence remains preserved.
+
+13.12 Two Years Later
+Alex has remained an active BioSense user.
+The Dynamic Health Model has matured considerably.
+Several early Health Beliefs have:
+strengthened, 
+merged, 
+been refined, 
+or retired. 
+The Confidence Engine has continuously evolved.
+Calibration Version 8 has replaced Calibration Version 5.
+Threshold methodology has improved.
+Scientific understanding has expanded.
+Despite these changes:
+Every historical confidence assessment remains reproducible.
+Every previous explanation remains available.
+No historical reasoning has been overwritten.
+
+13.13 Scientific Advancement
+A significant update to the Canonical Scientific Library introduces stronger evidence linking sleep regularity with long-term metabolic health.
+The Confidence Engine evaluates all relevant Health Beliefs.
+Several understandings receive:
+Minor confidence adjustments.
+No observations change.
+Only scientific understanding evolves.
+The platform preserves:
+Historical reasoning.
+Current reasoning.
+Scientific version history.
+
+Constitutional Principle
+Improved science should refine understanding without rewriting history.
+
+13.14 Confidence Integrity
+Throughout Alex's journey, the Confidence Engine continuously protects itself.
+It detects:
+No circular reasoning.
+No confidence inflation.
+No evidence contamination.
+No self-reinforcing recommendations.
+Contradictions remain visible.
+Novel evidence remains preserved.
+Objective observations continue to serve as the highest authority.
+The constitutional safeguards remain intact.
+
+13.15 End-to-End Validation
+This example demonstrates that:
+✓ Confidence is formed only after structured evidence evaluation.
+✓ Contradictory evidence reduces certainty without being discarded.
+✓ Competing hypotheses may coexist.
+✓ Confidence propagates responsibly through the Dynamic Health Model.
+✓ Decision Gates govern operational behaviour.
+✓ User explanations originate from structured reasoning.
+✓ Confidence evolves through time without losing historical lineage.
+✓ Calibration improves future reasoning without rewriting historical confidence.
+✓ Governance preserves complete reproducibility.
+✓ Objective evidence remains the ultimate authority throughout the entire lifecycle.
+
+Closing Statement
+The Confidence Engine is not a scoring system.
+It is not a probability calculator.
+It is not a statistical confidence estimator.
+It is the constitutional authority governing how BioSense earns, maintains, questions and revises its own understanding.
+Every confidence assessment begins with evidence.
+Every confidence assessment is evaluated transparently.
+Every confidence assessment remains open to revision.
+Every confidence assessment preserves its own history.
+Every confidence assessment can explain itself.
+Every confidence assessment acknowledges uncertainty where uncertainty remains.
+Through this architecture, BioSense does not seek to appear certain.
+It seeks to become appropriately certain as evidence accumulates.
+The Confidence Engine therefore transforms observations into trusted understanding while preserving the intellectual humility required of any system operating within the complex domain of human health.

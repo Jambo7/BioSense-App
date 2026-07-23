@@ -1,0 +1,1834 @@
+
+ENG-007: Predictive Intelligence & Longitudinal Forecasting Engine
+Engineering Specification
+Document ID:  ENG-007
+Version:  1.0 (Draft)
+Status:  In Development
+Authority:  BioSense Intelligence Constitution (Documents 1A–1C)
+Depends Upon:
+ENG-001 — Dynamic Health Model Engineering Specification
+ENG-002 — Observation Engine & Canonical Observation Store Engineering Specification
+ENG-003 — Confidence & Evidence Evaluation Engine Engineering Specification
+ENG-004 — Decision Intelligence & Intervention Engine Engineering Specification 
+ENG-005 — Conversation, Explanation & Intelligence Delivery Engine Engineering Specification
+ENG-006 — Personalisation & Adaptive Learning Engine Engineering Specification
+Contents
+	 TOC \o "1-2" \h \z \u ENG-007: Predictive Intelligence & Longitudinal Forecasting Engine Engineering Specification	 PAGEREF _Toc234388808 \h 1
+	Purpose & Design Philosophy	 PAGEREF _Toc234388809 \h 6
+	1.1 Purpose	 PAGEREF _Toc234388810 \h 6
+	1.2 Scope	 PAGEREF _Toc234388811 \h 6
+	1.3 Authority	 PAGEREF _Toc234388812 \h 7
+	1.4 Engineering Philosophy	 PAGEREF _Toc234388813 \h 8
+	1.5 Constitutional Definition	 PAGEREF _Toc234388814 \h 8
+	1.6 Prediction Is Not Decision-Making	 PAGEREF _Toc234388815 \h 9
+	1.7 Prediction Objects	 PAGEREF _Toc234388816 \h 9
+	1.8 Explainability	 PAGEREF _Toc234388817 \h 10
+	1.9 Forecast Boundaries	 PAGEREF _Toc234388818 \h 11
+	1.10 Acceptance Criteria	 PAGEREF _Toc234388819 \h 11
+	Predictive Intelligence Architecture	 PAGEREF _Toc234388820 \h 13
+	2.1 Purpose	 PAGEREF _Toc234388821 \h 13
+	2.2 Engineering Philosophy	 PAGEREF _Toc234388822 \h 13
+	2.3 Forecast Inputs	 PAGEREF _Toc234388823 \h 14
+	2.4 Forecasting Pipeline	 PAGEREF _Toc234388824 \h 15
+	2.5 Forecast Context Assembly	 PAGEREF _Toc234388825 \h 16
+	2.6 Forecast Assumptions	 PAGEREF _Toc234388826 \h 16
+	2.7 Trajectory Modelling	 PAGEREF _Toc234388827 \h 17
+	2.8 Scenario Evaluation	 PAGEREF _Toc234388828 \h 17
+	2.9 Forecast Production	 PAGEREF _Toc234388829 \h 18
+	2.10 Explainability	 PAGEREF _Toc234388830 \h 19
+	2.11 Engineering Constraints	 PAGEREF _Toc234388831 \h 19
+	2.12 Acceptance Criteria	 PAGEREF _Toc234388832 \h 19
+	Prediction Model & Canonical Prediction Objects	 PAGEREF _Toc234388833 \h 21
+	3.1 Purpose	 PAGEREF _Toc234388834 \h 21
+	3.2 Engineering Philosophy	 PAGEREF _Toc234388835 \h 21
+	3.3 Canonical Prediction Domains	 PAGEREF _Toc234388836 \h 22
+	3.4 Prediction Objects	 PAGEREF _Toc234388837 \h 23
+	3.5 Object Structure	 PAGEREF _Toc234388838 \h 24
+	3.6 Relationships Between Prediction Objects	 PAGEREF _Toc234388839 \h 25
+	3.7 Prediction Lifecycle	 PAGEREF _Toc234388840 \h 26
+	3.8 Consumer Engines	 PAGEREF _Toc234388841 \h 27
+	3.9 Forecast Horizons	 PAGEREF _Toc234388842 \h 28
+	3.10 Explainability	 PAGEREF _Toc234388843 \h 29
+	3.11 Engineering Constraints	 PAGEREF _Toc234388844 \h 29
+	3.12 Acceptance Criteria	 PAGEREF _Toc234388845 \h 29
+	Health Trajectories & Longitudinal Trend Forecasting	 PAGEREF _Toc234388846 \h 31
+	4.1 Purpose	 PAGEREF _Toc234388847 \h 31
+	4.2 Engineering Philosophy	 PAGEREF _Toc234388848 \h 31
+	4.3 Trajectory Categories	 PAGEREF _Toc234388849 \h 32
+	4.4 Trajectory Construction	 PAGEREF _Toc234388850 \h 33
+	4.5 Trajectory Characteristics	 PAGEREF _Toc234388851 \h 33
+	4.6 Trajectory States	 PAGEREF _Toc234388852 \h 34
+	4.7 Trajectory Evolution	 PAGEREF _Toc234388853 \h 35
+	4.8 Longitudinal Stability	 PAGEREF _Toc234388854 \h 35
+	4.9 Preventive Value	 PAGEREF _Toc234388855 \h 36
+	4.10 Explainability	 PAGEREF _Toc234388856 \h 36
+	4.11 Engineering Constraints	 PAGEREF _Toc234388857 \h 37
+	4.12 Acceptance Criteria	 PAGEREF _Toc234388858 \h 37
+	Scenario Modelling & Counterfactual Analysis	 PAGEREF _Toc234388859 \h 38
+	5.1 Purpose	 PAGEREF _Toc234388860 \h 38
+	5.2 Engineering Philosophy	 PAGEREF _Toc234388861 \h 38
+	5.3 Scenario Types	 PAGEREF _Toc234388862 \h 39
+	5.4 Counterfactual Analysis	 PAGEREF _Toc234388863 \h 40
+	5.5 Scenario Construction	 PAGEREF _Toc234388864 \h 40
+	5.6 Comparative Evaluation	 PAGEREF _Toc234388865 \h 41
+	5.7 Sensitivity Analysis	 PAGEREF _Toc234388866 \h 42
+	5.8 User Interaction	 PAGEREF _Toc234388867 \h 42
+	5.9 Scenario Limitations	 PAGEREF _Toc234388868 \h 43
+	5.10 Explainability	 PAGEREF _Toc234388869 \h 43
+	5.11 Engineering Constraints	 PAGEREF _Toc234388870 \h 43
+	5.12 Acceptance Criteria	 PAGEREF _Toc234388871 \h 44
+	Opportunity Detection & Preventive Intelligence	 PAGEREF _Toc234388872 \h 45
+	6.1 Purpose	 PAGEREF _Toc234388873 \h 45
+	6.2 Engineering Philosophy	 PAGEREF _Toc234388874 \h 45
+	6.3 Opportunity Window Definition	 PAGEREF _Toc234388875 \h 46
+	6.4 Opportunity Evidence Sources	 PAGEREF _Toc234388876 \h 46
+	6.5 Opportunity Categories	 PAGEREF _Toc234388877 \h 47
+	6.6 Opportunity Scoring	 PAGEREF _Toc234388878 \h 48
+	6.7 Window Evolution	 PAGEREF _Toc234388879 \h 48
+	6.8 Opportunity Expiration	 PAGEREF _Toc234388880 \h 49
+	6.9 Preventive Intelligence	 PAGEREF _Toc234388881 \h 50
+	6.10 Explainability	 PAGEREF _Toc234388882 \h 50
+	6.11 Engineering Constraints	 PAGEREF _Toc234388883 \h 50
+	6.12 Acceptance Criteria	 PAGEREF _Toc234388884 \h 51
+	Forecast Confidence, Uncertainty & Constitutional Boundaries	 PAGEREF _Toc234388885 \h 52
+	7.1 Purpose	 PAGEREF _Toc234388886 \h 52
+	7.2 Engineering Philosophy	 PAGEREF _Toc234388887 \h 52
+	7.3 Forecast Confidence	 PAGEREF _Toc234388888 \h 53
+	7.4 Sources of Uncertainty	 PAGEREF _Toc234388889 \h 53
+	7.5 Confidence Evolution	 PAGEREF _Toc234388890 \h 54
+	7.6 Forecast Limitations	 PAGEREF _Toc234388891 \h 55
+	7.7 Forecast Refusal	 PAGEREF _Toc234388892 \h 55
+	7.8 Confidence Communication	 PAGEREF _Toc234388893 \h 56
+	7.9 Constitutional Forecast Boundaries	 PAGEREF _Toc234388894 \h 57
+	7.10 Explainability	 PAGEREF _Toc234388895 \h 57
+	7.11 Engineering Constraints	 PAGEREF _Toc234388896 \h 58
+	7.12 Acceptance Criteria	 PAGEREF _Toc234388897 \h 58
+	Governance, Versioning & Forecast Lifecycle Management	 PAGEREF _Toc234388898 \h 59
+	8.1 Purpose	 PAGEREF _Toc234388899 \h 59
+	8.2 Engineering Philosophy	 PAGEREF _Toc234388900 \h 59
+	8.3 Governance Responsibilities	 PAGEREF _Toc234388901 \h 60
+	8.4 Versioning	 PAGEREF _Toc234388902 \h 60
+	8.5 Configuration Management	 PAGEREF _Toc234388903 \h 61
+	8.6 Predictive Engine Releases	 PAGEREF _Toc234388904 \h 62
+	8.7 Validation Before Deployment	 PAGEREF _Toc234388905 \h 62
+	8.8 Historical Reproducibility	 PAGEREF _Toc234388906 \h 63
+	8.9 Change Impact Assessment	 PAGEREF _Toc234388907 \h 63
+	8.10 Operational Monitoring	 PAGEREF _Toc234388908 \h 64
+	8.11 Auditability	 PAGEREF _Toc234388909 \h 64
+	8.12 Regulatory Readiness	 PAGEREF _Toc234388910 \h 65
+	8.13 Engineering Constraints	 PAGEREF _Toc234388911 \h 65
+	8.14 Acceptance Criteria	 PAGEREF _Toc234388912 \h 66
+	End-to-End Predictive Intelligence Lifecycle	 PAGEREF _Toc234388913 \h 67
+	9.1 Purpose	 PAGEREF _Toc234388914 \h 67
+	9.2 Example Scenario	 PAGEREF _Toc234388915 \h 67
+	9.3 Forecast Context Assembly	 PAGEREF _Toc234388916 \h 68
+	9.4 Assumption Generation	 PAGEREF _Toc234388917 \h 69
+	9.5 Trajectory Modelling	 PAGEREF _Toc234388918 \h 69
+	9.6 Scenario Evaluation	 PAGEREF _Toc234388919 \h 70
+	9.7 Opportunity Detection	 PAGEREF _Toc234388920 \h 71
+	9.8 Forecast Confidence	 PAGEREF _Toc234388921 \h 72
+	9.9 Prediction Object Publication	 PAGEREF _Toc234388922 \h 73
+	9.10 Communication	 PAGEREF _Toc234388923 \h 73
+	9.11 Forecast Evolution	 PAGEREF _Toc234388924 \h 74
+	9.12 End-to-End Validation	 PAGEREF _Toc234388925 \h 74
+
+Chapter 1
+Purpose & Design Philosophy
+
+1.1 Purpose
+The purpose of this specification is to define how the BioSense Intelligence Platform forecasts future health trajectories using trusted constitutional intelligence. Unlike previous engines, which establish the current understanding of an individual's health, the Predictive Intelligence & Longitudinal Forecasting Engine projects how that understanding may evolve over time. The engine shall identify plausible future health trajectories, emerging opportunities and potential risks while preserving scientific integrity, explainability and constitutional transparency. Its responsibility is to support proactive decision-making rather than retrospective analysis.
+
+Constitutional Principle
+Forecast possible futures without presenting them as certainty.
+
+1.2 Scope
+This specification governs:
+longitudinal forecasting, 
+Health Trajectories, 
+Prediction Objects, 
+forecast confidence, 
+Opportunity Windows, 
+future health scenarios, 
+intervention impact forecasting, 
+Biological Age forecasting, 
+risk trajectory forecasting, 
+goal achievement forecasting, 
+counterfactual modelling, 
+predictive explainability. 
+It deliberately excludes:
+Health Belief formation (ENG-001), 
+observation processing (ENG-002), 
+confidence calculation (ENG-003), 
+Decision Object generation (ENG-004), 
+communication delivery (ENG-005), 
+personalisation learning (ENG-006). 
+The Predictive Intelligence Engine consumes constitutional intelligence. It does not replace or reinterpret it.
+
+1.3 Authority
+The Predictive Intelligence Engine consumes outputs from upstream constitutional engines.
+It may consume:
+Health Beliefs, 
+Canonical Observations, 
+Confidence Objects, 
+Decision Objects, 
+Behavioural Identity, 
+Biological Identity, 
+Personalisation Objects, 
+intervention history, 
+longitudinal trends, 
+historical outcomes. 
+It shall not modify upstream intelligence. Instead, it produces governed Prediction Objects that may be consumed by other constitutional engines.
+
+Engineering Rule
+The Predictive Intelligence Engine is a read-only consumer of constitutional intelligence and a producer of predictive intelligence.
+
+1.4 Engineering Philosophy
+Prediction within BioSense is not an attempt to determine the future. It is an evidence-based estimation of plausible future trajectories under explicitly stated assumptions.
+Forecasts shall always remain:
+evidence-driven, 
+confidence-aware, 
+explainable, 
+transparent, 
+reproducible, 
+constitutionally governed. 
+The engine shall communicate uncertainty as prominently as prediction.
+
+Founder Principle
+A trustworthy forecast explains both what may happen and why it may not.
+
+1.5 Constitutional Definition
+For engineering purposes:
+The Predictive Intelligence & Longitudinal Forecasting Engine is the constitutional system responsible for generating governed, explainable and confidence-aware forecasts of an individual's future health trajectories using trusted BioSense intelligence.
+Prediction Objects represent plausible future states. They do not represent guaranteed outcomes.
+
+Constitutional Principle
+Every forecast is conditional upon the evidence and assumptions from which it was generated.
+
+1.6 Prediction Is Not Decision-Making
+A strict architectural boundary exists between forecasting and decision-making.
+Decision-making occurs within:
+ENG-004 
+Prediction occurs within:
+ENG-007 
+The Predictive Intelligence Engine shall never:
+generate Decision Objects, 
+reprioritise interventions, 
+reinterpret Health Beliefs, 
+alter Confidence Objects, 
+create recommendations independently. 
+Its responsibility is to forecast likely futures. Decision Intelligence determines how BioSense should respond.
+
+Engineering Rule
+Forecasts inform decisions.
+They do not become decisions.
+
+1.7 Prediction Objects
+The primary output of this engine shall be governed Prediction Objects.
+Illustrative examples include:
+Health Trajectory Object 
+Risk Trajectory Object 
+Biological Age Projection Object 
+Goal Achievement Forecast Object 
+Opportunity Window Object 
+Intervention Impact Forecast Object 
+Scenario Comparison Object 
+Forecast Confidence Object 
+Each Prediction Object shall possess:
+provenance, 
+assumptions, 
+confidence, 
+supporting evidence, 
+version, 
+validity period, 
+explainability, 
+audit history. 
+
+Founder Principle
+Predictions should exist as structured constitutional intelligence rather than generated narrative.
+
+1.8 Explainability
+Every Prediction Object shall remain independently explainable.
+BioSense shall always be capable of explaining:
+what is being forecast, 
+why the forecast exists, 
+which evidence supports it, 
+which assumptions were applied, 
+how confidence was determined, 
+which engines consume the forecast, 
+how the forecast may change if new evidence becomes available. 
+Forecasts that cannot be explained are constitutionally incomplete.
+
+Constitutional Principle
+Every prediction should be as explainable as every observation.
+
+1.9 Forecast Boundaries
+The Predictive Intelligence Engine exists to support proactive health management.
+It shall never:
+guarantee outcomes, 
+diagnose future disease, 
+predict exact dates of future events, 
+present speculative conclusions as established fact, 
+conceal uncertainty, 
+overstate precision beyond available evidence. 
+Forecasting shall remain proportionate to the quality of the supporting intelligence.
+
+Founder Principle
+Precision should never exceed evidence.
+
+1.10 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ The Predictive Intelligence Engine is clearly separated from all reasoning and decision-making engines.
+✓ Prediction Objects are established as first-class constitutional objects.
+✓ Forecasts are explicitly defined as conditional rather than deterministic.
+✓ Assumptions are recognised as constitutional components of every forecast.
+✓ Forecast confidence remains distinct from health confidence.
+✓ Forecast boundaries prohibit unsupported certainty.
+✓ Every Prediction Object remains explainable, versioned and auditable.
+Chapter 2
+Predictive Intelligence Architecture
+
+2.1 Purpose
+The purpose of this chapter is to define the constitutional architecture responsible for generating future health forecasts within the BioSense Intelligence Platform.
+Forecasting is a governed process.
+The Predictive Intelligence Engine shall not extrapolate future outcomes directly from raw observations. Instead, it shall consume trusted constitutional intelligence from upstream engines, combine this with explicit forecasting assumptions and produce structured Prediction Objects that describe plausible future health trajectories. The objective is to provide preventive intelligence while preserving scientific integrity, explainability and constitutional transparency.
+
+Constitutional Principle
+Forecasts should emerge from trusted intelligence rather than direct extrapolation of raw data.
+
+2.2 Engineering Philosophy
+Forecasting is the final stage of constitutional reasoning. The engine shall not independently analyse physiological observations or generate new Health Beliefs.
+Instead, it builds upon:
+trusted understanding, 
+validated evidence, 
+quantified confidence, 
+governed decisions, 
+longitudinal behavioural context. 
+Every forecast therefore inherits the constitutional integrity of the intelligence upon which it is based.
+
+Founder Principle
+Forecast from understanding, not from data alone.
+
+2.3 Forecast Inputs
+The Predictive Intelligence Engine may consume:
+From ENG-001
+Health Beliefs 
+Biological Identity 
+Behavioural Identity 
+Dynamic Health Model 
+
+From ENG-002
+Canonical Observations 
+Longitudinal trends 
+Observation quality 
+Observation completeness 
+
+From ENG-003
+Confidence Objects 
+Evidence Quality 
+Explanation Objects 
+Remaining uncertainty 
+
+From ENG-004
+Decision Objects 
+Expected Health Impact 
+Intervention history 
+
+From ENG-006
+Behavioural Adherence Objects 
+Routine Profile Objects 
+Personalisation Objects 
+The engine consumes intelligence.
+It does not reinterpret ownership.
+
+Engineering Rule
+Every consumed object remains read-only and version-pinned throughout forecast generation.
+
+2.4 Forecasting Pipeline
+Every Prediction Object shall follow the same constitutional forecasting pipeline.
+Constitutional Intelligence
+
+↓
+
+Forecast Context Assembly
+
+↓
+
+Forecast Assumptions
+
+↓
+
+Trajectory Modelling
+
+↓
+
+Scenario Evaluation
+
+↓
+
+Forecast Confidence
+
+↓
+
+Prediction Object
+
+↓
+
+Consumed by Other Engines
+No Prediction Object shall bypass this pipeline.
+
+Constitutional Principle
+Every forecast should follow one explainable constitutional pathway.
+
+2.5 Forecast Context Assembly
+Before forecasting begins, the engine shall assemble a Forecast Context. The Forecast Context shall contain only the intelligence required to evaluate the requested forecast.
+Illustrative components include:
+relevant Health Beliefs, 
+supporting observations, 
+confidence assessments, 
+historical trends, 
+intervention history, 
+behavioural adherence, 
+active goals. 
+Irrelevant intelligence shall not be included.
+
+Founder Principle
+Forecast with sufficient context, not maximum context.
+
+2.6 Forecast Assumptions
+Every forecast shall explicitly define the assumptions upon which it depends.
+Examples include:
+current behaviour remains unchanged, 
+interventions continue as currently observed, 
+observation quality remains stable, 
+no major external health events occur, 
+physiological relationships remain consistent with current evidence. 
+Assumptions shall be version-controlled and attached to every Prediction Object. Forecasts without explicit assumptions shall be constitutionally incomplete.
+
+Constitutional Principle
+Every forecast should declare the assumptions that make it possible.
+
+2.7 Trajectory Modelling
+Trajectory modelling estimates how relevant Health Beliefs may evolve under the declared assumptions.
+Examples include:
+Recovery trajectory.
+Biological Age trajectory.
+Cardiometabolic trajectory.
+Fitness trajectory.
+Sleep trajectory.
+Nutritional trajectory.
+Trajectory modelling shall preserve uncertainty and confidence throughout the forecasting process. The engine shall estimate ranges of plausible evolution rather than deterministic future states.
+
+Engineering Rule
+Trajectory models estimate plausible futures rather than exact outcomes.
+
+2.8 Scenario Evaluation
+Multiple scenarios may exist for the same individual.
+Examples include:
+Current behaviour continues.
+↓
+Sleep improves.
+↓
+Exercise increases.
+↓
+Alcohol intake decreases.
+↓
+Multiple interventions combined.
+Each scenario shall be independently modelled. Scenario comparisons shall remain transparent and reproducible.
+
+Founder Principle
+Compare plausible futures rather than declaring a single inevitable future.
+
+2.9 Forecast Production
+Trajectory modelling and scenario evaluation produce one or more Prediction Objects.
+Each Prediction Object shall contain:
+forecast description, 
+predicted trajectory, 
+forecast assumptions, 
+supporting Health Beliefs, 
+supporting observations, 
+confidence, 
+uncertainty, 
+validity period, 
+version, 
+explainability metadata. 
+Prediction Objects shall remain immutable once published.
+
+Constitutional Principle
+Forecasts become governed intelligence once generated.
+
+2.10 Explainability
+Every forecast shall answer:
+What future state is being forecast? 
+Which intelligence contributed? 
+Which assumptions were applied? 
+Which scenarios were evaluated? 
+Why was this trajectory selected? 
+How certain is BioSense? 
+What new evidence could materially change this forecast? 
+
+2.11 Engineering Constraints
+The Predictive Intelligence Architecture shall:
+consume constitutional intelligence only, 
+preserve ownership boundaries, 
+require explicit assumptions, 
+support multiple scenarios, 
+preserve uncertainty, 
+remain explainable, 
+remain fully auditable. 
+
+2.12 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Every Prediction Object follows the constitutional forecasting pipeline.
+✓ Forecast Context contains only relevant intelligence.
+✓ Every forecast declares explicit assumptions.
+✓ Scenario evaluation is independently governed.
+✓ Prediction Objects remain immutable after publication.
+✓ Ownership boundaries remain unambiguous.
+✓ Every forecast remains fully explainable and auditable.
+Chapter 3
+Prediction Model & Canonical Prediction Objects
+
+3.1 Purpose
+The purpose of this chapter is to define the canonical Prediction Model used by BioSense to represent future-oriented health intelligence. Prediction Objects provide a governed, explainable and reproducible representation of plausible future health trajectories. They serve as the constitutional source of predictive intelligence for the BioSense platform.
+Prediction Objects describe what may occur under explicitly stated assumptions. They do not represent guaranteed outcomes.
+
+Constitutional Principle
+Prediction Objects represent possible futures rather than promised futures.
+
+3.2 Engineering Philosophy
+Forecasts should exist as structured constitutional intelligence rather than generated narrative.
+Every prediction shall therefore exist as a governed Prediction Object possessing:
+provenance, 
+assumptions, 
+confidence, 
+supporting evidence, 
+validity period, 
+version, 
+explainability, 
+auditability. 
+The Prediction Model becomes the canonical representation of all future-oriented intelligence within BioSense.
+
+Founder Principle
+Future intelligence deserves the same engineering discipline as present intelligence.
+
+3.3 Canonical Prediction Domains
+Prediction Objects shall belong to one or more Prediction Domains.
+Illustrative domains include:
+Health Trajectory
+Expected evolution of current health state.
+
+Risk Trajectory
+Projected change in future health risk.
+
+Opportunity Window
+Periods where intervention is expected to provide disproportionate benefit.
+
+Biological Age Projection
+Expected Biological Age evolution under defined scenarios.
+
+Goal Achievement
+Likelihood of achieving active health goals.
+
+Intervention Impact
+Expected change following implementation of a Decision Object.
+
+Behavioural Forecast
+Expected behavioural adherence under current personalisation.
+
+Comparative Scenario
+Comparison of multiple plausible futures.
+Each Prediction Domain shall remain independently governed.
+
+Engineering Rule
+Prediction Domains shall remain mutually distinguishable with clearly defined ownership.
+
+3.4 Prediction Objects
+Each Prediction Domain shall contain one or more Prediction Objects.
+Illustrative examples include:
+Health Trajectory Object
+Expected direction of overall health.
+
+Recovery Forecast Object
+Projected recovery evolution.
+
+Biological Age Projection Object
+Expected Biological Age range.
+
+Cardiometabolic Forecast Object
+Projected cardiometabolic trajectory.
+
+Intervention Impact Forecast Object
+Estimated physiological effect of implementing a recommendation.
+
+Opportunity Window Object
+Periods where intervention timing is expected to maximise benefit.
+
+Goal Achievement Forecast Object
+Estimated likelihood of achieving a user-defined goal.
+
+Comparative Scenario Object
+Structured comparison of multiple future trajectories.
+
+Constitutional Principle
+Every forecast shall belong to one clearly defined Prediction Object.
+
+3.5 Object Structure
+Every Prediction Object shall contain:
+Object Identifier, 
+Prediction Domain, 
+Forecast Description, 
+Forecast Horizon, 
+Forecast Assumptions, 
+Supporting Intelligence, 
+Confidence, 
+Uncertainty Summary, 
+Validity Period, 
+Version, 
+
+
+Derived-Metric Method Version (where applicable),
+Explainability Metadata, 
+Consumer Engines. 
+The constitutional structure shall remain consistent regardless of prediction type.
+
+Founder Principle
+Every Prediction Object should answer what, why, how likely and under which assumptions. Where a Prediction Object forecasts a derived metric (Biological Age Projection, or a Health Score projection under Goal Achievement), its Derived-Metric Method Version shall pin the BIOLOGICAL_AGE_METHOD_VERSION or HEALTH_SCORE_METHOD_VERSION (ENG-001 §7.8) and the Scientific Knowledge versions (ENG-008) it forecasts against. A derived-metric projection is reproducible only against the method version of the present-value computation it extends; forecasting a derived metric without pinning its method version is prohibited.
+
+Engineering Rule
+Any projection of a derived metric (Biological Age, Health Score) pins the derived-metric method version it extends. This is guarantee (a)/(b) reproducibility per ENG-009 §5.3a applied to derived-metric forecasts.
+
+3.6 Relationships Between Prediction Objects
+Prediction Objects may contribute to one another.
+Illustrative examples include:
+Health Trajectory
+↓
+Risk Trajectory
+↓
+Opportunity Window
+
+Intervention Impact Forecast
+↓
+Goal Achievement Forecast
+
+Behavioural Forecast
+↓
+Scenario Comparison
+Relationships shall remain explicit.
+Implicit predictive dependencies shall be prohibited.
+
+Engineering Rule
+Relationships between Prediction Objects shall remain transparent and independently explainable.
+
+3.7 Prediction Lifecycle
+Every Prediction Object shall progress through a governed lifecycle.
+Illustrative stages include:
+Forecast Requested
+↓
+Forecast Generated
+↓
+Validated
+↓
+Published
+↓
+Consumed
+↓
+Superseded
+↓
+Archived
+Forecasts shall never silently change after publication. Generation of a new forecast creates a new Prediction Object version.
+Historical forecasts remain permanently reproducible.
+
+Constitutional Principle
+Predictions evolve through replacement rather than silent modification.
+
+3.8 Consumer Engines
+Prediction Objects may be consumed by multiple constitutional engines.
+Illustrative examples include:
+ENG-004
+Decision Intelligence Engine
+Consumes:
+Opportunity Window Objects.
+Intervention Impact Forecasts.
+Behavioural Forecasts.
+Purpose:
+Support intervention prioritisation.
+
+ENG-005
+Conversation Engine
+Consumes:
+Prediction Objects.
+Scenario Comparisons.
+Biological Age Projections.
+Purpose:
+Explain future trajectories.
+
+Future constitutional engines may consume Prediction Objects through governed interfaces.
+Ownership remains exclusively with ENG-007.
+
+Engineering Rule
+Prediction Objects remain read-only for all consumer engines.
+
+3.9 Forecast Horizons
+Every Prediction Object shall declare its intended forecast horizon.
+Illustrative examples include:
+Immediate
+Hours to days.
+
+Short-term
+Days to weeks.
+
+Medium-term
+Weeks to months.
+
+Long-term
+Months to years.
+Forecast confidence shall be expected to vary across different horizons. Longer forecast horizons shall generally communicate greater uncertainty unless supported by exceptional longitudinal evidence.
+
+Constitutional Principle
+Forecast horizon and forecast confidence should evolve together.
+
+3.10 Explainability
+Every Prediction Object shall answer:
+What future state is being forecast? 
+Which assumptions support the forecast? 
+Which constitutional intelligence contributed? 
+Which Prediction Domain does it belong to? 
+What is the forecast horizon? 
+Which engines consume this Prediction Object? 
+What future evidence could materially change this prediction? 
+
+3.11 Engineering Constraints
+The Prediction Model shall:
+remain domain-based, 
+preserve ownership boundaries, 
+support multiple forecast horizons, 
+maintain explicit relationships, 
+preserve explainability, 
+preserve historical reproducibility, 
+remain fully auditable. 
+
+3.12 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ The Prediction Model is established as the canonical representation of predictive intelligence.
+✓ Every forecast belongs to a governed Prediction Domain.
+✓ Prediction Objects possess structured constitutional metadata.
+✓ Forecast horizons are explicitly represented.
+✓ Relationships between Prediction Objects remain transparent.
+✓ Consumer engine ownership remains unambiguous.
+✓ Every Prediction Object remains fully explainable and auditable.
+Chapter 4
+Health Trajectories & Longitudinal Trend Forecasting
+
+4.1 Purpose
+The purpose of this chapter is to define how the Predictive Intelligence & Longitudinal Forecasting Engine models the expected evolution of an individual's health over time. Rather than viewing observations as isolated measurements, the engine shall identify longitudinal trajectories that describe the likely direction, pace and stability of health change. Health Trajectories provide the constitutional foundation for preventive intelligence by enabling BioSense to recognise where an individual is heading before meaningful deterioration or improvement becomes clinically obvious.
+
+Constitutional Principle
+Health should be understood as a trajectory rather than a collection of isolated measurements.
+
+4.2 Engineering Philosophy
+Human health is dynamic.
+Individual observations rarely provide sufficient information to understand long-term direction.
+Meaningful forecasting therefore requires the integration of:
+historical observations, 
+current Health Beliefs, 
+evidence quality, 
+confidence, 
+intervention history, 
+behavioural context, 
+longitudinal consistency. 
+Health Trajectories represent the evolution of constitutional intelligence rather than simple statistical trend lines.
+
+Founder Principle
+The direction of health is often more valuable than its current position.
+
+4.3 Trajectory Categories
+The Predictive Intelligence Engine may model multiple trajectory categories.
+Illustrative examples include:
+Recovery Trajectory
+Expected evolution of physiological recovery.
+
+Cardiometabolic Trajectory
+Expected progression of cardiometabolic health.
+
+Fitness Trajectory
+Expected evolution of physical capacity.
+
+Sleep Trajectory
+Expected changes in sleep quality and recovery.
+
+Nutritional Trajectory
+Expected development of nutritional health.
+
+Biological Age Trajectory
+Projected evolution of Biological Age.
+
+Composite Health Trajectory
+Overall direction of long-term health optimisation. Each trajectory remains independently explainable and version-controlled.
+
+Engineering Rule
+Trajectory categories shall remain constitutionally independent while supporting higher-level synthesis.
+
+4.4 Trajectory Construction
+Every Health Trajectory shall be constructed from constitutional intelligence rather than raw observations alone.
+Illustrative inputs include:
+validated Health Beliefs, 
+Canonical Observations, 
+Confidence Objects, 
+longitudinal trends, 
+intervention history, 
+behavioural adherence, 
+Personalisation Objects, 
+previously generated Prediction Objects where constitutionally appropriate. 
+Trajectory construction shall preserve uncertainty throughout the forecasting process.
+
+Constitutional Principle
+Forecast from trusted understanding rather than isolated measurements.
+
+4.5 Trajectory Characteristics
+Every Health Trajectory shall describe characteristics including:
+Direction.
+Rate of change.
+Stability.
+Acceleration.
+Deceleration.
+Variability.
+Expected persistence.
+Sensitivity to intervention.
+Trajectory characteristics shall be explicitly represented within Prediction Objects.
+
+Founder Principle
+Understanding how health is changing is as important as understanding whether it is changing.
+
+4.6 Trajectory States
+Trajectory models shall distinguish between common states including:
+Improving.
+↓
+Stable.
+↓
+Plateauing.
+↓
+Declining.
+↓
+Recovering.
+↓
+Volatile.
+↓
+Uncertain.
+Trajectory states represent the current interpretation of longitudinal evidence. They shall never be interpreted as permanent health classifications.
+
+Engineering Rule
+Trajectory states describe current movement rather than permanent identity.
+
+4.7 Trajectory Evolution
+Health Trajectories shall evolve only when supported by new constitutional intelligence.
+Illustrative examples include:
+Improved sleep consistency.
+↓
+Higher recovery confidence.
+↓
+Recovery trajectory strengthens.
+
+Reduced intervention adherence.
+↓
+Greater uncertainty.
+↓
+Trajectory confidence decreases.
+Trajectory evolution shall remain gradual unless supported by substantial new evidence.
+
+Constitutional Principle
+Trajectories evolve through accumulated evidence rather than isolated observations.
+
+4.8 Longitudinal Stability
+Trajectory models shall evaluate the stability of observed health direction.
+Examples include:
+Consistent improvement.
+↓
+High trajectory stability.
+
+Repeated fluctuation.
+↓
+Moderate stability.
+
+Sparse observations.
+↓
+Low stability.
+Trajectory stability shall contribute to Forecast Confidence without replacing it.
+
+Founder Principle
+Confidence in the direction depends upon confidence in its consistency.
+
+4.9 Preventive Value
+Health Trajectories enable BioSense to identify:
+gradual deterioration, 
+sustained improvement, 
+emerging plateaus, 
+accelerating decline, 
+unexpected recovery, 
+persistent variability. 
+Trajectory intelligence exists to support earlier intervention and improved long-term decision-making. Trajectory analysis shall not independently generate recommendations.
+
+Engineering Rule
+Trajectories provide predictive context rather than clinical judgement.
+
+4.10 Explainability
+Every Health Trajectory shall answer:
+Which trajectory is being modelled? 
+Which constitutional intelligence supports it? 
+What direction has been identified? 
+How stable is the observed trend? 
+Which assumptions underpin the forecast? 
+Which future evidence could materially change the trajectory? 
+
+4.11 Engineering Constraints
+The Health Trajectory Framework shall:
+consume constitutional intelligence only, 
+preserve uncertainty, 
+support gradual evolution, 
+distinguish stability from confidence, 
+prohibit deterministic forecasting, 
+remain explainable, 
+remain fully auditable. 
+
+4.12 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Health Trajectories are established as governed constitutional constructs.
+✓ Multiple trajectory categories remain independently explainable.
+✓ Trajectory characteristics are explicitly represented.
+✓ Trajectory evolution requires new constitutional intelligence.
+✓ Stability contributes to, but does not replace, Forecast Confidence.
+✓ Preventive intelligence remains distinct from Decision Intelligence.
+✓ Every Health Trajectory remains fully explainable and auditable.
+Chapter 5
+Scenario Modelling & Counterfactual Analysis
+
+5.1 Purpose
+The purpose of this chapter is to define how the Predictive Intelligence & Longitudinal Forecasting Engine evaluates alternative future health scenarios under explicitly defined assumptions.
+Health is shaped by choices.
+The Predictive Intelligence Engine shall therefore model multiple plausible futures, enabling BioSense to estimate how different behaviours, interventions and physiological changes may influence long-term health trajectories. Scenario Modelling exists to improve understanding. It shall never imply certainty regarding future outcomes.
+
+Constitutional Principle
+Model alternative futures without claiming knowledge of which future will occur.
+
+5.2 Engineering Philosophy
+Forecasting should not answer only:
+"What is likely to happen?"
+It should also answer:
+"What could happen if circumstances changed?"
+Scenario Modelling enables BioSense to compare multiple evidence-based futures while maintaining the same constitutional principles of transparency, confidence and explainability. Every scenario remains conditional upon clearly stated assumptions.
+
+Founder Principle
+Empower better decisions by making alternative futures visible.
+
+5.3 Scenario Types
+The Predictive Intelligence Engine may generate multiple categories of scenarios.
+Illustrative examples include:
+Baseline Scenario
+Expected trajectory if current behaviour continues.
+
+Intervention Scenario
+Expected trajectory following implementation of one or more Decision Objects.
+
+Behaviour Change Scenario
+Expected trajectory following sustained behavioural improvement.
+
+Biomarker Optimisation Scenario
+Expected trajectory following improvement in selected biomarkers.
+
+Lifestyle Scenario
+Expected trajectory following changes to sleep, nutrition, exercise or recovery.
+
+Goal Achievement Scenario
+Expected trajectory towards a defined user objective.
+
+Comparative Scenario
+Structured comparison of multiple plausible futures. Each scenario shall remain independently governed and explainable.
+
+Engineering Rule
+Scenario categories shall remain constitutionally distinct and explicitly defined.
+
+5.4 Counterfactual Analysis
+Counterfactual Analysis evaluates:
+"What would likely happen if one or more assumptions changed?"
+Illustrative examples include:
+If average sleep duration increased by one hour.
+↓
+Expected Recovery Trajectory.
+↓
+Expected Biological Age Trajectory.
+↓
+Expected cardiometabolic impact.
+
+If alcohol consumption reduced significantly.
+↓
+Expected liver biomarker trajectory.
+↓
+Expected sleep improvement.
+↓
+Expected recovery improvement.
+Counterfactual Analysis evaluates conditional futures.
+It does not guarantee outcomes.
+
+Constitutional Principle
+Counterfactual analysis explores possibility rather than certainty.
+
+5.5 Scenario Construction
+Every scenario shall be constructed using:
+constitutional intelligence, 
+explicit assumptions, 
+Prediction Objects, 
+Decision Objects where appropriate, 
+Personalisation Objects, 
+Health Trajectories, 
+Forecast Confidence. 
+The Scenario Engine shall preserve complete traceability between assumptions and projected outcomes.
+
+Founder Principle
+Every projected future should be traceable to the assumptions that created it.
+
+5.6 Comparative Evaluation
+Scenario Modelling shall support structured comparison between multiple futures.
+Illustrative comparison dimensions include:
+Expected health improvement.
+Forecast confidence.
+Time horizon.
+Biological Age impact.
+Risk trajectory.
+Behavioural feasibility.
+Intervention complexity.
+Comparisons shall remain transparent.
+BioSense shall never conceal uncertainty when comparing scenarios.
+
+Engineering Rule
+Scenario comparisons shall communicate trade-offs rather than winners.
+
+5.7 Sensitivity Analysis
+Some forecasts are highly sensitive to changes in underlying assumptions. The Predictive Intelligence Engine shall therefore identify assumptions that materially influence predicted outcomes.
+Illustrative examples include:
+Sleep consistency.
+Exercise adherence.
+Body composition.
+Medication adherence (where applicable).
+Observation completeness.
+Sensitivity Analysis shall indicate which variables contribute most significantly to forecast uncertainty.
+
+Constitutional Principle
+Identify the assumptions that matter most.
+
+5.8 User Interaction
+Scenario Modelling may support user-driven exploration.
+Illustrative examples include:
+"What if I reach 15% body fat?"
+"What if I complete every recommended intervention?"
+"What if I improve my resting heart rate?"
+"What if I maintain my current habits?"
+Every user-generated scenario shall produce independently governed Prediction Objects. Previously generated scenarios shall remain reproducible.
+
+Founder Principle
+Curiosity should generate understanding rather than speculation.
+
+5.9 Scenario Limitations
+The Predictive Intelligence Engine shall explicitly prohibit:
+forecasting unsupported physiological relationships, 
+extrapolating beyond available evidence, 
+presenting speculative outcomes as established science, 
+generating scenarios without declared assumptions, 
+concealing model uncertainty. 
+Scenario Modelling shall always remain proportionate to available constitutional intelligence.
+
+Engineering Rule
+The complexity of a scenario shall never exceed the quality of the supporting evidence.
+
+5.10 Explainability
+Every Scenario Comparison shall answer:
+Which future is being modelled? 
+Which assumptions differ? 
+Which constitutional intelligence supports the projection? 
+Which variables contribute most significantly? 
+How confident is BioSense? 
+What evidence could materially change these forecasts? 
+
+5.11 Engineering Constraints
+The Scenario Modelling Framework shall:
+preserve constitutional ownership, 
+require explicit assumptions, 
+support multiple concurrent scenarios, 
+communicate uncertainty transparently, 
+preserve Forecast Confidence, 
+remain explainable, 
+remain fully auditable. 
+
+5.12 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Multiple scenario categories are constitutionally defined.
+✓ Counterfactual Analysis is explicitly distinguished from prediction.
+✓ Every scenario declares its assumptions.
+✓ Comparative evaluation communicates trade-offs rather than certainty.
+✓ Sensitivity Analysis identifies influential assumptions.
+✓ User-generated scenarios produce governed Prediction Objects.
+✓ Every scenario remains fully explainable and auditable.
+Chapter 6
+Opportunity Detection & Preventive Intelligence
+
+6.1 Purpose
+The purpose of this chapter is to define how the Predictive Intelligence & Longitudinal Forecasting Engine identifies periods where timely action is expected to produce disproportionately beneficial health outcomes. Preventive healthcare is not solely concerned with what action should be taken. It is equally concerned with when that action is most likely to succeed. The Predictive Intelligence Engine shall therefore identify governed Opportunity Windows that enable earlier, more effective and more personalised intervention while preserving constitutional integrity and scientific transparency.
+
+Constitutional Principle
+The value of an intervention depends upon both its quality and its timing.
+
+6.2 Engineering Philosophy
+Health trajectories rarely change at constant rates.
+Periods often exist where:
+improvement accelerates, 
+deterioration begins, 
+physiological resilience changes, 
+behavioural momentum increases, 
+interventions become substantially more effective. 
+Recognising these periods enables BioSense to support preventive health before meaningful decline occurs. Opportunity detection shall therefore prioritise timing rather than urgency.
+
+Founder Principle
+The best intervention is often the one delivered at the right moment.
+
+6.3 Opportunity Window Definition
+An Opportunity Window is defined as:
+A governed Prediction Object representing a period during which one or more interventions are forecast to provide materially greater long-term benefit than if delayed.
+Opportunity Windows are forecasts.
+They are not recommendations.
+Decision Objects determine the appropriate intervention. Opportunity Windows indicate when its expected value is greatest.
+
+Engineering Rule
+Opportunity Windows describe timing.
+Decision Objects describe action.
+
+6.4 Opportunity Evidence Sources
+Opportunity detection may utilise:
+Health Trajectories, 
+Risk Trajectories, 
+Confidence Objects, 
+Decision Objects, 
+intervention history, 
+behavioural adherence, 
+Personalisation Objects, 
+routine stability, 
+longitudinal observations, 
+Forecast Confidence. 
+Opportunity detection consumes constitutional intelligence.
+It generates no new Health Beliefs.
+
+Constitutional Principle
+Opportunities emerge from constitutional intelligence rather than isolated events.
+
+6.5 Opportunity Categories
+Illustrative Opportunity Windows include:
+Prevention Window
+Action may prevent future deterioration.
+
+Optimisation Window
+Action is expected to maximise improvement.
+
+Recovery Window
+Recovery capacity is forecast to be particularly favourable.
+
+Behaviour Change Window
+Behavioural adherence is forecast to be unusually high.
+
+Education Window
+Learning is expected to improve future intervention success.
+
+Monitoring Window
+Additional observations are likely to reduce significant uncertainty. Each Opportunity Window shall remain independently explainable.
+
+Founder Principle
+Different opportunities require different forms of action.
+
+6.6 Opportunity Scoring
+Every Opportunity Window shall possess a governed Opportunity Score.
+Illustrative contributors include:
+expected health impact, 
+Forecast Confidence, 
+trajectory direction, 
+intervention sensitivity, 
+behavioural feasibility, 
+timing sensitivity, 
+supporting evidence quality. 
+The constitutional methodology for calculating Opportunity Scores shall remain version-controlled and explainable.
+Opportunity Scores shall assist prioritisation.
+They shall never replace clinical reasoning.
+
+Engineering Rule
+Opportunity Scores communicate relative timing value rather than clinical importance.
+
+6.7 Window Evolution
+Opportunity Windows evolve as constitutional intelligence changes.
+Examples include:
+Improved sleep consistency.
+↓
+Reduced urgency for recovery intervention.
+
+Declining recovery trajectory.
+↓
+Expanded prevention opportunity.
+
+Improved behavioural adherence.
+↓
+Greater opportunity for progressive intervention.
+Every Opportunity Window shall remain evidence-driven and continuously reassessed.
+
+Constitutional Principle
+Opportunity Windows evolve with the individual rather than remaining fixed.
+
+6.8 Opportunity Expiration
+Not every opportunity remains available indefinitely.
+Examples include:
+Missed behavioural momentum.
+↓
+Reduced intervention efficiency.
+
+Delayed lifestyle improvement.
+↓
+Reduced projected benefit.
+
+Improved physiological state.
+↓
+Previous opportunity becomes obsolete.
+Expired Opportunity Windows shall remain historically available for audit and longitudinal analysis.
+
+Founder Principle
+Some opportunities are temporary, but every opportunity should remain explainable.
+
+6.9 Preventive Intelligence
+Opportunity detection enables BioSense to recognise:
+emerging deterioration before threshold breach, 
+sustained positive momentum, 
+optimal intervention sequencing, 
+periods of increased behavioural readiness, 
+opportunities to reduce future uncertainty, 
+moments where relatively small changes may produce disproportionate long-term benefit. 
+Preventive Intelligence supports proactive healthcare.
+It shall not independently generate recommendations.
+
+Engineering Rule
+Preventive intelligence provides context.
+Decision Intelligence determines action.
+
+6.10 Explainability
+Every Opportunity Window shall answer:
+What opportunity has been identified? 
+Why does this opportunity exist now? 
+Which constitutional intelligence supports it? 
+How long is the opportunity expected to remain relevant? 
+How confident is BioSense? 
+Which future evidence could strengthen or weaken this opportunity? 
+
+6.11 Engineering Constraints
+The Opportunity Detection Framework shall:
+consume constitutional intelligence only, 
+distinguish timing from recommendation, 
+preserve Forecast Confidence, 
+support evolving opportunities, 
+preserve historical Opportunity Windows, 
+remain explainable, 
+remain fully auditable. 
+
+6.12 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Opportunity Windows are established as governed Prediction Objects.
+✓ Opportunity detection remains distinct from Decision Intelligence.
+✓ Opportunity Scores remain explainable and version-controlled.
+✓ Opportunity Windows evolve through new constitutional intelligence.
+✓ Expired opportunities remain historically reproducible.
+✓ Preventive intelligence remains separate from recommendation generation.
+✓ Every Opportunity Window remains fully explainable and auditable.
+Chapter 7
+Forecast Confidence, Uncertainty & Constitutional Boundaries
+
+7.1 Purpose
+The purpose of this chapter is to define how the Predictive Intelligence & Longitudinal Forecasting Engine quantifies forecast confidence, communicates uncertainty and establishes the constitutional boundaries within which forecasting may occur.
+Forecasting is inherently uncertain.
+The Predictive Intelligence Engine shall therefore communicate not only the most plausible future trajectory, but also the strength of the supporting evidence, the limitations of the forecast and the conditions under which the forecast may change. The objective is to ensure that every Prediction Object remains scientifically honest, proportionate and constitutionally trustworthy.
+
+Constitutional Principle
+Forecast confidence should be communicated as clearly as the forecast itself.
+
+7.2 Engineering Philosophy
+Every forecast represents an estimation rather than a certainty.
+Confidence depends upon many factors including:
+quality of evidence, 
+quantity of evidence, 
+longitudinal consistency, 
+behavioural stability, 
+physiological variability, 
+completeness of observations, 
+validity of assumptions. 
+The Predictive Intelligence Engine shall therefore communicate both prediction and uncertainty as first-class constitutional intelligence.
+
+Founder Principle
+Users should understand not only what BioSense believes, but how strongly it believes it.
+
+7.3 Forecast Confidence
+Every Prediction Object shall possess an independent Forecast Confidence assessment. Forecast Confidence reflects confidence in the forecast itself.
+It is distinct from:
+Confidence Objects (ENG-003), 
+Health Beliefs, 
+Opportunity Scores, 
+Personalisation confidence. 
+Illustrative confidence contributors include:
+supporting evidence quality, 
+trajectory stability, 
+observation completeness, 
+model applicability, 
+assumption stability, 
+historical consistency. 
+Forecast Confidence shall remain version-controlled and reproducible.
+
+Engineering Rule
+Forecast Confidence describes confidence in the projection rather than confidence in the underlying health intelligence.
+
+7.4 Sources of Uncertainty
+Every Prediction Object shall identify relevant sources of uncertainty.
+Illustrative examples include:
+Incomplete observations.
+↓
+Limited longitudinal history.
+↓
+Behavioural variability.
+↓
+Changing intervention adherence.
+↓
+Sparse biomarker coverage.
+↓
+Conflicting physiological evidence.
+↓
+Rapid lifestyle change.
+↓
+Low-quality observations.
+The engine shall preserve these uncertainties throughout the forecasting process.
+
+Constitutional Principle
+Uncertainty should be preserved rather than hidden.
+
+7.5 Confidence Evolution
+Forecast Confidence shall evolve as constitutional intelligence evolves.
+Illustrative examples include:
+Additional longitudinal observations.
+↓
+Higher trajectory stability.
+↓
+Improved Forecast Confidence.
+
+Reduced wearable usage.
+↓
+Greater observational uncertainty.
+↓
+Reduced Forecast Confidence.
+Forecast confidence shall change gradually unless substantial new constitutional intelligence becomes available.
+
+Founder Principle
+Confidence should evolve with evidence rather than fluctuate with individual observations.
+
+7.6 Forecast Limitations
+The Predictive Intelligence Engine shall explicitly prohibit:
+deterministic future claims, 
+exact dates for future physiological events, 
+unsupported causal inference, 
+extrapolation beyond validated evidence, 
+concealment of uncertainty, 
+over-precision, 
+unsupported disease prediction, 
+prediction beyond declared forecast horizons. 
+These limitations are constitutional.
+They shall not be bypassed through application configuration.
+
+Engineering Rule
+Forecasts shall remain bounded by available constitutional intelligence.
+
+7.7 Forecast Refusal
+The Predictive Intelligence Engine shall refuse to generate forecasts where constitutional requirements cannot be satisfied.
+Illustrative examples include:
+Insufficient supporting evidence.
+↓
+Low observation completeness.
+↓
+Conflicting Health Beliefs.
+↓
+Invalid assumptions.
+↓
+Forecast horizon exceeds constitutional limits.
+↓
+Required constitutional intelligence unavailable.
+When forecasting is refused, BioSense shall explain why a forecast could not responsibly be produced.
+
+Constitutional Principle
+Refusing an unreliable forecast is preferable to generating an unreliable one.
+
+7.8 Confidence Communication
+Forecast confidence shall be communicated consistently across all consumer engines.
+Confidence communication may include:
+confidence level, 
+uncertainty summary, 
+principal assumptions, 
+evidence quality summary, 
+significant limitations, 
+future evidence likely to improve confidence. 
+Presentation style may vary by channel.
+Meaning shall remain consistent.
+
+Founder Principle
+Communicate uncertainty in language users can understand without reducing scientific accuracy.
+
+7.9 Constitutional Forecast Boundaries
+The Predictive Intelligence Engine shall never:
+replace clinical judgement, 
+diagnose disease, 
+guarantee future outcomes, 
+imply inevitability, 
+infer unsupported physiological relationships, 
+optimise predictions for engagement, 
+conceal model limitations, 
+generate forecasts without explainable evidence. 
+Forecasting shall always remain subordinate to the BioSense Intelligence Constitution.
+
+Engineering Rule
+Prediction serves constitutional intelligence rather than replacing it.
+
+7.10 Explainability
+Every Prediction Object shall answer:
+How confident is BioSense? 
+Why is this confidence appropriate? 
+Which uncertainties remain unresolved? 
+Which assumptions contribute most significantly? 
+Under what conditions would the forecast materially change? 
+Why would BioSense refuse to generate this forecast? 
+
+7.11 Engineering Constraints
+The Forecast Confidence Framework shall:
+preserve uncertainty, 
+distinguish Forecast Confidence from health confidence, 
+support forecast refusal, 
+prohibit deterministic forecasting, 
+communicate limitations consistently, 
+remain explainable, 
+remain fully auditable. 
+
+7.12 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Forecast Confidence is established as an independent constitutional construct.
+✓ Sources of uncertainty remain explicitly represented.
+✓ Forecast confidence evolves through new constitutional intelligence.
+✓ Forecast refusal conditions are constitutionally defined.
+✓ Deterministic forecasting is explicitly prohibited.
+✓ Confidence communication remains consistent across all delivery channels.
+✓ Every forecast remains fully explainable and auditable.
+Chapter 8
+Governance, Versioning & Forecast Lifecycle Management
+
+8.1 Purpose
+The purpose of this chapter is to define the governance framework responsible for the long-term stewardship, evolution and auditability of the Predictive Intelligence & Longitudinal Forecasting Engine. Forecasts influence preventive healthcare decisions and future planning. The methods used to generate forecasts shall therefore evolve only through governed, transparent and reproducible engineering processes. The objective is to improve predictive capability while preserving historical integrity, constitutional consistency and user trust.
+
+Constitutional Principle
+Forecasting should evolve through governed improvement rather than uncontrolled model change.
+
+8.2 Engineering Philosophy
+Forecasting models will naturally improve as:
+scientific knowledge expands, 
+longitudinal datasets mature, 
+constitutional intelligence grows, 
+validation techniques improve, 
+forecasting methodologies evolve. 
+However, improvements shall never compromise:
+historical reproducibility, 
+constitutional explainability, 
+scientific integrity, 
+auditability, 
+version traceability, 
+user trust. 
+Forecast evolution shall improve future predictions without rewriting historical predictions.
+
+Founder Principle
+Improve tomorrow's forecasts without changing yesterday's truth.
+
+8.3 Governance Responsibilities
+Forecast Governance shall oversee:
+Prediction Object definitions, 
+Prediction Domains, 
+trajectory methodologies, 
+Opportunity Window algorithms, 
+Forecast Confidence methodology, 
+scenario modelling, 
+assumption frameworks, 
+forecast horizon definitions, 
+lifecycle management, 
+validation methodology. 
+Governance establishes forecasting policy.
+The Predictive Intelligence Engine executes it.
+
+Engineering Rule
+Governance defines forecasting standards.
+The Predictive Intelligence Engine applies them.
+
+8.4 Versioning
+Every Prediction Object shall reference:
+Predictive Engine Version, 
+Forecast Model Version, 
+Scenario Model Version, 
+Opportunity Framework Version, 
+Forecast Confidence Version, 
+Assumption Framework Version, 
+Governance Policy Version. 
+These references shall enable historical reconstruction of every forecast exactly as it existed when originally generated.
+
+Constitutional Principle
+Every forecast should remain permanently reproducible.
+
+8.5 Configuration Management
+Forecasting behaviour may evolve through governed configuration.
+Illustrative examples include:
+confidence calibration, 
+forecast horizon parameters, 
+trajectory weighting, 
+opportunity scoring methodology, 
+scenario comparison logic, 
+assumption validation rules, 
+uncertainty communication thresholds. 
+Configuration changes shall remain:
+version-controlled, 
+documented, 
+independently validated, 
+fully auditable. 
+
+Founder Principle
+Configuration should evolve transparently rather than invisibly.
+
+8.6 Predictive Engine Releases
+Every Predictive Intelligence Engine release shall preserve:
+Release Version, 
+Release Date, 
+Engineering rationale, 
+Behavioural impact assessment, 
+Validation evidence, 
+Compatibility assessment, 
+Migration documentation. 
+Historical Prediction Objects shall remain interpretable regardless of future forecasting improvements.
+
+Engineering Rule
+Engine evolution shall preserve historical forecast meaning.
+
+8.7 Validation Before Deployment
+No forecasting methodology shall enter production without structured validation.
+Validation may include:
+forecast accuracy evaluation, 
+trajectory consistency, 
+confidence calibration, 
+scenario reproducibility, 
+assumption validation, 
+historical replay testing, 
+cross-engine compatibility, 
+explainability verification. 
+Validation shall demonstrate improved forecasting performance without compromising constitutional principles.
+
+Constitutional Principle
+Every forecasting improvement should strengthen trust as well as accuracy.
+
+8.8 Historical Reproducibility
+At any future point, BioSense shall be capable of reconstructing:
+Prediction Objects, 
+supporting assumptions, 
+Forecast Confidence, 
+trajectory models, 
+Opportunity Windows, 
+scenario comparisons, 
+governance policies, 
+exactly as they existed when originally generated. Historical forecasts shall remain independent of future forecasting methodologies.
+
+Founder Principle
+History should remain a record, not a moving target.
+
+8.9 Change Impact Assessment
+Before deployment, Forecast Governance shall evaluate:
+Which Prediction Domains are affected? 
+Which consumer engines may change? 
+Will Forecast Confidence behaviour change? 
+Will Opportunity Window identification change? 
+Are user-facing explanations affected? 
+Will historical compatibility remain preserved? 
+Does validation demonstrate measurable improvement? 
+Potential impacts shall be documented prior to release.
+
+Engineering Rule
+Every forecasting change should have an explicitly documented impact assessment.
+
+8.10 Operational Monitoring
+Forecast Governance shall monitor:
+forecast generation rates, 
+Forecast Confidence distribution, 
+Opportunity Window generation, 
+forecast refusal frequency, 
+prediction validity, 
+scenario utilisation, 
+explainability performance, 
+governance exceptions, 
+validation failures. 
+Operational monitoring informs future governance.
+It shall never automatically alter forecasting behaviour.
+
+Constitutional Principle
+Operational observation should guide governance rather than replace it.
+
+8.11 Auditability
+Every governance activity shall generate an immutable audit record.
+Illustrative examples include:
+Forecast Model revisions, 
+Prediction Domain updates, 
+confidence methodology changes, 
+Opportunity Window framework revisions, 
+scenario modelling improvements, 
+governance approvals, 
+deployment history. 
+Audit records shall remain permanently available.
+
+8.12 Regulatory Readiness
+Forecast Governance shall support future regulatory expectations concerning:
+predictive AI, 
+algorithm transparency, 
+explainable forecasting, 
+healthcare AI oversight, 
+model governance, 
+auditability, 
+user rights. 
+The governance framework shall remain adaptable without compromising constitutional principles.
+
+8.13 Engineering Constraints
+Forecast Governance shall:
+preserve constitutional forecasting boundaries, 
+support controlled evolution, 
+preserve historical reproducibility, 
+maintain explainability, 
+preserve auditability, 
+support future regulatory frameworks, 
+remain constitutionally consistent. 
+
+8.14 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Every Prediction Object is version-controlled.
+✓ Forecasting methodologies evolve only through governed change.
+✓ Historical forecasts remain reproducible.
+✓ Forecast deployment requires structured validation.
+✓ Governance activities remain fully auditable.
+✓ Operational monitoring informs future improvement without automatically altering forecasting behaviour.
+✓ The Predictive Intelligence Engine remains prepared for future regulatory expectations.
+Chapter 9
+End-to-End Predictive Intelligence Lifecycle
+
+9.1 Purpose
+The purpose of this chapter is to demonstrate the complete operational lifecycle of the Predictive Intelligence & Longitudinal Forecasting Engine within the BioSense Intelligence Platform. Previous chapters define the constitutional architecture governing predictive intelligence, Health Trajectories, Prediction Objects, Scenario Modelling, Opportunity Detection, Forecast Confidence and governance. This chapter illustrates how those components interact to produce a governed, explainable and reproducible forecast. The objective is to demonstrate that every Prediction Object follows one continuous constitutional lifecycle from trusted intelligence to preventive insight.
+
+Constitutional Principle
+Every forecast should be traceable from trusted intelligence to delivered preventive insight through one continuous and explainable lifecycle.
+
+9.2 Example Scenario
+For the purposes of this example we introduce a fictional BioSense user.
+Name: Alex Carter
+Age: 38
+Alex has used BioSense continuously for four years.
+The platform currently contains:
+longitudinal wearable observations, 
+blood biomarker history, 
+Dynamic Health Model, 
+validated Health Beliefs, 
+Confidence Objects, 
+Decision Objects, 
+Personalisation Objects, 
+Health Trajectories. 
+Alex asks:
+"What is likely to happen if I continue my current lifestyle for the next twelve months?"
+The Predictive Intelligence Engine begins constitutional forecasting.
+
+Founder Principle
+Forecasts begin with trusted understanding rather than user questions alone.
+
+9.3 Forecast Context Assembly
+The Predictive Intelligence Engine assembles the Forecast Context.
+Illustrative inputs include:
+From ENG-001
+Dynamic Health Model, 
+Health Beliefs, 
+Biological Identity. 
+
+From ENG-002
+Canonical Observations, 
+longitudinal trends, 
+observation quality. 
+
+From ENG-003
+Confidence Objects, 
+remaining uncertainty, 
+evidence quality. 
+
+From ENG-004
+active Decision Objects, 
+intervention history. 
+
+From ENG-006
+Behavioural Adherence Objects, 
+Routine Profile, 
+Personalisation Objects. 
+Only intelligence relevant to the requested forecast is assembled.
+
+Engineering Rule
+Forecast Context shall contain sufficient constitutional intelligence without introducing irrelevant information.
+
+9.4 Assumption Generation
+The engine establishes explicit forecasting assumptions.
+Illustrative assumptions include:
+current behaviour continues, 
+intervention adherence remains unchanged, 
+no major medical events occur, 
+observation quality remains consistent, 
+current physiological relationships remain applicable. 
+Assumptions are attached to the Prediction Object. No forecast proceeds without declared assumptions.
+
+Constitutional Principle
+Assumptions are constitutional components of every forecast.
+
+9.5 Trajectory Modelling
+The engine evaluates multiple Health Trajectories.
+Examples include:
+Recovery.
+↓
+Stable improvement.
+
+Cardiometabolic health.
+↓
+Gradual optimisation.
+
+Biological Age.
+↓
+Expected reduction.
+
+Sleep.
+↓
+Plateau.
+Trajectory evolution remains confidence-aware.
+No deterministic outcomes are produced.
+
+Founder Principle
+Trajectory modelling estimates the direction of health rather than claiming certainty about its destination.
+
+9.6 Scenario Evaluation
+The engine evaluates multiple futures.
+Baseline Scenario
+↓
+Current behaviour continues.
+
+Optimisation Scenario
+↓
+Sleep consistency improves.
+
+Lifestyle Scenario
+↓
+Alcohol intake decreases.
+
+Combined Intervention Scenario
+↓
+Current recommendations fully adopted.
+Each scenario produces independently governed Prediction Objects.
+Scenario comparison highlights:
+projected benefits, 
+assumptions, 
+uncertainty, 
+Forecast Confidence. 
+
+Engineering Rule
+Every scenario remains independently reproducible.
+
+9.7 Opportunity Detection
+Trajectory analysis identifies:
+Recovery Optimisation Window.
+Expected duration:
+Approximately eight weeks.
+Supporting intelligence:
+improving recovery, 
+increasing adherence, 
+stable sleep behaviour. 
+Opportunity Score:
+High.
+Decision Intelligence may consume this Opportunity Window when prioritising future interventions.
+
+Constitutional Principle
+Forecasting identifies opportunity. Decision Intelligence determines action.
+
+9.8 Forecast Confidence
+The engine evaluates:
+Supporting evidence quality.
+↓
+Trajectory stability.
+↓
+Observation completeness.
+↓
+Behavioural consistency.
+↓
+Assumption validity.
+Forecast Confidence:
+High.
+Remaining uncertainties:
+future travel, 
+illness, 
+major lifestyle changes. 
+These limitations are explicitly attached to the Prediction Object.
+
+Founder Principle
+Every forecast should communicate its limitations as clearly as its conclusions.
+
+9.9 Prediction Object Publication
+The completed Prediction Object contains:
+forecast summary, 
+trajectory, 
+assumptions, 
+Forecast Confidence, 
+uncertainty summary, 
+validity period, 
+supporting constitutional intelligence, 
+version, 
+governance metadata. 
+The Prediction Object becomes immutable.
+Consumer engines access the published object through governed interfaces.
+
+Engineering Rule
+Published Prediction Objects remain immutable constitutional artefacts.
+
+9.10 Communication
+ENG-005 consumes the Prediction Object.
+Alex receives:
+"Based on your current health trajectory and assuming your current habits remain broadly consistent, BioSense estimates continued improvement in recovery and cardiometabolic health over the next twelve months. Your projected Biological Age is expected to improve modestly. Confidence in this forecast is high, although future changes in lifestyle or observation quality could materially alter these projections."
+The communication faithfully represents the Prediction Object. No additional predictive claims are generated.
+
+Constitutional Principle
+Communication should faithfully represent predictive intelligence without embellishment.
+
+9.11 Forecast Evolution
+Six months later:
+New observations become available.
+Recovery improves more rapidly than expected.
+Intervention adherence increases.
+Trajectory stability strengthens.
+The original Prediction Object remains unchanged. A new Prediction Object is generated under the latest constitutional intelligence and governance framework. Historical forecasts remain available for comparison.
+
+Founder Principle
+Forecasts should evolve by generating new intelligence rather than rewriting previous intelligence.
+
+9.12 End-to-End Validation
+This example demonstrates that:
+✓ Forecasts consume only trusted constitutional intelligence.
+✓ Every forecast declares explicit assumptions.
+✓ Health Trajectories remain independently governed.
+✓ Opportunity Windows remain distinct from Decision Objects.
+✓ Forecast Confidence remains separate from Health Confidence.
+✓ Prediction Objects become immutable once published.
+✓ Consumer engines remain read-only.
+✓ Historical forecasts remain fully reproducible.
+
+Closing Statement
+The Predictive Intelligence & Longitudinal Forecasting Engine is not a prediction engine in the conventional sense. It is not a statistical extrapolation engine. It is not an artificial intelligence that claims to know the future.
+It is the constitutional system through which BioSense develops explainable, evidence-based forecasts of plausible future health trajectories. Every forecast begins with trusted constitutional intelligence. Every trajectory is grounded in validated understanding.
+Every assumption is explicit.
+Every uncertainty remains visible.
+Every Prediction Object is governed, versioned and reproducible. Every Opportunity Window exists to support prevention rather than reaction. Through this architecture, BioSense transforms today's understanding into tomorrow's insight without compromising scientific integrity or constitutional transparency. The Predictive Intelligence Engine therefore enables BioSense to move beyond monitoring health and towards anticipating its future, helping individuals make better-informed decisions while always remaining honest about what is known, what is uncertain and what may change.

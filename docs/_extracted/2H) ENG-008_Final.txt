@@ -1,0 +1,1966 @@
+
+ENG-008: Scientific Knowledge & Evidence Intelligence Engine
+Engineering Specification
+Document ID:  ENG-008
+Version:  1.0 (Draft)
+Status:  In Development
+Authority:  BioSense Intelligence Constitution (Documents 1A–1C)
+Depends Upon:
+ENG-001 — Dynamic Health Model Engineering Specification
+ENG-002 — Observation Engine & Canonical Observation Store Engineering Specification
+ENG-003 — Confidence & Evidence Evaluation Engine Engineering Specification
+ENG-004 — Decision Intelligence & Intervention Engine Engineering Specification 
+ENG-005 — Conversation, Explanation & Intelligence Delivery Engine Engineering Specification
+ENG-006 — Personalisation & Adaptive Learning Engine Engineering Specification
+ENG-007 — Predictive Intelligence & Longitudinal Forecasting Engine Engineering Specification
+Contents
+	 TOC \o "1-2" \h \z \u ENG-008: Scientific Knowledge & Evidence Intelligence Engine Engineering Specification	 PAGEREF _Toc234388926 \h 1
+	Purpose & Design Philosophy	 PAGEREF _Toc234388927 \h 6
+	1.1 Purpose	 PAGEREF _Toc234388928 \h 6
+	1.2 Scope	 PAGEREF _Toc234388929 \h 6
+	1.3 Authority	 PAGEREF _Toc234388930 \h 7
+	1.4 Engineering Philosophy	 PAGEREF _Toc234388931 \h 8
+	1.5 Constitutional Definition	 PAGEREF _Toc234388932 \h 8
+	1.6 Knowledge Is Not Reasoning	 PAGEREF _Toc234388933 \h 9
+	1.7 Scientific Knowledge Objects	 PAGEREF _Toc234388934 \h 9
+	1.8 Explainability	 PAGEREF _Toc234388935 \h 10
+	1.9 Scientific Boundaries	 PAGEREF _Toc234388936 \h 11
+	1.10 Acceptance Criteria	 PAGEREF _Toc234388937 \h 11
+	2.1 Purpose	 PAGEREF _Toc234388938 \h 12
+	2.2 Engineering Philosophy	 PAGEREF _Toc234388939 \h 12
+	2.3 Scientific Sources	 PAGEREF _Toc234388940 \h 13
+	2.4 Knowledge Acquisition Pipeline	 PAGEREF _Toc234388941 \h 13
+	2.5 Source Verification	 PAGEREF _Toc234388942 \h 14
+	2.6 Evidence Classification	 PAGEREF _Toc234388943 \h 15
+	2.7 Scientific Appraisal	 PAGEREF _Toc234388944 \h 15
+	2.8 Knowledge Extraction	 PAGEREF _Toc234388945 \h 16
+	2.9 Scientific Validation	 PAGEREF _Toc234388946 \h 17
+	2.10 Canonical Scientific Library Admission	 PAGEREF _Toc234388947 \h 17
+	2.11 Engineering Constraints	 PAGEREF _Toc234388948 \h 18
+	2.12 Acceptance Criteria	 PAGEREF _Toc234388949 \h 18
+	Scientific Knowledge Model & Canonical Scientific Knowledge Objects	 PAGEREF _Toc234388950 \h 20
+	3.1 Purpose	 PAGEREF _Toc234388951 \h 20
+	3.2 Engineering Philosophy	 PAGEREF _Toc234388952 \h 20
+	3.3 Scientific Knowledge Domains	 PAGEREF _Toc234388953 \h 21
+	3.4 Scientific Knowledge Objects	 PAGEREF _Toc234388954 \h 22
+	3.5 Object Structure	 PAGEREF _Toc234388955 \h 23
+	3.6 Relationships Between Scientific Knowledge Objects	 PAGEREF _Toc234388956 \h 24
+	3.7 Knowledge Lifecycle	 PAGEREF _Toc234388957 \h 25
+	3.8 Consumer Engines	 PAGEREF _Toc234388958 \h 26
+	3.9 Knowledge Currency	 PAGEREF _Toc234388959 \h 27
+	3.10 Explainability	 PAGEREF _Toc234388960 \h 28
+	3.11 Engineering Constraints	 PAGEREF _Toc234388961 \h 28
+	3.12 Acceptance Criteria	 PAGEREF _Toc234388962 \h 28
+	Evidence Hierarchies, Scientific Consensus & Conflict Resolution	 PAGEREF _Toc234388963 \h 30
+	4.1 Purpose	 PAGEREF _Toc234388964 \h 30
+	4.2 Engineering Philosophy	 PAGEREF _Toc234388965 \h 30
+	4.3 Constitutional Evidence Hierarchy	 PAGEREF _Toc234388966 \h 31
+	4.4 Scientific Consensus	 PAGEREF _Toc234388967 \h 32
+	4.5 Scientific Conflict	 PAGEREF _Toc234388968 \h 32
+	4.6 Population Applicability	 PAGEREF _Toc234388969 \h 33
+	4.7 Emerging Science	 PAGEREF _Toc234388970 \h 34
+	4.8 Scientific Retirement	 PAGEREF _Toc234388971 \h 34
+	4.9 Conflict Resolution Process	 PAGEREF _Toc234388972 \h 35
+	4.10 Explainability	 PAGEREF _Toc234388973 \h 36
+	4.11 Engineering Constraints	 PAGEREF _Toc234388974 \h 36
+	4.12 Acceptance Criteria	 PAGEREF _Toc234388975 \h 36
+	Scientific Knowledge Evolution & Lifecycle Management	 PAGEREF _Toc234388976 \h 38
+	5.1 Purpose	 PAGEREF _Toc234388977 \h 38
+	5.2 Engineering Philosophy	 PAGEREF _Toc234388978 \h 38
+	5.3 Knowledge Lifecycle	 PAGEREF _Toc234388979 \h 39
+	5.4 Scheduled Scientific Review	 PAGEREF _Toc234388980 \h 40
+	5.5 Triggered Review	 PAGEREF _Toc234388981 \h 40
+	5.6 Knowledge Revision	 PAGEREF _Toc234388982 \h 41
+	5.7 Knowledge Dependencies	 PAGEREF _Toc234388983 \h 41
+	5.8 Historical Preservation	 PAGEREF _Toc234388984 \h 42
+	5.9 Deprecation	 PAGEREF _Toc234388985 \h 42
+	5.10 Explainability	 PAGEREF _Toc234388986 \h 43
+	5.11 Engineering Constraints	 PAGEREF _Toc234388987 \h 43
+	5.12 Acceptance Criteria	 PAGEREF _Toc234388988 \h 44
+	Knowledge Consumption & Constitutional Integration	 PAGEREF _Toc234388989 \h 45
+	6.1 Purpose	 PAGEREF _Toc234388990 \h 45
+	6.2 Engineering Philosophy	 PAGEREF _Toc234388991 \h 45
+	6.3 Constitutional Consumers	 PAGEREF _Toc234388992 \h 45
+	6.4 Read-Only Consumption	 PAGEREF _Toc234388993 \h 48
+	6.5 Knowledge Context	 PAGEREF _Toc234388994 \h 48
+	6.6 Knowledge Traceability	 PAGEREF _Toc234388995 \h 49
+	6.7 Knowledge Consistency	 PAGEREF _Toc234388996 \h 50
+	6.8 Knowledge Refresh	 PAGEREF _Toc234388997 \h 50
+	6.9 Explainability	 PAGEREF _Toc234388998 \h 51
+	6.10 Engineering Constraints	 PAGEREF _Toc234388999 \h 51
+	6.11 Acceptance Criteria	 PAGEREF _Toc234389000 \h 51
+	Knowledge Currency, Monitoring & Scientific Surveillance	 PAGEREF _Toc234389001 \h 53
+	7.1 Purpose	 PAGEREF _Toc234389002 \h 53
+	7.2 Engineering Philosophy	 PAGEREF _Toc234389003 \h 53
+	7.3 Scientific Monitoring Sources	 PAGEREF _Toc234389004 \h 54
+	7.4 Monitoring Pipeline	 PAGEREF _Toc234389005 \h 54
+	7.5 Knowledge Impact Assessment	 PAGEREF _Toc234389006 \h 55
+	7.6 Monitoring Priority	 PAGEREF _Toc234389007 \h 55
+	7.7 Stale Knowledge Detection	 PAGEREF _Toc234389008 \h 56
+	7.8 Scientific Surveillance Dashboard	 PAGEREF _Toc234389009 \h 57
+	7.9 Consumer Protection	 PAGEREF _Toc234389010 \h 57
+	7.10 Explainability	 PAGEREF _Toc234389011 \h 58
+	7.11 Engineering Constraints	 PAGEREF _Toc234389012 \h 58
+	7.12 Acceptance Criteria	 PAGEREF _Toc234389013 \h 58
+	Scientific Quality Assurance, Validation & Knowledge Integrity	 PAGEREF _Toc234389014 \h 60
+	8.1 Purpose	 PAGEREF _Toc234389015 \h 60
+	8.2 Engineering Philosophy	 PAGEREF _Toc234389016 \h 60
+	8.3 Validation Objectives	 PAGEREF _Toc234389017 \h 61
+	8.4 Validation Pipeline	 PAGEREF _Toc234389018 \h 61
+	8.5 Integrity Validation	 PAGEREF _Toc234389019 \h 62
+	8.6 Scientific Consistency Validation	 PAGEREF _Toc234389020 \h 62
+	8.7 Evidence Traceability Validation	 PAGEREF _Toc234389021 \h 63
+	8.8 Explainability Validation	 PAGEREF _Toc234389022 \h 64
+	8.9 Knowledge Integrity Status	 PAGEREF _Toc234389023 \h 64
+	8.10 Operational Monitoring	 PAGEREF _Toc234389024 \h 65
+	8.11 Engineering Constraints	 PAGEREF _Toc234389025 \h 65
+	8.12 Acceptance Criteria	 PAGEREF _Toc234389026 \h 66
+	Governance, Versioning & Scientific Knowledge Governance	 PAGEREF _Toc234389027 \h 67
+	9.1 Purpose	 PAGEREF _Toc234389028 \h 67
+	9.2 Engineering Philosophy	 PAGEREF _Toc234389029 \h 67
+	9.3 Governance Responsibilities	 PAGEREF _Toc234389030 \h 68
+	9.4 Versioning	 PAGEREF _Toc234389031 \h 68
+	9.5 Configuration Management	 PAGEREF _Toc234389032 \h 69
+	9.6 Scientific Knowledge Engine Releases	 PAGEREF _Toc234389033 \h 70
+	9.7 Validation Before Deployment	 PAGEREF _Toc234389034 \h 70
+	9.8 Historical Reproducibility	 PAGEREF _Toc234389035 \h 71
+	9.9 Change Impact Assessment	 PAGEREF _Toc234389036 \h 71
+	9.10 Operational Monitoring	 PAGEREF _Toc234389037 \h 72
+	9.11 Auditability	 PAGEREF _Toc234389038 \h 73
+	9.12 Regulatory Readiness	 PAGEREF _Toc234389039 \h 73
+	9.13 Engineering Constraints	 PAGEREF _Toc234389040 \h 73
+	9.14 Acceptance Criteria	 PAGEREF _Toc234389041 \h 74
+	End-to-End Scientific Knowledge Lifecycle	 PAGEREF _Toc234389042 \h 75
+	10.1 Purpose	 PAGEREF _Toc234389043 \h 75
+	10.2 Example Scenario	 PAGEREF _Toc234389044 \h 75
+	10.3 Source Verification	 PAGEREF _Toc234389045 \h 75
+	10.4 Scientific Appraisal	 PAGEREF _Toc234389046 \h 76
+	10.5 Knowledge Extraction	 PAGEREF _Toc234389047 \h 77
+	10.6 Scientific Validation	 PAGEREF _Toc234389048 \h 77
+	10.7 Canonical Scientific Library	 PAGEREF _Toc234389049 \h 78
+	10.8 Constitutional Consumption	 PAGEREF _Toc234389050 \h 78
+	10.9 Governance	 PAGEREF _Toc234389051 \h 79
+	10.10 End-to-End Validation	 PAGEREF _Toc234389052 \h 80
+
+Chapter 1
+Purpose & Design Philosophy
+
+1.1 Purpose
+The purpose of this specification is to define the constitutional architecture governing how BioSense acquires, organises, validates, versions and maintains trusted scientific knowledge. Every constitutional engine depends upon scientific understanding. The Scientific Knowledge & Evidence Intelligence Engine serves as the authoritative source of that understanding, ensuring that every Health Belief, Decision Object, Prediction Object and Structured Explanation is ultimately grounded in governed scientific evidence.
+Its responsibility is not to reason about individuals. Its responsibility is to preserve the scientific knowledge upon which constitutional reasoning depends.
+
+Constitutional Principle
+Reason about individuals using trusted science rather than reasoning about science itself.
+
+1.2 Scope
+This specification governs:
+Scientific Knowledge Objects, 
+Clinical Knowledge Objects, 
+Evidence Objects, 
+Guideline Objects, 
+Mechanistic Knowledge, 
+Evidence hierarchies, 
+Scientific provenance, 
+knowledge versioning, 
+evidence lifecycle, 
+knowledge validation, 
+conflict resolution, 
+scientific currency, 
+retirement of obsolete knowledge, 
+Canonical Scientific Library. 
+It deliberately excludes:
+individual Health Beliefs (ENG-001), 
+observation processing (ENG-002), 
+confidence evaluation (ENG-003), 
+decision generation (ENG-004), 
+communication (ENG-005), 
+personalisation (ENG-006), 
+forecasting (ENG-007). 
+This engine owns scientific truth.
+Other engines apply it.
+
+1.3 Authority
+The Scientific Knowledge Engine provides constitutional knowledge to every other engine.
+Consumer engines may include:
+ENG-001 
+ENG-002 
+ENG-003 
+ENG-004 
+ENG-005 
+ENG-006 
+ENG-007 
+Consumer engines shall remain read-only.
+Scientific knowledge ownership remains exclusively with ENG-008.
+
+Engineering Rule
+Scientific knowledge has one constitutional owner.
+All other engines consume it.
+
+1.4 Engineering Philosophy
+Scientific knowledge evolves continuously.
+New evidence emerges.
+Guidelines change.
+Consensus develops.
+Previously accepted understanding may become obsolete.
+BioSense shall therefore distinguish between:
+permanent constitutional architecture, 
+evolving scientific knowledge. 
+The platform architecture should remain stable while scientific understanding evolves through governed updates.
+
+Founder Principle
+Allow science to evolve without redesigning the platform.
+
+1.5 Constitutional Definition
+For engineering purposes:
+The Scientific Knowledge & Evidence Intelligence Engine is the constitutional system responsible for governing the acquisition, validation, versioning, organisation and lifecycle management of trusted scientific knowledge used throughout the BioSense Intelligence Platform.
+It establishes scientific understanding.
+It does not apply that understanding to individuals.
+
+Constitutional Principle
+Scientific knowledge should exist independently from individual health intelligence.
+
+1.6 Knowledge Is Not Reasoning
+A strict architectural boundary exists between scientific knowledge and constitutional reasoning.
+Scientific knowledge answers:
+"What is currently supported by trusted evidence?"
+Reasoning answers:
+"What does that mean for this individual?"
+Those are separate constitutional responsibilities.
+The Scientific Knowledge Engine shall never:
+create Health Beliefs, 
+interpret observations, 
+calculate confidence, 
+prioritise interventions, 
+communicate recommendations. 
+It supplies knowledge.
+Other engines perform reasoning.
+
+Engineering Rule
+Knowledge informs reasoning.
+It does not perform reasoning.
+
+1.7 Scientific Knowledge Objects
+The primary output of this engine shall be governed Scientific Knowledge Objects.
+Illustrative examples include:
+Biomarker Knowledge Object 
+Disease Knowledge Object 
+Physiological Mechanism Object 
+Nutrition Knowledge Object 
+Exercise Knowledge Object 
+Sleep Knowledge Object 
+Medication Knowledge Object 
+Clinical Guideline Object 
+Scientific Consensus Object 
+Evidence Summary Object 
+Each Scientific Knowledge Object shall possess:
+provenance, 
+evidence hierarchy, 
+scientific confidence, 
+publication history, 
+supporting literature, 
+version, 
+review history, 
+explainability, 
+audit history. 
+
+Founder Principle
+Scientific understanding should exist as structured constitutional knowledge rather than scattered documents.
+
+1.8 Explainability
+Every Scientific Knowledge Object shall remain independently explainable.
+BioSense shall always be capable of explaining:
+what the scientific knowledge states, 
+which evidence supports it, 
+why BioSense accepts it, 
+how current the knowledge is, 
+which guidelines contributed, 
+where uncertainty remains, 
+when the knowledge was last reviewed. 
+Scientific knowledge that cannot be explained shall not become constitutional knowledge.
+
+Constitutional Principle
+Scientific truth should remain transparent rather than assumed.
+
+1.9 Scientific Boundaries
+The Scientific Knowledge Engine shall never:
+invent medical knowledge, 
+speculate beyond available evidence, 
+elevate weak evidence to established knowledge, 
+conceal scientific disagreement, 
+present hypotheses as consensus, 
+replace expert medical literature. 
+Scientific knowledge shall always remain proportionate to the quality of supporting evidence.
+
+Founder Principle
+The confidence of scientific knowledge should never exceed the confidence of the science itself.
+
+1.10 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ The Scientific Knowledge Engine is clearly separated from constitutional reasoning.
+✓ Scientific Knowledge Objects are established as first-class constitutional objects.
+✓ Scientific ownership boundaries remain unambiguous.
+✓ Scientific knowledge evolves independently from platform architecture.
+✓ Knowledge remains explainable, versioned and auditable.
+✓ Scientific uncertainty is explicitly preserved.
+✓ Every Scientific Knowledge Object remains constitutionally governed.
+2.1 Purpose
+The purpose of this chapter is to define the constitutional architecture governing how scientific knowledge is acquired, evaluated, validated and admitted into the Canonical Scientific Library.
+Scientific literature evolves continuously.
+However, not every publication represents constitutional scientific knowledge. The Scientific Knowledge & Evidence Intelligence Engine shall therefore operate a governed acquisition pipeline that transforms external scientific evidence into trusted Scientific Knowledge Objects. The objective is to ensure that every piece of knowledge consumed by BioSense has passed through a transparent, explainable and reproducible validation process.
+
+Constitutional Principle
+Scientific knowledge should be admitted through governance rather than ingestion alone.
+
+2.2 Engineering Philosophy
+Modern healthcare produces an enormous volume of research.
+Not all research is:
+equally rigorous, 
+equally applicable, 
+equally reproducible, 
+equally relevant. 
+The Scientific Knowledge Engine shall therefore distinguish between:
+scientific publication, 
+scientific evidence, 
+constitutional knowledge. 
+Only validated constitutional knowledge shall become available to downstream engines.
+
+Founder Principle
+Reading science is not the same as accepting science.
+
+2.3 Scientific Sources
+The acquisition architecture may consume knowledge from governed sources including:
+peer-reviewed journals, 
+systematic reviews, 
+meta-analyses, 
+recognised clinical guidelines, 
+consensus statements, 
+professional medical societies, 
+regulatory publications, 
+authoritative biomedical reference works. 
+The platform shall preserve provenance for every acquired source.
+
+Engineering Rule
+Every scientific source shall possess an identifiable provenance before entering constitutional review.
+
+2.4 Knowledge Acquisition Pipeline
+Every Scientific Knowledge Object shall follow the same constitutional pipeline.
+External Scientific Source
+
+↓
+
+Source Verification
+
+↓
+
+Evidence Classification
+
+↓
+
+Scientific Appraisal
+
+↓
+
+Knowledge Extraction
+
+↓
+
+Scientific Validation
+
+↓
+
+Scientific Knowledge Object
+
+↓
+
+Canonical Scientific Library
+
+↓
+
+Consumed by Constitutional Engines
+No Scientific Knowledge Object shall bypass this process.
+
+Constitutional Principle
+Scientific knowledge should follow one governed constitutional pathway.
+
+2.5 Source Verification
+Before scientific evaluation begins, every source shall undergo verification.
+Verification shall establish:
+publication identity, 
+publication status, 
+publication date, 
+source authenticity, 
+publication integrity, 
+citation traceability. 
+Unverified sources shall not proceed further.
+
+Founder Principle
+Trust the source before trusting the science.
+
+2.6 Evidence Classification
+Verified sources shall be classified according to constitutional evidence categories.
+Illustrative classifications include:
+systematic review, 
+meta-analysis, 
+randomised controlled trial, 
+observational study, 
+cohort study, 
+case-control study, 
+case series, 
+expert consensus, 
+clinical guideline, 
+mechanistic research. 
+Classification does not determine acceptance.
+It provides context for subsequent appraisal.
+
+Engineering Rule
+Evidence classification precedes evidence judgement.
+
+2.7 Scientific Appraisal
+Every classified source shall undergo structured scientific appraisal.
+Illustrative appraisal dimensions include:
+methodological quality, 
+sample size, 
+reproducibility, 
+statistical robustness, 
+external validity, 
+population relevance, 
+publication limitations, 
+known biases, 
+conflicting evidence. 
+Scientific appraisal shall remain transparent and reproducible.
+
+Constitutional Principle
+Evaluate the quality of science before accepting its conclusions.
+
+2.8 Knowledge Extraction
+Following appraisal, the Scientific Knowledge Engine shall extract structured scientific understanding.
+Illustrative examples include:
+physiological mechanisms, 
+biomarker interpretation, 
+intervention evidence, 
+risk relationships, 
+guideline recommendations, 
+evidence limitations, 
+unresolved scientific questions. 
+Knowledge extraction shall preserve scientific meaning without reproducing publications verbatim. Extracted knowledge shall remain linked to its supporting evidence.
+
+Founder Principle
+Extract understanding rather than copying literature.
+
+2.9 Scientific Validation
+Extracted knowledge shall undergo constitutional validation.
+Validation shall confirm:
+consistency with accepted scientific understanding, 
+provenance integrity, 
+evidence sufficiency, 
+constitutional compatibility, 
+explainability, 
+reproducibility. 
+Knowledge failing validation shall not become constitutional knowledge. Validation outcomes shall be permanently recorded.
+
+Engineering Rule
+Validation establishes constitutional acceptance rather than scientific certainty.
+
+2.10 Canonical Scientific Library Admission
+Only validated Scientific Knowledge Objects shall enter the Canonical Scientific Library.
+Admission shall preserve:
+Scientific Knowledge Object, 
+supporting evidence, 
+provenance, 
+evidence hierarchy, 
+version, 
+review history, 
+validation history, 
+explainability metadata. 
+Consumer engines shall access scientific knowledge exclusively through the Canonical Scientific Library.
+
+Constitutional Principle
+One canonical scientific library should serve the entire BioSense platform.
+
+2.11 Engineering Constraints
+The Scientific Knowledge Acquisition Framework shall:
+require source verification, 
+preserve provenance, 
+separate classification from appraisal, 
+require constitutional validation, 
+prohibit direct publication ingestion, 
+preserve explainability, 
+remain fully auditable. 
+
+2.12 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Every Scientific Knowledge Object follows the constitutional acquisition pipeline.
+✓ Source verification precedes scientific appraisal.
+✓ Evidence classification remains distinct from validation.
+✓ Knowledge extraction preserves scientific meaning while maintaining traceability.
+✓ Only validated Scientific Knowledge Objects enter the Canonical Scientific Library.
+✓ Consumer engines access scientific knowledge exclusively through governed interfaces.
+✓ Every stage of knowledge acquisition remains fully explainable and auditable.
+Chapter 3
+Scientific Knowledge Model & Canonical Scientific Knowledge Objects
+
+3.1 Purpose
+The purpose of this chapter is to define the canonical Scientific Knowledge Model used throughout the BioSense Intelligence Platform. Scientific knowledge shall exist as structured constitutional intelligence rather than collections of documents, publications or guidelines. Scientific Knowledge Objects provide the governed representation of accepted scientific understanding upon which all constitutional reasoning depends. They form the canonical interface between evolving medical science and the BioSense Intelligence Platform.
+
+Constitutional Principle
+Scientific understanding should exist as structured knowledge rather than unstructured literature.
+
+3.2 Engineering Philosophy
+Medical science is complex.
+The same physiological concept may be supported by:
+multiple publications, 
+multiple guidelines, 
+multiple systematic reviews, 
+differing populations, 
+evolving evidence. 
+Rather than exposing this complexity directly to downstream engines, the Scientific Knowledge Engine shall synthesise accepted understanding into governed Scientific Knowledge Objects. Scientific Knowledge Objects become the constitutional source of scientific truth within BioSense.
+
+Founder Principle
+Engines should reason from scientific understanding rather than scientific documents.
+
+3.3 Scientific Knowledge Domains
+Every Scientific Knowledge Object shall belong to one or more Scientific Knowledge Domains.
+Illustrative domains include:
+Biomarker Knowledge
+Scientific understanding of biomarker physiology, interpretation and significance.
+
+Physiological Mechanisms
+Mechanisms underlying biological processes.
+
+Disease Knowledge
+Current understanding of disease development, progression and prevention.
+
+Nutrition Knowledge
+Evidence relating to dietary patterns, nutrients and metabolic health.
+
+Exercise Knowledge
+Evidence relating to physical activity, recovery and performance.
+
+Sleep Knowledge
+Scientific understanding of sleep physiology and optimisation.
+
+Medication Knowledge
+General scientific understanding of medication mechanisms, interactions and evidence.
+
+Longevity Knowledge
+Evidence relating to healthy ageing and lifespan optimisation.
+
+Clinical Guideline Knowledge
+Structured representation of recognised clinical guidance.
+
+Population Reference Knowledge
+Scientific understanding of demographic and population-level variation. Each Scientific Knowledge Domain shall remain independently governed.
+
+Engineering Rule
+Scientific Knowledge Domains shall remain mutually distinguishable with clearly defined ownership.
+
+3.4 Scientific Knowledge Objects
+Each Scientific Knowledge Domain shall contain one or more Scientific Knowledge Objects.
+Illustrative examples include:
+ApoB Knowledge Object
+Current scientific understanding of ApoB physiology, interpretation and evidence.
+
+VO₂ Max Knowledge Object
+Scientific understanding of aerobic fitness and associated health outcomes.
+
+Sleep Consistency Knowledge Object
+Evidence relating to sleep regularity and physiological recovery.
+
+Omega-3 Knowledge Object
+Scientific understanding of omega-3 physiology, evidence and limitations.
+
+Biological Age Knowledge Object
+Accepted scientific models relating to biological ageing.
+
+Cardiometabolic Risk Knowledge Object
+Current understanding of cardiometabolic disease mechanisms.
+
+Exercise Recovery Knowledge Object
+Evidence supporting recovery optimisation.
+
+Constitutional Principle
+Every scientific concept shall belong to one governed Scientific Knowledge Object.
+
+3.5 Object Structure
+Every Scientific Knowledge Object shall contain:
+Object Identifier, 
+Knowledge Domain, 
+Scientific Statement, 
+Supporting Evidence, 
+Evidence Hierarchy, 
+Scientific Consensus Status, 
+Known Limitations, 
+Population Applicability, 
+Publication History, 
+Version, 
+Review History, 
+Explainability Metadata, 
+Consumer Engines. 
+The constitutional structure shall remain consistent regardless of knowledge type.
+
+Founder Principle
+Every Scientific Knowledge Object should answer what is known, how well it is known and where uncertainty remains.
+
+3.6 Relationships Between Scientific Knowledge Objects
+Scientific Knowledge Objects may contribute to one another.
+Illustrative examples include:
+Sleep Knowledge
+↓
+Recovery Knowledge
+↓
+Exercise Adaptation Knowledge
+
+Nutrition Knowledge
+↓
+Cardiometabolic Knowledge
+↓
+Longevity Knowledge
+
+Inflammation Knowledge
+↓
+Disease Knowledge
+↓
+Biomarker Knowledge
+Relationships shall remain explicit.
+Implicit scientific dependencies shall be prohibited.
+
+Engineering Rule
+Scientific relationships shall remain transparent and independently explainable.
+
+3.7 Knowledge Lifecycle
+Every Scientific Knowledge Object shall progress through a governed lifecycle.
+Illustrative stages include:
+Scientific Evidence Identified
+↓
+Scientific Appraisal
+↓
+Knowledge Extraction
+↓
+Scientific Validation
+↓
+Published
+↓
+Consumed
+↓
+Revised
+↓
+Superseded
+↓
+Archived
+Historical Scientific Knowledge Objects shall remain permanently reproducible. Knowledge evolution shall occur through replacement rather than modification.
+
+Constitutional Principle
+Scientific understanding evolves through new versions rather than rewritten history.
+
+3.8 Consumer Engines
+Scientific Knowledge Objects may be consumed by every constitutional engine.
+Illustrative examples include:
+ENG-001
+Consumes:
+Physiological Knowledge.
+Biomarker Knowledge.
+Disease Knowledge.
+Purpose:
+Construct Health Beliefs.
+
+ENG-003
+Consumes:
+Evidence Knowledge.
+Consensus Knowledge.
+Purpose:
+Support confidence evaluation.
+
+ENG-004
+Consumes:
+Intervention Knowledge.
+Clinical Guideline Knowledge.
+Purpose:
+Generate Decision Objects.
+
+ENG-007
+Consumes:
+Mechanistic Knowledge.
+Trajectory Knowledge.
+Purpose:
+Generate Prediction Objects.
+Ownership remains exclusively with ENG-008.
+
+Engineering Rule
+Scientific Knowledge Objects remain read-only for all consumer engines.
+
+3.9 Knowledge Currency
+Every Scientific Knowledge Object shall declare its current scientific status.
+Illustrative states include:
+Current Consensus.
+
+Emerging Evidence.
+
+Established Mechanism.
+
+Limited Evidence.
+
+Conflicting Evidence.
+
+Superseded Knowledge.
+Knowledge status shall evolve through constitutional governance. Scientific uncertainty shall remain explicitly represented.
+
+Constitutional Principle
+Scientific maturity should be represented as clearly as scientific content.
+
+3.10 Explainability
+Every Scientific Knowledge Object shall answer:
+What scientific concept is represented? 
+Which evidence supports this understanding? 
+What is the current consensus status? 
+Which populations does this knowledge apply to? 
+What limitations exist? 
+Which constitutional engines consume this knowledge? 
+When was this understanding last reviewed? 
+
+3.11 Engineering Constraints
+The Scientific Knowledge Model shall:
+remain domain-based, 
+preserve constitutional ownership, 
+support explicit scientific relationships, 
+preserve knowledge currency, 
+support historical reproducibility, 
+remain explainable, 
+remain fully auditable. 
+
+3.12 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Scientific Knowledge Objects are established as the canonical representation of scientific understanding.
+✓ Every scientific concept belongs to a governed Knowledge Domain.
+✓ Scientific relationships remain explicit.
+✓ Knowledge lifecycle stages are constitutionally defined.
+✓ Scientific currency is explicitly represented.
+✓ Consumer engine ownership remains unambiguous.
+✓ Every Scientific Knowledge Object remains fully explainable and auditable.
+Chapter 4
+Evidence Hierarchies, Scientific Consensus & Conflict Resolution
+
+4.1 Purpose
+The purpose of this chapter is to define how the Scientific Knowledge & Evidence Intelligence Engine evaluates differing sources of scientific evidence, establishes constitutional scientific consensus and manages situations where scientific knowledge is incomplete, evolving or conflicting.
+Medical science is dynamic.
+Different studies, guidelines and expert groups may legitimately reach different conclusions. The Scientific Knowledge Engine shall therefore represent scientific agreement and disagreement explicitly rather than forcing artificial certainty. The objective is to ensure that BioSense reasons from the best available scientific understanding while preserving transparency regarding uncertainty and evolving evidence.
+
+Constitutional Principle
+Scientific disagreement should be represented rather than concealed.
+
+4.2 Engineering Philosophy
+Not all scientific evidence contributes equally to constitutional knowledge.
+Some evidence is:
+more rigorous, 
+more reproducible, 
+more generalisable, 
+more widely accepted, 
+more clinically applicable. 
+Scientific consensus therefore emerges from the collective strength of evidence rather than from individual publications. The Scientific Knowledge Engine shall evaluate bodies of evidence rather than isolated studies whenever possible.
+
+Founder Principle
+Constitutional knowledge should emerge from scientific convergence rather than individual findings.
+
+4.3 Constitutional Evidence Hierarchy
+The Scientific Knowledge Engine shall evaluate evidence using a governed Evidence Hierarchy.
+Illustrative hierarchy includes:
+Level 1
+Systematic reviews and high-quality meta-analyses.
+
+Level 2
+Major international clinical guidelines.
+
+Level 3
+Large randomised controlled trials.
+
+Level 4
+Well-designed cohort and observational studies.
+
+Level 5
+Mechanistic and physiological research.
+
+Level 6
+Expert consensus statements.
+
+Level 7
+Case reports and preliminary observations.
+The Evidence Hierarchy supports appraisal.
+It does not automatically determine constitutional acceptance.
+
+Engineering Rule
+Evidence hierarchy informs judgement without replacing scientific appraisal.
+
+4.4 Scientific Consensus
+Every Scientific Knowledge Object shall declare its current Consensus Status.
+Illustrative states include:
+Established Consensus.
+↓
+Strong Emerging Consensus.
+↓
+Moderate Consensus.
+↓
+Limited Consensus.
+↓
+Conflicting Evidence.
+↓
+Insufficient Evidence.
+Consensus status reflects the current body of scientific understanding rather than individual publications. Consensus shall evolve only through constitutional governance.
+
+Constitutional Principle
+Consensus reflects the balance of evidence rather than unanimous agreement.
+
+4.5 Scientific Conflict
+Conflicting scientific evidence shall be represented explicitly.
+Illustrative examples include:
+Conflicting intervention studies.
+↓
+Conflicting guideline recommendations.
+↓
+Population-specific differences.
+↓
+Conflicting mechanistic explanations.
+↓
+Incomplete replication.
+Conflict shall not prevent constitutional knowledge from existing.
+Instead, the Scientific Knowledge Object shall explicitly describe:
+the conflicting positions, 
+supporting evidence, 
+strength of competing evidence, 
+current consensus position, 
+remaining uncertainty. 
+
+Founder Principle
+BioSense should acknowledge disagreement rather than simplify it away.
+
+4.6 Population Applicability
+Scientific conclusions are often population-dependent.
+Scientific Knowledge Objects shall therefore declare where evidence is most applicable.
+Illustrative dimensions include:
+age, 
+biological sex, 
+ethnicity where scientifically justified, 
+disease status, 
+athletic populations, 
+pregnancy, 
+medication status, 
+geographical context where relevant. 
+Population applicability shall form part of every Scientific Knowledge Object.
+
+Engineering Rule
+Scientific conclusions should be applied only within their supported populations.
+
+4.7 Emerging Science
+Not all promising research should become constitutional knowledge immediately. Emerging scientific evidence shall remain distinguishable from established scientific understanding.
+Illustrative characteristics include:
+early replication, 
+limited study numbers, 
+evolving mechanisms, 
+incomplete consensus, 
+ongoing guideline review. 
+Emerging science may support future constitutional updates. It shall not automatically replace established knowledge.
+
+Constitutional Principle
+Scientific novelty should be recognised without being mistaken for scientific certainty.
+
+4.8 Scientific Retirement
+Scientific understanding evolves.
+Some Scientific Knowledge Objects will become obsolete.
+Retirement may occur following:
+guideline revision, 
+superior evidence, 
+scientific refutation, 
+updated consensus, 
+improved mechanistic understanding. 
+Retired Scientific Knowledge Objects shall remain permanently available for historical reconstruction. They shall no longer be consumed by current constitutional reasoning.
+
+Founder Principle
+Scientific progress should preserve history while improving the future.
+
+4.9 Conflict Resolution Process
+Where meaningful scientific disagreement exists, the Scientific Knowledge Engine shall:
+Preserve all relevant evidence. 
+Evaluate evidence quality. 
+Assess consensus across trusted sources. 
+Determine constitutional applicability. 
+Document unresolved uncertainty. 
+Publish an updated Scientific Knowledge Object. 
+Conflict resolution shall remain transparent and reproducible.
+
+Engineering Rule
+Conflict resolution should produce explainable constitutional knowledge rather than artificial certainty.
+
+4.10 Explainability
+Every Scientific Knowledge Object shall answer:
+What evidence supports this knowledge? 
+Which evidence conflicts with it? 
+What is the current consensus status? 
+Which populations are represented? 
+Which uncertainties remain unresolved? 
+Why has BioSense adopted its current constitutional position? 
+
+4.11 Engineering Constraints
+The Scientific Consensus Framework shall:
+preserve conflicting evidence, 
+distinguish hierarchy from consensus, 
+support population-specific applicability, 
+preserve emerging science, 
+support scientific retirement, 
+remain explainable, 
+remain fully auditable. 
+
+4.12 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Evidence hierarchy is constitutionally defined.
+✓ Consensus status is explicitly represented.
+✓ Scientific conflicts remain visible rather than concealed.
+✓ Population applicability forms part of every Scientific Knowledge Object.
+✓ Emerging science remains distinguishable from established consensus.
+✓ Retired knowledge remains historically reproducible.
+✓ Every consensus decision remains fully explainable and auditable.
+Chapter 5
+Scientific Knowledge Evolution & Lifecycle Management
+
+5.1 Purpose
+The purpose of this chapter is to define how the Scientific Knowledge & Evidence Intelligence Engine manages the ongoing evolution of scientific understanding while preserving historical integrity, explainability and constitutional stability. Scientific knowledge is continuously refined through new research, updated clinical guidance and evolving scientific consensus. The Scientific Knowledge Engine shall therefore support controlled knowledge evolution without compromising historical reproducibility or the constitutional integrity of downstream intelligence. The objective is to ensure that BioSense remains scientifically current while preserving a complete history of how its understanding has evolved.
+
+Constitutional Principle
+Scientific knowledge should evolve continuously without rewriting historical understanding.
+
+5.2 Engineering Philosophy
+Medical science is not static.
+Knowledge evolves through:
+new evidence, 
+replication, 
+scientific debate, 
+guideline revision, 
+technological advancement, 
+improved physiological understanding. 
+The Scientific Knowledge Engine shall therefore treat scientific evolution as an expected constitutional process rather than an exceptional event. Scientific progress shall strengthen constitutional knowledge while preserving historical context.
+
+Founder Principle
+A living knowledge base should preserve both today's understanding and yesterday's reasoning.
+
+5.3 Knowledge Lifecycle
+Every Scientific Knowledge Object shall progress through a governed lifecycle.
+Illustrative lifecycle stages include:
+Scientific Evidence Identified
+↓
+Scientific Appraisal
+↓
+Knowledge Extraction
+↓
+Scientific Validation
+↓
+Published
+↓
+Consumed
+↓
+Reviewed
+↓
+Updated
+↓
+Superseded
+↓
+Archived
+Lifecycle progression shall remain fully auditable. Knowledge shall never transition between stages without constitutional governance.
+
+Engineering Rule
+Knowledge evolution shall occur through governed lifecycle progression rather than direct modification.
+
+5.4 Scheduled Scientific Review
+Scientific Knowledge Objects shall undergo periodic review.
+Review frequency may vary according to:
+rate of scientific change, 
+clinical importance, 
+evidence maturity, 
+guideline update frequency, 
+emerging controversy, 
+consumer engine dependency. 
+High-impact knowledge shall generally be reviewed more frequently than stable, well-established scientific concepts.
+Review schedules shall remain version-controlled.
+
+Constitutional Principle
+Scientific review frequency should reflect the pace of scientific change.
+
+5.5 Triggered Review
+In addition to scheduled reviews, constitutional review may be initiated following:
+publication of major clinical guidelines, 
+significant systematic reviews, 
+landmark clinical trials, 
+regulatory updates, 
+major consensus revisions, 
+identification of constitutional inconsistencies, 
+formal governance requests. 
+Triggered reviews shall preserve the existing Scientific Knowledge Object until review is complete.
+
+Founder Principle
+Major scientific developments deserve timely constitutional review.
+
+5.6 Knowledge Revision
+Where review concludes that scientific understanding has evolved, the Scientific Knowledge Engine shall generate a new version of the affected Scientific Knowledge Object.
+Revision may include updates to:
+scientific statements, 
+evidence hierarchy, 
+consensus status, 
+population applicability, 
+known limitations, 
+supporting evidence, 
+mechanistic understanding. 
+The previous version shall remain immutable and available for historical reconstruction.
+
+Engineering Rule
+Scientific revision creates a new object version rather than modifying an existing one.
+
+5.7 Knowledge Dependencies
+Scientific Knowledge Objects may be consumed by multiple constitutional engines. Before publishing an updated object, governance shall identify downstream dependencies.
+Illustrative consumers include:
+Health Beliefs, 
+Confidence Objects, 
+Decision Objects, 
+Prediction Objects, 
+Structured Explanations. 
+Dependency analysis shall determine whether additional constitutional re-evaluation is required following publication.
+
+Constitutional Principle
+Knowledge changes should consider their impact across the constitutional architecture.
+
+5.8 Historical Preservation
+Every historical Scientific Knowledge Object shall remain available for:
+audit, 
+replay, 
+historical explanation, 
+regulatory review, 
+engineering analysis, 
+longitudinal comparison. 
+Historical versions shall never be overwritten or deleted through routine lifecycle management.
+
+Founder Principle
+Scientific history is part of scientific transparency.
+
+5.9 Deprecation
+Where scientific understanding has been superseded, the previous Scientific Knowledge Object shall enter a governed deprecation state.
+Deprecated objects:
+remain historically available, 
+are excluded from new constitutional reasoning, 
+retain complete provenance, 
+preserve version history, 
+remain fully explainable. 
+Deprecation shall never invalidate historical reasoning that was correct at the time it occurred.
+
+Engineering Rule
+Deprecation affects future consumption, not historical validity.
+
+5.10 Explainability
+Every Scientific Knowledge Object shall answer:
+When was this knowledge last reviewed? 
+Why was it updated? 
+Which scientific developments prompted revision? 
+Which previous versions exist? 
+Which constitutional engines consume this knowledge? 
+Has the consensus materially changed? 
+
+5.11 Engineering Constraints
+The Scientific Knowledge Lifecycle Framework shall:
+preserve historical versions, 
+support scheduled and triggered reviews, 
+maintain explicit dependency tracking, 
+prohibit silent modification, 
+support governed deprecation, 
+remain explainable, 
+remain fully auditable. 
+
+5.12 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Scientific Knowledge Objects follow a governed lifecycle.
+✓ Scheduled and triggered review mechanisms are constitutionally defined.
+✓ New scientific understanding creates new object versions.
+✓ Downstream dependency analysis is performed before publication.
+✓ Historical knowledge remains permanently reproducible.
+✓ Deprecated knowledge remains available for audit but excluded from future reasoning.
+✓ Every lifecycle transition remains fully explainable and auditable.
+Chapter 6
+Knowledge Consumption & Constitutional Integration
+
+6.1 Purpose
+The purpose of this chapter is to define how Scientific Knowledge Objects are consumed throughout the BioSense Intelligence Platform while preserving constitutional ownership, consistency and explainability. The Scientific Knowledge & Evidence Intelligence Engine is the sole constitutional owner of scientific understanding. All other engines shall consume Scientific Knowledge Objects through governed interfaces without modifying, duplicating or reinterpreting their contents. The objective is to ensure that every constitutional engine reasons from the same scientific foundation while maintaining clear ownership boundaries.
+
+Constitutional Principle
+One source of scientific truth should serve every constitutional engine.
+
+6.2 Engineering Philosophy
+Scientific knowledge should exist once.
+Reasoning may occur many times.
+Rather than allowing individual engines to maintain independent scientific understanding, the platform shall centralise all accepted scientific knowledge within the Canonical Scientific Library. Constitutional engines shall consume that knowledge as required for their specific responsibilities. This architecture ensures that improvements to scientific understanding propagate consistently throughout the platform.
+
+Founder Principle
+Centralise scientific knowledge. Decentralise scientific reasoning.
+
+6.3 Constitutional Consumers
+Scientific Knowledge Objects may be consumed by every constitutional engine.
+ENG-001
+Consumes:
+Biomarker Knowledge 
+Physiological Mechanisms 
+Disease Knowledge 
+Population Reference Knowledge 
+Purpose:
+Construct Dynamic Health Models and Health Beliefs.
+
+ENG-002
+Consumes:
+Biomarker Knowledge 
+Measurement Standards 
+Observation Interpretation Rules 
+Purpose:
+Interpret Canonical Observations.
+
+ENG-003
+Consumes:
+Evidence Hierarchy 
+Scientific Consensus 
+Population Applicability 
+Purpose:
+Evaluate Confidence Objects.
+
+ENG-004
+Consumes:
+Intervention Knowledge 
+Clinical Guideline Knowledge 
+Mechanistic Knowledge 
+Purpose:
+Generate Decision Objects.
+
+ENG-005
+Consumes:
+Evidence Summaries 
+Scientific Statements 
+Known Limitations 
+Purpose:
+Generate explainable communication.
+
+ENG-006
+Consumes:
+Behavioural Science Knowledge 
+Educational Knowledge 
+Purpose:
+Support adaptive learning.
+
+ENG-007
+Consumes:
+Mechanistic Knowledge 
+Risk Relationships 
+Longevity Knowledge 
+Purpose:
+Generate Prediction Objects.
+
+Engineering Rule
+Scientific Knowledge Objects remain read-only regardless of consumer.
+
+6.4 Read-Only Consumption
+Consumer engines shall never:
+modify Scientific Knowledge Objects, 
+create competing scientific interpretations, 
+duplicate canonical knowledge, 
+override scientific consensus, 
+alter evidence hierarchy. 
+Where engine-specific interpretation is required, that interpretation shall remain distinct from the underlying Scientific Knowledge Object.
+
+Constitutional Principle
+Knowledge remains immutable while reasoning remains dynamic.
+
+6.5 Knowledge Context
+Consumer engines shall request only the scientific knowledge relevant to the task being performed.
+Illustrative examples include:
+Health Belief generation.
+↓
+Relevant biomarker physiology.
+
+Decision generation.
+↓
+Relevant intervention evidence.
+
+Forecast generation.
+↓
+Relevant mechanistic relationships.
+
+Conversation generation.
+↓
+Relevant evidence summaries.
+Retrieval shall remain context-aware.
+The Scientific Knowledge Engine shall not provide unnecessary scientific information.
+
+Founder Principle
+Deliver sufficient scientific knowledge rather than maximum scientific knowledge.
+
+6.6 Knowledge Traceability
+Every constitutional output shall remain traceable to the Scientific Knowledge Objects that informed it.
+Illustrative examples include:
+Health Belief
+↓
+Supporting Biomarker Knowledge Object.
+
+Decision Object
+↓
+Supporting Intervention Knowledge Object.
+
+Prediction Object
+↓
+Supporting Mechanistic Knowledge Object.
+
+Structured Explanation
+↓
+Supporting Evidence Summary Object.
+Traceability shall remain available throughout the entire constitutional lifecycle.
+
+Engineering Rule
+Every constitutional conclusion shall be scientifically traceable.
+
+6.7 Knowledge Consistency
+Equivalent scientific concepts shall produce materially consistent reasoning regardless of consumer engine.
+Illustrative example:
+The physiological understanding of ApoB shall remain identical whether consumed by:
+ENG-001, 
+ENG-003, 
+ENG-004, 
+ENG-005, 
+ENG-007. 
+Differences may exist in application.
+They shall never exist in scientific understanding.
+
+Constitutional Principle
+Scientific consistency should be independent of consumer engine.
+
+6.8 Knowledge Refresh
+Consumer engines shall always retrieve the currently active version of a Scientific Knowledge Object unless historical replay explicitly requires an earlier version. Historical reasoning shall always reference the version that existed at the time the reasoning occurred. Current reasoning shall always reference the latest constitutionally approved version.
+
+Founder Principle
+Today's reasoning should use today's science while yesterday's reasoning preserves yesterday's science.
+
+6.9 Explainability
+Every constitutional engine shall be capable of answering:
+Which Scientific Knowledge Objects contributed? 
+Which versions were used? 
+Which evidence summaries were consumed? 
+Which scientific consensus informed the reasoning? 
+Has the underlying knowledge changed since this reasoning occurred? 
+
+6.10 Engineering Constraints
+The Knowledge Consumption Framework shall:
+preserve single ownership, 
+require read-only consumption, 
+maintain context-aware retrieval, 
+preserve complete traceability, 
+ensure cross-engine consistency, 
+support historical replay, 
+remain fully explainable and auditable. 
+
+6.11 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Scientific Knowledge Objects are consumed exclusively through governed interfaces.
+✓ Consumer engines remain read-only.
+✓ Scientific traceability is preserved across every constitutional engine.
+✓ Knowledge retrieval remains context-aware.
+✓ Scientific understanding remains consistent across all consumers.
+✓ Historical reasoning references historical knowledge versions.
+✓ Every knowledge dependency remains fully explainable and auditable.
+Chapter 7
+Knowledge Currency, Monitoring & Scientific Surveillance
+
+7.1 Purpose
+The purpose of this chapter is to define how the Scientific Knowledge & Evidence Intelligence Engine monitors the scientific landscape to ensure the Canonical Scientific Library remains current, relevant and constitutionally trustworthy.
+Scientific understanding evolves continuously.
+The Scientific Knowledge Engine shall therefore monitor for developments that may warrant constitutional review while preserving governed validation, explainability and historical reproducibility.
+Monitoring identifies potential change.
+Governance determines whether change occurs.
+
+Constitutional Principle
+Scientific monitoring should identify change without automatically changing constitutional knowledge.
+
+7.2 Engineering Philosophy
+Remaining scientifically current requires continuous awareness of:
+new publications, 
+updated clinical guidelines, 
+revised consensus statements, 
+regulatory changes, 
+landmark clinical trials, 
+evolving mechanistic understanding. 
+However, awareness shall never be confused with constitutional acceptance. Detection and adoption are separate constitutional responsibilities.
+
+Founder Principle
+Detect scientific change early. Adopt scientific change carefully.
+
+7.3 Scientific Monitoring Sources
+Scientific surveillance may monitor:
+peer-reviewed medical journals, 
+recognised clinical guideline publishers, 
+major professional medical societies, 
+systematic review databases, 
+regulatory health authorities, 
+biomedical evidence repositories, 
+constitutional governance watchlists. 
+Monitoring sources shall themselves remain governed and version-controlled.
+
+Engineering Rule
+Only trusted monitoring sources may trigger constitutional review.
+
+7.4 Monitoring Pipeline
+Scientific surveillance shall follow a governed monitoring pipeline.
+Scientific Source Monitoring
+
+↓
+
+Potential Knowledge Change Detected
+
+↓
+
+Relevance Assessment
+
+↓
+
+Knowledge Impact Assessment
+
+↓
+
+Governance Review Request
+
+↓
+
+Scientific Review
+
+↓
+
+Knowledge Revision (if approved)
+
+↓
+
+Canonical Scientific Library Update
+Detection alone shall never update Scientific Knowledge Objects.
+
+Constitutional Principle
+Scientific monitoring informs governance rather than replacing governance.
+
+7.5 Knowledge Impact Assessment
+Potential scientific developments shall undergo structured impact assessment.
+Illustrative assessment questions include:
+Which Scientific Knowledge Objects may be affected? 
+Which constitutional engines consume those objects? 
+Does current scientific consensus appear materially altered? 
+Is this incremental evidence or potentially practice-changing evidence? 
+Is immediate review justified? 
+Impact assessment determines review priority.
+It does not determine constitutional acceptance.
+
+Founder Principle
+Understand the impact of new science before changing existing science.
+
+7.6 Monitoring Priority
+Potential updates may be prioritised according to:
+Critical
+Potential impact on constitutional reasoning.
+
+High
+Major guideline or consensus revision.
+
+Moderate
+Significant supporting evidence.
+
+Routine
+Incremental scientific development.
+
+Informational
+Scientific interest without immediate constitutional relevance.
+Priority affects review scheduling only.
+It shall not influence scientific conclusions.
+
+Engineering Rule
+Monitoring priority determines urgency, not truth.
+
+7.7 Stale Knowledge Detection
+The Scientific Knowledge Engine shall identify Scientific Knowledge Objects that may require review.
+Illustrative indicators include:
+elapsed review interval, 
+multiple recent publications, 
+guideline supersession, 
+regulatory changes, 
+unresolved scientific conflict, 
+significant dependency across constitutional engines. 
+Detection of potentially stale knowledge shall generate governance notifications. It shall not automatically deprecate knowledge.
+
+Constitutional Principle
+Potentially outdated knowledge deserves review rather than automatic replacement.
+
+7.8 Scientific Surveillance Dashboard
+Governance may maintain visibility into:
+pending review requests, 
+overdue Scientific Knowledge Objects, 
+monitoring alerts, 
+emerging scientific themes, 
+unresolved conflicts, 
+recently updated knowledge, 
+dependency impact summaries. 
+The dashboard supports governance.
+It does not perform governance.
+
+Founder Principle
+Visibility improves governance without replacing judgement.
+
+7.9 Consumer Protection
+Until constitutional review is completed:
+existing Scientific Knowledge Objects remain active, 
+downstream reasoning remains reproducible, 
+Health Beliefs remain valid, 
+Decision Objects remain historically explainable, 
+Prediction Objects remain historically reproducible. 
+Pending review shall never silently alter user-facing intelligence.
+
+Engineering Rule
+Knowledge remains constitutionally stable until governance explicitly approves change.
+
+7.10 Explainability
+The Scientific Knowledge Engine shall answer:
+Why has this Scientific Knowledge Object been flagged? 
+Which scientific developments triggered review? 
+What downstream constitutional objects may be affected? 
+Has constitutional knowledge changed? 
+Is review pending or complete? 
+
+7.11 Engineering Constraints
+The Scientific Surveillance Framework shall:
+separate monitoring from adoption, 
+preserve constitutional stability, 
+support structured impact assessment, 
+detect stale knowledge, 
+maintain governance visibility, 
+remain explainable, 
+remain fully auditable. 
+
+7.12 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Scientific monitoring remains distinct from constitutional adoption.
+✓ Monitoring follows a governed surveillance pipeline.
+✓ Knowledge Impact Assessment precedes scientific review.
+✓ Stale knowledge detection is constitutionally defined.
+✓ Governance dashboards remain informational rather than authoritative.
+✓ Pending reviews never silently alter constitutional knowledge.
+✓ Every monitoring activity remains fully explainable and auditable.
+Chapter 8
+Scientific Quality Assurance, Validation & Knowledge Integrity
+
+8.1 Purpose
+The purpose of this chapter is to define the constitutional framework for validating the quality, integrity and operational reliability of the Scientific Knowledge & Evidence Intelligence Engine. As the authoritative source of scientific knowledge for the BioSense Intelligence Platform, the Scientific Knowledge Engine shall continuously demonstrate that its outputs remain accurate, current, explainable and constitutionally governed. The objective is to ensure that every Scientific Knowledge Object consumed by downstream engines satisfies the standards required for trustworthy preventive healthcare.
+
+Constitutional Principle
+The integrity of constitutional reasoning depends upon the integrity of constitutional knowledge.
+
+8.2 Engineering Philosophy
+Scientific knowledge cannot be assumed to remain correct simply because it has entered the Canonical Scientific Library. Knowledge quality shall therefore be continuously evaluated through structured validation processes.
+Validation exists to verify that:
+scientific meaning has been preserved, 
+provenance remains intact, 
+evidence remains traceable, 
+consensus remains accurately represented, 
+knowledge remains internally consistent. 
+Validation strengthens trust without altering constitutional ownership.
+
+Founder Principle
+Scientific knowledge should be continually verified rather than permanently trusted.
+
+8.3 Validation Objectives
+The Scientific Knowledge Engine shall validate that every Scientific Knowledge Object maintains:
+provenance integrity, 
+evidence traceability, 
+constitutional consistency, 
+scientific completeness, 
+consensus accuracy, 
+version integrity, 
+explainability. 
+Validation applies to both newly created and existing Scientific Knowledge Objects.
+
+Engineering Rule
+Validation shall evaluate knowledge quality rather than scientific novelty.
+
+8.4 Validation Pipeline
+Every Scientific Knowledge Object shall participate in the constitutional validation lifecycle.
+Scientific Knowledge Object
+
+↓
+
+Integrity Validation
+
+↓
+
+Scientific Consistency Validation
+
+↓
+
+Evidence Traceability Validation
+
+↓
+
+Consensus Validation
+
+↓
+
+Explainability Validation
+
+↓
+
+Knowledge Integrity Status
+
+↓
+
+Eligible for Constitutional Consumption
+Validation shall occur before knowledge becomes available to consumer engines.
+
+Constitutional Principle
+Scientific knowledge should be validated before it is trusted.
+
+8.5 Integrity Validation
+Integrity validation shall confirm that each Scientific Knowledge Object contains:
+complete provenance, 
+complete version history, 
+valid supporting evidence, 
+declared consensus status, 
+explicit limitations, 
+consumer mappings, 
+lifecycle metadata. 
+Objects failing integrity validation shall not become constitutionally active.
+
+Founder Principle
+Incomplete knowledge should never become constitutional knowledge.
+
+8.6 Scientific Consistency Validation
+The Scientific Knowledge Engine shall verify that Scientific Knowledge Objects remain internally consistent.
+Illustrative checks include:
+contradictory scientific statements, 
+incompatible consensus classifications, 
+conflicting mechanistic explanations, 
+inconsistent population applicability, 
+duplicate constitutional knowledge. 
+Detected inconsistencies shall initiate governance review. They shall not automatically modify Scientific Knowledge Objects.
+
+Engineering Rule
+Consistency validation identifies issues without independently resolving them.
+
+8.7 Evidence Traceability Validation
+Every scientific conclusion shall remain traceable to its supporting evidence.
+Validation shall confirm:
+supporting evidence exists, 
+provenance remains complete, 
+evidence hierarchy is preserved, 
+references remain valid, 
+constitutional mappings remain intact. 
+Loss of traceability shall constitute a constitutional validation failure.
+
+Constitutional Principle
+Scientific conclusions without traceable evidence shall not remain constitutional knowledge.
+
+8.8 Explainability Validation
+The Scientific Knowledge Engine shall verify that every Scientific Knowledge Object can answer:
+What scientific understanding is represented? 
+Which evidence supports it? 
+What limitations remain? 
+What is the current consensus? 
+Which populations are represented? 
+Which constitutional engines consume this knowledge? 
+Objects failing explainability validation shall require governance review before continued constitutional use.
+
+Founder Principle
+Knowledge that cannot explain itself cannot support constitutional reasoning.
+
+8.9 Knowledge Integrity Status
+Every Scientific Knowledge Object shall possess a governed Knowledge Integrity Status.
+Illustrative states include:
+Validated.
+
+Under Review.
+
+Validation Pending.
+
+Deprecated.
+
+Retired.
+Knowledge Integrity Status shall remain independent of Scientific Consensus Status. An object may represent established scientific consensus while temporarily undergoing integrity review.
+
+Engineering Rule
+Integrity reflects constitutional quality rather than scientific agreement.
+
+8.10 Operational Monitoring
+The Scientific Knowledge Engine shall monitor:
+validation success rates, 
+integrity failures, 
+traceability failures, 
+explainability failures, 
+duplicate knowledge detection, 
+consistency exceptions, 
+governance review requests, 
+validation latency. 
+Operational monitoring supports continuous improvement.
+It shall never automatically modify Scientific Knowledge Objects.
+
+Constitutional Principle
+Monitoring informs governance rather than replacing governance.
+
+8.11 Engineering Constraints
+The Scientific Quality Assurance Framework shall:
+validate every Scientific Knowledge Object, 
+preserve provenance, 
+preserve evidence traceability, 
+separate integrity from scientific consensus, 
+support governance review, 
+remain explainable, 
+remain fully auditable. 
+
+8.12 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Every Scientific Knowledge Object undergoes structured validation.
+✓ Integrity validation remains distinct from scientific appraisal.
+✓ Evidence traceability is continuously verified.
+✓ Explainability forms part of constitutional validation.
+✓ Knowledge Integrity Status is independently represented.
+✓ Operational monitoring informs governance without altering knowledge.
+✓ Every validation activity remains fully explainable and auditable.
+Chapter 9
+Governance, Versioning & Scientific Knowledge Governance
+
+9.1 Purpose
+The purpose of this chapter is to define the governance framework responsible for the long-term stewardship, evolution and constitutional integrity of the Scientific Knowledge & Evidence Intelligence Engine. Scientific knowledge underpins every constitutional engine within the BioSense Intelligence Platform. Changes to scientific understanding shall therefore occur only through governed, transparent and reproducible processes that preserve historical integrity, explainability and scientific trust. The objective is continuous scientific improvement without compromising constitutional stability.
+
+Constitutional Principle
+Scientific knowledge should evolve through governance rather than uncontrolled change.
+
+9.2 Engineering Philosophy
+Scientific understanding is expected to evolve throughout the lifetime of the BioSense platform.
+Governance exists to ensure that scientific evolution remains:
+deliberate, 
+evidence-based, 
+transparent, 
+explainable, 
+reproducible, 
+constitutionally consistent. 
+Scientific progress shall strengthen the Canonical Scientific Library while preserving historical versions and downstream reproducibility.
+
+Founder Principle
+Improve scientific understanding without rewriting scientific history.
+
+9.3 Governance Responsibilities
+Scientific Knowledge Governance shall oversee:
+Scientific Knowledge Domains, 
+Scientific Knowledge Object definitions, 
+acquisition methodology, 
+appraisal methodology, 
+validation standards, 
+Evidence Hierarchy, 
+Consensus Status methodology, 
+Knowledge Integrity methodology, 
+lifecycle management, 
+review scheduling, 
+deprecation policy, 
+dependency management, 
+constitutional compatibility. 
+Governance establishes scientific policy.
+The Scientific Knowledge Engine executes it.
+
+Engineering Rule
+Governance defines scientific standards.
+The Scientific Knowledge Engine applies them.
+
+9.4 Versioning
+Every Scientific Knowledge Object shall reference:
+Scientific Knowledge Engine Version, 
+Acquisition Pipeline Version, 
+Appraisal Methodology Version, 
+Validation Framework Version, 
+Evidence Hierarchy Version, 
+Consensus Framework Version, 
+Knowledge Lifecycle Version, 
+Governance Policy Version. 
+These references shall enable complete historical reconstruction of every Scientific Knowledge Object exactly as it existed at any point in time.
+
+Constitutional Principle
+Every scientific conclusion should remain permanently reproducible.
+
+9.5 Configuration Management
+Certain governance parameters may evolve without requiring architectural redesign.
+Illustrative examples include:
+review frequency, 
+appraisal methodology, 
+monitoring thresholds, 
+validation rules, 
+lifecycle timing, 
+dependency analysis parameters, 
+governance workflows. 
+Configuration changes shall remain:
+version-controlled, 
+documented, 
+independently validated, 
+fully auditable. 
+
+Founder Principle
+Scientific governance should evolve transparently rather than invisibly.
+
+9.6 Scientific Knowledge Engine Releases
+Every Scientific Knowledge Engine release shall preserve:
+Release Version, 
+Release Date, 
+Engineering rationale, 
+Scientific impact assessment, 
+Validation evidence, 
+Compatibility assessment, 
+Migration guidance. 
+Historical Scientific Knowledge Objects shall remain interpretable regardless of future engine releases.
+
+Engineering Rule
+Engine evolution shall preserve historical scientific meaning.
+
+9.7 Validation Before Deployment
+No governance change shall enter production without structured validation.
+Validation may include:
+acquisition validation, 
+appraisal consistency, 
+consensus consistency, 
+dependency analysis, 
+lifecycle validation, 
+historical replay, 
+explainability verification, 
+cross-engine compatibility. 
+Validation shall demonstrate improved governance without compromising constitutional principles.
+
+Constitutional Principle
+Governance improvements should strengthen scientific trust rather than simply improve process efficiency.
+
+9.8 Historical Reproducibility
+At any future point, BioSense shall be capable of reconstructing:
+Scientific Knowledge Objects, 
+supporting evidence, 
+consensus status, 
+evidence hierarchy, 
+knowledge integrity, 
+provenance, 
+review history, 
+governance policies, 
+exactly as they existed when originally published. Historical scientific understanding shall remain independent of future scientific revisions.
+
+Founder Principle
+Scientific history should remain permanently accessible.
+
+9.9 Change Impact Assessment
+Before publishing any governed scientific change, governance shall evaluate:
+Which Scientific Knowledge Objects are affected? 
+Which constitutional engines consume those objects? 
+Will downstream reasoning materially change? 
+Will historical compatibility remain preserved? 
+Are new reviews required? 
+Are regulatory implications affected? 
+Has constitutional explainability been preserved? 
+Potential impacts shall be documented before deployment.
+
+Engineering Rule
+Every scientific governance change shall include a documented constitutional impact assessment.
+
+9.10 Operational Monitoring
+Scientific Knowledge Governance shall monitor:
+acquisition activity, 
+review completion, 
+validation performance, 
+stale knowledge detection, 
+governance exceptions, 
+dependency impact, 
+integrity failures, 
+explainability performance, 
+scientific update frequency. 
+Operational monitoring informs governance.
+It shall never automatically modify Scientific Knowledge Objects.
+
+Constitutional Principle
+Operational monitoring supports governance without replacing it.
+
+9.11 Auditability
+Every governance activity shall generate an immutable audit record.
+Illustrative examples include:
+Scientific Knowledge Object revisions, 
+Evidence Hierarchy updates, 
+consensus methodology revisions, 
+governance approvals, 
+review outcomes, 
+lifecycle transitions, 
+deployment history. 
+Audit records shall remain permanently available.
+
+9.12 Regulatory Readiness
+Scientific Knowledge Governance shall support future regulatory expectations concerning:
+AI transparency, 
+scientific explainability, 
+evidence governance, 
+healthcare AI regulation, 
+algorithm accountability, 
+medical software quality systems, 
+auditability. 
+The governance framework shall remain adaptable without compromising constitutional principles.
+
+9.13 Engineering Constraints
+Scientific Knowledge Governance shall:
+preserve constitutional ownership, 
+support controlled scientific evolution, 
+preserve historical reproducibility, 
+maintain explainability, 
+maintain auditability, 
+support future regulatory frameworks, 
+remain constitutionally consistent. 
+
+9.14 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Every Scientific Knowledge Object is version-controlled.
+✓ Scientific governance evolves only through governed change.
+✓ Historical scientific understanding remains reproducible.
+✓ Governance deployment requires structured validation.
+✓ Governance activities remain fully auditable.
+✓ Operational monitoring informs governance without automatically modifying scientific knowledge.
+✓ The Scientific Knowledge Engine remains prepared for future regulatory expectations.
+Chapter 10
+End-to-End Scientific Knowledge Lifecycle
+
+10.1 Purpose
+The purpose of this chapter is to demonstrate the complete operational lifecycle of the Scientific Knowledge & Evidence Intelligence Engine within the BioSense Intelligence Platform. Previous chapters define the constitutional architecture governing scientific acquisition, validation, Scientific Knowledge Objects, evidence hierarchy, consensus management, lifecycle evolution, knowledge consumption and governance. This chapter illustrates how these components interact to transform external scientific evidence into governed constitutional knowledge that can safely support downstream reasoning. The objective is to demonstrate that every Scientific Knowledge Object follows a complete constitutional lifecycle from external publication to trusted platform intelligence.
+
+Constitutional Principle
+Every constitutional conclusion should ultimately trace back to governed scientific knowledge through one continuous and explainable lifecycle.
+
+10.2 Example Scenario
+For the purposes of this example we introduce a fictional scientific development. A major international cardiology society publishes an updated clinical guideline recommending increased emphasis on Apolipoprotein B (ApoB) for cardiovascular risk assessment following multiple large-scale systematic reviews and meta-analyses. The Scientific Knowledge Engine identifies the publication through its governed monitoring framework. No constitutional knowledge changes at this stage.
+
+Founder Principle
+Scientific awareness begins with observation rather than adoption.
+
+10.3 Source Verification
+The acquisition pipeline verifies:
+publication authenticity, 
+issuing organisation, 
+publication status, 
+release date, 
+citation integrity, 
+provenance. 
+Verification succeeds.
+The publication proceeds to constitutional appraisal.
+
+Engineering Rule
+Verification establishes source trust before scientific evaluation begins.
+
+10.4 Scientific Appraisal
+The Scientific Knowledge Engine evaluates:
+methodological quality, 
+supporting evidence, 
+systematic review quality, 
+existing guideline consistency, 
+population applicability, 
+evidence limitations, 
+remaining scientific uncertainty. 
+The body of evidence demonstrates strong support for updating constitutional understanding.
+Scientific appraisal is completed.
+
+Constitutional Principle
+Appraisal evaluates the strength of scientific understanding rather than the popularity of scientific opinion.
+
+10.5 Knowledge Extraction
+The Scientific Knowledge Engine extracts structured constitutional understanding.
+Illustrative extraction includes:
+Updated physiological role of ApoB.
+↓
+Current evidence regarding cardiovascular prediction.
+↓
+Updated intervention evidence.
+↓
+Known limitations.
+↓
+Population applicability.
+↓
+Remaining uncertainty.
+This information becomes a candidate Scientific Knowledge Object.
+
+Founder Principle
+Extract scientific understanding rather than reproducing scientific publications.
+
+10.6 Scientific Validation
+The candidate Scientific Knowledge Object undergoes constitutional validation.
+Validation confirms:
+provenance integrity, 
+evidence traceability, 
+consensus consistency, 
+explainability, 
+constitutional compatibility, 
+lifecycle completeness. 
+Validation succeeds.
+Governance approves publication.
+
+Engineering Rule
+Validation establishes constitutional readiness rather than scientific perfection.
+
+10.7 Canonical Scientific Library
+A new version of the ApoB Scientific Knowledge Object is published.
+The Canonical Scientific Library now contains:
+Previous Version
+↓
+Archived.
+
+New Version
+↓
+Current.
+Historical versions remain permanently reproducible.
+No historical Health Beliefs are modified.
+
+Constitutional Principle
+Scientific evolution creates new constitutional knowledge without rewriting historical understanding.
+
+10.8 Constitutional Consumption
+Consumer engines retrieve the updated Scientific Knowledge Object.
+Illustrative examples include:
+ENG-001
+↓
+Future Health Beliefs reference the updated scientific understanding.
+
+ENG-003
+↓
+Confidence evaluations reference the revised consensus.
+
+ENG-004
+↓
+Decision Intelligence references updated intervention evidence.
+
+ENG-005
+↓
+Structured explanations reference the revised evidence summaries.
+
+ENG-007
+↓
+Forecast models utilise updated mechanistic understanding where appropriate. Existing constitutional outputs remain historically reproducible. Only future reasoning consumes the updated knowledge.
+
+Founder Principle
+Improved science should improve future reasoning without changing historical reasoning.
+
+10.9 Governance
+Several months later:
+Additional supporting studies strengthen the scientific consensus.
+Governance schedules another constitutional review.
+Scientific Consensus Status evolves from:
+Strong Emerging Consensus
+↓
+Established Consensus
+A new Scientific Knowledge Object version is published. Previous versions remain available for replay. The constitutional history of scientific understanding is preserved.
+
+Engineering Rule
+Consensus evolves through governed versions rather than silent updates.
+
+10.10 End-to-End Validation
+This example demonstrates that:
+✓ External science enters BioSense through governed acquisition.
+✓ Scientific appraisal precedes constitutional acceptance.
+✓ Scientific Knowledge Objects remain independently governed.
+✓ Consumer engines remain read-only.
+✓ Historical knowledge remains reproducible.
+✓ Scientific evolution creates new object versions.
+✓ Constitutional reasoning always references governed scientific knowledge.
+✓ Every stage remains fully explainable and auditable.
+
+Closing Statement
+The Scientific Knowledge & Evidence Intelligence Engine is not a medical literature database. It is not a search engine. It is not a large language model trained on scientific publications. It is the constitutional system through which BioSense transforms evolving medical science into governed, structured and explainable scientific knowledge.
+Every Scientific Knowledge Object begins with trusted evidence. Every scientific conclusion undergoes structured appraisal. Every constitutional position preserves uncertainty where appropriate. Every object remains versioned, traceable and reproducible.
+Every downstream engine reasons from the same governed scientific foundation. Through this architecture, BioSense remains scientifically current while preserving the stability, transparency and trust required of a long-term preventive healthcare platform. The Scientific Knowledge Engine therefore provides the constitutional foundation upon which every other intelligence capability within BioSense depends.

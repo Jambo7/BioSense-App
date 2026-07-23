@@ -108,6 +108,12 @@ pushed to Neon — only run `npx prisma db push` after editing `prisma/schema.pr
 
 ## 6. Open items / TODO
 
+- [ ] **⚠️ REMINDER (James): set `CRON_SECRET` in Vercel for proper cron auth.** The daily
+      wearable-sync cron currently authorises Vercel's scheduler via its `vercel-cron/1.0`
+      user-agent (so it works with no secret), but that endpoint is therefore triggerable by
+      anyone who finds the URL (harmless — only forces a data refresh, no data exposed).
+      Adding a `CRON_SECRET` env var in Vercel locks it down; the code already prefers it
+      when present. Low priority, not urgent.
 - [ ] **Validate Fitbit data mapping** against a real stored payload once data syncs
       (check `lib/wearable-metrics.ts` paths match what Fitbit actually sends).
 - [ ] **Confirm Vercel ⇄ Terra environment alignment** (Testing vs Production keys).

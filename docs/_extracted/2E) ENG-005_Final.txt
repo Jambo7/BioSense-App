@@ -1,0 +1,2471 @@
+
+ENG-005: Conversation, Explanation & Intelligence Delivery Engine 
+Engineering Specification
+Document ID:  ENG-005
+Version:  1.0 (Draft)
+Status:  In Development
+Authority:  BioSense Intelligence Constitution (Documents 1A–1C)
+Depends Upon:
+ENG-001 — Dynamic Health Model Engineering Specification
+ENG-002 — Observation Engine & Canonical Observation Store Engineering Specification
+ENG-003 — Confidence & Evidence Evaluation Engine Engineering Specification
+ENG-004 — Decision Intelligence & Intervention Engine Engineering Specification 
+Contents
+	 TOC \o "1-2" \h \z \u ENG-005: Conversation, Explanation & Intelligence Delivery Engine  Engineering Specification	 PAGEREF _Toc234388455 \h 1
+	Purpose & Design Philosophy	 PAGEREF _Toc234388456 \h 8
+	1.1 Purpose	 PAGEREF _Toc234388457 \h 8
+	1.2 Scope	 PAGEREF _Toc234388458 \h 8
+	1.3 Authority	 PAGEREF _Toc234388459 \h 9
+	1.4 Engineering Philosophy	 PAGEREF _Toc234388460 \h 10
+	1.5 Constitutional Definition	 PAGEREF _Toc234388461 \h 11
+	1.5a Normative Enumerations & Glossary	 PAGEREF _Toc234388462 \h 11
+	1.6 Communication Is Not Reasoning	 PAGEREF _Toc234388463 \h 11
+	1.7 Intelligence Delivery	 PAGEREF _Toc234388464 \h 12
+	1.8 Explainability	 PAGEREF _Toc234388465 \h 13
+	1.9 Human-Centred Communication	 PAGEREF _Toc234388466 \h 13
+	1.10 Acceptance Criteria	 PAGEREF _Toc234388467 \h 14
+	Context Assembly & Grounding Architecture	 PAGEREF _Toc234388468 \h 15
+	2.1 Purpose	 PAGEREF _Toc234388469 \h 15
+	2.2 Engineering Philosophy	 PAGEREF _Toc234388470 \h 15
+	2.3 Context Sources	 PAGEREF _Toc234388471 \h 16
+	2.3a Engine Interface Contracts	 PAGEREF _Toc234388472 \h 17
+	2.4 Context Assembly Pipeline	 PAGEREF _Toc234388473 \h 18
+	2.5 Intent Classification	 PAGEREF _Toc234388474 \h 19
+	2.5a Intent Confidence & Ambiguity Fallback	 PAGEREF _Toc234388475 \h 19
+	2.6 Context Selection	 PAGEREF _Toc234388476 \h 20
+	2.7 Context Prioritisation	 PAGEREF _Toc234388477 \h 20
+	2.8 Context Integrity	 PAGEREF _Toc234388478 \h 21
+	2.9 Missing Information	 PAGEREF _Toc234388479 \h 21
+	2.10 Context Freshness	 PAGEREF _Toc234388480 \h 22
+	2.10a Read-Consistency — Pin the Response to a Version Snapshot	 PAGEREF _Toc234388481 \h 22
+	2.11 Explainability	 PAGEREF _Toc234388482 \h 23
+	2.12 Engineering Constraints	 PAGEREF _Toc234388483 \h 23
+	2.13 Acceptance Criteria	 PAGEREF _Toc234388484 \h 23
+	Explanation Engine & Structured Intelligence Communication	 PAGEREF _Toc234388485 \h 25
+	3.1 Purpose	 PAGEREF _Toc234388486 \h 25
+	3.2 Engineering Philosophy	 PAGEREF _Toc234388487 \h 25
+	3.3 Explanation Architecture	 PAGEREF _Toc234388488 \h 26
+	3.3a Ownership of the Structured Explanation & Meaning-Preserving Personalisation	 PAGEREF _Toc234388489 \h 27
+	3.4 Structured Explanation Model	 PAGEREF _Toc234388490 \h 27
+	3.5 Progressive Disclosure	 PAGEREF _Toc234388491 \h 28
+	3.6 Personalised Explanations	 PAGEREF _Toc234388492 \h 29
+	3.7 Educational Integration	 PAGEREF _Toc234388493 \h 29
+	3.7a Scientific-Fact Grounding for Educational and General Claims	 PAGEREF _Toc234388494 \h 30
+	3.8 Explaining Uncertainty	 PAGEREF _Toc234388495 \h 30
+	3.9 Explaining Decisions	 PAGEREF _Toc234388496 \h 30
+	3.10 Explanation Consistency	 PAGEREF _Toc234388497 \h 31
+	3.11 Explainability	 PAGEREF _Toc234388498 \h 32
+	3.12 Engineering Constraints	 PAGEREF _Toc234388499 \h 32
+	3.13 Acceptance Criteria	 PAGEREF _Toc234388500 \h 32
+	Conversation Behaviour & Interaction Model	 PAGEREF _Toc234388501 \h 34
+	4.1 Purpose	 PAGEREF _Toc234388502 \h 34
+	4.2 Engineering Philosophy	 PAGEREF _Toc234388503 \h 34
+	4.3 Conversation States	 PAGEREF _Toc234388504 \h 35
+	4.4 Response Strategy	 PAGEREF _Toc234388505 \h 36
+	4.5 Clarification	 PAGEREF _Toc234388506 \h 36
+	4.6 Follow-Up Conversations	 PAGEREF _Toc234388507 \h 37
+	4.7 Managing Assumptions	 PAGEREF _Toc234388508 \h 37
+	4.8 Responding to Unanswerable Questions	 PAGEREF _Toc234388509 \h 38
+	4.9 Managing Conversation Scope	 PAGEREF _Toc234388510 \h 38
+	4.10 Conversation Closure	 PAGEREF _Toc234388511 \h 39
+	4.11 Explainability	 PAGEREF _Toc234388512 \h 39
+	4.12 Engineering Constraints	 PAGEREF _Toc234388513 \h 39
+	4.13 Acceptance Criteria	 PAGEREF _Toc234388514 \h 40
+	Personalisation & Communication Adaptation	 PAGEREF _Toc234388515 \h 41
+	5.1 Purpose	 PAGEREF _Toc234388516 \h 41
+	5.2 Engineering Philosophy	 PAGEREF _Toc234388517 \h 41
+	5.3 Personalisation Inputs	 PAGEREF _Toc234388518 \h 42
+	5.4 Communication Profiles	 PAGEREF _Toc234388519 \h 43
+	5.5 Reading Level Adaptation	 PAGEREF _Toc234388520 \h 44
+	5.6 Coaching Style	 PAGEREF _Toc234388521 \h 45
+	5.7 Educational Progression	 PAGEREF _Toc234388522 \h 45
+	5.8 Consistency Across Channels	 PAGEREF _Toc234388523 \h 46
+	5.9 Adaptive Communication	 PAGEREF _Toc234388524 \h 46
+	5.10 Accessibility	 PAGEREF _Toc234388525 \h 47
+	5.11 Explainability	 PAGEREF _Toc234388526 \h 47
+	5.12 Engineering Constraints	 PAGEREF _Toc234388527 \h 48
+	5.13 Acceptance Criteria	 PAGEREF _Toc234388528 \h 48
+	Intelligence Delivery Channels & Narrative Generation	 PAGEREF _Toc234388529 \h 49
+	6.1 Purpose	 PAGEREF _Toc234388530 \h 49
+	6.2 Engineering Philosophy	 PAGEREF _Toc234388531 \h 49
+	6.3 Intelligence Delivery Channels	 PAGEREF _Toc234388532 \h 50
+	6.4 Narrative Generation	 PAGEREF _Toc234388533 \h 52
+	6.4a Narrative Verbalisation, Not Generation	 PAGEREF _Toc234388534 \h 52
+	6.5 Narrative Structure	 PAGEREF _Toc234388535 \h 52
+	6.6 Longitudinal Storytelling	 PAGEREF _Toc234388536 \h 53
+	6.7 Multi-Channel Consistency	 PAGEREF _Toc234388537 \h 53
+	6.8 Narrative Freshness	 PAGEREF _Toc234388538 \h 54
+	6.9 Channel Optimisation	 PAGEREF _Toc234388539 \h 55
+	6.10 Communication Frequency	 PAGEREF _Toc234388540 \h 56
+	6.11 Explainability	 PAGEREF _Toc234388541 \h 56
+	6.12 Engineering Constraints	 PAGEREF _Toc234388542 \h 57
+	6.13 Acceptance Criteria	 PAGEREF _Toc234388543 \h 57
+	Multi-Turn Conversation Management & Conversational Continuity	 PAGEREF _Toc234388544 \h 58
+	7.1 Purpose	 PAGEREF _Toc234388545 \h 58
+	7.2 Engineering Philosophy	 PAGEREF _Toc234388546 \h 58
+	7.3 Conversation State	 PAGEREF _Toc234388547 \h 59
+	7.3a Conversation State Storage, Privacy & Erasure	 PAGEREF _Toc234388548 \h 59
+	7.4 Context Refresh	 PAGEREF _Toc234388549 \h 60
+	7.4a Cross-Turn Grounding — Prior Turns Are Not Evidence	 PAGEREF _Toc234388550 \h 60
+	7.5 Topic Management	 PAGEREF _Toc234388551 \h 60
+	7.6 Avoiding Unnecessary Repetition	 PAGEREF _Toc234388552 \h 61
+	7.7 Revisiting Earlier Topics	 PAGEREF _Toc234388553 \h 62
+	7.8 Conversation Branching	 PAGEREF _Toc234388554 \h 62
+	7.9 Handling Interruptions	 PAGEREF _Toc234388555 \h 63
+	7.10 Conversation Completion	 PAGEREF _Toc234388556 \h 63
+	7.11 Explainability	 PAGEREF _Toc234388557 \h 64
+	7.12 Engineering Constraints	 PAGEREF _Toc234388558 \h 64
+	7.13 Acceptance Criteria	 PAGEREF _Toc234388559 \h 64
+	Safety, Uncertainty & Constitutional Communication	 PAGEREF _Toc234388560 \h 66
+	8.1 Purpose	 PAGEREF _Toc234388561 \h 66
+	8.2 Engineering Philosophy	 PAGEREF _Toc234388562 \h 66
+	8.3 Constitutional Authority	 PAGEREF _Toc234388563 \h 67
+	8.4 Communicating Uncertainty	 PAGEREF _Toc234388564 \h 68
+	8.5 Handling Unsupported Questions	 PAGEREF _Toc234388565 \h 68
+	8.6 Communication During Safety Escalation	 PAGEREF _Toc234388566 \h 69
+	8.6a Governed Templates for Safety-Critical Wording	 PAGEREF _Toc234388567 \h 70
+	8.7 Prompt Injection & Manipulation Resistance	 PAGEREF _Toc234388568 \h 70
+	8.7a Prompt-Injection Architecture — Trusted vs Untrusted Channels	 PAGEREF _Toc234388569 \h 70
+	8.8 External Information	 PAGEREF _Toc234388570 \h 71
+	8.8a External Information Ingestion Interface	 PAGEREF _Toc234388571 \h 72
+	8.9 Emotional Neutrality	 PAGEREF _Toc234388572 \h 72
+	8.10 Transparency	 PAGEREF _Toc234388573 \h 72
+	8.11 Explainability	 PAGEREF _Toc234388574 \h 73
+	8.12 Engineering Constraints	 PAGEREF _Toc234388575 \h 73
+	8.13 Acceptance Criteria	 PAGEREF _Toc234388576 \h 73
+	Response Validation, Grounding Verification & Hallucination Prevention	 PAGEREF _Toc234388577 \h 75
+	9.1 Purpose	 PAGEREF _Toc234388578 \h 75
+	9.2 Engineering Philosophy	 PAGEREF _Toc234388579 \h 75
+	9.3 Validation Pipeline	 PAGEREF _Toc234388580 \h 76
+	9.4 Grounding Validation	 PAGEREF _Toc234388581 \h 77
+	9.4a Grounding & Hallucination Validation Mechanism	 PAGEREF _Toc234388582 \h 77
+	9.5 Explanation Consistency Validation	 PAGEREF _Toc234388583 \h 78
+	9.6 Confidence Validation	 PAGEREF _Toc234388584 \h 78
+	9.7 Decision Validation	 PAGEREF _Toc234388585 \h 79
+	9.8 Hallucination Detection	 PAGEREF _Toc234388586 \h 79
+	9.9 Constitutional Compliance Validation	 PAGEREF _Toc234388587 \h 80
+	9.10 Deterministic Integrity	 PAGEREF _Toc234388588 \h 80
+	9.11 Validation Outcomes	 PAGEREF _Toc234388589 \h 81
+	9.11a Bounded Validation, Latency & Reject Behaviour	 PAGEREF _Toc234388590 \h 81
+	9.12 Explainability	 PAGEREF _Toc234388591 \h 82
+	9.13 Engineering Constraints	 PAGEREF _Toc234388592 \h 82
+	9.14 Acceptance Criteria	 PAGEREF _Toc234388593 \h 82
+	Governance, Versioning & Communication Lifecycle Management	 PAGEREF _Toc234388594 \h 84
+	10.1 Purpose	 PAGEREF _Toc234388595 \h 84
+	10.2 Engineering Philosophy	 PAGEREF _Toc234388596 \h 84
+	10.3 Governance Responsibilities	 PAGEREF _Toc234388597 \h 85
+	10.4 Communication Versioning	 PAGEREF _Toc234388598 \h 85
+	10.4a Communication Reproducibility — Stored Record and Manifest	 PAGEREF _Toc234388599 \h 86
+	10.5 Configuration Management	 PAGEREF _Toc234388600 \h 86
+	10.6 Communication Engine Releases	 PAGEREF _Toc234388601 \h 87
+	10.7 Validation Before Deployment	 PAGEREF _Toc234388602 \h 88
+	10.8 Historical Reproducibility	 PAGEREF _Toc234388603 \h 88
+	10.9 Change Impact Assessment	 PAGEREF _Toc234388604 \h 89
+	10.10 Operational Monitoring	 PAGEREF _Toc234388605 \h 89
+	10.11 Auditability	 PAGEREF _Toc234388606 \h 90
+	10.12 Regulatory Readiness	 PAGEREF _Toc234388607 \h 90
+	10.13 Engineering Constraints	 PAGEREF _Toc234388608 \h 91
+	10.14 Acceptance Criteria	 PAGEREF _Toc234388609 \h 91
+	End-to-End Conversation & Intelligence Delivery Lifecycle	 PAGEREF _Toc234388610 \h 92
+	11.1 Purpose	 PAGEREF _Toc234388611 \h 92
+	11.2 Example Scenario	 PAGEREF _Toc234388612 \h 92
+	11.3 Intent Recognition	 PAGEREF _Toc234388613 \h 93
+	11.4 Context Assembly	 PAGEREF _Toc234388614 \h 93
+	11.5 Structured Explanation	 PAGEREF _Toc234388615 \h 94
+	11.6 Communication Personalisation	 PAGEREF _Toc234388616 \h 95
+	11.7 Response Generation	 PAGEREF _Toc234388617 \h 96
+	11.8 Response Validation	 PAGEREF _Toc234388618 \h 96
+	11.9 Multi-Turn Conversation	 PAGEREF _Toc234388619 \h 97
+	11.10 Alternative Delivery Channels	 PAGEREF _Toc234388620 \h 98
+	11.11 Governance	 PAGEREF _Toc234388621 \h 99
+	11.12 End-to-End Validation	 PAGEREF _Toc234388622 \h 99
+
+Chapter 1
+Purpose & Design Philosophy
+
+1.1 Purpose
+The purpose of this specification is to define how BioSense transforms trusted intelligence into clear, accurate, personalised and constitutionally compliant communication.
+The Conversation, Explanation & Intelligence Delivery Engine is responsible for presenting BioSense's understanding to users in a way that is:
+understandable, 
+scientifically accurate, 
+appropriately cautious, 
+context-aware, 
+explainable, 
+actionable, 
+consistent with the BioSense Constitution. 
+Unlike a general-purpose conversational AI, this engine does not generate health knowledge.
+It communicates health knowledge that has already been established by the upstream intelligence engines.
+
+Constitutional Principle
+BioSense communicates what it knows. It does not invent what it does not know.
+
+1.2 Scope
+This specification governs:
+conversational responses, 
+Health AI interactions, 
+biomarker explanations, 
+Discovery explanations, 
+recommendation explanations, 
+"Latest Intelligence" summaries, 
+home screen insights, 
+weekly reports, 
+monthly reports, 
+notification content, 
+educational content, 
+blood test interpretations, 
+longitudinal narratives, 
+coaching responses, 
+follow-up conversations. 
+It deliberately excludes:
+observation processing (ENG-002), 
+confidence formation (ENG-003), 
+decision generation (ENG-004), 
+user interface implementation, 
+notification delivery infrastructure. 
+Its responsibility begins only after trusted intelligence has already been established.
+
+1.3 Authority
+The Conversation Engine consumes outputs from every previous engine.
+It may consume:
+Dynamic Health Model objects, 
+Health Beliefs, 
+Discoveries, 
+Biological Identity, 
+Behavioural Identity, 
+Confidence Objects, 
+Explanation Objects, 
+Decision Objects, 
+Canonical Observations, 
+User Goals. 
+It shall not modify any upstream engine.
+
+Engineering Rule
+The Conversation Engine is read-only with respect to all upstream intelligence.
+
+1.4 Engineering Philosophy
+The purpose of conversation is not to answer questions.
+The purpose of conversation is to help the user understand their health.
+Every response should therefore optimise:
+understanding, 
+trust, 
+clarity, 
+context, 
+scientific integrity, 
+user autonomy. 
+The engine shall never optimise for:
+conversation length, 
+entertainment, 
+engagement, 
+persuasive behaviour, 
+unnecessary interaction. 
+
+Founder Principle
+Conversation exists to improve understanding—not to prolong conversation.
+
+1.5 Constitutional Definition
+For engineering purposes:
+The Conversation, Explanation & Intelligence Delivery Engine is the constitutional system responsible for translating trusted BioSense intelligence into human-understandable communication without altering its meaning, confidence or constitutional authority.
+The engine is therefore an interpreter of intelligence rather than a creator of intelligence.
+
+Constitutional Principle
+Communication should preserve meaning, not reinterpret it.
+
+1.5a Normative Enumerations & Glossary
+Where this specification lists 'examples' that gate behaviour — intents (2.5), conversation states (4.3), delivery channels (1.7, 6.3) and validation outcomes (9.11) — those sets shall be closed, versioned enumerations, marked normative rather than illustrative, since the intent set in particular determines which intelligence is eligible for a response. A normative glossary shall also fix terms that overlap with upstream specifications: 'Structured Explanation' relative to ENG-003's Explanation Object, and 'Narrative' relative to ENG-001's Health Narrative.
+Engineering Rule
+Behaviour-gating vocabularies are closed, versioned and normative; shared terms are aligned to their owning specification.
+1.6 Communication Is Not Reasoning
+A strict architectural boundary exists between reasoning and communication.
+Reasoning occurs within:
+ENG-001 
+ENG-002 
+ENG-003 
+ENG-004 
+Communication begins only after those processes have completed.
+The Conversation Engine shall never:
+generate new Health Beliefs, 
+create new confidence, 
+alter Decision Objects, 
+reinterpret observations, 
+change constitutional safety outcomes. 
+It communicates.
+It does not reason.
+
+Engineering Rule
+The Conversation Engine shall never become a second reasoning engine.
+
+1.7 Intelligence Delivery
+Conversation represents only one method through which BioSense communicates.
+The same underlying intelligence may be delivered through:
+interactive conversation, 
+home screen summaries, 
+Latest Intelligence, 
+weekly reports, 
+monthly reports, 
+biomarker pages, 
+blood test reports, 
+goal updates, 
+educational cards, 
+push notifications, 
+clinician-ready exports. 
+Every delivery channel consumes the same underlying intelligence objects.
+Only presentation changes.
+
+Founder Principle
+One source of truth. Many methods of communication.
+
+1.8 Explainability
+Every response produced by the engine shall remain traceable to its originating intelligence.
+BioSense shall always be capable of explaining:
+Why this response was generated. 
+Which Health Beliefs contributed. 
+Which observations supported it. 
+Which confidence assessments influenced it. 
+Which Decision Objects informed it. 
+Which uncertainties remain. 
+If this cannot be demonstrated, the response is constitutionally incomplete.
+
+Constitutional Principle
+Every explanation should itself be explainable.
+
+1.9 Human-Centred Communication
+BioSense shall optimise for human understanding.
+This includes:
+plain language, 
+progressive disclosure, 
+contextual education, 
+appropriate terminology, 
+emotional neutrality, 
+encouragement without coercion, 
+transparency regarding uncertainty. 
+Scientific accuracy shall never be sacrificed.
+Communication shall adapt to the user's level of understanding while preserving the underlying truth.
+
+Founder Principle
+Explain complexity without hiding it.
+
+On Acceptance Criteria
+Acceptance criteria throughout this specification shall be objective, automatable assertions rather than aspirations. Each should be restated verifiably — for example: 'every delivered response resolves each significant factual claim to a grounding token'; 'a response with an unresolved claim is never delivered'; 'the communicated confidence band equals the source Confidence Object band'; 'user input never enters the trusted-context channel'.
+Engineering Rule
+A criterion that cannot be checked by a test or a defined inspection is not an acceptance criterion. This applies to every chapter's acceptance section.
+1.10 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ The Conversation Engine is clearly separated from reasoning engines.
+✓ Communication is established as a read-only consumer of trusted intelligence.
+✓ Multiple delivery channels are recognised as consumers of the same intelligence.
+✓ Explainability requirements are explicitly defined.
+✓ Human understanding is established as the primary communication objective.
+✓ The engine is constitutionally prohibited from creating new health intelligence.
+✓ Architectural ownership boundaries are unambiguous.
+Chapter 2
+Context Assembly & Grounding Architecture
+
+2.1 Purpose
+The purpose of this chapter is to define how the Conversation, Explanation & Intelligence Delivery Engine assembles, validates and grounds the information used to generate every BioSense communication.
+Large Language Models are highly effective at generating natural language.
+They are not authoritative sources of health knowledge.
+BioSense shall therefore construct every response from trusted intelligence that has already been established elsewhere within the platform.
+The Conversation Engine is responsible for assembling that intelligence into a structured Conversation Context before language generation begins.
+
+Constitutional Principle
+Language shall be generated from trusted intelligence, never used to discover it.
+
+2.2 Engineering Philosophy
+The quality of a response depends primarily upon the quality of its context.
+Rather than exposing the language model to the entirety of the user's health record, the Conversation Engine shall provide only the information necessary to answer the user's request accurately.
+Context assembly is therefore a process of intelligent selection rather than indiscriminate retrieval.
+The objective is:
+accuracy, 
+relevance, 
+explainability, 
+efficiency, 
+constitutional safety. 
+
+Founder Principle
+The best conversations begin with the right context, not the most context.
+
+2.3 Context Sources
+The Conversation Engine may assemble context from the following authoritative sources.
+Dynamic Health Model (ENG-001)
+Health Beliefs 
+Discoveries 
+Biological Identity 
+Behavioural Identity 
+User Goals 
+Health Narratives 
+
+Observation Engine (ENG-002)
+Canonical Observation references 
+Observation summaries 
+Evidence provenance 
+Quality Profiles 
+
+Confidence Engine (ENG-003)
+Confidence Objects 
+Explanation Objects 
+Remaining uncertainty 
+Competing hypotheses 
+
+Decision Intelligence Engine (ENG-004)
+Decision Objects 
+Active interventions 
+Expected Health Impact 
+Timing 
+Intensity 
+Outcome evaluations 
+
+Additional sources may include:
+user preferences, 
+conversation history, 
+educational library, 
+canonical scientific library. 
+The Conversation Engine shall not access information outside approved constitutional sources.
+
+Engineering Rule
+Every context element shall possess an identifiable authoritative source.
+
+2.3a Engine Interface Contracts
+The sources above are enumerated but not contracted. For each upstream engine the interface shall specify what is read, that it is read strictly read-only, and the versions it is pinned to. The Conversation Engine consumes beliefs, confidence, decisions and observations without modifying any of them (consistent with 1.6 and with ENG-003's rule that the communication layer consumes intelligence and never alters it).
+Every concept consumed here shall be defined in its owning specification. 'Explanation Objects' (ENG-003), 'Health Narratives', 'Behavioural Identity' and 'User Goals' (ENG-001) and 'Expected Health Impact' (ENG-004) shall be defined in those specifications or added to them; they are not assumed to exist.
+Engineering Rule
+Every upstream input is read-only, version-pinned, and defined in its owning specification. Communication consumes intelligence; it never writes upstream engines.
+2.4 Context Assembly Pipeline
+Every response shall follow the same constitutional assembly process.
+User Intent
+
+↓
+
+Intent Classification
+
+↓
+
+Relevant Health Beliefs
+
+↓
+
+Relevant Discoveries
+
+↓
+
+Relevant Observations
+
+↓
+
+Confidence Objects
+
+↓
+
+Decision Objects
+
+↓
+
+Explanation Objects
+
+↓
+
+Educational References
+
+↓
+
+Conversation Context
+
+↓
+
+Language Model
+
+↓
+
+BioSense Response
+The Language Model consumes the assembled Conversation Context.
+It does not independently retrieve platform intelligence.
+
+Constitutional Principle
+Grounding precedes generation.
+
+2.5 Intent Classification
+Before assembling context, the Conversation Engine shall determine the user's primary intent.
+Examples include:
+explanation, 
+education, 
+recommendation clarification, 
+biomarker interpretation, 
+progress review, 
+goal discussion, 
+comparison, 
+troubleshooting, 
+general health education. 
+Intent Classification determines which intelligence objects are eligible for inclusion.
+
+Founder Principle
+Understand the question before assembling the answer.
+
+2.5a Intent Confidence & Ambiguity Fallback
+Intent Classification gates which intelligence is eligible for a response, so a silent misclassification produces a confident but wrong or incomplete answer. Intent classification shall therefore carry a confidence, and where intent is ambiguous or low-confidence the engine shall fail safe — assembling broader context and, where appropriate, asking a clarifying question (4.5) — rather than committing to a single intent. Misclassification errs toward more context or clarification, never toward a narrow, confident answer.
+Engineering Rule
+Intent classification carries a confidence; ambiguity triggers broader context or clarification, not a committed wrong intent.
+2.6 Context Selection
+Only context relevant to the identified intent shall be assembled.
+Example:
+User asks:
+"Why is my HRV low?"
+Relevant context may include:
+Recovery Health Belief 
+Sleep Health Belief 
+Recent HRV observations 
+Recent illness 
+Active interventions 
+Confidence explanation 
+Irrelevant information such as historical Vitamin D status or hydration education shall not be included.
+Context selection shall minimise noise while preserving completeness.
+
+2.7 Context Prioritisation
+Where multiple relevant intelligence objects exist, the Conversation Engine shall prioritise context according to:
+constitutional relevance, 
+confidence, 
+Expected Health Impact, 
+recency, 
+explanatory value, 
+user intent. 
+Context shall remain bounded.
+It shall not exceed practical limits required for accurate reasoning.
+
+Constitutional Principle
+Prioritise information that improves understanding, not information that merely exists.
+
+2.8 Context Integrity
+Every Conversation Context shall preserve:
+source attribution, 
+version references, 
+confidence, 
+uncertainty, 
+evidence provenance. 
+Context assembly shall never alter the underlying intelligence.
+It shall only organise it for communication.
+
+Engineering Rule
+The Conversation Context is a view of intelligence, not a modification of intelligence.
+
+2.9 Missing Information
+Where required context is unavailable, the Conversation Engine shall recognise the limitation explicitly.
+Examples include:
+disconnected wearable, 
+missing laboratory data, 
+insufficient longitudinal evidence, 
+incomplete behavioural history. 
+The engine may:
+communicate uncertainty, 
+request additional information, 
+recommend evidence collection, 
+defer conclusions. 
+It shall never fabricate missing context.
+
+Founder Principle
+Missing context should lead to honest uncertainty, not confident invention.
+
+2.10 Context Freshness
+Before response generation, the Conversation Engine shall verify that context remains current.
+Checks may include:
+recent observations, 
+updated Decision Objects, 
+revised confidence, 
+active intervention status, 
+Dynamic Health Model version. 
+If newer intelligence exists, the Conversation Context shall be refreshed before language generation.
+
+Constitutional Principle
+Responses should reflect the current state of understanding, not stale intelligence.
+
+2.10a Read-Consistency — Pin the Response to a Version Snapshot
+Because the platform updates continuously, the Dynamic Health Model can change between context assembly, generation and validation. Freshness (2.10) is therefore a read-consistency requirement, not a race: the entire response — assembly, generation and validation — shall run against a single pinned engine-version snapshot. 'Freshness' selects the pin; once selected, newer intelligence produces a new response rather than being swapped in mid-flight, so a delivered response is always internally consistent with one state of understanding.
+Engineering Rule
+A response is pinned to one read-consistent version snapshot end to end. Newer intelligence triggers a new response, never a mid-flight swap.
+2.11 Explainability
+Every assembled Conversation Context shall answer:
+Why was this information selected? 
+Which sources contributed? 
+Which intelligence was intentionally excluded? 
+Which confidence assessments influenced inclusion? 
+What uncertainty remains? 
+Which version of each engine supplied the information? 
+
+2.12 Engineering Constraints
+The Context Assembly Framework shall:
+consume only authoritative intelligence, 
+preserve complete source attribution, 
+support intent-driven context selection, 
+minimise irrelevant information, 
+remain explainable, 
+remain deterministic in selection, grounding and validation (generative wording excepted, per 9.10),
+remain fully auditable. 
+
+2.13 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Every response begins with Intent Classification.
+✓ Context is assembled only from authoritative BioSense engines.
+✓ The Language Model consumes an assembled Conversation Context rather than raw platform data.
+✓ Context selection remains relevant, bounded and explainable.
+✓ Missing information is communicated honestly.
+✓ Context freshness is verified before response generation.
+✓ Every Conversation Context preserves complete source attribution and engine version references.
+Chapter 3
+Explanation Engine & Structured Intelligence Communication
+
+3.1 Purpose
+The purpose of this chapter is to define how BioSense constructs clear, accurate and constitutionally compliant explanations from trusted platform intelligence.
+An explanation is more than a collection of facts.
+It is a structured interpretation of trusted understanding designed to help the individual comprehend:
+what BioSense knows, 
+why it knows it, 
+how certain it is, 
+what it recommends, 
+what uncertainty remains. 
+Every explanation generated by BioSense shall follow a consistent constitutional structure regardless of the communication channel.
+
+Constitutional Principle
+Every explanation should increase understanding without increasing uncertainty unnecessarily.
+
+3.2 Engineering Philosophy
+The objective of an explanation is not to demonstrate the sophistication of BioSense.
+The objective is to help the individual make better health decisions.
+Every explanation shall therefore optimise:
+clarity, 
+accuracy, 
+relevance, 
+transparency, 
+educational value, 
+scientific integrity. 
+Complex reasoning may exist beneath the surface.
+Communication should reveal only the complexity necessary for understanding.
+
+Founder Principle
+Explain enough to build understanding, not enough to overwhelm.
+
+3.3 Explanation Architecture
+Every explanation shall be constructed from structured intelligence rather than generated directly by the language model.
+The Explanation Engine consumes:
+Health Beliefs, 
+Discoveries, 
+Canonical Observations, 
+Confidence Objects, 
+Explanation Objects, 
+Decision Objects, 
+Educational References. 
+These components are assembled into a Structured Explanation before natural language generation begins.
+
+Engineering Rule
+The Language Model shall verbalise structured explanations.
+It shall not invent explanatory structure.
+
+3.3a Ownership of the Structured Explanation & Meaning-Preserving Personalisation
+The Structured Explanation is assembled from upstream intelligence — principally ENG-003 Explanation Objects together with the relevant Health Beliefs, Confidence Objects, Decision Objects and observations — and the Conversation Engine shall not add explanatory structure, causal relationships or conclusions that are not present upstream. Introducing new explanatory or causal content would make this a second reasoning engine, contrary to 1.6.
+Personalisation and reading-level adaptation (3.6, 5.5) and Communication Profiles (5.4) are versioned configuration and affect examples, emphasis and depth only. That they never alter scientific meaning shall be a validated invariant in the Chapter 9 pipeline, not merely a stated principle.
+Engineering Rule
+ENG-005 assembles and verbalises upstream explanation; it never invents explanatory or causal content. Personalisation preserving meaning is a validated invariant.
+3.4 Structured Explanation Model
+Every explanation shall be capable of answering the following constitutional questions.
+What do we understand?
+Which Health Belief or Discovery is being explained?
+
+Why do we believe this?
+Which observations and evidence support the understanding?
+
+How certain are we?
+Summarise confidence and remaining uncertainty.
+
+Why does it matter?
+Describe the potential health significance.
+
+What should happen next?
+Reference relevant Decision Objects where appropriate.
+
+What could change this understanding?
+Identify additional evidence or future observations that may revise the conclusion.
+
+Constitutional Principle
+Every explanation should tell the complete story of an understanding.
+
+3.5 Progressive Disclosure
+Different users require different levels of explanation.
+The Explanation Engine shall support progressive disclosure.
+Level One
+Concise summary.
+
+Level Two
+Expanded explanation.
+
+Level Three
+Evidence and reasoning.
+
+Level Four
+Scientific detail.
+
+Each level shall originate from the same Structured Explanation.
+Only presentation depth changes.
+
+Founder Principle
+Reveal complexity gradually, never conceal it.
+
+3.6 Personalised Explanations
+Explanations shall remain relevant to the individual.
+Personalisation may consider:
+user goals, 
+health history, 
+Biological Identity, 
+Behavioural Identity, 
+previous conversations, 
+current interventions, 
+preferred communication style. 
+Personalisation shall influence examples and emphasis.
+It shall not alter the underlying scientific meaning.
+
+Engineering Rule
+Personalisation affects communication, not truth.
+
+3.7 Educational Integration
+Where appropriate, explanations may incorporate educational content from the Canonical Educational Library.
+Educational content shall:
+reinforce understanding, 
+explain unfamiliar concepts, 
+support behaviour change, 
+remain evidence-based, 
+remain constitutionally governed. 
+Education supplements explanation.
+It does not replace explanation.
+
+3.7a Scientific-Fact Grounding for Educational and General Claims
+Grounding has two distinct targets. Statements about the individual (their beliefs, confidence, decisions, observations) ground to the user's intelligence objects. General medical and educational statements — including educational integration (3.7) and general health education (2.5) — are scientific facts and shall ground to a versioned entry in the Canonical Scientific Library, per the grounding contract established in ENG-001 and Document 1C, never to the language model's parametric memory.
+Engineering Rule
+Personal claims ground to the user's intelligence; general scientific and educational claims ground to a versioned Scientific-Library entry. Neither is asserted from model memory.
+3.8 Explaining Uncertainty
+Every explanation shall communicate uncertainty where appropriate.
+Examples include:
+Limited longitudinal evidence.
+Competing hypotheses.
+Recent physiological change.
+Incomplete observations.
+Missing laboratory data.
+Scientific uncertainty.
+Uncertainty shall be presented as an expected characteristic of complex health rather than a platform weakness.
+
+Constitutional Principle
+Honest uncertainty strengthens trust.
+
+3.9 Explaining Decisions
+Where a recommendation exists, the explanation shall explicitly connect:
+Health Belief
+↓
+Confidence
+↓
+Decision Object
+↓
+Recommendation
+The causal chain shall remain visible.
+The user should understand not only what BioSense recommends, but why it recommends it.
+
+Founder Principle
+Recommendations deserve explanations equal to the intelligence that created them.
+
+3.10 Explanation Consistency
+Equivalent intelligence shall generate equivalent explanations.
+Differences in wording may occur.
+Differences in meaning shall not.
+Consistency shall be maintained across:
+conversations, 
+reports, 
+notifications, 
+biomarker pages, 
+clinician exports. 
+All communication channels shall consume the same Structured Explanation.
+
+Engineering Rule
+One explanation.
+Many presentations.
+
+3.11 Explainability
+Every explanation shall answer:
+Which intelligence objects contributed? 
+Which observations supported the explanation? 
+Which confidence assessments were used? 
+Which educational references were incorporated? 
+Which Decision Objects influenced the recommendation? 
+Which uncertainties remain visible? 
+
+3.12 Engineering Constraints
+The Explanation Engine shall:
+consume structured intelligence, 
+preserve scientific meaning, 
+support progressive disclosure, 
+personalise presentation, 
+communicate uncertainty honestly, 
+remain explainable, 
+remain fully auditable. 
+
+3.13 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Every explanation originates from a Structured Explanation rather than free-form language generation.
+✓ Every explanation answers the six constitutional questions.
+✓ Progressive disclosure supports multiple levels of detail.
+✓ Personalisation changes presentation without changing meaning.
+✓ Educational content supplements rather than replaces explanation.
+✓ Recommendations remain explicitly linked to their supporting intelligence.
+✓ Equivalent intelligence produces equivalent explanations across all delivery channels.
+✓ Every explanation remains fully explainable and auditable.
+Chapter 4
+Conversation Behaviour & Interaction Model
+
+4.1 Purpose
+The purpose of this chapter is to define the constitutional behaviour of the Conversation Engine during user interactions.
+Conversation is not merely the delivery of information.
+It is an interactive process through which BioSense helps the individual understand their health while remaining scientifically accurate, constitutionally compliant and appropriately transparent.
+The Conversation Engine shall therefore follow a consistent behavioural framework regardless of conversation length or communication channel.
+
+Constitutional Principle
+Every conversation should increase understanding while preserving trust, accuracy and user autonomy.
+
+4.2 Engineering Philosophy
+The purpose of conversation is not to maximise interaction.
+It is to resolve the user's informational need as effectively and efficiently as possible.
+The Conversation Engine shall therefore favour:
+clarity, 
+relevance, 
+transparency, 
+educational value, 
+appropriate brevity, 
+progressive exploration when requested. 
+Conversation shall never be intentionally prolonged for engagement.
+
+Founder Principle
+End the conversation when the user has what they need.
+
+4.3 Conversation States
+Every interaction shall progress through recognised conversational states.
+Suggested states include:
+Intent Recognition
+Determine what the user is trying to achieve.
+
+Context Assembly
+Retrieve relevant intelligence.
+
+Explanation Construction
+Assemble the Structured Explanation.
+
+Response Generation
+Produce constitutionally grounded communication.
+
+Clarification
+Seek additional information where required.
+
+Follow-Up
+Support deeper exploration where appropriate.
+
+Closure
+Conclude the interaction once the user's objective has been satisfied.
+
+Engineering Rule
+Conversation shall progress through explicit behavioural states rather than ad hoc language generation.
+
+4.4 Response Strategy
+Before generating a response, the Conversation Engine shall determine the most appropriate communication strategy.
+Examples include:
+Direct answer.
+Explanation.
+Educational guidance.
+Decision clarification.
+Recommendation explanation.
+Comparative analysis.
+Progress review.
+Request for additional information.
+Referral to constitutional safety pathways.
+The strategy shall reflect the user's intent rather than a fixed conversational template.
+
+Constitutional Principle
+Choose the communication strategy before generating the communication.
+
+4.5 Clarification
+Where the available context is insufficient to answer confidently, the Conversation Engine shall seek clarification before generating conclusions.
+Examples include:
+ambiguous symptoms, 
+incomplete wearable data, 
+unclear user intent, 
+missing laboratory information, 
+conflicting historical context. 
+Clarification questions shall be:
+relevant, 
+minimal, 
+purposeful, 
+constitutionally justified. 
+The engine shall avoid unnecessary questioning.
+
+Founder Principle
+Ask only the questions that meaningfully improve understanding.
+
+4.6 Follow-Up Conversations
+The Conversation Engine shall support natural follow-up interactions.
+Examples include:
+"Can you explain that further?"
+"What evidence supports this?"
+"What changed since last month?"
+"What would increase your confidence?"
+Follow-up conversations shall reuse the existing Conversation Context where appropriate while incorporating any newly relevant intelligence.
+The Conversation Engine shall preserve conversational continuity without repeating unnecessary information.
+
+4.7 Managing Assumptions
+The Conversation Engine shall avoid making unsupported assumptions about the user.
+If an assumption is required to progress the conversation, it shall be explicitly identified as an assumption rather than presented as established fact.
+Where possible, assumptions should be replaced by clarification or evidence.
+
+Constitutional Principle
+Assumptions should be visible, challengeable and temporary.
+
+4.8 Responding to Unanswerable Questions
+Certain questions cannot be answered using the available intelligence.
+Examples include:
+insufficient evidence, 
+future events, 
+unknown medical diagnoses, 
+unsupported causal claims. 
+In these situations, the Conversation Engine shall:
+explain the limitation, 
+describe what is currently known, 
+identify what additional evidence would help, 
+avoid speculation. 
+
+Founder Principle
+An honest limitation is more valuable than an invented answer.
+
+4.9 Managing Conversation Scope
+The Conversation Engine shall recognise when conversations move beyond the scope of the original intent.
+Where appropriate, BioSense may:
+complete the current topic before introducing a new one, 
+explicitly acknowledge a change in subject, 
+recommend addressing a separate question independently, 
+maintain continuity without conflating unrelated discussions. 
+This preserves clarity and reduces cognitive overload.
+
+4.10 Conversation Closure
+The engine shall determine when a conversation has reached a natural conclusion.
+Closure may include:
+confirming that the user's question has been answered, 
+summarising key points, 
+identifying any remaining uncertainty, 
+suggesting a logical next question where genuinely helpful, 
+concluding without unnecessary continuation. 
+Conversation should end naturally rather than encouraging ongoing interaction.
+
+Founder Principle
+A successful conversation leaves the user informed, not dependent.
+
+4.11 Explainability
+Every conversational response shall answer:
+Why was this communication strategy selected? 
+Why were clarification questions asked? 
+Why was additional information requested? 
+Why was uncertainty communicated? 
+Why was the conversation concluded? 
+Which intelligence objects supported the interaction? 
+
+4.12 Engineering Constraints
+The Conversation Behaviour Framework shall:
+remain intent-driven, 
+minimise unnecessary interaction, 
+support clarification where appropriate, 
+avoid unsupported assumptions, 
+preserve conversational continuity, 
+remain constitutionally compliant, 
+remain fully explainable and auditable. 
+
+4.13 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Every conversation progresses through recognised behavioural states.
+✓ Communication strategy is selected before response generation.
+✓ Clarification questions are purposeful and minimal.
+✓ Unsupported assumptions are explicitly identified or avoided.
+✓ Unanswerable questions are handled transparently without speculation.
+✓ Conversation scope is actively managed.
+✓ Conversations conclude naturally once the user's objective has been achieved.
+✓ Every conversational interaction remains explainable and auditable.
+Chapter 5
+Personalisation & Communication Adaptation
+
+5.1 Purpose
+The purpose of this chapter is to define how the Conversation Engine adapts communication to the individual while preserving scientific accuracy, constitutional integrity and consistency.
+Every individual understands health differently.
+Some users prefer concise summaries.
+Others prefer detailed explanations.
+Some seek coaching.
+Others seek evidence.
+The Conversation Engine shall adapt communication style without altering the underlying intelligence.
+
+Constitutional Principle
+Personalisation should change how BioSense communicates, never what BioSense knows.
+
+5.2 Engineering Philosophy
+Communication is most effective when it matches the needs of the individual.
+The Conversation Engine shall therefore adapt presentation according to the user's established communication preferences while preserving:
+scientific meaning, 
+confidence, 
+uncertainty, 
+constitutional authority, 
+recommendation intent. 
+Personalisation exists to improve understanding.
+It shall never modify underlying health intelligence.
+
+Founder Principle
+Different people require different explanations. Truth does not.
+
+5.3 Personalisation Inputs
+The Conversation Engine may adapt communication using trusted personalisation signals supplied by upstream systems.
+Examples include:
+From ENG-001
+User Goals 
+Behavioural Identity 
+Biological Identity 
+
+From ENG-006 (Learning Engine)
+Preferred explanation depth 
+Preferred coaching style 
+Educational progress 
+Historical interaction patterns 
+Preferred report formats 
+Reading behaviour 
+Communication preferences 
+
+Additional inputs may include:
+conversation history, 
+selected language, 
+accessibility settings, 
+user-configured preferences. 
+The Conversation Engine shall never infer permanent communication preferences from isolated interactions.
+
+Engineering Rule
+Communication preferences shall originate from governed user models rather than transient assumptions.
+
+5.4 Communication Profiles
+Every user may possess a Communication Profile.
+Examples include:
+Concise
+Short summaries.
+Minimal supporting detail.
+
+Balanced
+Summary followed by optional explanation.
+
+Analytical
+Detailed reasoning.
+Evidence.
+Confidence.
+Scientific references where appropriate.
+
+Coaching
+Action-oriented.
+Encouraging.
+Behaviour-focused.
+
+Educational
+Learning-focused.
+Concepts explained progressively.
+
+Profiles influence presentation.
+They do not alter conclusions.
+
+Constitutional Principle
+Communication profiles change expression, not intelligence.
+
+5.5 Reading Level Adaptation
+The Conversation Engine shall adapt explanation complexity where appropriate.
+Examples include:
+General audience.
+↓
+Plain language.
+
+Experienced health enthusiast.
+↓
+Greater technical depth.
+
+Healthcare professional.
+↓
+Clinical terminology.
+Every explanation shall originate from the same Structured Explanation.
+Only linguistic complexity changes.
+
+Founder Principle
+Explain at the user's level without reducing scientific accuracy.
+
+5.6 Coaching Style
+Where coaching is appropriate, the Conversation Engine may adapt behavioural encouragement.
+Examples include:
+Supportive.
+Analytical.
+Goal-focused.
+Habit-focused.
+Educational.
+Reflective.
+Coaching style shall remain constitutionally bounded.
+It shall never manipulate, pressure or shame the individual.
+
+Constitutional Principle
+Encouragement should respect autonomy.
+
+5.7 Educational Progression
+Communication shall recognise previous learning.
+Examples:
+If the user has already learned basic cholesterol physiology:
+Future explanations need not repeat introductory concepts.
+Instead, BioSense may build upon established understanding.
+Educational progression supports cumulative learning.
+It shall never assume understanding without evidence.
+
+Founder Principle
+Teach progressively rather than repeatedly.
+
+5.8 Consistency Across Channels
+Communication preferences shall remain consistent across all intelligence delivery channels.
+Examples include:
+Health AI conversations, 
+Latest Intelligence, 
+weekly reports, 
+monthly reports, 
+biomarker pages, 
+notifications, 
+clinician exports. 
+Each channel may differ in length and format.
+The underlying communication profile shall remain consistent.
+
+Engineering Rule
+One communication profile.
+Many delivery channels.
+
+5.9 Adaptive Communication
+Communication preferences may evolve over time.
+Examples include:
+The user increasingly requests deeper explanations.
+↓
+Communication gradually becomes more analytical.
+
+The user consistently chooses concise summaries.
+↓
+Default explanations become shorter.
+Adaptation shall occur gradually through governed learning.
+Abrupt communication changes shall be avoided.
+
+Constitutional Principle
+Personalisation should evolve with the individual rather than react to isolated behaviour.
+
+5.10 Accessibility
+The Conversation Engine shall support communication accessibility where appropriate.
+Examples include:
+simplified language, 
+alternative terminology, 
+visual summaries, 
+structured bullet-based explanations, 
+future voice delivery, 
+multilingual communication. 
+Accessibility adaptations preserve meaning.
+They do not alter intelligence.
+
+5.11 Explainability
+Every personalised communication shall answer:
+Which communication profile was used? 
+Which preferences influenced presentation? 
+Why was this explanation concise? 
+Why was additional detail omitted? 
+Could the explanation be expanded? 
+Did personalisation alter meaning? 
+The answer to the final question shall always be:
+No.
+
+Engineering Rule
+Personalisation shall remain independently explainable.
+
+5.12 Engineering Constraints
+The Personalisation Framework shall:
+personalise presentation, 
+preserve scientific meaning, 
+support multiple communication profiles, 
+adapt gradually, 
+maintain consistency across delivery channels, 
+remain explainable, 
+remain fully auditable. 
+
+5.13 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Communication adapts without altering intelligence.
+✓ Communication profiles remain distinct from health intelligence.
+✓ Reading level and coaching style are independently configurable.
+✓ Educational progression avoids unnecessary repetition.
+✓ Personalisation evolves gradually through governed learning.
+✓ Accessibility is explicitly supported.
+✓ Communication remains consistent across all BioSense delivery channels.
+✓ Every personalised response remains fully explainable and auditable.
+Chapter 6
+Intelligence Delivery Channels & Narrative Generation
+
+6.1 Purpose
+The purpose of this chapter is to define how the Conversation Engine delivers trusted BioSense intelligence across multiple communication channels while preserving consistency, explainability and constitutional integrity.
+Conversation is only one form of communication.
+BioSense shall support a unified Intelligence Delivery Framework through which the same underlying intelligence can be presented appropriately for different contexts without altering its meaning.
+
+Constitutional Principle
+Every communication channel should present the same truth in a form appropriate to its purpose.
+
+6.2 Engineering Philosophy
+Health intelligence should exist independently from the channel through which it is delivered.
+Whether a user reads:
+a push notification, 
+a weekly report, 
+a biomarker explanation, 
+a home screen insight, 
+or engages in conversation, 
+the underlying intelligence shall remain identical.
+Only the presentation, level of detail and interaction model shall differ.
+
+Founder Principle
+Change the presentation, never the intelligence.
+
+6.3 Intelligence Delivery Channels
+The Conversation Engine shall support multiple delivery channels, including but not limited to:
+Interactive Health AI
+Multi-turn conversational responses.
+
+Home Screen
+Latest Intelligence summaries.
+Daily priorities.
+Health highlights.
+
+Latest Intelligence Feed
+Significant new observations.
+Updated Health Beliefs.
+Emerging Discoveries.
+Recommendation updates.
+
+Weekly Reports
+Progress summaries.
+Behavioural trends.
+Physiological changes.
+Completed interventions.
+
+Monthly Reports
+Longitudinal health review.
+Major changes.
+Emerging patterns.
+Goal progression.
+
+Biomarker Pages
+Individual biomarker explanations.
+Relationships.
+Historical trends.
+Relevant recommendations.
+
+Blood Test Reports
+Structured interpretation of uploaded laboratory results.
+Cross-biomarker relationships.
+Longitudinal comparison.
+Decision summaries.
+
+Goal Progress
+Progress towards active health objectives.
+
+Notifications
+Timely communication of important intelligence.
+Notifications shall summarise intelligence.
+They shall not replace it.
+
+Clinician Reports (Future)
+Structured export of trusted BioSense intelligence for professional review.
+
+Engineering Rule
+All delivery channels shall consume the same underlying Structured Explanation.
+
+6.4 Narrative Generation
+Health information is more valuable when presented as a coherent story rather than disconnected observations.
+The Conversation Engine shall therefore generate Health Narratives where constitutionally appropriate.
+Narratives may explain:
+progress, 
+deterioration, 
+behavioural change, 
+physiological adaptation, 
+emerging patterns, 
+completed interventions, 
+long-term trends. 
+Narratives shall always remain grounded in trusted intelligence.
+
+Constitutional Principle
+Narratives explain relationships. They do not create them.
+
+6.4a Narrative Verbalisation, Not Generation
+The narrative content BioSense communicates is the Health Narrative owned by the Dynamic Health Model (ENG-001); this chapter verbalises and structures that narrative for delivery. The Conversation Engine shall not invent narrative content, causal links or longitudinal storyline that is not present in the ENG-001 narrative — doing so would reason rather than communicate (1.6). 'Narrative generation' here means presentation of the reasoned narrative, not creation of a new one.
+Engineering Rule
+ENG-005 verbalises the ENG-001 Health Narrative; it never invents narrative content or causality. The communication narrative presents the reasoned one.
+6.5 Narrative Structure
+Every Health Narrative should answer:
+What changed?
+↓
+Why did it change?
+↓
+Why does it matter?
+↓
+What should happen next?
+↓
+What remains uncertain?
+Narratives shall preserve causal transparency.
+They shall never imply unsupported causation.
+
+Founder Principle
+Tell the story of the health journey, not simply the events within it.
+
+6.6 Longitudinal Storytelling
+The Conversation Engine shall support longitudinal storytelling.
+Examples include:
+"This is the fourth consecutive month that your sleep consistency has improved."
+"You've maintained your biological age below your chronological age for twelve months."
+"Over the past two years, BioSense has observed a gradual improvement in your recovery profile."
+Longitudinal narratives shall strengthen continuity without overstating conclusions.
+
+6.7 Multi-Channel Consistency
+Equivalent intelligence shall generate consistent narratives across all delivery channels.
+Example:
+Weekly Report
+↓
+Conversation
+↓
+Home Screen
+↓
+Notification
+↓
+Clinician Report
+The wording may differ.
+The underlying narrative shall remain identical.
+
+Engineering Rule
+One narrative.
+Multiple presentations.
+
+6.8 Narrative Freshness
+Narratives shall reflect the current state of the Dynamic Health Model.
+Before publication, the Conversation Engine shall verify:
+current Health Beliefs, 
+latest Discoveries, 
+active Decision Objects, 
+current confidence, 
+current interventions. 
+Narratives based upon outdated intelligence shall not be published.
+
+Constitutional Principle
+Narratives should evolve as understanding evolves.
+
+6.9 Channel Optimisation
+Each delivery channel possesses different communication constraints.
+Examples include:
+Notification
+Brief.
+High-value.
+Action-oriented where appropriate.
+
+Home Screen
+Summary.
+Immediate relevance.
+
+Conversation
+Interactive.
+Progressive.
+Explorable.
+
+Weekly Report
+Reflective.
+Comparative.
+Longitudinal.
+
+Clinician Report
+Structured.
+Evidence-focused.
+Professionally formatted.
+Optimisation shall affect presentation only.
+
+Founder Principle
+Every channel deserves communication designed for its purpose.
+
+6.10 Communication Frequency
+The Conversation Engine shall not generate communication simply because a channel is available.
+Communication should occur when:
+meaningful intelligence exists, 
+interventions change, 
+confidence changes materially, 
+significant observations emerge, 
+progress justifies reflection, 
+education is likely to improve understanding. 
+Silence is an acceptable outcome.
+
+Constitutional Principle
+Meaningful communication should be event-driven rather than schedule-driven wherever appropriate.
+
+6.11 Explainability
+Every delivered narrative shall answer:
+Which intelligence generated this narrative? 
+Which delivery channel requested it? 
+Which Structured Explanation was used? 
+Why was this level of detail selected? 
+Which information was intentionally omitted? 
+Which uncertainties remain? 
+
+6.12 Engineering Constraints
+The Intelligence Delivery Framework shall:
+support multiple delivery channels, 
+preserve narrative consistency, 
+generate longitudinal health stories, 
+remain grounded in trusted intelligence, 
+optimise communication for each channel, 
+remain explainable, 
+remain fully auditable. 
+
+6.13 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Every delivery channel consumes the same underlying Structured Explanation.
+✓ Health Narratives remain grounded in trusted intelligence.
+✓ Longitudinal storytelling is explicitly supported.
+✓ Equivalent intelligence produces equivalent narratives across all channels.
+✓ Communication frequency is driven by meaningful intelligence rather than channel availability.
+✓ Channel optimisation affects presentation without altering meaning.
+✓ Every narrative remains fully explainable and auditable.
+Chapter 7
+Multi-Turn Conversation Management & Conversational Continuity
+
+7.1 Purpose
+The purpose of this chapter is to define how the Conversation Engine maintains continuity across multiple conversational turns while preserving constitutional accuracy, contextual integrity and user understanding.
+Health conversations are rarely resolved in a single exchange.
+Individuals naturally ask follow-up questions, seek clarification, revisit previous topics and explore new areas of interest.
+The Conversation Engine shall therefore manage conversational continuity without altering the underlying health intelligence.
+
+Constitutional Principle
+Conversation should remember what has been discussed without changing what is true.
+
+7.2 Engineering Philosophy
+Health understanding develops progressively.
+A meaningful conversation should feel coherent rather than fragmented.
+The Conversation Engine shall therefore maintain a structured Conversation State that enables continuity while ensuring each response remains grounded in the latest trusted intelligence.
+Conversation continuity exists to improve understanding.
+It shall never replace constitutional reasoning.
+
+Founder Principle
+Remember the conversation. Revalidate the health intelligence.
+
+7.3 Conversation State
+Every active conversation shall possess a Conversation State.
+The Conversation State represents the temporary context of the interaction.
+It may include:
+current topic, 
+previous questions, 
+previously delivered explanations, 
+clarification requests, 
+outstanding questions, 
+unresolved uncertainty, 
+active Structured Explanations, 
+user-selected detail level. 
+Conversation State shall not contain permanent health knowledge.
+
+Engineering Rule
+Conversation State is transient.
+Health intelligence remains authoritative within upstream engines.
+
+7.3a Conversation State Storage, Privacy & Erasure
+Conversation state and history are sensitive health data, so their handling shall be specified: where conversation state is stored, its retention period, and its privacy handling within the Document 1C boundary. Conversation records are subject to the same right-to-erasure and crypto-shred mechanism as observations (ENG-002) and the Dynamic Health Model (ENG-001); erasing a user removes their conversation history.
+Engineering Rule
+Conversation state is stored, retained and erased under the 1C privacy boundary, with the same erasure guarantee as the rest of the platform.
+7.4 Context Refresh
+Before every conversational response, the Conversation Engine shall refresh its Conversation Context using the current state of the platform.
+Conversation history alone shall never determine the response.
+Instead:
+Conversation State
+
+Current Conversation Context
+↓
+Updated Response
+This ensures that newly available intelligence is always considered.
+
+Constitutional Principle
+Every response should reflect the latest understanding, even within an ongoing conversation.
+
+7.4a Cross-Turn Grounding — Prior Turns Are Not Evidence
+Each turn shall re-ground against current platform intelligence. Prior assistant turns are conversational context only and shall never be treated as a source of truth, as evidence, or as a grounding target. This prevents a conversation drifting from the underlying intelligence over successive turns — hallucination accumulation — by the model grounding on its own earlier words rather than on the platform's understanding. This mirrors the anti-contamination rules of ENG-003 and ENG-004: derived or communicated output never becomes evidence.
+Engineering Rule
+Every turn re-grounds against current intelligence; prior assistant turns are context, never evidence or a grounding source.
+7.5 Topic Management
+The Conversation Engine shall explicitly recognise conversational topics.
+Examples include:
+sleep, 
+recovery, 
+biomarkers, 
+longevity, 
+nutrition, 
+exercise, 
+blood testing, 
+recommendations, 
+Biological Age. 
+When the conversation shifts between topics, the engine shall:
+preserve continuity, 
+update context, 
+avoid blending unrelated discussions, 
+maintain clear conversational boundaries. 
+
+Founder Principle
+Changing the topic should not change the integrity of the conversation.
+
+7.6 Avoiding Unnecessary Repetition
+The Conversation Engine shall recognise information that has already been explained during the current interaction.
+Where appropriate, BioSense may:
+summarise previous explanations, 
+build upon earlier discussion, 
+reference earlier conclusions, 
+avoid repeating introductory material. 
+However, if new intelligence materially changes the explanation, the updated understanding shall always take precedence.
+
+Engineering Rule
+Avoid repetition unless repetition improves understanding.
+
+7.7 Revisiting Earlier Topics
+Users may return to topics discussed earlier in the conversation.
+When this occurs, the Conversation Engine shall:
+retrieve the relevant Conversation State, 
+refresh the supporting intelligence, 
+identify whether anything has changed, 
+provide an updated explanation where appropriate. 
+Historical discussion shall never override current intelligence.
+
+7.8 Conversation Branching
+Complex health discussions may naturally branch into related topics.
+Example:
+HRV
+↓
+Recovery
+↓
+Sleep
+↓
+Alcohol
+↓
+Inflammation
+The Conversation Engine shall support logical conversational branching while preserving:
+topic traceability, 
+explanation integrity, 
+user orientation. 
+The user should always be able to understand how one topic led to another.
+
+Constitutional Principle
+Related conversations should connect naturally without becoming confusing.
+
+7.9 Handling Interruptions
+Users may interrupt explanations or introduce unrelated questions.
+Example:
+"Actually, why is my ferritin increasing?"
+The Conversation Engine shall:
+acknowledge the topic change, 
+preserve the previous Conversation State, 
+answer the new question, 
+allow the user to return to the earlier discussion if desired. 
+Interruptions shall not corrupt conversation continuity.
+
+7.10 Conversation Completion
+The Conversation Engine shall recognise when a conversational objective has been achieved.
+Completion may occur when:
+the original question has been answered, 
+uncertainty has been explained, 
+recommendations have been clarified, 
+no unresolved questions remain. 
+Conversation completion shall not terminate future interaction.
+It simply concludes the current conversational objective.
+
+Founder Principle
+Every conversation should have a clear beginning, middle and end.
+
+7.11 Explainability
+Every conversational state transition shall answer:
+Why did the topic change? 
+Which previous explanations were reused? 
+Which intelligence was refreshed? 
+Why was repetition avoided? 
+Why was additional clarification requested? 
+Why was the conversation considered complete? 
+
+7.12 Engineering Constraints
+The Multi-Turn Conversation Framework shall:
+maintain temporary Conversation State, 
+preserve topic continuity, 
+refresh intelligence before every response, 
+avoid unnecessary repetition, 
+support branching conversations, 
+remain constitutionally grounded, 
+remain fully explainable and auditable. 
+
+7.13 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Every active conversation maintains a temporary Conversation State.
+✓ Health intelligence is refreshed before every response.
+✓ Topic transitions are explicitly managed.
+✓ Previously explained concepts are reused appropriately without unnecessary repetition.
+✓ Interrupted conversations preserve continuity.
+✓ Conversation completion is recognised independently of platform usage.
+✓ Every conversational transition remains fully explainable and auditable.
+Chapter 8
+Safety, Uncertainty & Constitutional Communication
+
+8.1 Purpose
+The purpose of this chapter is to define the constitutional safeguards governing every communication produced by the Conversation, Explanation & Intelligence Delivery Engine.
+Communication has the power to influence understanding, behaviour and decision-making.
+The Conversation Engine shall therefore ensure that every response remains scientifically accurate, constitutionally compliant and proportionate to the underlying intelligence.
+Communication shall never exceed the authority of the intelligence it represents.
+
+Constitutional Principle
+Communication should never express greater certainty, authority or scope than the intelligence from which it originates.
+
+8.2 Engineering Philosophy
+Natural language is persuasive.
+Users may interpret fluent explanations as certainty even when significant uncertainty remains.
+The Conversation Engine shall therefore actively preserve:
+confidence, 
+uncertainty, 
+constitutional boundaries, 
+scientific humility, 
+user autonomy. 
+The objective is not simply to answer questions.
+It is to communicate responsibly.
+
+Founder Principle
+Clear communication includes knowing what not to say.
+
+8.3 Constitutional Authority
+The Conversation Engine inherits its authority from upstream engines.
+It may:
+explain Health Beliefs, 
+explain Discoveries, 
+explain observations, 
+explain confidence, 
+explain Decision Objects, 
+provide educational information, 
+recommend discussion with an appropriately qualified healthcare professional where constitutionally justified. 
+It shall not:
+diagnose disease, 
+prescribe medication, 
+replace clinical judgement, 
+overstate confidence, 
+invent explanations, 
+reinterpret constitutional safety decisions. 
+These limits are absolute.
+
+Engineering Rule
+The Conversation Engine communicates authority.
+It does not expand authority.
+
+8.4 Communicating Uncertainty
+Where uncertainty exists, it shall be communicated explicitly.
+Sources of uncertainty may include:
+limited evidence, 
+conflicting observations, 
+competing hypotheses, 
+insufficient longitudinal data, 
+missing laboratory results, 
+recently emerging patterns, 
+scientific uncertainty. 
+The explanation shall describe:
+what is known, 
+what is uncertain, 
+why uncertainty exists, 
+what additional evidence could reduce uncertainty. 
+Uncertainty shall never be hidden to improve user confidence.
+
+Constitutional Principle
+Visible uncertainty builds trust. Hidden uncertainty erodes it.
+
+8.5 Handling Unsupported Questions
+Users may ask questions that cannot be answered using the available intelligence.
+Examples include:
+"What disease do I have?"
+"Will I have a heart attack?"
+"Am I definitely deficient in magnesium?"
+The Conversation Engine shall:
+explain why the question cannot be answered definitively, 
+communicate the current evidence, 
+explain relevant uncertainty, 
+identify additional evidence where appropriate, 
+recommend professional medical discussion where constitutionally justified. 
+It shall never fabricate certainty.
+
+Founder Principle
+An honest limitation is preferable to an impressive guess.
+
+8.6 Communication During Safety Escalation
+Where the Decision Intelligence Engine activates a constitutional safety pathway, the Conversation Engine shall communicate that outcome faithfully.
+The Conversation Engine may:
+explain why escalation occurred, 
+describe the relevant observations, 
+explain why further assessment is appropriate, 
+encourage timely consultation with an appropriately qualified healthcare professional. 
+It shall not:
+reinterpret the escalation, 
+reduce its significance, 
+increase its significance, 
+speculate beyond the established Decision Object. 
+
+Engineering Rule
+Safety communication reflects constitutional decisions rather than generating new ones.
+
+8.6a Governed Templates for Safety-Critical Wording
+The exact wording of a safety-critical communication — escalation, or advice to seek assessment — is itself safety-critical and shall not be free-generated. High-consequence safety messages are drawn from approved, versioned templates governed with the medical-advisory function and validated deterministically in Chapter 9; the language model personalises around fixed safety language rather than composing it. This is consistent with the ENG-001 safety rule engine and ENG-004's deterministic safety enforcement.
+Engineering Rule
+Safety-critical wording comes from approved, versioned templates validated deterministically. The model personalises around fixed safety language; it does not compose it.
+8.7 Prompt Injection & Manipulation Resistance
+The Conversation Engine shall resist attempts to bypass constitutional controls.
+Examples include user requests to:
+ignore previous instructions, 
+disregard uncertainty, 
+invent diagnoses, 
+reveal hidden prompts, 
+expose internal system architecture, 
+override constitutional safety policies. 
+The Conversation Engine shall continue operating within constitutional boundaries regardless of conversational instructions.
+
+Constitutional Principle
+Conversation shall never override governance.
+
+8.7a Prompt-Injection Architecture — Trusted vs Untrusted Channels
+Injection resistance (8.7) is an architecture, not only a principle, because this is the one engine exposed to arbitrary user text. User input is data, never instruction, and shall never be admitted to the trusted-context channel: the assembled Conversation Context (2.4) is the sole authority the model treats as ground truth, and user text is processed as a question about that context, not as a source of it or a set of instructions to it.
+System-prompt contents and internal architecture shall never be disclosed regardless of user request, and output grounding validation (9.4a) is the backstop that catches any injection-induced ungrounded claim before delivery.
+Engineering Rule
+User input is data, never instruction, and never enters the trusted-context channel. Injection is defended architecturally and caught again by output grounding validation.
+8.8 External Information
+Users may introduce information from external sources.
+Examples include:
+internet articles, 
+laboratory reports, 
+wearable platforms, 
+clinician advice, 
+scientific publications. 
+The Conversation Engine may:
+explain how the information relates to existing BioSense intelligence, 
+identify agreement or disagreement, 
+recommend additional evidence where appropriate. 
+It shall not automatically treat externally supplied information as authoritative.
+External information shall follow the appropriate constitutional ingestion pathways where applicable.
+
+Founder Principle
+New information should be evaluated before it becomes trusted intelligence.
+
+8.8a External Information Ingestion Interface
+When a user supplies external information (8.8) such as a laboratory result or a wearable export, the interface is defined: user-supplied measurements are routed to the Observation Engine (ENG-002) as observations with a user source and are treated as unverified until they pass constitutional ingestion. Merely mentioning information in conversation never makes it trusted intelligence; it becomes trusted only through the ingestion pathway.
+Engineering Rule
+User-supplied data routes to the Observation Engine as unverified observations and becomes trusted only through ingestion. Conversation never confers authority.
+8.9 Emotional Neutrality
+The Conversation Engine shall communicate with empathy while remaining emotionally neutral.
+Communication should:
+acknowledge concern, 
+encourage understanding, 
+avoid unnecessary alarm, 
+avoid false reassurance, 
+preserve user autonomy, 
+remain respectful. 
+Empathy shall never distort scientific communication.
+
+Constitutional Principle
+Compassion and accuracy should reinforce one another.
+
+8.10 Transparency
+The Conversation Engine shall remain transparent about:
+where information originated, 
+why recommendations exist, 
+how confidence was determined, 
+what uncertainty remains, 
+which engine supplied the underlying intelligence. 
+Transparency strengthens explainability and trust.
+
+8.11 Explainability
+Every safety-related communication shall answer:
+Why was this response considered constitutionally appropriate? 
+Which uncertainty was communicated? 
+Why were certain conclusions avoided? 
+Why was professional discussion recommended? 
+Which safety pathway, if any, was activated? 
+Which intelligence objects supported the response? 
+
+8.12 Engineering Constraints
+The Constitutional Communication Framework shall:
+preserve constitutional authority, 
+communicate uncertainty honestly, 
+resist prompt manipulation, 
+preserve emotional neutrality, 
+support safety escalation, 
+remain transparent, 
+remain fully explainable and auditable. 
+
+8.13 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Communication never exceeds the authority of upstream intelligence.
+✓ Uncertainty is communicated explicitly where appropriate.
+✓ Unsupported questions are handled transparently without speculation.
+✓ Safety escalations are communicated faithfully.
+✓ Prompt injection and manipulation attempts do not alter constitutional behaviour.
+✓ External information is evaluated through appropriate constitutional pathways.
+✓ Empathy never compromises scientific accuracy.
+✓ Every safety-related communication remains fully explainable and auditable.
+Chapter 9
+Response Validation, Grounding Verification & Hallucination Prevention
+
+9.1 Purpose
+The purpose of this chapter is to define the validation framework that verifies every generated communication before it is delivered to the user.
+Although responses are generated from grounded Conversation Context, natural language generation remains probabilistic.
+The Conversation Engine shall therefore validate that every response faithfully represents the trusted intelligence from which it was produced.
+No response shall be delivered solely because it is linguistically plausible.
+
+Constitutional Principle
+A fluent response is not necessarily a truthful response.
+
+9.2 Engineering Philosophy
+Language generation and response validation are independent engineering responsibilities.
+The Language Model proposes a response.
+The Validation Framework determines whether that response faithfully communicates the underlying intelligence.
+Validation exists to protect:
+scientific accuracy, 
+constitutional authority, 
+explainability, 
+user trust, 
+regulatory readiness. 
+
+Founder Principle
+Generate first. Trust only after verification.
+
+9.3 Validation Pipeline
+Every generated response shall undergo constitutional validation before delivery.
+The recommended pipeline is:
+Conversation Context
+
+↓
+
+Language Model
+
+↓
+
+Generated Response
+
+↓
+
+Grounding Validation
+
+↓
+
+Explanation Consistency Validation
+
+↓
+
+Confidence Validation
+
+↓
+
+Decision Validation
+
+↓
+
+Safety Validation
+
+↓
+
+Delivery Decision
+
+↓
+
+User
+No validation stage may be bypassed.
+
+Engineering Rule
+Validation is mandatory for every communication channel.
+
+9.4 Grounding Validation
+Grounding Validation confirms that every significant factual statement can be traced to trusted platform intelligence.
+Validation shall verify that statements originate from:
+Health Beliefs, 
+Discoveries, 
+Canonical Observations, 
+Confidence Objects, 
+Decision Objects, 
+Structured Explanations, 
+Educational References. 
+Statements lacking constitutional support shall not be presented as fact.
+
+Constitutional Principle
+Every factual statement should have an identifiable origin.
+
+9.4a Grounding & Hallucination Validation Mechanism
+Grounding Validation (9.4) and Hallucination Detection (9.8) are the platform's final safety barrier and shall be specified as a mechanism, not only an intent. The generated response is decomposed into its significant factual claims — any statement asserting a fact about the individual's health, a physiological relationship, a measurement, a confidence, or a recommendation. Each such claim shall carry, or must resolve to, a grounding token identifying the source intelligence object (Health Belief, Confidence Object, Decision Object, Observation, Structured Explanation, or Scientific-Library entry). A claim that does not resolve is not presented as fact: it is stripped, revised, or the response regenerated.
+This resolution shall be performed by a non-generative resolver, not by a second language model alone. The validation framework is partly non-generative: a deterministic grounding resolver, a confidence-versus-language consistency check (the communicated band must equal the Confidence Object band), a safety-template check (8.6a) and a scope/PII check. A generative reviewer may assess tone and consistency but is never the sole guarantee — consistent with the Constitutional Review layer of ENG-001. 'Significant factual statement' is defined above and shall be maintained as governed configuration.
+Engineering Rule
+Every significant factual claim must resolve to a grounding token via a non-generative resolver; unresolved claims are never delivered. Validation is partly non-generative, never sole-LLM self-critique.
+9.5 Explanation Consistency Validation
+The generated explanation shall preserve the meaning of the underlying Structured Explanation.
+Validation shall confirm that the response has not:
+changed the conclusion, 
+altered causal relationships, 
+omitted material uncertainty, 
+exaggerated recommendations, 
+introduced unsupported reasoning. 
+Equivalent Structured Explanations shall produce equivalent meaning.
+
+Founder Principle
+Language may vary. Meaning must not.
+
+9.6 Confidence Validation
+The response shall accurately reflect the associated Confidence Objects.
+Validation shall confirm that:
+confidence is neither understated nor overstated, 
+uncertainty remains visible, 
+competing hypotheses remain appropriately represented, 
+confidence language is proportionate to the underlying assessment. 
+Communication confidence shall never exceed platform confidence.
+
+Constitutional Principle
+Confidence communicated should equal confidence calculated.
+
+9.7 Decision Validation
+Where Decision Objects are referenced, validation shall confirm that the response accurately communicates:
+intervention category, 
+priority, 
+timing, 
+intensity, 
+Expected Health Impact, 
+supporting rationale. 
+The Conversation Engine shall not create or modify recommendations during communication.
+
+Engineering Rule
+Decision communication shall remain read-only.
+
+9.8 Hallucination Detection
+The Validation Framework shall identify potential hallucinations, including:
+unsupported medical claims, 
+invented physiological relationships, 
+fabricated observations, 
+fabricated historical events, 
+invented confidence, 
+invented Decision Objects, 
+invented educational content. 
+Where hallucination risk is detected, the response shall:
+be regenerated, 
+be revised, 
+or be rejected. 
+Responses containing unsupported intelligence shall never be delivered.
+
+Founder Principle
+If BioSense cannot support a statement, BioSense should not say it.
+
+9.9 Constitutional Compliance Validation
+Every response shall be evaluated for constitutional compliance.
+Validation shall confirm that the response:
+remains within constitutional authority, 
+preserves user autonomy, 
+avoids diagnosis, 
+avoids prescription, 
+respects safety pathways, 
+preserves explainability, 
+communicates uncertainty appropriately. 
+Failure shall prevent delivery.
+
+Constitutional Principle
+Every response should remain constitutionally faithful from beginning to end.
+
+9.10 Deterministic Integrity
+Equivalent inputs should produce materially equivalent outputs.
+The Validation Framework shall tolerate linguistic variation while ensuring:
+identical scientific meaning, 
+identical recommendations, 
+identical confidence representation, 
+identical constitutional behaviour. 
+Deterministic meaning is more important than deterministic wording.
+
+Founder Principle
+Consistency of meaning builds trust more effectively than consistency of phrasing.
+
+9.11 Validation Outcomes
+Every generated response shall receive one of the following outcomes:
+Accepted
+Delivered without modification.
+
+Accepted with Revision
+Minor constitutional corrections applied before delivery.
+
+Regenerated
+Response regenerated using the same Conversation Context.
+
+Escalated
+Additional validation or governance required.
+
+Rejected
+Response fails constitutional validation and is not delivered.
+Validation outcomes shall remain fully auditable.
+
+9.11a Bounded Validation, Latency & Reject Behaviour
+The regenerate-on-failure loop (9.8, 9.11) shall be bounded: a maximum number of regeneration attempts, after which the response falls back to a safe, fully-grounded message rather than looping. Each response has a defined validation latency and cost budget; the deterministic checks (9.4a) run first and cheaply, and generative review runs only where needed, so validation scales.
+The user-facing behaviour of each outcome shall be defined. In particular, a Rejected response shall never surface a fabricated answer or a raw error; it surfaces a safe, grounded fallback (for example, an honest statement of uncertainty or a suggestion to consult a professional where constitutionally justified).
+Engineering Rule
+Regeneration is bounded and falls back to a safe grounded message; validation has a latency budget with deterministic checks first; Reject never yields a fabricated answer.
+9.12 Explainability
+Every validation process shall answer:
+Which factual statements were validated? 
+Which intelligence objects supported the response? 
+Which constitutional checks were performed? 
+Was the response regenerated? 
+Were any unsupported statements removed? 
+Why was the response accepted or rejected? 
+
+9.13 Engineering Constraints
+The Response Validation Framework shall:
+validate every generated response, 
+preserve grounding, 
+preserve explanation integrity, 
+preserve confidence, 
+detect hallucinations, 
+preserve constitutional compliance, 
+remain deterministic in meaning, 
+remain fully auditable. 
+
+9.14 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Every generated response undergoes mandatory validation before delivery.
+✓ Every factual statement is traceable to authoritative BioSense intelligence.
+✓ Confidence representation remains faithful to the Confidence Engine.
+✓ Hallucinations are detected and prevented from reaching the user.
+✓ Constitutional compliance is independently validated.
+✓ Equivalent intelligence produces equivalent meaning across responses.
+✓ Every validation outcome remains fully explainable and auditable.
+Chapter 10
+Governance, Versioning & Communication Lifecycle Management
+
+10.1 Purpose
+The purpose of this chapter is to define the governance framework responsible for the long-term stewardship of the Conversation, Explanation & Intelligence Delivery Engine.
+Communication influences how users understand their health, interpret recommendations and build trust in BioSense.
+Changes to communication behaviour shall therefore be governed with the same discipline applied to reasoning, confidence and decision-making.
+The objective is continuous improvement while preserving consistency, explainability and constitutional integrity.
+
+Constitutional Principle
+Communication should evolve through governed refinement rather than uncontrolled experimentation.
+
+10.2 Engineering Philosophy
+The way BioSense communicates should improve over time.
+However, improvements shall never compromise:
+scientific accuracy, 
+constitutional authority, 
+historical reproducibility, 
+user trust, 
+explainability, 
+consistency across communication channels. 
+Communication improvements shall strengthen understanding without altering underlying intelligence.
+
+Founder Principle
+Improve how BioSense explains, never what BioSense knows.
+
+10.3 Governance Responsibilities
+Conversation Governance shall oversee:
+communication policies, 
+explanation structures, 
+Communication Profiles, 
+narrative generation, 
+delivery channel standards, 
+conversational behaviour, 
+response validation policies, 
+safety communication, 
+accessibility standards, 
+communication versioning. 
+Governance defines how BioSense communicates.
+It does not generate individual responses.
+
+Engineering Rule
+Governance manages communication standards.
+The Conversation Engine applies them.
+
+10.4 Communication Versioning
+Every generated communication shall reference:
+Conversation Engine Version, 
+Structured Explanation Version, 
+Narrative Framework Version, 
+Communication Profile Version, 
+Response Validation Framework Version, 
+Decision Engine Version, 
+Confidence Engine Version, 
+Dynamic Health Model Version. 
+These references, together with the response stored verbatim as its own auditable record, shall allow every historical communication to be reconstructed exactly as delivered. 'Reconstructed exactly' means the stored response and its pinned inputs are retained and re-inspectable; it does not mean the language is regenerated bit-for-bit, which is impossible for model-generated prose (see 10.4a and 9.10).
+
+Constitutional Principle
+Every communication shall remain permanently reproducible.
+
+10.4a Communication Reproducibility — Stored Record and Manifest
+Because the delivered text is model-generated and cannot be regenerated bit-for-bit, reproducibility is achieved by storage plus pinning, not regeneration. Every delivered communication shall be stored verbatim as its auditable record, together with a manifest pinning the Conversation Engine version, all upstream engine versions (per 10.4), the Conversation Context snapshot it was built from, and the validation-framework version and result. Reconstructing a historical communication means retrieving the stored response and re-inspecting it against its pinned inputs.
+This manifest aligns with, and references, the ENG-001, ENG-002, ENG-003 and ENG-004 version manifests, so one 'as-of' state spans all engines. It resolves the tension with 9.10: meaning and inputs are reproducible; wording is retained rather than regenerated. This is guarantee (b) of the three reproducibility guarantees defined normatively in ENG-009 §5.3a.
+Engineering Rule
+Delivered text is stored verbatim and pinned to a cross-engine manifest. Reproducibility is retrieval plus re-inspection, not bit-for-bit regeneration.
+10.5 Configuration Management
+Certain communication behaviours may evolve independently of architectural redesign.
+Examples include:
+explanation templates, 
+narrative structures, 
+clarification strategies, 
+accessibility rules, 
+channel-specific presentation, 
+communication profiles, 
+educational sequencing, 
+reading level adaptation. 
+Configuration changes shall remain:
+version-controlled, 
+documented, 
+validated, 
+fully auditable. 
+
+10.6 Communication Engine Releases
+Every Conversation Engine release shall preserve:
+Release Version, 
+Release Date, 
+Engineering rationale, 
+User experience rationale, 
+Expected communication changes, 
+Validation results, 
+Compatibility notes, 
+Migration guidance. 
+Historical communication versions shall remain reconstructable.
+
+Founder Principle
+Every release should make BioSense easier to understand, not simply different to read.
+
+10.7 Validation Before Deployment
+No communication revision shall enter production without structured validation.
+Validation may include:
+explanation consistency testing, 
+readability testing, 
+narrative consistency, 
+accessibility validation, 
+hallucination validation, 
+safety communication validation, 
+multi-channel consistency testing, 
+historical replay. 
+Validation shall demonstrate improved communication quality without altering constitutional behaviour.
+
+Constitutional Principle
+Every communication improvement should demonstrate greater clarity while preserving identical meaning.
+
+10.8 Historical Reproducibility
+At any future point BioSense shall be capable of reconstructing:
+Conversation Context, 
+Structured Explanation, 
+generated response, 
+validation outcome, 
+communication profile, 
+delivery channel, 
+confidence representation, 
+Decision Objects, 
+supporting Health Beliefs, 
+exactly as they existed when the communication was delivered.
+Historical reconstruction shall never depend upon the current Conversation Engine version.
+
+10.9 Change Impact Assessment
+Before deployment, governance shall evaluate:
+Which communication channels may change? 
+Which user groups may be affected? 
+Will explanation depth change? 
+Will readability change? 
+Will accessibility improve? 
+Could trust or understanding be affected? 
+Will historical consistency remain preserved? 
+Potential impacts shall be documented before release.
+
+Founder Principle
+Understand how communication changes before users experience them.
+
+10.10 Operational Monitoring
+Communication Governance shall monitor:
+explanation clarity, 
+user comprehension signals, 
+follow-up clarification frequency, 
+explanation consistency, 
+hallucination detection rates, 
+validation failure rates, 
+accessibility performance, 
+communication drift. 
+Monitoring informs governance.
+It shall never automatically alter communication behaviour.
+
+Engineering Rule
+Operational monitoring informs improvement without bypassing governance.
+
+10.11 Auditability
+Every governance activity shall generate an immutable audit record.
+Examples include:
+explanation template revisions, 
+Communication Profile changes, 
+narrative framework updates, 
+accessibility improvements, 
+validation rule changes, 
+deployment approvals, 
+governance reviews. 
+Audit records shall remain permanently available.
+
+10.12 Regulatory Readiness
+Conversation Governance shall support future regulatory expectations concerning:
+AI transparency, 
+explainability, 
+healthcare AI communication, 
+accessibility, 
+algorithm governance, 
+user rights, 
+communication accountability. 
+The governance framework shall remain adaptable without compromising constitutional principles.
+
+10.13 Engineering Constraints
+Conversation Governance shall:
+preserve communication consistency, 
+preserve constitutional authority, 
+preserve historical reproducibility, 
+support controlled evolution, 
+remain explainable, 
+remain fully auditable, 
+support future regulatory frameworks. 
+
+10.14 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Every communication is version-controlled.
+✓ Communication configuration changes remain independently governed.
+✓ Communication behaviour is validated before deployment.
+✓ Historical responses remain fully reproducible.
+✓ Governance changes remain fully auditable.
+✓ Operational monitoring informs future improvements without automatically changing communication behaviour.
+✓ The Conversation Engine remains prepared for future regulatory expectations.
+Chapter 11
+End-to-End Conversation & Intelligence Delivery Lifecycle
+
+11.1 Purpose
+The purpose of this chapter is to demonstrate the complete operational lifecycle of the Conversation, Explanation & Intelligence Delivery Engine within the BioSense Intelligence Platform.
+Previous chapters define the architecture governing context assembly, explanation construction, conversational behaviour, personalisation, narrative generation, safety, validation and governance.
+This chapter illustrates how those components interact to produce a single, trustworthy communication from trusted BioSense intelligence.
+The objective is to demonstrate that every communication remains grounded, explainable, reproducible and constitutionally governed from beginning to end.
+
+Constitutional Principle
+Every communication should be traceable from user intent to delivered response through one continuous and explainable communication lifecycle.
+
+11.2 Example Scenario
+For the purposes of this example we introduce a fictional BioSense user.
+Name: Alex Carter
+Age: 37
+Alex has used BioSense continuously for two years.
+The Dynamic Health Model currently contains:
+91 Health Beliefs 
+17 Discoveries 
+8 Behavioural Identity characteristics 
+5 Biological Identity characteristics 
+The Decision Intelligence Engine currently recommends:
+Improve sleep consistency 
+Reduce alcohol intake 
+Delay increased training volume 
+Continue monitoring recovery 
+Alex opens Health AI and asks:
+"Why are you recommending that I improve my sleep before exercising more?"
+The Conversation Engine begins processing the request.
+
+11.3 Intent Recognition
+The Conversation Engine classifies the user's request.
+Primary Intent:
+Recommendation Explanation.
+Secondary Intent:
+Educational Understanding.
+The engine determines that no clarification is required.
+Conversation proceeds.
+
+Constitutional Principle
+Understanding the question precedes answering it.
+
+11.4 Context Assembly
+The Conversation Engine assembles the minimum trusted context required.
+From ENG-001:
+Relevant Health Beliefs 
+Recovery profile 
+Behavioural Identity 
+User goals 
+From ENG-002:
+Recent sleep observations 
+Recovery observations 
+HRV trends 
+Evidence Quality Profiles 
+From ENG-003:
+Confidence Objects 
+Explanation Objects 
+Remaining uncertainty 
+From ENG-004:
+Decision Object 
+Expected Health Impact 
+Intervention Priority 
+Timing 
+Intensity 
+Only relevant intelligence is assembled.
+No unrelated health information is included.
+
+Engineering Rule
+The Language Model receives only the context necessary to answer the question accurately.
+
+11.5 Structured Explanation
+Using the assembled Conversation Context, the Explanation Engine constructs a Structured Explanation.
+It answers:
+What do we understand?
+↓
+Sleep inconsistency is contributing to reduced recovery.
+
+Why do we believe this?
+↓
+Wearable observations over four months.
+Stable evidence.
+High confidence.
+
+How certain are we?
+↓
+High confidence.
+Some uncertainty remains regarding work-related stress contribution.
+
+Why does it matter?
+↓
+Improved recovery increases the likelihood of successful exercise progression.
+
+What should happen next?
+↓
+Improve sleep consistency before increasing training intensity.
+
+What could change this understanding?
+↓
+Future observations showing improved recovery despite unchanged sleep.
+
+Founder Principle
+Structure the explanation before generating the language.
+
+11.6 Communication Personalisation
+Alex's Communication Profile is:
+Balanced.
+The Conversation Engine therefore generates:
+concise explanation first, 
+optional supporting detail, 
+educational expansion available on request. 
+The underlying explanation remains unchanged.
+Only presentation adapts.
+
+11.7 Response Generation
+The Language Model receives:
+Conversation Context, 
+Structured Explanation, 
+Communication Profile, 
+Channel constraints. 
+The model generates:
+"BioSense currently recommends improving your sleep consistency before increasing training volume because your recent recovery patterns suggest that poor sleep is limiting your ability to recover effectively. This conclusion is supported by several months of wearable observations and carries a high level of confidence. Once recovery improves, increasing exercise is expected to provide greater long-term benefit."
+The explanation remains grounded in trusted intelligence.
+
+Constitutional Principle
+Natural language communicates intelligence. It does not replace it.
+
+11.8 Response Validation
+Before delivery, the Validation Framework evaluates the response.
+Checks include:
+Grounding Validation.
+↓
+Pass.
+
+Explanation Consistency.
+↓
+Pass.
+
+Confidence Representation.
+↓
+Pass.
+
+Decision Validation.
+↓
+Pass.
+
+Safety Validation.
+↓
+Pass.
+
+Hallucination Detection.
+↓
+No unsupported statements identified.
+The response is approved.
+
+Engineering Rule
+No response reaches the user without constitutional validation.
+
+11.9 Multi-Turn Conversation
+Alex asks:
+"What evidence would increase your confidence even further?"
+Conversation State is preserved.
+Conversation Context is refreshed.
+The Conversation Engine identifies:
+No new Health Beliefs.
+No new Decision Objects.
+Relevant Confidence Objects updated.
+The follow-up explanation builds upon the previous discussion without repeating unnecessary information.
+
+11.10 Alternative Delivery Channels
+The same Structured Explanation may subsequently generate:
+Home Screen
+↓
+"Improving sleep remains your highest-impact opportunity this week."
+
+Weekly Report
+↓
+Sleep consistency has improved by 12%.
+Recovery continues to improve.
+Exercise recommendation remains deferred.
+
+Notification
+↓
+Your recovery has improved this week. Keep prioritising sleep before increasing training.
+
+Clinician Report
+↓
+Detailed explanation including:
+observations, 
+confidence, 
+Decision Object, 
+Expected Health Impact, 
+intervention sequencing. 
+Every channel communicates the same underlying intelligence.
+
+Constitutional Principle
+One explanation. Many presentations.
+
+11.11 Governance
+Six months later:
+Conversation Engine Version 4.2 introduces:
+Improved readability.
+Better accessibility.
+Enhanced educational progression.
+Validation confirms:
+unchanged scientific meaning, 
+unchanged recommendations, 
+unchanged confidence, 
+improved comprehension. 
+Future conversations use Version 4.2.
+Historical conversations remain reproducible using Version 4.1.
+
+Founder Principle
+Communication should improve without rewriting history.
+
+11.12 End-to-End Validation
+This example demonstrates that:
+✓ User intent is recognised before context assembly.
+✓ Only relevant trusted intelligence is assembled.
+✓ Structured Explanations precede language generation.
+✓ Personalisation alters presentation rather than meaning.
+✓ Every response undergoes constitutional validation.
+✓ Multi-turn conversations preserve continuity while refreshing intelligence.
+✓ Every delivery channel consumes the same underlying explanation.
+✓ Governance improves future communication without altering historical responses.
+
+Closing Statement
+The Conversation, Explanation & Intelligence Delivery Engine is not a chatbot.
+It is not a general-purpose language model.
+It is the constitutional communication system of the BioSense Intelligence Platform.
+Every communication begins with trusted intelligence.
+Every explanation is grounded in evidence.
+Every recommendation preserves confidence.
+Every uncertainty remains visible.
+Every response is validated before delivery.
+Every conversation respects constitutional authority.
+Every narrative remains explainable.
+Every communication remains reproducible.
+Through this architecture, BioSense does not seek to generate persuasive conversations.
+It seeks to generate trustworthy understanding.
+The Conversation Engine therefore transforms the intelligence created by the BioSense platform into communication that is scientifically accurate, personally relevant and constitutionally faithful, enabling individuals to better understand their health while preserving transparency, user autonomy and lifelong trust.

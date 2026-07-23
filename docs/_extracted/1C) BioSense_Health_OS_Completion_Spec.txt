@@ -1,0 +1,322 @@
+
+6286501225550
+
+BioSense Health OS
+System Completion Specification
+The operating-system envelope around the reasoning kernel
+Version  0.1 (Working Draft — for engineering and clinical ratification)
+Position  The third pillar of the BioSense architecture, alongside the Intelligence Constitution (why and how it reasons) and the Reasoning Architecture (how the kernel is built). This document specifies everything around the kernel: the knowledge base it reasons from, the legal envelope it runs inside, the drivers that feed it, the process for upgrading it, the harness that proves it works, and the person it serves.
+Rule register  This document continues the single engineering-rule index begun in the Reasoning Architecture. New rules run from ER-24. One index across all three documents; each rule cites the constitutional or architectural clause it implements.
+Important caveat  The regulatory, data-protection and clinical-governance sections describe engineering and organisational structure. They are not legal advice. Every jurisdictional and clinical position in this document must be confirmed by qualified regulatory counsel and a licensed clinician before launch.
+Document owner  Neil MacLaren  ·  Prepared by: Architecture Review
+
+
+Contents
+ TOC \z \o "1-2" \u \hPart I  ·  The completion map	 PAGEREF _Toc234486196 \h 3
+What is already built vs what this document adds	 PAGEREF _Toc234486197 \h 3
+Gap register and build order	 PAGEREF _Toc234486198 \h 3
+Part II  ·  Foundational dependencies	 PAGEREF _Toc234486199 \h 5
+2.  The Canonical Scientific Library	 PAGEREF _Toc234486200 \h 5
+3.  Data lifecycle: the erasure–immutability resolution	 PAGEREF _Toc234486201 \h 7
+4.  Ingestion drivers and the canonical schema	 PAGEREF _Toc234486202 \h 8
+Part III  ·  Governance layers	 PAGEREF _Toc234486203 \h 9
+5.  Regulatory and clinical positioning	 PAGEREF _Toc234486204 \h 9
+6.  Clinical governance and adverse events	 PAGEREF _Toc234486205 \h 9
+7.  Model lifecycle governance (the kernel-upgrade process)	 PAGEREF _Toc234486206 \h 10
+8.  Learning governance	 PAGEREF _Toc234486207 \h 10
+Part IV  ·  Assurance and operations	 PAGEREF _Toc234486208 \h 11
+9.  Validation and safety-assurance harness	 PAGEREF _Toc234486209 \h 11
+10.  Security architecture for special-category data	 PAGEREF _Toc234486210 \h 11
+11.  Operational observability	 PAGEREF _Toc234486211 \h 11
+12.  Degraded-mode behaviour	 PAGEREF _Toc234486212 \h 11
+Part V  ·  The human and the commitments	 PAGEREF _Toc234486213 \h 13
+13.  User agency	 PAGEREF _Toc234486214 \h 13
+14.  A commitment to ratify: safety is never paywalled	 PAGEREF _Toc234486215 \h 13
+Part VI  ·  Decisions requiring sign-off	 PAGEREF _Toc234486216 \h 14
+		
+
+
+Part I  ·  The completion map
+The previous two documents specified the kernel — how BioSense thinks and what constrains it. An operating system is more than a kernel, and a health OS has an unusually large envelope around it. Almost everything still missing lives in that envelope. This document names each piece, resolves it where it can be resolved in engineering, and frames it as a decision where the resolution needs a human call.
+What is already built vs what this document adds
+Layer
+Status
+Where
+Values & governance of reasoning
+Specified
+Intelligence Constitution
+Reasoning kernel (state machine, DHM, deterministic subsystems)
+Specified
+Reasoning Architecture
+Knowledge base the kernel reasons from
+Missing → this doc, Part II
+§2 Canonical Scientific Library
+Data lifecycle, erasure, consent, residency
+Missing → this doc, Part II
+§3
+Ingestion drivers & canonical schema
+Partial → this doc, Part II
+§4
+Regulatory & clinical envelope
+Missing → this doc, Part III
+§5–§6
+Kernel-upgrade (model lifecycle) & learning governance
+Missing → this doc, Part III
+§7–§8
+Assurance: validation, security, observability, degraded mode
+Missing → this doc, Part IV
+§9–§12
+The human: user agency & commitments
+Missing → this doc, Part V
+§13–§14
+Gap register and build order
+Every gap, its type, who must own it, what it blocks, and when it must be resolved. Priority: P0 blocks the build; P1 must be resolved before general availability; P2 is post-launch hardening.
+Gap
+Type
+Owner
+Blocks
+Pri
+Canonical Scientific Library
+Spec + build
+Clinical + Eng
+All grounded output; the grounding rule is vapour without it
+P0
+Erasure vs immutable DHM
+Decision + spec
+Legal + Eng
+Finalising the DHM store; very costly to retrofit
+P0
+Canonical ingestion schema (FHIR/LOINC)
+Decision + spec
+Eng + Clinical
+S1 ingestion; clinical interoperability
+P0
+Regulatory classification
+Decision
+Regulatory counsel
+Launch scope; safety-engine language; disclaimers
+P1
+Clinical governance & adverse events
+Spec + org
+Clinical
+Authoring safety rules & Library sign-off
+P1
+Model lifecycle governance
+Spec
+Eng + Clinical
+Any model change reaching users safely
+P1
+Learning governance
+Spec
+Eng + Clinical
+Unsupervised drift of the system
+P1
+Validation & safety-assurance harness
+Spec + build
+Eng + Clinical
+Trusting it works; the evidence regulators demand
+P1
+Security architecture (special-category)
+Spec + build
+Security
+Handling health data lawfully and safely
+P1
+Observability
+Spec + build
+Eng
+Knowing the live system is behaving
+P2
+Degraded-mode behaviour
+Spec
+Eng
+Safety when the model or Library is unavailable
+P1
+User agency (corrections, contest, constrain)
+Spec
+Product + Eng
+Trust, ethics, retention
+P1
+Safety never paywalled
+Principle
+Founder
+A liability and values exposure in tiering
+P1
+The three to design in now or regret later.  Most of these can be built in sequence. Three cannot be deferred, because retrofitting them into a running system is disproportionately expensive: the Canonical Scientific Library (everything grounded depends on it), the erasure-vs-immutability resolution (it sits inside the event-sourcing core), and the FHIR/LOINC schema decision (it shapes every ingestion driver and the DHM's canonical values). These are the P0 items and the reason this document leads with them.
+
+
+Part II  ·  Foundational dependencies
+2.  The Canonical Scientific Library
+Both prior documents lean on the Library as the grounding oracle — the thing that makes “no scientific claim from parametric memory” enforceable. Neither specifies how it is built, graded, versioned or governed. It is the largest unbuilt dependency in the design, and grounding — the single most important rule in the architecture — is unenforceable until it exists. It is not a static reference file; it is a living, curated, evidence-graded knowledge base with its own governance.
+2.1  Entry structure
+LibraryEntry
+  id, version, status,   // active | superseded | retired
+  claim { subject, relation, object,
+          population,            // who this applies to
+          conditions },          // when it holds
+  evidence_grade,        // ordinal; see 2.2
+  effect { direction, magnitude?, uncertainty },
+  sources[] { citation, study_type, year },
+  applicability_constraints[],   // e.g. age, sex, comorbidity
+  caveats[],
+  supersedes -> id, superseded_by -> id,
+  reviewed_by, review_date, provenance
+The claim is structured, not prose, so the retrieval layer can match it to an observation and the review layer can verify grounding mechanically. Every entry carries its population and applicability so stages S2–S3 can down-weight when the individual does not match the studied population — the commonest way population evidence is misapplied to a person.
+2.2  Evidence grading reuses the Constitution's hierarchy
+The Library grades evidence on the same ordinal hierarchy the Constitution already defines (Appendix C: meta-analysis / systematic review at the top, through RCTs, cohort and case-control studies, down to mechanistic and anecdotal). Reusing one scale means the Library and the reasoning engine share a single evidence vocabulary, and the confidence calculus (ER-16) can consume an entry's grade directly as its scientific-confidence input.
+ER-24 (Ch 1.4, 8.5; RA ER-15).  Every user-facing scientific claim resolves to a structured, graded, versioned Library entry. No entry may exist without at least one cited source and an evidence grade. Facts generated by a language model may never enter the Library without human clinical validation.
+2.3  Conflicting evidence is represented, not silently resolved
+When two well-run studies disagree, the Library must not pick a winner behind the scenes. An entry can hold competing findings, each with its own grade and sources, and expose that disagreement to the reasoning engine so the resulting interpretation inherits the uncertainty rather than laundering it into false confidence.
+ER-25 (Ch 3.4, 15.x).  Where the evidence base genuinely conflicts, the Library represents the conflict explicitly. The reasoning engine must surface the resulting uncertainty rather than presenting one side as settled.
+2.4  Versioning, retention and the link to belief revision
+Every change to an entry creates a new version; prior versions are retained, because interpretations pin to the version that produced them (RA ER-10). A past explanation is a fact about what BioSense believed then, and must not be silently rewritten. Retiring or superseding an entry does not alter pinned history — but it does trigger the truth-maintenance machinery: any active hypothesis whose scientific basis referenced the retired entry is flagged for re-evaluation.
+ER-26 (RA ER-10, ER-13).  Library entries are versioned and immutable once published; superseding creates a new version and retains the old. Retiring an entry flags every active hypothesis that depended on it for re-evaluation, so the user's understanding cannot silently rest on withdrawn science.
+2.5  Curation governance and the retrieval contract
+Authority to add or change entries rests with the clinical/scientific review function (§6), with recorded sign-off. Retrieval is a structured query by metric and relation returning entries with their versions and grades; the grounding token attached to any downstream claim carries the entry id and version so Review can resolve it deterministically.
+ER-27 (Ch 21.7; RA ER-19).  Only the clinical review function may publish or retire Library entries, with recorded sign-off. The retrieval contract returns entry id + version + grade; grounding tokens carry id + version so the review layer can verify every claim mechanically.
+2.6  Bootstrapping is a real cost, not a given
+Populating v1 is a project in itself. The realistic options are to license an existing curated medical knowledge base, to build the initial corpus through clinical partnership, or to extract structured claims from published guidelines under human validation — most likely a combination. This effort should be planned and resourced explicitly; it is on the critical path to any grounded output.
+Decision required: Canonical Library bootstrap strategy — license, partner, or extract-and-validate (or a mix). Blocks all grounded output; see D3.
+Constitutional basis: Constitution Ch 1.4 (three layers of truth), Appendix C (evidence hierarchy), Ch 21.4 (Library as Level Three authority), Ch 21.7 (medical advisory).
+
+
+3.  Data lifecycle: the erasure–immutability resolution
+This is the sharpest hidden conflict in the design. The Reasoning Architecture makes the DHM an append-only, immutable event log — that is what powers “why did we change our mind, by replay.” But UAE PDPL, and GDPR the moment there are EU users, grant a right to erasure over what is special-category health data. Immutable-by-design and erasable-on-request are in direct opposition. It is actually a three-way tension between auditability-by-replay, erasure, and the ability to reconstruct belief state — and each naive fix sacrifices one of the three.
+3.1  The options and their costs
+Tombstoning / logical delete.  Insufficient for legal erasure — the data still exists.
+Per-user crypto-shredding.  Each user's data is encrypted under a per-user key; destroying the key renders their data permanently unrecoverable. Clean legal erasure. Cost: replay for that user is lost — which, for an erased user, is the correct and intended outcome.
+Segregated logs.  Separate erasable raw observations from de-identified reasoning events. Hard in practice because reasoning events reference the observations, and the belief state derived from them may itself be personal.
+3.2  Recommended architecture
+Per-user crypto-shredding, plus a redaction event appended to the log that records the fact and time of erasure without retaining any content — a meta-audit that erasure occurred, which is itself often a compliance requirement. Accept that replay is lost for erased users; that is the lawful result. Retain a calibration signal (RA ER-17) from erased users only if it is genuinely non-identifiable and consent covered it — otherwise it goes too. Derived belief state counts as personal data and is covered by the same key.
+ER-28 (Ch 11.x; PDPL / GDPR erasure).  The DHM supports erasure by per-user crypto-shredding. Erasure destroys the user's key (rendering observations and derived belief state unrecoverable) and appends a content-free redaction event for audit. The architecture accepts loss of replay for erased users as the correct outcome, and this trade-off is a ratified design decision, not an accident.
+3.3  Consent, residency and retention are first-class
+Consent is granular per data source and revocable (this extends the WHOOP “insights only, no model training” position already established); revoking a source's consent stops ingestion and can trigger erasure of that source's contribution. Data residency and cross-border-transfer rules differ by market and must be designed in, not bolted on. Retention schedules are explicit per data class.
+ER-29 (Ch 21.x; PDPL).  Consent is a first-class, granular, revocable record per data source. Ingestion, reasoning and retention all check consent state. Data residency and retention schedules are configured per launch market and enforced in the data layer.
+Decision required: Erasure architecture (crypto-shred + accept replay loss is recommended) and the consent / data-residency model per launch market. Confirm with counsel. See D2, D8. Not legal advice.
+Constitutional basis: Constitution Ch 11 (memory), Ch 21 (governance); prior WHOOP-compliant Privacy Policy work (insights only, no training on Connected Service data).
+
+
+4.  Ingestion drivers and the canonical schema
+The Reasoning Architecture treats ingestion as solved by “Canonical Translation” (S1). It is in fact a substantial subsystem: connectors, per-source reliability, temporal alignment across devices and timezones, and the handling of gaps and device-off periods. The most consequential decision here is the canonical schema itself.
+4.1  Align to FHIR and LOINC rather than inventing a schema
+A bespoke canonical schema is a liability: it is not clinically interoperable, not credible to a clinician or regulator, and a wall between BioSense and any future clinical integration. Aligning the canonical representation to FHIR resources (Observation, DiagnosticReport, Patient) and coding lab results to LOINC makes the platform interoperable and clinically legible from the start, at modest additional early cost.
+ER-30 (RA S1).  The canonical schema aligns to FHIR resources and codes clinical measurements with standard terminologies (LOINC for labs). Every ingestion driver maps its source to this canonical representation; the DHM stores canonical values in it.
+4.2  Per-source reliability and absence-of-data
+Each source is a driver with a reliability profile — device accuracy priors that feed the data-confidence assigned at S1, so a consumer wearable's reading and a clinical lab's are not treated as equally trustworthy. Missing data is a reasoned state, not silence: a device worn intermittently, a gap in a stream, or an un-drawn panel must be handled explicitly, because “no data” must never be read as “normal.”
+ER-31 (RA S1, S6).  Every source carries a reliability profile that parameterises the data-confidence set at S1. Absence of data is represented and reasoned about explicitly; the engine never infers normality from missing data.
+Constitutional basis: Reasoning Architecture S1 (validation & canonical translation), S6 (confidence).
+
+
+Part III  ·  Governance layers
+5.  Regulatory and clinical positioning
+The line between “wellness insights” and a “medical device / diagnosis” is legally load-bearing, and the entire “insights, not diagnosis” stance is in part a regulatory strategy. That strategy has to be enforced architecturally, not merely stated: it shapes the safety engine's language, the disclaimers, what the system may assert, and where the human sits in the loop.
+The determining question in most regimes is whether the software is intended to diagnose, treat, prevent or predict disease, or merely to provide general wellness information. BioSense's safety-escalation feature — “prompt a medical assessment” — sits close to that line and must be worded and bounded with care. Jurisdictions diverge: the UAE has its own medical-device and health-data framework; EU MDR may classify qualifying medical software as a device (potentially Class IIa under the software rule); the US distinguishes wellness enforcement discretion from regulated clinical-decision-support and SaMD. These are not equivalent, and the platform will touch several.
+ER-32 (Ch 4.6, 5.2; regulatory).  The regulatory stance is an architectural input. BioSense is designed to the most conservative market it will touch: the safety engine's language, the disclaimers, and the human-in-the-loop boundary are set so the system informs and escalates but does not diagnose. A formal, written classification opinion is obtained per launch market before general availability.
+Decision required: Formal regulatory classification per market (UAE first; EU/US on expansion). Blocks GA scope and fixes the safety-engine language. Engage regulatory counsel. See D1. This document is not legal advice.
+6.  Clinical governance and adverse events
+The Constitution names a medical advisory function (21.7) but never operationalises it. A health platform needs a standing clinical governance layer with real authority and a real feedback loop.
+Authority.  A clinical review board owns the safety rules (§7 below / RA 7.1), signs off Library entries (ER-27) and clears model releases (§7).
+Adverse-event capture.  Users can report harm or a near-miss; every report is triaged and reviewed within a defined SLA, in a pharmacovigilance-style loop.
+Feedback.  Findings from adverse events feed back into safety rules, Library entries and the validation harness — the system learns from its failures under human control.
+ER-33 (Ch 21.7).  A clinical review board holds sign-off authority over safety rules, Library entries and model releases. An adverse-event and near-miss reporting pathway exists, with defined triage and review SLAs, and its findings feed back into the safety rules and the validation harness.
+
+
+7.  Model lifecycle governance (the kernel-upgrade process)
+The architecture version-pins the Library and the belief state, but not the reasoning model itself. The substrate is a language model that will be upgraded, swapped or deprecated by its provider — and when it changes, interpretations change, which silently breaks the promise that understanding evolves coherently rather than lurching. This is the kernel-upgrade process of the OS, and it is currently absent.
+ER-34 (RA 7.5, ER-21).  No model reaches users without passing the validation harness (§9), including a non-regression check on safety escalation: a candidate model that regresses on fail-to-escalate cases cannot ship, full stop.
+ER-35 (Ch 8.5, 16.x).  Before a model change reaches users it is compared against the incumbent on a holdout (shadow deployment). Where the new model materially shifts existing users' belief states, the change is gated and the shift is communicated rather than applied silently. Rollback is always available, and the model version is recorded in every reasoning trace.
+ER-36 (resilience).  The reasoning substrate sits behind an abstraction so BioSense is not locked to a single provider and can meet the continuity its multi-year promise to users implies.
+Decision required: Model-provider abstraction and multi-vendor stance (how much portability to engineer now). See D5.
+8.  Learning governance
+The Constitution wants continuous improvement; that improvement must not drift unsupervised. The dividing line is simple and must be enforced: automated processes may refine, but may never alter a system-enforced component.
+May update automatically
+Requires human sign-off
+Baseline recomputation from new observations
+Safety rules (clinical board)
+Calibration monitoring and drift alerts (alert, do not auto-adjust)
+Library entries (clinical board)
+Rolling statistics and expected-variation bands within configured limits
+Model releases and the prompt derivative
+Per-user belief-state updates via the normal reasoning path
+The confidence calculus and thresholds θ
+ER-37 (RA §2, ER-16).  No automated process may modify a system-enforced component (safety rules, grounding, confidence calculus, review gates). Learning is confined to the model-taught and derived-data layers; changes to enforced components require human sign-off.
+ER-38 (WHOOP privacy position).  Learning loops respect the data boundary: Connected Service data covered by the “no training” commitment is barred from any training or fine-tuning pipeline. Calibration on such data is permitted only where consent and contract allow and only in de-identified form.
+
+
+Part IV  ·  Assurance and operations
+9.  Validation and safety-assurance harness
+The calibration loop (RA ER-17) is one instrument, not a validation programme. Distinct from “how it reasons” you need “how we know it is correct and safe.” For a health AI this is the difference between a product and a liability, and it is the evidence a regulator or an acquirer will demand.
+Golden cases.  A curated library of known inputs with expected reasoning and expected escalation, run as a regression suite.
+Adversarial fail-to-escalate suite.  The asymmetric risk in health is the false negative: failing to escalate something dangerous. A dedicated adversarial set probes specifically for this, because it is the catastrophic failure mode.
+Release gates.  The harness runs before any model, Library or prompt change ships. A safety regression blocks the release automatically.
+Clinical validation.  Over time, a formal clinical validation study — the strongest evidence, and increasingly a regulatory expectation.
+ER-39 (RA 7.1, 7.5).  A validation harness of golden and adversarial cases — with explicit fail-to-escalate coverage — gates every change to a model, the Library, the safety rules or the prompt derivative. A safety regression is a hard release blocker.
+10.  Security architecture for special-category data
+Health data is special-category, and the platform's promises about it must be enforced as data-flow boundaries, not policy sentences. Baseline: encryption in transit and at rest, per-user keys (which also enable the crypto-shred erasure of §3), least-privilege access with audited access to health data, a defined breach-response process, secrets management and a maintained threat model with periodic penetration testing.
+ER-40 (PDPL; WHOOP position).  Special-category data is encrypted with per-user keys, access is least-privilege and audited, and the “no training on Connected Service data” commitment is enforced as a tagged data-flow boundary that provably prevents such data from entering training pipelines — not merely a stated policy.
+11.  Operational observability
+Beyond calibration, the live system needs instruments a clinical-grade platform cannot run without: cost and latency per reasoning path (the unit economics that make Section-4-scale real), input- and output-distribution drift detection, Library-staleness monitoring, and aggregate anomaly alarms — for example, an escalation-rate spike that is either a bug or a real-world signal, and you must know which.
+ER-41 (RA §4; Ch 16.x).  The platform monitors, per path, cost and latency, input/output drift, Library staleness and aggregate safety-signal rates, with alarms on anomalous movement. These instruments are available to both the engineering and clinical functions.
+12.  Degraded-mode behaviour
+What the system does when a dependency fails is, in health, a safety question rather than an uptime one. Two rules matter most.
+ER-42 (RA 7.1; Ch 4.6).  Safety escalation must not depend on the availability of the language model or the Library. The safety rule engine is deterministic and remains operational even when the model is down; it is the last line that must never fail open.
+ER-43 (RA 7.2, ER-15).  When the Library is unreachable, grounding cannot be verified, so the engine must not assert scientific claims: it falls back to safe, explicitly-hedged holding responses and never fabricates. When the model is unavailable, synchronous requests inform the user and asynchronous work queues.
+
+
+Part V  ·  The human and the commitments
+13.  User agency
+As specified, the DHM treats the user as a data subject, not an actor. But people will disagree with conclusions, will hold context the sensors cannot see (“I was ill that week,” “that draw was botched,” “I’d just started a medication”), and will want to dispute or delete inferences. This is both an ethics requirement and a trust-and-retention one — the difference between a system done to someone and one they take part in.
+UserAssertion            // a first-class DHM input
+  id, user_id, kind,     // context | correction | dispute
+  statement, references -> {Observation|Hypothesis|Narrative},
+  confidence,            // user-sourced, handled explicitly
+  created_at, provenance = 'user'
+A user correction or dispute enters the reasoning path as evidence like any other — a dispute is simply a contradicting-evidence event that triggers the truth-maintenance machinery (RA ER-13). The user can also see what has been inferred, contest it, and constrain it (opt a source out, or suppress a topic).
+ER-44 (Ch 9.x, 11.x; RA ER-13).  User-supplied context, corrections and disputes are first-class DHM inputs with their own confidence and provenance. A dispute is processed as contradicting evidence through the normal belief-revision path.
+ER-45 (Ch 9.x transparency).  Users can see the inferences held about them, contest any inference (triggering re-evaluation), and constrain what is inferred — including opting a data source out or suppressing a topic.
+14.  A commitment to ratify: safety is never paywalled
+Before the tiered plans (Free / Plus / Pro) harden, one principle should be written down. Safety-critical escalation is delivered in full to every user regardless of tier; only optimisation — depth, breadth, personalisation — is tiered. A Free user must receive the safety engine complete. This is a one-line constitutional commitment that closes both a values exposure and a liability exposure, and it is far cheaper to state now than to argue about later.
+ER-46 (Ch 4.6, 9.x; commercial).  Safety-critical escalation is provided in full to every user on every tier and is never gated behind payment. Tiering applies only to optimisation depth and breadth. Recommended for ratification into the Constitution.
+Decision required: Ratify “safety is never paywalled” into the Constitution (via the amendment procedure now defined in Ch 21). See D7.
+
+
+Part VI  ·  Decisions requiring sign-off
+The points where completion needs a human decision, consolidated. Type marks who must own it. The first three are P0 — they gate the build.
+#
+Decision
+Recommendation
+Owner
+D1
+Regulatory classification per launch market (wellness vs SaMD).
+Formal written opinion before GA; design to the most conservative market.
+Regulatory counsel
+D2
+Erasure architecture within the immutable DHM.
+Per-user crypto-shred + redaction event; accept replay loss for erased users.
+Legal + Eng
+D3
+Canonical Library bootstrap strategy.
+Combine licensing / clinical partnership / validated guideline extraction; resource explicitly.
+Clinical + Eng
+D4
+Canonical schema: FHIR/LOINC vs bespoke.
+Adopt FHIR/LOINC. Interoperability and clinical credibility outweigh early cost.
+Eng + Clinical
+D5
+Model-provider abstraction / multi-vendor stance.
+Abstract the substrate now; avoid single-vendor lock given the multi-year promise.
+Eng
+D6
+Clinical review board: composition and authority.
+Stand up before authoring safety rules; give it real sign-off over rules, Library, model releases.
+Founder + Clinical
+D7
+Ratify “safety never paywalled” into the Constitution.
+Ratify via the Ch 21 amendment procedure.
+Founder
+D8
+Consent, data-residency and retention model per market.
+Granular, revocable consent; residency and retention configured per market; confirm with counsel.
+Legal + Eng
+
+How to use this document.  Resolve D1–D4 first; they unblock the build and fix the most expensive-to-retrofit decisions. The clinical board (D6) should be standing before safety rules are authored, because it owns them. Everything in Parts IV and V should be in place before general availability, not after. Each engineering rule (ER-24 to ER-46) extends the single index that runs across the Constitution, the Reasoning Architecture and this document — one architecture, three views.
+End of working draft v0.1.

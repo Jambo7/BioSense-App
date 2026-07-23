@@ -1,0 +1,2868 @@
+
+
+ENG-004: Decision Intelligence & Intervention Engine
+Engineering Specification
+Document ID:  ENG-004
+Version:  1.0 (Draft)
+Status:  In Development
+Authority:  BioSense Intelligence Constitution (Documents 1A–1C)
+Depends Upon:
+ENG-001 — Dynamic Health Model Engineering Specification
+ENG-002 — Observation Engine & Canonical Observation Store Engineering Specification
+ENG-003 — Confidence & Evidence Evaluation Engine Engineering Specification 
+Contents
+	 TOC \o "1-2" \h \z \u ENG-004: Decision Intelligence & Intervention Engine Engineering Specification	 PAGEREF _Toc234350713 \h 1
+	Purpose & Design Philosophy	 PAGEREF _Toc234350714 \h 8
+	1.1 Purpose	 PAGEREF _Toc234350715 \h 8
+	1.2 Scope	 PAGEREF _Toc234350716 \h 8
+	1.3 Authority	 PAGEREF _Toc234350717 \h 9
+	1.4 Engineering Philosophy	 PAGEREF _Toc234350718 \h 10
+	1.5 Constitutional Definition of Decision Intelligence	 PAGEREF _Toc234350719 \h 10
+	1.6 Action Is Not Recommendation	 PAGEREF _Toc234350720 \h 11
+	1.7 Outcome Optimisation	 PAGEREF _Toc234350721 \h 12
+	1.8 Explainability	 PAGEREF _Toc234350722 \h 12
+	1.9 Expected Health Impact	 PAGEREF _Toc234350723 \h 13
+	1.10 Acceptance Criteria	 PAGEREF _Toc234350724 \h 14
+	Decision Formation Architecture	 PAGEREF _Toc234350725 \h 15
+	2.1 Purpose	 PAGEREF _Toc234350726 \h 15
+	2.2 Engineering Philosophy	 PAGEREF _Toc234350727 \h 15
+	2.3 Decision Inputs	 PAGEREF _Toc234350728 \h 16
+	2.3a Engine Interface Contracts	 PAGEREF _Toc234350729 \h 17
+	2.4 Decision Candidate	 PAGEREF _Toc234350730 \h 17
+	2.5 Decision Formation Workflow	 PAGEREF _Toc234350731 \h 18
+	2.6 Decision Objects	 PAGEREF _Toc234350732 \h 19
+	2.6a Decision Object Storage & Ownership	 PAGEREF _Toc234350733 \h 20
+	2.7 Separation of Decision and Communication	 PAGEREF _Toc234350734 \h 20
+	2.8 Decision States	 PAGEREF _Toc234350735 \h 20
+	2.8a Enumerations Are Closed and Normative	 PAGEREF _Toc234350736 \h 21
+	2.9 Decision Independence	 PAGEREF _Toc234350737 \h 22
+	2.10 Decision Lifecycle	 PAGEREF _Toc234350738 \h 22
+	2.11 Decision Validation	 PAGEREF _Toc234350739 \h 23
+	2.12 Explainability	 PAGEREF _Toc234350740 \h 23
+	2.13 Engineering Constraints	 PAGEREF _Toc234350741 \h 24
+	2.14 Acceptance Criteria	 PAGEREF _Toc234350742 \h 24
+	Intervention Classification & Action Taxonomy	 PAGEREF _Toc234350743 \h 25
+	3.1 Purpose	 PAGEREF _Toc234350744 \h 25
+	3.2 Engineering Philosophy	 PAGEREF _Toc234350745 \h 25
+	3.3 Constitutional Intervention Categories	 PAGEREF _Toc234350746 \h 26
+	3.4 Multi-Category Interventions	 PAGEREF _Toc234350747 \h 31
+	3.5 Intervention Hierarchy	 PAGEREF _Toc234350748 \h 32
+	3.5a Two Axes — Intervention Magnitude and Safety Urgency	 PAGEREF _Toc234350749 \h 33
+	3.6 Category Evolution	 PAGEREF _Toc234350750 \h 33
+	3.7 Explainability	 PAGEREF _Toc234350751 \h 33
+	3.8 Engineering Constraints	 PAGEREF _Toc234350752 \h 34
+	3.9 Acceptance Criteria	 PAGEREF _Toc234350753 \h 34
+	Decision Eligibility & Intervention Prioritisation	 PAGEREF _Toc234350754 \h 35
+	4.1 Purpose	 PAGEREF _Toc234350755 \h 35
+	4.2 Engineering Philosophy	 PAGEREF _Toc234350756 \h 35
+	4.3 Eligibility Assessment	 PAGEREF _Toc234350757 \h 36
+	4.4 Prioritisation Philosophy	 PAGEREF _Toc234350758 \h 36
+	4.5 Expected Health Impact	 PAGEREF _Toc234350759 \h 37
+	4.5a Expected Health Impact Contract & Calibration	 PAGEREF _Toc234350760 \h 38
+	4.6 Intervention Burden	 PAGEREF _Toc234350761 \h 38
+	4.7 Behavioural Capacity	 PAGEREF _Toc234350762 \h 39
+	4.7a Burden, Behavioural Capacity and Intensity as Defined Models	 PAGEREF _Toc234350763 \h 39
+	4.8 Interaction Between Interventions	 PAGEREF _Toc234350764 \h 40
+	4.9 Priority Groups	 PAGEREF _Toc234350765 \h 41
+	4.10 Limiting Active Interventions	 PAGEREF _Toc234350766 \h 41
+	4.11 Re-Prioritisation	 PAGEREF _Toc234350767 \h 42
+	4.12 Explainability	 PAGEREF _Toc234350768 \h 42
+	4.13 Engineering Constraints	 PAGEREF _Toc234350769 \h 43
+	4.14 Acceptance Criteria	 PAGEREF _Toc234350770 \h 43
+	Intervention Timing & Decision Scheduling	 PAGEREF _Toc234350771 \h 44
+	5.1 Purpose	 PAGEREF _Toc234350772 \h 44
+	5.2 Engineering Philosophy	 PAGEREF _Toc234350773 \h 44
+	5.3 Timing Inputs	 PAGEREF _Toc234350774 \h 45
+	5.4 Timing States	 PAGEREF _Toc234350775 \h 45
+	5.5 Readiness Assessment	 PAGEREF _Toc234350776 \h 46
+	5.6 Opportunity Windows	 PAGEREF _Toc234350777 \h 47
+	5.7 Sequencing	 PAGEREF _Toc234350778 \h 47
+	5.8 Repetition	 PAGEREF _Toc234350779 \h 48
+	5.9 Adaptive Timing	 PAGEREF _Toc234350780 \h 49
+	5.10 Timing Conflicts	 PAGEREF _Toc234350781 \h 49
+	5.11 Intervention Duration	 PAGEREF _Toc234350782 \h 50
+	5.12 Explainability	 PAGEREF _Toc234350783 \h 50
+	5.13 Engineering Constraints	 PAGEREF _Toc234350784 \h 50
+	5.14 Acceptance Criteria	 PAGEREF _Toc234350785 \h 51
+	Intervention Intensity & Recommendation Strength	 PAGEREF _Toc234350786 \h 52
+	6.1 Purpose	 PAGEREF _Toc234350787 \h 52
+	6.2 Engineering Philosophy	 PAGEREF _Toc234350788 \h 52
+	6.3 Intervention Intensity Model	 PAGEREF _Toc234350789 \h 53
+	6.3a Reconciling Category, Intensity, Priority and Lifecycle	 PAGEREF _Toc234350790 \h 54
+	6.4 Determining Intensity	 PAGEREF _Toc234350791 \h 55
+	6.5 Confidence Relationship	 PAGEREF _Toc234350792 \h 55
+	6.6 User Autonomy	 PAGEREF _Toc234350793 \h 56
+	6.7 Escalation Limits	 PAGEREF _Toc234350794 \h 56
+	6.8 Intensity Evolution	 PAGEREF _Toc234350795 \h 57
+	6.9 Consistency	 PAGEREF _Toc234350796 \h 57
+	6.10 Multi-Intervention Consistency	 PAGEREF _Toc234350797 \h 58
+	6.11 Explainability	 PAGEREF _Toc234350798 \h 58
+	6.12 Engineering Constraints	 PAGEREF _Toc234350799 \h 59
+	6.13 Acceptance Criteria	 PAGEREF _Toc234350800 \h 59
+	Competing Interventions & Decision Conflict Resolution	 PAGEREF _Toc234350801 \h 60
+	7.1 Purpose	 PAGEREF _Toc234350802 \h 60
+	7.2 Engineering Philosophy	 PAGEREF _Toc234350803 \h 60
+	7.3 Conflict Detection	 PAGEREF _Toc234350804 \h 61
+	7.4 Types of Conflict	 PAGEREF _Toc234350805 \h 61
+	7.5 Conflict Evaluation	 PAGEREF _Toc234350806 \h 63
+	7.6 Resolution Strategies	 PAGEREF _Toc234350807 \h 63
+	7.7 Coordinated Intervention Plans	 PAGEREF _Toc234350808 \h 64
+	7.8 Goal Reconciliation	 PAGEREF _Toc234350809 \h 65
+	7.9 Opportunity Cost	 PAGEREF _Toc234350810 \h 65
+	7.10 Dynamic Reconciliation	 PAGEREF _Toc234350811 \h 66
+	7.11 Explainability	 PAGEREF _Toc234350812 \h 66
+	7.12 Engineering Constraints	 PAGEREF _Toc234350813 \h 66
+	7.13 Acceptance Criteria	 PAGEREF _Toc234350814 \h 67
+	Outcome Evaluation, Intervention Effectiveness & Closed-Loop Learning	 PAGEREF _Toc234350815 \h 68
+	8.1 Purpose	 PAGEREF _Toc234350816 \h 68
+	8.2 Engineering Philosophy	 PAGEREF _Toc234350817 \h 68
+	8.3 Outcome Evaluation Inputs	 PAGEREF _Toc234350818 \h 69
+	8.4 Outcome Categories	 PAGEREF _Toc234350819 \h 70
+	8.5 Measuring Success	 PAGEREF _Toc234350820 \h 71
+	8.5a Outcome Objectives Are Pre-Registered	 PAGEREF _Toc234350821 \h 71
+	8.6 Behaviour vs Physiology	 PAGEREF _Toc234350822 \h 72
+	8.6a Causal Attribution Limits	 PAGEREF _Toc234350823 \h 72
+	8.7 Unexpected Discoveries	 PAGEREF _Toc234350824 \h 73
+	8.8 Feedback Without Contamination	 PAGEREF _Toc234350825 \h 73
+	8.9 Longitudinal Learning	 PAGEREF _Toc234350826 \h 74
+	8.9a Governance of Longitudinal Learning	 PAGEREF _Toc234350827 \h 75
+	8.10 Intervention Retirement	 PAGEREF _Toc234350828 \h 75
+	8.11 Explainability	 PAGEREF _Toc234350829 \h 75
+	8.12 Engineering Constraints	 PAGEREF _Toc234350830 \h 76
+	8.13 Acceptance Criteria	 PAGEREF _Toc234350831 \h 76
+	Intervention Lifecycle, Review & Retirement	 PAGEREF _Toc234350832 \h 77
+	9.1 Purpose	 PAGEREF _Toc234350833 \h 77
+	9.2 Engineering Philosophy	 PAGEREF _Toc234350834 \h 77
+	9.3 Intervention Lifecycle States	 PAGEREF _Toc234350835 \h 78
+	9.4 Scheduled Review	 PAGEREF _Toc234350836 \h 79
+	9.5 Review Triggers	 PAGEREF _Toc234350837 \h 79
+	9.6 Modification	 PAGEREF _Toc234350838 \h 80
+	9.7 Completion	 PAGEREF _Toc234350839 \h 80
+	9.8 Retirement	 PAGEREF _Toc234350840 \h 81
+	9.9 Re-Activation	 PAGEREF _Toc234350841 \h 81
+	9.10 Intervention Fatigue	 PAGEREF _Toc234350842 \h 82
+	9.11 Historical Learning	 PAGEREF _Toc234350843 \h 82
+	9.12 Explainability	 PAGEREF _Toc234350844 \h 83
+	9.13 Engineering Constraints	 PAGEREF _Toc234350845 \h 83
+	9.14 Acceptance Criteria	 PAGEREF _Toc234350846 \h 83
+	Constitutional Safety Framework & Intervention Guardrails	 PAGEREF _Toc234350847 \h 85
+	10.1 Purpose	 PAGEREF _Toc234350848 \h 85
+	10.2 Engineering Philosophy	 PAGEREF _Toc234350849 \h 85
+	10.3 Constitutional Authority	 PAGEREF _Toc234350850 \h 86
+	10.4 Safety Validation	 PAGEREF _Toc234350851 \h 86
+	10.4a Safety Ownership — Deferral to the ENG-001 Safety Rule Engine	 PAGEREF _Toc234350852 \h 87
+	10.5 High-Risk Interventions	 PAGEREF _Toc234350853 \h 87
+	10.6 Vulnerable Contexts	 PAGEREF _Toc234350854 \h 88
+	10.6a Deterministic Enforcement of High-Risk and Vulnerable Contexts	 PAGEREF _Toc234350855 \h 89
+	10.7 Uncertainty Safeguards	 PAGEREF _Toc234350856 \h 89
+	10.8 Recommendation Saturation	 PAGEREF _Toc234350857 \h 90
+	10.9 Commercial Independence	 PAGEREF _Toc234350858 \h 90
+	10.10 Human Oversight	 PAGEREF _Toc234350859 \h 90
+	10.10a Mandatory Handling for Adverse and High-Risk Cases	 PAGEREF _Toc234350860 \h 91
+	10.11 Escalation Pathways	 PAGEREF _Toc234350861 \h 91
+	10.12 Explainability	 PAGEREF _Toc234350862 \h 92
+	10.13 Engineering Constraints	 PAGEREF _Toc234350863 \h 92
+	10.14 Acceptance Criteria	 PAGEREF _Toc234350864 \h 92
+	Governance, Versioning & Decision Lifecycle Management	 PAGEREF _Toc234350865 \h 94
+	11.1 Purpose	 PAGEREF _Toc234350866 \h 94
+	11.2 Engineering Philosophy	 PAGEREF _Toc234350867 \h 94
+	11.3 Governance Responsibilities	 PAGEREF _Toc234350868 \h 95
+	11.4 Decision Versioning	 PAGEREF _Toc234350869 \h 95
+	11.4a Decision Reproducibility Manifest & Determinism Scope	 PAGEREF _Toc234350870 \h 96
+	11.5 Configuration Management	 PAGEREF _Toc234350871 \h 96
+	11.6 Decision Engine Releases	 PAGEREF _Toc234350872 \h 97
+	11.7 Scientific Governance	 PAGEREF _Toc234350873 \h 98
+	11.8 Validation Before Deployment	 PAGEREF _Toc234350874 \h 98
+	11.9 Historical Reproducibility	 PAGEREF _Toc234350875 \h 99
+	11.10 Change Impact Assessment	 PAGEREF _Toc234350876 \h 99
+	11.11 Auditability	 PAGEREF _Toc234350877 \h 100
+	11.12 Regulatory Readiness	 PAGEREF _Toc234350878 \h 100
+	11.13 Operational Monitoring	 PAGEREF _Toc234350879 \h 100
+	11.14 Engineering Constraints	 PAGEREF _Toc234350880 \h 101
+	11.15 Acceptance Criteria	 PAGEREF _Toc234350881 \h 101
+	End-to-End Decision Intelligence Lifecycle	 PAGEREF _Toc234350882 \h 103
+	12.1 Purpose	 PAGEREF _Toc234350883 \h 103
+	12.2 Introducing the User	 PAGEREF _Toc234350884 \h 103
+	12.3 Decision Candidates	 PAGEREF _Toc234350885 \h 104
+	12.4 Eligibility Assessment	 PAGEREF _Toc234350886 \h 105
+	12.5 Expected Health Impact	 PAGEREF _Toc234350887 \h 105
+	12.6 Conflict Resolution	 PAGEREF _Toc234350888 \h 106
+	12.7 Timing & Intensity	 PAGEREF _Toc234350889 \h 107
+	12.8 Safety Validation	 PAGEREF _Toc234350890 \h 108
+	12.9 User Communication	 PAGEREF _Toc234350891 \h 108
+	12.10 Outcome Evaluation	 PAGEREF _Toc234350892 \h 109
+	12.11 Intervention Review	 PAGEREF _Toc234350893 \h 110
+	12.12 Longitudinal Evolution	 PAGEREF _Toc234350894 \h 111
+	12.13 Governance	 PAGEREF _Toc234350895 \h 111
+	12.14 End-to-End Validation	 PAGEREF _Toc234350896 \h 112
+
+Chapter 1
+Purpose & Design Philosophy
+
+1.1 Purpose
+The purpose of this specification is to define the architecture governing how BioSense converts trusted understanding into safe, prioritised and personalised health decisions.
+The Decision Intelligence & Intervention Engine is responsible for determining whether BioSense should act, what action should be taken, when that action should occur and how it should be communicated.
+Unlike the Dynamic Health Model, which develops understanding, or the Confidence Engine, which determines the reliability of that understanding, the Decision Intelligence Engine determines the most appropriate course of action for the individual.
+Its responsibility is not to maximise the number of recommendations.
+Its responsibility is to maximise meaningful health improvement while minimising unnecessary intervention.
+
+Constitutional Principle
+The purpose of intelligence is not merely to understand. It is to improve outcomes through appropriate action.
+
+1.2 Scope
+This specification defines:
+Decision Intelligence 
+Intervention selection 
+Recommendation generation 
+Recommendation prioritisation 
+Intervention timing 
+Intervention intensity 
+Competing intervention resolution 
+Expected Health Impact evaluation 
+Outcome monitoring 
+Recommendation retirement 
+Safety controls 
+Intervention governance 
+This specification deliberately excludes:
+Observation ingestion (ENG-002) 
+Dynamic Health Model architecture (ENG-001) 
+Confidence calculation (ENG-003) 
+User conversation generation 
+Notification delivery 
+User interface design 
+Those responsibilities are defined elsewhere within the BioSense engineering library.
+
+1.3 Authority
+This specification operates under the constitutional hierarchy:
+BioSense Constitution
+↓
+ENG-001 — Dynamic Health Model
+↓
+ENG-002 — Observation Engine
+↓
+ENG-003 — Confidence Engine
+↓
+ENG-004 — Decision Intelligence Engine
+The Decision Intelligence Engine consumes understanding and confidence.
+It does not create either.
+
+Engineering Rule
+The Decision Intelligence Engine shall never modify observations, Health Beliefs or confidence directly.
+It consumes the outputs of previous engines and produces decision objects for downstream systems.
+
+1.4 Engineering Philosophy
+The presence of a Health Belief does not automatically justify intervention.
+Likewise, high confidence does not necessarily require a recommendation.
+BioSense shall first determine whether intervention is beneficial, proportionate and likely to improve the individual's long-term health.
+In some circumstances, the most appropriate decision is to continue observing.
+In others, it may be to educate rather than advise.
+In others, it may be to recommend seeking professional medical advice.
+The Decision Intelligence Engine therefore exists to optimise action, not activity.
+
+Founder Principle
+The best recommendation is sometimes no recommendation at all.
+
+1.5 Constitutional Definition of Decision Intelligence
+For engineering purposes:
+Decision Intelligence is the structured process by which BioSense transforms trusted understanding into prioritised, evidence-based interventions designed to improve long-term health outcomes.
+Decision Intelligence therefore considers:
+evidence, 
+confidence, 
+expected health impact, 
+user context, 
+intervention burden, 
+competing priorities, 
+uncertainty, 
+constitutional safety principles. 
+It does not optimise for engagement, notification frequency or application usage.
+
+Constitutional Principle
+BioSense should optimise for better health, not more interactions.
+
+1.6 Action Is Not Recommendation
+A key architectural distinction exists between a decision and a recommendation.
+A decision is the internal conclusion reached by the Decision Intelligence Engine.
+A recommendation is only one possible expression of that decision.
+Possible decision outcomes include:
+No action 
+Continue monitoring 
+Collect additional evidence 
+Provide education 
+Generate a lifestyle recommendation 
+Suggest behavioural change 
+Recommend discussion with a healthcare professional 
+Escalate through constitutional safety pathways 
+The Conversation Engine and User Interface determine how these decisions are presented.
+They do not determine which decisions are made.
+
+Engineering Rule
+Every recommendation originates from a decision, but not every decision results in a recommendation.
+
+1.7 Outcome Optimisation
+The objective of the Decision Intelligence Engine is not to maximise the number of interventions.
+Its objective is to maximise meaningful improvements in long-term health.
+Every decision shall therefore be evaluated according to its expected contribution to:
+healthspan, 
+longevity, 
+disease prevention, 
+behavioural sustainability, 
+user wellbeing, 
+constitutional safety. 
+
+Founder Principle
+Measure success by better health, not by completed recommendations.
+
+1.8 Explainability
+Every decision generated by the engine shall remain explainable.
+BioSense shall always be capable of answering:
+Why was this action selected? 
+Why was another action not selected? 
+Why is this the highest priority? 
+Why now? 
+Why not later? 
+Why is no action recommended? 
+If these questions cannot be answered, the decision is constitutionally incomplete.
+
+Constitutional Principle
+Every intervention should be as explainable as the understanding that created it.
+
+1.9 Expected Health Impact
+Decision prioritisation shall be driven primarily by Expected Health Impact, not by the number of abnormalities detected.
+Expected Health Impact represents BioSense's estimate of the potential long-term improvement associated with a successful intervention.
+Factors contributing to Expected Health Impact may include:
+strength of supporting evidence, 
+confidence, 
+magnitude of potential benefit, 
+sustainability, 
+interaction with other Health Beliefs, 
+relevance to the individual's goals, 
+constitutional safety. 
+Expected Health Impact shall be formally defined in later chapters.
+
+Founder Principle
+Address what matters most, not what is easiest to detect.
+
+On Acceptance Criteria
+Acceptance criteria throughout this specification shall be objective, automatable assertions rather than aspirations. Each should be restated verifiably — for example: 're-running prioritisation at pinned engine and configuration versions reproduces the same ranking'; 'an intervention exceeding constitutional authority is blocked deterministically'; 'an intervention outcome never becomes supporting evidence (8.8)'; 'every Decision Object resolves to a reproducibility manifest (11.4a)'.
+Engineering Rule
+A criterion that cannot be checked by a test or a defined inspection is not an acceptance criterion. This applies to every chapter's acceptance section.
+1.10 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Decision Intelligence is clearly separated from understanding and confidence.
+✓ Recommendations are recognised as only one possible decision outcome.
+✓ The engine consumes previous intelligence without modifying it.
+✓ Decisions optimise long-term health rather than engagement.
+✓ Expected Health Impact is established as the primary prioritisation philosophy.
+✓ Every decision remains explainable.
+✓ The architecture clearly positions the Decision Intelligence Engine within the wider BioSense Intelligence Platform.
+Chapter 2
+Decision Formation Architecture
+
+2.1 Purpose
+The purpose of this chapter is to define the constitutional workflow through which the Decision Intelligence Engine transforms trusted understanding into structured intervention decisions.
+Every decision generated by BioSense shall follow a common architectural process.
+The objective is to ensure that interventions remain:
+evidence-based, 
+confidence-aware, 
+proportionate, 
+explainable, 
+reproducible, 
+constitutionally compliant. 
+No intervention shall bypass this workflow.
+
+Constitutional Principle
+Every intervention shall be earned through structured decision-making rather than generated by intuition or heuristics.
+
+2.2 Engineering Philosophy
+Decision-making represents the transition between intelligence and action.
+By the time the Decision Intelligence Engine begins processing:
+observations already exist, 
+Health Beliefs already exist, 
+confidence has already been evaluated. 
+The Decision Intelligence Engine shall therefore avoid re-evaluating evidence.
+Instead, it consumes trusted understanding and determines the most appropriate response.
+This separation preserves clear architectural boundaries between engines.
+
+Engineering Rule
+The Decision Intelligence Engine shall consume intelligence.
+It shall not recreate intelligence.
+
+2.3 Decision Inputs
+Every decision shall be formed from structured inputs supplied by upstream engines.
+These include:
+From ENG-001
+Health Beliefs 
+Discoveries 
+Biological Identity 
+Behavioural Identity 
+User Goals 
+Narratives 
+
+From ENG-002
+Supporting Observation References 
+Observation Quality metadata 
+Evidence provenance 
+
+From ENG-003
+Confidence assessment 
+Confidence threshold 
+Explanation Object 
+Remaining uncertainty 
+Competing hypotheses 
+
+Additional contextual inputs may include:
+User preferences 
+User availability 
+Intervention history 
+Active recommendations 
+Safety constraints 
+The Decision Engine shall not independently generate these inputs.
+
+Constitutional Principle
+Decisions should be built upon trusted intelligence, not reconstructed intelligence.
+
+2.3a Engine Interface Contracts
+The inputs listed above are enumerated but not contracted. For each upstream engine the interface shall specify what is read, that it is read strictly read-only, and the versions it is pinned to. In particular, the Decision Intelligence Engine consumes confidence from ENG-003 and beliefs from ENG-001 without modifying them (ENG-003 states that the recommendation layer consumes confidence and never modifies it), and it reads observations and quality from ENG-002 by reference.
+Every concept consumed here shall be defined in its owning specification. 'Behavioural Identity' and 'User Goals' are consumed from ENG-001 and shall either be defined there or added to ENG-001; they shall not be assumed to exist. The provenance of contextual inputs (user availability, active interventions, safety constraints) shall likewise be named.
+Engineering Rule
+Every upstream input is read-only, version-pinned, and defined in its owning specification. The Decision Engine consumes intelligence; it never writes upstream engines.
+2.4 Decision Candidate
+Every potential intervention shall begin life as a Decision Candidate.
+A Decision Candidate represents a proposed course of action.
+It has not yet been approved.
+It shall contain:
+Candidate ID 
+Target Health Belief(s) 
+Supporting confidence 
+Supporting evidence references 
+Proposed intervention 
+Expected Health Impact 
+Safety assessment 
+Decision timestamp 
+Engine version 
+Decision Candidates remain internal objects until validated.
+
+Engineering Rule
+Every intervention shall begin as a Decision Candidate.
+
+2.5 Decision Formation Workflow
+Every Decision Candidate shall progress through the same constitutional workflow.
+Trusted Understanding
+
+↓
+
+Relevant Health Beliefs Identified
+
+↓
+
+Decision Candidates Generated
+
+↓
+
+Eligibility Assessment
+
+↓
+
+Expected Health Impact Assessment
+
+↓
+
+Conflict Resolution
+
+↓
+
+Safety Evaluation
+
+↓
+
+Priority Assessment
+
+↓
+
+Decision Validation
+
+↓
+
+Approved Decision Object
+Each stage shall remain independently explainable.
+
+2.6 Decision Objects
+Once validated, a Decision Candidate becomes a Decision Object.
+Decision Objects represent the constitutional source of truth for all downstream actions.
+A Decision Object may ultimately result in:
+no action, 
+continued monitoring, 
+evidence collection, 
+educational guidance, 
+lifestyle intervention, 
+behavioural coaching, 
+referral advice, 
+future observation scheduling, 
+recommendation generation. 
+Every downstream engine consumes Decision Objects.
+No downstream engine creates them.
+
+Founder Principle
+Recommendations are outputs of Decision Objects, not substitutes for them.
+
+2.6a Decision Object Storage & Ownership
+Decision Objects are the source of truth for downstream actions, so their store shall be owned unambiguously. The Decision Intelligence Engine owns the Decision store; ENG-001's Recommendation History and a belief's linked recommendations reference Decision Objects by identifier and version rather than duplicating them. Any write into the Dynamic Health Model that results from a decision (for example scheduling a future observation) goes through the DHM's per-individual single-writer path (ENG-001), never by the Decision Engine writing the DHM directly.
+Engineering Rule
+ENG-004 owns the Decision store; the DHM references decisions by id and version. Decision-driven DHM writes use the DHM single-writer path.
+2.7 Separation of Decision and Communication
+Decision formation shall remain entirely independent from communication.
+Example:
+Decision:
+Collect additional blood biomarkers.
+Communication:
+"To improve our understanding of your iron status, BioSense recommends repeating your blood test in approximately three months."
+The Conversation Engine determines wording.
+The Decision Intelligence Engine determines intent.
+
+Constitutional Principle
+The meaning of a decision should never depend upon how it is communicated.
+
+2.8 Decision States
+Every Decision Object shall progress through recognised lifecycle states.
+Suggested states include:
+Candidate
+Awaiting evaluation.
+
+Eligible
+Suitable for further assessment.
+
+Validated
+Passes constitutional checks.
+
+Approved
+Ready for downstream consumption.
+
+Deferred
+Temporarily postponed.
+
+Active
+Currently influencing the user experience.
+
+Completed
+Intervention finished.
+
+Retired
+No longer applicable.
+
+Founder Principle
+Decisions should mature through recognised stages rather than appear instantaneously.
+
+2.8a Enumerations Are Closed and Normative
+Where this specification lists 'suggested' states, levels, groups or categories that gate behaviour — Decision States (2.8), Priority Groups (4.9), Timing States (5.4), Intensity levels (6.3), intervention categories (3.3), Outcome Categories (8.4) and lifecycle states (9.3) — those sets shall be closed, versioned enumerations, marked normative rather than illustrative, and extended only through governed addition. A normative glossary shall also fix the distinct meanings of 'Decision', 'Recommendation', 'Intervention' and 'Decision Object', which are currently used with overlapping sense.
+Engineering Rule
+Behaviour-gating vocabularies are closed, versioned and normative. Illustrative examples are marked as such.
+2.9 Decision Independence
+Every Decision Object shall remain independent.
+Multiple decisions may originate from:
+one Health Belief, 
+multiple Health Beliefs, 
+one Discovery, 
+several Discoveries. 
+Similarly:
+One Health Belief may generate no decisions whatsoever.
+Decision generation shall remain evidence-driven rather than rule-driven.
+
+2.10 Decision Lifecycle
+Decision Objects shall evolve in response to the triggers listed below — not by constant recomputation. 'Continuous' means triggered plus scheduled review plus lazy evaluation on read, consistent with ENG-001's trigger model and ENG-003.
+Triggers include:
+confidence revision, 
+new observations, 
+completed interventions, 
+changing user goals, 
+emerging discoveries, 
+safety reassessment, 
+competing recommendations. 
+Historical Decision Objects shall remain preserved.
+New decisions shall supersede rather than overwrite previous ones.
+
+Constitutional Principle
+Every decision should have a history.
+
+2.11 Decision Validation
+Before approval, every Decision Object shall satisfy constitutional validation.
+Validation confirms:
+sufficient confidence, 
+sufficient evidence, 
+eligibility, 
+safety compliance, 
+conflict assessment, 
+explainability, 
+governance requirements. 
+If validation fails:
+The Decision Candidate shall not become active.
+
+Engineering Rule
+No intervention may enter production without passing Decision Validation.
+
+2.12 Explainability
+Every Decision Object shall answer:
+Why was this decision generated? 
+Which Health Beliefs contributed? 
+Which confidence assessments supported it? 
+Why was this intervention selected? 
+Which alternatives were rejected? 
+Why now? 
+Why not later? 
+What future evidence could change this decision? 
+
+2.13 Engineering Constraints
+The Decision Formation Architecture shall:
+consume upstream intelligence without modifying it, 
+preserve architectural separation, 
+generate structured Decision Objects, 
+remain deterministic where appropriate, 
+preserve complete audit history, 
+remain fully explainable, 
+support future intervention types. 
+
+2.14 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Every intervention begins as a Decision Candidate.
+✓ Every Decision Candidate follows a common constitutional workflow.
+✓ Decision Objects become the sole source of downstream interventions.
+✓ Decision formation remains separate from communication.
+✓ Decision lifecycle states are explicitly defined.
+✓ Validation prevents unsupported interventions.
+✓ Every Decision Object remains fully explainable and auditable.
+✓ The architecture preserves clear ownership boundaries between all BioSense intelligence engines.
+Chapter 3
+Intervention Classification & Action Taxonomy
+
+3.1 Purpose
+The purpose of this chapter is to define the constitutional classification framework used by the Decision Intelligence Engine to categorise every intervention generated by BioSense.
+Not all health decisions are equivalent.
+Different interventions possess different objectives, evidence requirements, safety implications and communication styles.
+By classifying interventions into clearly defined categories, BioSense ensures that every action is governed consistently throughout the platform.
+
+Constitutional Principle
+Every intervention should belong to a clearly defined constitutional category before it is delivered.
+
+3.2 Engineering Philosophy
+The objective of BioSense is not simply to generate recommendations.
+Its objective is to determine the most appropriate intervention for the individual's current situation.
+That intervention may involve:
+providing knowledge, 
+collecting additional evidence, 
+encouraging behavioural change, 
+suggesting professional medical advice, 
+or intentionally taking no action. 
+The classification of an intervention influences:
+eligibility, 
+prioritisation, 
+confidence requirements, 
+communication, 
+outcome monitoring, 
+retirement. 
+
+Founder Principle
+Choosing the right type of intervention is as important as choosing the right intervention.
+
+3.3 Constitutional Intervention Categories
+Every Decision Object shall belong to one primary intervention category.
+The following categories are constitutionally recognised.
+
+Category One — No Action
+The Decision Intelligence Engine determines that no intervention is currently appropriate.
+Reasons may include:
+insufficient confidence, 
+low expected health impact, 
+temporary physiological variation, 
+adequate current management, 
+conflicting evidence, 
+ongoing observation. 
+No Action remains an active decision.
+It is not the absence of decision-making.
+
+Constitutional Principle
+Choosing not to intervene is itself an intelligent intervention.
+
+Category Two — Continued Observation
+BioSense continues monitoring without recommending behavioural change.
+Examples include:
+emerging trends, 
+incomplete longitudinal evidence, 
+unresolved competing hypotheses, 
+ongoing confidence maturation. 
+Observation allows understanding to develop before action is taken.
+
+Category Three — Evidence Collection
+Additional evidence is likely to improve BioSense's understanding.
+Examples include:
+repeat blood testing, 
+wearable reconnection, 
+symptom questionnaire, 
+nutrition logging, 
+medication update, 
+body composition assessment. 
+The purpose is to reduce uncertainty.
+Not to increase engagement.
+
+Founder Principle
+The most valuable intervention is sometimes better evidence.
+
+Category Four — Education
+The user would benefit from additional knowledge without requiring immediate behavioural change.
+Examples include:
+biomarker education, 
+sleep physiology, 
+recovery science, 
+nutrition fundamentals, 
+exercise principles, 
+longevity education. 
+Educational interventions improve understanding rather than directly altering behaviour.
+
+Category Five — Behavioural Intervention
+The engine recommends modification of an established behaviour.
+Examples include:
+bedtime consistency, 
+hydration, 
+alcohol reduction, 
+stress management, 
+meal timing, 
+screen exposure. 
+Behavioural interventions focus upon habits rather than isolated actions.
+
+Constitutional Principle
+Sustainable behaviour change should be preferred over isolated actions.
+
+Category Six — Lifestyle Optimisation
+Recommendations intended to improve long-term healthspan.
+Examples include:
+physical activity, 
+nutrition quality, 
+strength training, 
+recovery routines, 
+cardiovascular fitness, 
+social wellbeing. 
+Lifestyle optimisation generally influences multiple Health Beliefs simultaneously.
+
+Category Seven — Nutritional Intervention
+Recommendations related specifically to dietary intake.
+Examples include:
+increasing dietary fibre, 
+improving protein intake, 
+reducing ultra-processed foods, 
+increasing omega-3 consumption, 
+improving hydration. 
+Supplement recommendations remain governed separately.
+
+Category Eight — Supplement Guidance
+BioSense may suggest consideration of supplements where constitutionally appropriate.
+Examples include:
+Vitamin D, 
+Iron, 
+Magnesium, 
+Omega-3. 
+Supplement guidance shall remain:
+evidence-based, 
+proportionate, 
+confidence-aware, 
+constitutionally cautious. 
+It shall always prioritise nutritional improvement where appropriate.
+
+Founder Principle
+Food should generally be considered before supplementation.
+
+Category Nine — Medical Discussion
+BioSense recommends discussing findings with a suitably qualified healthcare professional.
+Examples include:
+persistent abnormal biomarkers, 
+unexpected physiological changes, 
+concerning longitudinal deterioration, 
+red-flag findings defined within the Constitution. 
+BioSense does not diagnose.
+It facilitates appropriate escalation.
+
+Constitutional Principle
+BioSense supports clinical care. It does not replace it.
+
+Category Ten — Safety Escalation
+Certain situations require accelerated constitutional handling.
+Examples include:
+red-flag biomarker combinations, 
+significant physiological deterioration, 
+repeated constitutional safety triggers. 
+Safety Escalation is a request signal only: it raises a safety-relevant escalation request to ENG-010, which computes the final Escalation Level and publication response. ENG-004 activates the pathway; it does not determine the escalation level.
+
+Category Eleven — Goal Optimisation
+Interventions designed specifically to improve progress towards user-defined goals.
+Examples include:
+marathon preparation, 
+weight reduction, 
+muscle gain, 
+healthy ageing, 
+improved sleep. 
+Goal Optimisation shall remain aligned with overall health priorities.
+Goal achievement shall never compromise constitutional safety.
+
+Founder Principle
+Goals should shape recommendations without compromising health.
+
+3.4 Multi-Category Interventions
+Certain Decision Objects may legitimately belong to multiple categories.
+Example:
+Poor ferritin.
+↓
+Education.
+↓
+Nutrition.
+↓
+Repeat blood test.
+↓
+Medical discussion.
+Each component shall remain independently identifiable.
+The intervention remains one coordinated strategy.
+
+3.5 Intervention Hierarchy
+Categories differ along two independent axes that shall not be conflated: intervention magnitude (how much is being asked of the individual, from No Action upward) and safety urgency (how time-critical the situation is). See 3.5a.
+Conceptually:
+No Action
+
+↓
+
+Observation
+
+↓
+
+Evidence Collection
+
+↓
+
+Education
+
+↓
+
+Behavioural Intervention
+
+↓
+
+Lifestyle Optimisation
+
+↓
+
+Nutritional Intervention
+
+↓
+
+Supplement Guidance
+
+↓
+
+Medical Discussion
+
+↓
+
+Safety Escalation
+Movement towards higher-impact categories generally requires increasing confidence and stronger evidence.
+
+Engineering Rule
+Higher-consequence interventions shall require proportionately stronger constitutional justification.
+
+3.5a Two Axes — Intervention Magnitude and Safety Urgency
+This chapter is the engineering realisation of the recommendation hierarchy defined in the Constitution (Volume 1A) and the least-necessary-intervention rule in ENG-001; it does not introduce a second, divergent hierarchy, and the eleven categories map to the constitutional set.
+Two axes shall be kept separate. The intervention-magnitude axis expresses least-necessary-intervention: prefer the lowest-magnitude sufficient response (No Action, Observation, Evidence Collection, Education, then behavioural and lifestyle categories). The safety-urgency axis is orthogonal: Medical Discussion and Safety Escalation are not 'more intervention' than a supplement — they are time-critical responses that override the magnitude ordering via the safety floor (10.4a), regardless of tier.
+Engineering Rule
+Prefer the least-magnitude sufficient intervention; safety urgency is a separate axis that overrides magnitude through the safety floor. The two are never collapsed into one ranking.
+3.6 Category Evolution
+Decision Objects may transition between categories.
+Example:
+Observation
+↓
+Evidence Collection
+↓
+Education
+↓
+Behavioural Intervention
+↓
+Lifestyle Optimisation
+As BioSense's understanding matures, intervention type may evolve naturally.
+Historical classifications shall remain preserved.
+
+3.7 Explainability
+Every intervention shall explain:
+Why was this category selected? 
+Why were alternative categories rejected? 
+Which confidence threshold authorised this category? 
+Which Health Beliefs contributed? 
+Which safety principles apply? 
+Could the category change with additional evidence? 
+
+3.8 Engineering Constraints
+The Intervention Classification Framework shall:
+classify every Decision Object, 
+support multiple intervention categories, 
+preserve constitutional safety, 
+remain explainable, 
+remain extensible, 
+remain fully auditable, 
+support future intervention types. 
+
+3.9 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Every Decision Object belongs to at least one constitutional intervention category.
+✓ "No Action" is recognised as an explicit intervention outcome.
+✓ Educational, behavioural, nutritional, lifestyle and medical interventions remain distinct.
+✓ Multi-category intervention strategies are supported.
+✓ Higher-consequence interventions require stronger justification.
+✓ Intervention categories evolve without losing historical lineage.
+✓ Every intervention classification remains fully explainable and auditable.
+Chapter 4
+Decision Eligibility & Intervention Prioritisation
+
+4.1 Purpose
+The purpose of this chapter is to define how the Decision Intelligence Engine determines which interventions are eligible for consideration and how eligible interventions are prioritised before being presented to the user.
+The existence of a valid Decision Object does not guarantee that it should become an active intervention.
+BioSense may possess numerous appropriate interventions simultaneously.
+Its responsibility is to identify those expected to produce the greatest meaningful improvement while avoiding unnecessary cognitive burden.
+
+Constitutional Principle
+The value of an intervention depends not only on its correctness, but on whether it deserves the user's attention today.
+
+4.2 Engineering Philosophy
+Health optimisation is constrained by human attention.
+Even highly motivated individuals can realistically sustain only a limited number of meaningful behavioural changes at any given time.
+The Decision Intelligence Engine shall therefore prioritise interventions according to their expected contribution to long-term health rather than attempting to optimise every measurable variable simultaneously.
+The objective is not completeness.
+The objective is meaningful progress.
+
+Founder Principle
+Improve the person, not every metric.
+
+4.3 Eligibility Assessment
+Before an intervention enters the prioritisation process it shall undergo Eligibility Assessment.
+Eligibility confirms that the intervention satisfies all constitutional requirements.
+Assessment shall consider:
+supporting confidence, 
+constitutional safety, 
+intervention category, 
+expected health impact, 
+conflicting interventions, 
+user context, 
+active intervention history. 
+Only eligible Decision Objects may proceed to prioritisation.
+
+Engineering Rule
+Eligibility determines whether an intervention may compete for attention.
+It does not determine whether it will be selected.
+
+4.4 Prioritisation Philosophy
+The Decision Intelligence Engine shall rank interventions according to their Expected Health Impact.
+Expected Health Impact represents the estimated long-term benefit likely to result if the intervention is successfully adopted.
+The engine shall not prioritise interventions based solely upon:
+abnormal laboratory values, 
+confidence, 
+novelty, 
+recent observations, 
+ease of implementation. 
+Expected Health Impact shall consider the individual's health as an integrated system.
+
+Constitutional Principle
+BioSense should prioritise interventions by expected improvement in health, not by the severity of isolated measurements.
+
+4.5 Expected Health Impact
+Expected Health Impact is a constitutional property of every Decision Object.
+It represents BioSense's best estimate of the overall value of the proposed intervention.
+Factors influencing Expected Health Impact may include:
+strength of supporting evidence, 
+confidence, 
+number of Health Beliefs affected, 
+anticipated longevity benefit, 
+disease prevention potential, 
+behavioural sustainability, 
+interaction with existing interventions, 
+alignment with user goals, 
+constitutional safety. 
+Expected Health Impact shall remain explainable.
+Expected Health Impact shall not be a single opaque number, but it shall be a structured, decomposable and comparable score: explainable in its parts (see 4.5a) yet ordered enough to rank interventions. 'Explainable, not a black box' and 'rankable' are reconciled by such a structured score, not by refusing to define one.
+
+Founder Principle
+Prioritise what changes lives, not what changes dashboards.
+
+4.5a Expected Health Impact Contract & Calibration
+Expected Health Impact is the quantity by which every intervention is ranked, so it is defined here rather than deferred. It shall be produced by a single versioned methodology owned by the data and clinical function that combines its stated factors (evidence strength, confidence, magnitude and durability of benefit, disease-prevention potential, breadth across Health Beliefs, behavioural sustainability, goal alignment and constitutional safety) into a structured, decomposable and comparable score. The score is explainable in its components and ordered enough to rank; it is not a single opaque number, and it is not left undefined.
+Because Expected Health Impact is a prediction of future benefit, it shall be calibrated: the Outcome Evaluation loop (Chapter 8) compares predicted impact against observed outcomes and the methodology is adjusted under governance (8.9a), exactly as ENG-003 calibrates confidence. Weights and thresholds are to be confirmed; the contract is binding now.
+Engineering Rule
+Expected Health Impact is one versioned, explainable, comparable score, and it is calibrated against actual outcomes. Prioritisation ranks on it; it is never left undefined.
+4.6 Intervention Burden
+Not all beneficial interventions carry the same cost to the individual.
+The Decision Intelligence Engine shall consider Intervention Burden.
+Examples include:
+Low burden:
+increasing hydration, 
+adjusting bedtime, 
+short educational content. 
+Moderate burden:
+structured exercise programme, 
+nutrition planning, 
+alcohol reduction. 
+High burden:
+significant lifestyle restructuring, 
+repeated laboratory testing, 
+major behavioural change. 
+High Expected Health Impact may justify higher Intervention Burden.
+Minor Expected Health Impact generally shall not.
+
+Constitutional Principle
+The burden of an intervention should be proportionate to its expected benefit.
+
+4.7 Behavioural Capacity
+BioSense shall recognise that users possess finite behavioural capacity.
+The Decision Intelligence Engine should avoid presenting more concurrent interventions than the individual can reasonably sustain.
+Factors may include:
+existing active interventions, 
+historical adherence, 
+life circumstances, 
+current stress, 
+illness, 
+travel, 
+major life events. 
+Behavioural capacity influences prioritisation.
+It does not determine medical importance.
+
+Founder Principle
+Sustainable progress beats ambitious overload.
+
+4.7a Burden, Behavioural Capacity and Intensity as Defined Models
+Intervention Burden (4.6), Behavioural Capacity (4.7) and Intervention Intensity (6.4) each shape what the individual is asked to do and shall be defined, versioned models — inputs, combination and output scale — owned by the data and clinical function, not qualitative judgement. 'Low/Moderate/High' shall be the output of a defined model, not an example.
+The inputs to Behavioural Capacity (current stress, illness, travel, major life events) are sensitive and shall have a named provenance — declared by the user or inferred with an attached confidence — and shall be handled within the privacy boundary of Document 1C. Inferred capacity errs toward fewer concurrent interventions, never more.
+Engineering Rule
+Burden, capacity and intensity are defined versioned models with named, privacy-governed inputs. Inference is conservative.
+4.8 Interaction Between Interventions
+Interventions rarely exist independently.
+Some interventions reinforce one another.
+Examples:
+Improved sleep
+↓
+Better recovery
+↓
+Improved exercise consistency
+↓
+Improved metabolic health.
+Others compete.
+Examples:
+Increase calorie intake.
+↓
+Weight-loss goal.
+Or:
+Increase training intensity.
+↓
+Recovery deficit.
+The Decision Intelligence Engine shall recognise both synergistic and competing interventions before determining priority.
+
+Constitutional Principle
+The best intervention strategy is often a coordinated sequence rather than a collection of isolated recommendations.
+
+4.9 Priority Groups
+Eligible interventions shall be organised into priority groups.
+Suggested groups include:
+Immediate Priority
+Expected Health Impact is substantial.
+Timely intervention is important.
+
+Near-Term Priority
+Intervention is valuable but not immediately time-sensitive.
+
+Development Priority
+Intervention should become active after higher-priority work is established.
+
+Monitoring Priority
+Continue observing.
+No immediate behavioural change.
+
+Deferred
+Constitutionally appropriate but intentionally postponed.
+
+Priority Groups represent planning rather than urgency alone.
+
+4.10 Limiting Active Interventions
+The Decision Intelligence Engine shall intentionally limit the number of concurrently active interventions.
+The maximum number shall remain configurable.
+Selection shall favour:
+highest Expected Health Impact, 
+behavioural sustainability, 
+complementary interventions, 
+constitutional safety. 
+Remaining interventions remain preserved as Decision Objects for future reassessment.
+
+Founder Principle
+Helping someone do three important things is better than asking them to do twenty.
+
+4.11 Re-Prioritisation
+Intervention priority shall remain dynamic.
+Re-prioritisation may occur following:
+new observations, 
+confidence changes, 
+successful intervention completion, 
+changing user goals, 
+changing behavioural capacity, 
+illness, 
+travel, 
+significant life events. 
+Priority shall therefore evolve alongside the individual.
+
+4.12 Explainability
+Every prioritisation decision shall answer:
+Why was this intervention selected? 
+Why is it ranked above other interventions? 
+Which interventions were deferred? 
+What expected health impact justified this ranking? 
+Which competing interventions were considered? 
+What future events could alter this priority? 
+
+4.13 Engineering Constraints
+The Prioritisation Framework shall:
+evaluate eligibility before prioritisation, 
+optimise Expected Health Impact, 
+consider behavioural capacity, 
+minimise intervention burden, 
+support coordinated intervention strategies, 
+remain explainable, 
+remain fully auditable. 
+
+4.14 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Every intervention undergoes Eligibility Assessment before prioritisation.
+✓ Expected Health Impact becomes the primary prioritisation principle.
+✓ Intervention Burden and Behavioural Capacity are explicitly considered.
+✓ Synergistic and competing interventions influence ranking.
+✓ Active interventions remain intentionally limited.
+✓ Deferred interventions remain preserved for future review.
+✓ Every prioritisation decision remains explainable and auditable.
+Chapter 5
+Intervention Timing & Decision Scheduling
+
+5.1 Purpose
+The purpose of this chapter is to define how the Decision Intelligence Engine determines the optimal timing for interventions.
+The effectiveness of an intervention depends not only upon its appropriateness, but also upon when it is introduced.
+The Decision Intelligence Engine shall therefore determine:
+whether intervention should occur, 
+when intervention should occur, 
+whether intervention should be delayed, 
+whether intervention should be repeated, 
+whether intervention should expire. 
+Timing is treated as an integral component of decision intelligence rather than a communication concern.
+
+Constitutional Principle
+The right intervention delivered at the wrong time may become the wrong intervention.
+
+5.2 Engineering Philosophy
+Health exists within time.
+Recovery occurs over days.
+Behaviour changes over weeks.
+Physiology changes over months.
+Biological Identity evolves over years.
+Interventions shall therefore align with the natural timescale of the physiological process they are intended to influence.
+The Decision Intelligence Engine shall optimise intervention timing to maximise the probability of meaningful behavioural adoption and positive health outcomes.
+
+Founder Principle
+Decision quality includes deciding when not to act.
+
+5.3 Timing Inputs
+Intervention timing shall consider:
+current Health Beliefs, 
+confidence, 
+Expected Health Impact, 
+intervention priority, 
+behavioural capacity, 
+physiological state, 
+recent intervention history, 
+user goals, 
+ongoing interventions, 
+safety considerations. 
+Timing decisions shall consume upstream intelligence.
+They shall not recreate it.
+
+Engineering Rule
+Timing shall be derived from trusted understanding rather than raw observations.
+
+5.4 Timing States
+Every Decision Object shall possess a Timing State.
+Suggested Timing States include:
+Immediate
+The intervention should begin without unnecessary delay.
+
+Near-Term
+The intervention should begin soon but is not urgent.
+
+Scheduled
+The intervention should occur at a defined future point.
+
+Deferred
+The intervention remains appropriate but should be postponed.
+
+Monitoring
+Continue observation before intervention.
+
+Expired
+The opportunity for intervention has passed.
+
+Retired
+The intervention is no longer appropriate.
+
+Constitutional Principle
+Every intervention should know not only what it is, but when it belongs.
+
+5.5 Readiness Assessment
+Before scheduling an intervention, the Decision Intelligence Engine shall evaluate user readiness.
+Factors may include:
+active illness, 
+recovery status, 
+competing interventions, 
+behavioural capacity, 
+major life events, 
+travel, 
+sleep disruption, 
+training load. 
+Readiness influences timing.
+It does not alter the underlying recommendation.
+
+Founder Principle
+The same recommendation may succeed or fail depending entirely on readiness.
+
+5.6 Opportunity Windows
+Certain interventions possess optimal opportunity windows.
+Examples include:
+Improving recovery routines during periods of increased training.
+Strength training recommendations following injury rehabilitation.
+Repeat blood testing after an appropriate physiological interval.
+Lifestyle interventions following completion of major life events.
+The Decision Intelligence Engine shall recognise opportunity windows where constitutionally appropriate.
+
+5.7 Sequencing
+Interventions shall not be treated as isolated events.
+The engine may determine that:
+Intervention A
+↓
+should occur before
+↓
+Intervention B
+Example:
+Improve sleep consistency
+↓
+before increasing training intensity.
+Or:
+Reduce alcohol intake
+↓
+before reassessing liver biomarkers.
+Sequencing shall maximise cumulative health improvement.
+
+Constitutional Principle
+The order of interventions may influence their effectiveness.
+
+5.8 Repetition
+Certain interventions require periodic reinforcement.
+Examples include:
+Educational refreshers.
+Repeat laboratory testing.
+Behavioural reviews.
+Progress evaluations.
+Lifestyle reassessment.
+The Decision Intelligence Engine shall determine whether repetition remains justified.
+Repetition shall never occur solely to increase engagement.
+
+Founder Principle
+Repeat interventions only when repetition improves outcomes.
+
+5.9 Adaptive Timing
+Intervention timing shall remain dynamic.
+Examples:
+Recovery improves faster than expected.
+↓
+Exercise intervention moves forward.
+
+Illness develops.
+↓
+Training intervention deferred.
+
+Confidence decreases.
+↓
+Recommendation returns to monitoring.
+Timing evolves alongside understanding.
+
+5.10 Timing Conflicts
+Multiple interventions may compete for the same period.
+Examples:
+Weight-loss programme.
+↓
+Marathon preparation.
+Or:
+Improve sleep.
+↓
+Increase early-morning exercise.
+The Decision Intelligence Engine shall resolve timing conflicts before activating interventions.
+Priority alone shall not determine sequencing.
+
+Constitutional Principle
+Interventions should complement one another in time as well as purpose.
+
+5.11 Intervention Duration
+Every active intervention shall define an expected duration.
+Duration may depend upon:
+intervention type, 
+expected physiological response, 
+behavioural objective, 
+review interval, 
+supporting confidence. 
+Duration is reviewed continuously.
+It is not fixed permanently.
+
+5.12 Explainability
+Every timing decision shall answer:
+Why now? 
+Why not earlier? 
+Why not later? 
+Which factors delayed the intervention? 
+Which factors accelerated the intervention? 
+What event will trigger reassessment? 
+How long is the intervention expected to remain active? 
+
+5.13 Engineering Constraints
+The Timing Framework shall:
+optimise intervention timing, 
+support sequencing, 
+recognise readiness, 
+support adaptive scheduling, 
+minimise timing conflicts, 
+remain explainable, 
+remain fully auditable. 
+
+5.14 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Every Decision Object possesses a Timing State.
+✓ User readiness influences timing without altering the underlying decision.
+✓ Opportunity windows and sequencing are explicitly supported.
+✓ Timing adapts as understanding evolves.
+✓ Intervention repetition is outcome-driven rather than engagement-driven.
+✓ Intervention duration is continuously reviewed.
+✓ Every timing decision remains fully explainable and auditable.
+Chapter 6
+Intervention Intensity & Recommendation Strength
+
+6.1 Purpose
+The purpose of this chapter is to define how the Decision Intelligence Engine determines the appropriate strength of an intervention before it is communicated.
+Not all interventions warrant the same level of certainty or urgency.
+The strength with which BioSense recommends an action shall always remain proportionate to:
+supporting evidence, 
+confidence, 
+expected health impact, 
+constitutional safety, 
+potential consequences of inaction. 
+Intervention intensity governs the authority of the decision.
+It does not govern the wording used to communicate it.
+
+Constitutional Principle
+The strength of an intervention should never exceed the strength of the evidence supporting it.
+
+6.2 Engineering Philosophy
+Decision quality consists of more than selecting the correct intervention.
+It also requires determining how strongly that intervention should be expressed.
+Examples include:
+A newly emerging observation.
+↓
+Suggestion.
+
+A well-established behavioural pattern.
+↓
+Recommendation.
+
+A persistent constitutional safety concern.
+↓
+Strong recommendation to seek professional medical advice.
+Each represents the same decision architecture operating with different intervention intensity.
+
+Founder Principle
+Confidence determines conviction.
+
+6.3 Intervention Intensity Model
+Every Decision Object shall possess an associated Intervention Intensity.
+Suggested constitutional levels include:
+Informational
+The objective is awareness.
+No behavioural expectation exists.
+Example:
+Educational content.
+
+Exploratory
+BioSense proposes a possible opportunity.
+Evidence remains limited.
+Example:
+"We're beginning to observe..."
+
+Suggested
+Evidence supports potential benefit.
+Behavioural change is optional.
+
+Recommended
+Evidence consistently supports intervention.
+BioSense believes the recommendation is likely to improve health.
+
+Strongly Recommended
+High confidence.
+High Expected Health Impact.
+Significant opportunity for improvement.
+
+Clinical Discussion Recommended
+BioSense recommends discussing findings with an appropriately qualified healthcare professional.
+This remains guidance rather than diagnosis.
+
+Safety Escalation
+Constitutional safety pathways are activated.
+Communication follows BioSense's Safety Framework.
+
+Engineering Rule
+Intervention intensity shall be assigned independently from intervention category.
+
+6.3a Reconciling Category, Intensity, Priority and Lifecycle
+Several taxonomies describe the same Decision Object — intervention category (3.3), intensity (6.3), priority group (4.9), decision state (2.8) and lifecycle state (9.3). A single crosswalk shall state how they relate and shall remove collisions: 'Safety Escalation' and 'Clinical Discussion' currently appear as both a category and an intensity and shall carry one meaning each. Category is what kind of intervention; intensity is how strongly it is expressed; priority group is when it competes for attention; state is where it is in its lifecycle. These are distinct dimensions, not synonyms.
+Engineering Rule
+One crosswalk relates category, intensity, priority and lifecycle; no label appears in two taxonomies with two meanings.
+6.4 Determining Intensity
+Intensity shall consider:
+confidence, 
+Expected Health Impact, 
+intervention burden, 
+intervention category, 
+safety considerations, 
+competing hypotheses, 
+remaining uncertainty, 
+constitutional constraints. 
+No single factor shall determine intensity independently.
+
+Constitutional Principle
+Intensity emerges from balanced judgement rather than isolated metrics.
+
+6.5 Confidence Relationship
+Confidence influences intensity.
+It does not define it.
+Example:
+High confidence.
+↓
+Low Expected Health Impact.
+↓
+Moderate recommendation.
+
+Moderate confidence.
+↓
+Potential constitutional safety issue.
+↓
+Higher intervention intensity.
+The Decision Intelligence Engine evaluates multiple considerations simultaneously.
+
+6.6 User Autonomy
+Intervention intensity shall never compromise user autonomy.
+Even strong recommendations shall preserve:
+informed choice, 
+transparency, 
+explainability, 
+constitutional humility. 
+BioSense supports decision-making.
+It does not direct behaviour.
+
+Founder Principle
+The user's autonomy is never reduced by BioSense's confidence.
+
+6.7 Escalation Limits
+The Decision Intelligence Engine shall not increase intervention intensity beyond constitutional authority.
+Examples:
+BioSense shall not:
+diagnose disease, 
+prescribe medication, 
+instruct emergency treatment, 
+provide definitive clinical conclusions. 
+Higher intensity remains bounded by BioSense's constitutional role.
+
+Constitutional Principle
+Confidence cannot expand constitutional authority.
+
+6.8 Intensity Evolution
+Intervention intensity may change over time.
+Example:
+Exploratory
+↓
+Suggested
+↓
+Recommended
+↓
+Strongly Recommended
+or
+Strongly Recommended
+↓
+Suggested
+↓
+Monitoring
+↓
+Retired
+Intensity evolves as understanding evolves.
+Historical intensity shall remain preserved.
+
+6.9 Consistency
+Similar situations should produce similar intervention intensity.
+The Confidence Engine and Decision Intelligence Engine shall therefore maintain consistent constitutional behaviour across equivalent scenarios.
+This supports:
+predictability, 
+fairness, 
+user trust, 
+engineering reproducibility. 
+
+Engineering Rule
+Equivalent evidence should produce equivalent intervention strength.
+
+6.10 Multi-Intervention Consistency
+Multiple active interventions should possess internally consistent intensity.
+Example:
+Minor hydration advice should not appear more urgent than:
+Persistent hypertension requiring medical discussion.
+The Decision Intelligence Engine shall maintain proportionality across the entire intervention portfolio.
+
+6.11 Explainability
+Every intervention intensity decision shall answer:
+Why is this recommendation expressed at this level? 
+Which evidence justified the intensity? 
+Why is the intervention not stronger? 
+Why is it not weaker? 
+Which constitutional constraints apply? 
+What future evidence could alter the intensity? 
+
+6.12 Engineering Constraints
+The Intervention Intensity Framework shall:
+remain proportionate, 
+preserve user autonomy, 
+reflect confidence appropriately, 
+remain constitutionally bounded, 
+support gradual evolution, 
+remain explainable, 
+remain fully auditable. 
+
+6.13 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Every Decision Object possesses an Intervention Intensity.
+✓ Intensity remains distinct from intervention category.
+✓ Confidence influences intensity without determining it independently.
+✓ Constitutional authority limits intervention strength.
+✓ User autonomy is preserved regardless of confidence.
+✓ Intervention intensity evolves alongside understanding.
+✓ Similar evidence produces consistent intervention strength.
+✓ Every intensity decision remains fully explainable and auditable.
+Chapter 7
+Competing Interventions & Decision Conflict Resolution
+
+7.1 Purpose
+The purpose of this chapter is to define how the Decision Intelligence Engine identifies, evaluates and resolves situations in which multiple interventions compete, conflict or cannot reasonably be pursued simultaneously.
+Human health is a complex system.
+Interventions that are individually beneficial may become counterproductive when combined.
+The Decision Intelligence Engine shall therefore optimise coordinated intervention strategies rather than independent recommendations.
+
+Constitutional Principle
+The best health strategy is not the sum of the best individual recommendations.
+
+7.2 Engineering Philosophy
+Health optimisation is inherently multi-objective.
+An intervention designed to optimise one outcome may temporarily compromise another.
+Examples include:
+Calorie restriction improving metabolic health while limiting muscle gain. 
+Increased training improving fitness while reducing recovery. 
+Aggressive sleep extension reducing available training time. 
+Frequent blood testing improving evidence while increasing intervention burden. 
+Rather than treating these as engineering failures, BioSense shall recognise them as expected characteristics of complex health optimisation.
+
+Founder Principle
+Health decisions should optimise the whole person, not individual variables.
+
+7.3 Conflict Detection
+Every Decision Object shall undergo Conflict Assessment before activation.
+Conflict detection shall identify:
+competing recommendations, 
+mutually exclusive interventions, 
+contradictory behavioural objectives, 
+excessive cumulative burden, 
+timing conflicts, 
+safety conflicts, 
+resource conflicts. 
+Conflict detection shall occur continuously as Decision Objects evolve.
+
+Engineering Rule
+No intervention shall become active before conflict assessment.
+
+7.4 Types of Conflict
+The Decision Intelligence Engine shall recognise multiple forms of conflict.
+Direct Conflict
+Two interventions recommend opposing actions.
+Example:
+Increase calorie intake.
+↓
+Reduce calorie intake.
+
+Resource Conflict
+Both interventions compete for limited time, effort or attention.
+Example:
+Increase strength training.
+↓
+Increase sleep duration.
+
+Physiological Conflict
+Optimising one physiological system temporarily reduces performance in another.
+Example:
+Weight loss.
+↓
+Muscle hypertrophy.
+
+Goal Conflict
+The user's goals compete with one another.
+Example:
+Complete an ultramarathon.
+↓
+Maximise muscle growth.
+
+Temporal Conflict
+Both interventions require the same implementation window.
+
+Safety Conflict
+One intervention increases the risk associated with another.
+Example:
+Increase exercise intensity.
+↓
+Acute illness.
+
+Constitutional Principle
+Different conflicts require different resolutions.
+
+7.5 Conflict Evaluation
+Once identified, conflicts shall be evaluated according to:
+Expected Health Impact, 
+confidence, 
+constitutional safety, 
+intervention burden, 
+user goals, 
+timing, 
+reversibility, 
+supporting evidence. 
+Conflict evaluation shall remain explainable.
+
+7.6 Resolution Strategies
+The Decision Intelligence Engine may resolve conflicts using several constitutional strategies.
+Prioritisation
+One intervention proceeds.
+The competing intervention is deferred.
+
+Sequencing
+Both interventions remain active.
+Implementation order is adjusted.
+
+Combination
+Multiple compatible interventions are merged into one coordinated strategy.
+
+Modification
+One intervention is adapted to reduce conflict.
+Example:
+Reduce training intensity rather than increasing it.
+
+Monitoring
+Neither intervention proceeds until additional evidence becomes available.
+
+Retirement
+One intervention is permanently withdrawn.
+
+Founder Principle
+Resolving conflict should preserve as much health benefit as possible.
+
+7.7 Coordinated Intervention Plans
+Rather than presenting isolated recommendations, the Decision Intelligence Engine may generate Coordinated Intervention Plans.
+Example:
+Phase 1
+Improve sleep consistency.
+↓
+Phase 2
+Increase training volume.
+↓
+Phase 3
+Reduce body fat.
+↓
+Phase 4
+Repeat blood testing.
+Each phase supports the next.
+The entire plan remains one constitutional Decision Strategy.
+
+Constitutional Principle
+Long-term success often depends upon coordinated sequencing rather than simultaneous optimisation.
+
+7.8 Goal Reconciliation
+User goals influence conflict resolution.
+However, goals shall never override constitutional safety.
+Example:
+User goal:
+Lose 15 kg in six weeks.
+BioSense may:
+modify the goal, 
+recommend a safer timeline, 
+reduce intervention intensity, 
+prioritise long-term health. 
+The platform shall support ambition without compromising safety.
+
+Founder Principle
+Goals guide optimisation. They do not suspend constitutional principles.
+
+7.9 Opportunity Cost
+Selecting one intervention necessarily postpones others.
+The Decision Intelligence Engine shall explicitly consider opportunity cost.
+Examples include:
+Choosing:
+Sleep optimisation.
+Means delaying:
+High-volume endurance training.
+Choosing:
+Recovery from illness.
+Means delaying:
+Performance progression.
+Opportunity cost shall be considered during prioritisation.
+It shall remain explainable.
+
+7.10 Dynamic Reconciliation
+Conflict resolution is not permanent.
+As new observations, confidence changes and Health Beliefs evolve, previously conflicting interventions may become compatible.
+Similarly, previously compatible interventions may later conflict.
+Conflict assessment shall therefore remain continuous.
+
+7.11 Explainability
+Every conflict resolution shall answer:
+Which interventions conflicted? 
+Why were they considered incompatible? 
+Which strategy resolved the conflict? 
+Why was this strategy preferred? 
+Which interventions were deferred? 
+What future evidence could alter the decision? 
+What trade-offs remain? 
+
+7.12 Engineering Constraints
+The Conflict Resolution Framework shall:
+detect competing interventions, 
+support multiple conflict types, 
+optimise coordinated strategies, 
+preserve constitutional safety, 
+recognise opportunity cost, 
+remain explainable, 
+remain fully auditable. 
+
+7.13 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Every Decision Object undergoes conflict assessment.
+✓ Multiple forms of intervention conflict are explicitly recognised.
+✓ Conflict resolution supports prioritisation, sequencing, combination and modification.
+✓ Coordinated Intervention Plans are supported.
+✓ User goals influence, but never override, constitutional safety.
+✓ Opportunity cost is explicitly considered.
+✓ Conflict resolution remains dynamic as understanding evolves.
+✓ Every conflict resolution remains fully explainable and auditable.
+Chapter 8
+Outcome Evaluation, Intervention Effectiveness & Closed-Loop Learning
+
+8.1 Purpose
+The purpose of this chapter is to define how the Decision Intelligence Engine evaluates the effectiveness of interventions after they have been implemented.
+Recommendations should not be regarded as completed when they are delivered.
+Their true value can only be determined by observing whether they produced meaningful improvements in health.
+The Decision Intelligence Engine shall therefore continuously evaluate intervention outcomes while preserving the constitutional separation between observations, understanding and decision-making.
+
+Constitutional Principle
+An intervention is complete only after its outcome has been evaluated.
+
+8.2 Engineering Philosophy
+Every intervention represents a hypothesis.
+For example:
+Improving sleep consistency will improve recovery.
+The intervention itself does not prove the hypothesis.
+Only subsequent observations can do that.
+The Decision Intelligence Engine therefore evaluates outcomes using newly acquired evidence rather than assuming success.
+This preserves the scientific integrity of the BioSense Intelligence Platform.
+
+Founder Principle
+Recommendations are hypotheses. Outcomes are evidence.
+
+8.3 Outcome Evaluation Inputs
+Outcome evaluation shall consume:
+From ENG-001
+Updated Health Beliefs 
+Updated Discoveries 
+Biological Identity changes 
+
+From ENG-002
+New observations 
+Longitudinal trends 
+Evidence Quality Profiles 
+
+From ENG-003
+Updated confidence 
+Revised Explanation Objects 
+Confidence evolution 
+
+From ENG-004
+Original Decision Object 
+Intervention history 
+Expected Health Impact 
+Intervention timing 
+Intervention intensity 
+The Outcome Evaluation process shall not modify upstream engines.
+
+Engineering Rule
+Outcome evaluation consumes updated intelligence.
+It does not reinterpret historical evidence.
+
+8.4 Outcome Categories
+Every completed intervention shall receive an Outcome Classification.
+Suggested categories include:
+Successful
+Expected improvement observed.
+
+Partially Successful
+Some intended improvements observed.
+Further optimisation appropriate.
+
+Neutral
+No meaningful physiological change observed.
+
+Inconclusive
+Insufficient evidence available.
+Further observation required.
+
+Unexpected Outcome
+Physiological changes differed from expectations.
+Further investigation appropriate.
+
+Adverse Outcome
+The intervention appears associated with undesirable physiological or behavioural consequences.
+Constitutional safety pathways may be triggered where appropriate.
+
+Constitutional Principle
+Every intervention deserves an honest evaluation, including those that do not work.
+
+8.5 Measuring Success
+Success shall be evaluated according to predefined Outcome Objectives.
+Examples include:
+Improved sleep efficiency.
+Reduced resting heart rate.
+Improved HbA1c.
+Reduced alcohol intake.
+Improved recovery.
+Improved symptom burden.
+Progress towards user goals.
+No single observation shall independently determine intervention success.
+The Decision Intelligence Engine shall consider longitudinal physiological change.
+
+Founder Principle
+Success is measured by meaningful improvement, not recommendation completion.
+
+8.5a Outcome Objectives Are Pre-Registered
+To prevent success being judged after the fact, the Outcome Objectives against which an intervention will be evaluated shall be defined at decision time and stored on the Decision Object, before the intervention is delivered. Evaluation then measures the pre-registered objectives rather than selecting a favourable outcome retrospectively.
+Engineering Rule
+Outcome objectives are pre-registered on the Decision Object at decision time. Success is graded against them, never chosen post hoc.
+8.6 Behaviour vs Physiology
+Outcome evaluation shall distinguish between:
+Behavioural Success
+The user adopted the intervention.
+Physiological Success
+The intervention produced measurable biological improvement.
+These outcomes are related but independent.
+Example:
+The user consistently sleeps earlier.
+↓
+Behavioural Success.
+HRV remains unchanged.
+↓
+Physiological Neutral.
+Understanding both dimensions improves future decision-making.
+
+Constitutional Principle
+Changing behaviour and changing biology are different achievements.
+
+8.6a Causal Attribution Limits
+Attributing a physiological change to an intervention is causal inference from observational data, where regression to the mean, natural history and confounding can masquerade as effect. Outcome evaluation shall be confounder-aware, shall attach a confidence bound to any attribution of change to an intervention, and shall not treat post-intervention improvement as proven effect. This limit is what makes the longitudinal learning of 8.9 safe to use.
+Engineering Rule
+Post-intervention improvement is not proven effect. Attribution is confounder-aware and carries a confidence bound.
+8.7 Unexpected Discoveries
+Some interventions may produce outcomes unrelated to their original objective.
+Example:
+Sleep intervention unexpectedly improves glucose regulation.
+Exercise intervention unexpectedly improves mood.
+Nutrition intervention unexpectedly reduces migraine frequency.
+Such observations may contribute to:
+new Health Beliefs, 
+new Discoveries, 
+revised Biological Identity. 
+The Decision Intelligence Engine records these outcomes.
+The Dynamic Health Model determines whether they become understanding.
+
+Engineering Rule
+Unexpected outcomes create opportunities for learning, not automatic conclusions.
+
+8.8 Feedback Without Contamination
+This is one of the most important constitutional safeguards.
+Intervention outcomes shall influence BioSense only through newly observed evidence.
+The intervention itself shall never become supporting evidence.
+Correct sequence:
+Intervention
+↓
+New observations
+↓
+Observation Engine
+↓
+Confidence Engine
+↓
+Updated understanding
+Incorrect sequence:
+Intervention
+↓
+Assume improvement
+↓
+Increase confidence
+This behaviour is constitutionally prohibited.
+
+Constitutional Principle
+Outcomes influence understanding only through evidence.
+
+8.9 Longitudinal Learning
+Repeated intervention outcomes may gradually improve future decision-making.
+Examples include:
+Certain interventions consistently succeed.
+Certain interventions consistently fail.
+Certain interventions perform better under specific physiological conditions.
+The Decision Intelligence Engine may refine future prioritisation using validated longitudinal outcome analysis.
+Historical Decision Objects remain unchanged.
+
+Founder Principle
+BioSense should learn from outcomes without rewriting history.
+
+8.9a Governance of Longitudinal Learning
+The learning that refines future prioritisation from outcomes is powerful and can quietly optimise for the wrong thing, so it is governed. It shall guard explicitly against adherence bias (easy interventions appearing successful, contrary to 4.4), selection and survivorship bias (outcomes existing only for interventions that were tried) and confounding (per 8.6a). Learned adjustments to the Expected Health Impact methodology or to prioritisation shall be validated and require clinical and data-science sign-off before they affect live decisions.
+This governs the prioritisation model; it does not relax 8.8. The contamination boundary of 8.8 — an intervention never becomes evidence — remains absolute.
+Engineering Rule
+Outcome-driven learning is bias-controlled, calibrated and human-signed-off before it changes prioritisation. 8.8's contamination rule is never relaxed.
+8.10 Intervention Retirement
+Outcome evaluation may result in:
+Continuation.
+Modification.
+Re-prioritisation.
+Suspension.
+Retirement.
+Retired interventions remain fully auditable.
+Retirement does not imply failure.
+It reflects the current state of understanding.
+
+8.11 Explainability
+Every outcome evaluation shall answer:
+What was the original objective? 
+Was behavioural adoption achieved? 
+Was physiological improvement observed? 
+Which observations support this conclusion? 
+Were unexpected outcomes detected? 
+How will this influence future decisions? 
+Does additional evidence remain necessary? 
+
+8.12 Engineering Constraints
+The Outcome Evaluation Framework shall:
+evaluate interventions objectively, 
+distinguish behaviour from physiology, 
+preserve constitutional separation of evidence, 
+support longitudinal learning, 
+prevent evidence contamination, 
+remain explainable, 
+remain fully auditable. 
+
+8.13 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Every completed intervention receives an Outcome Classification.
+✓ Behavioural and physiological outcomes are evaluated independently.
+✓ Unexpected outcomes may contribute to future understanding through the proper constitutional pathway.
+✓ Intervention outcomes influence future decisions only through newly acquired evidence.
+✓ Intervention retirement is explicitly supported.
+✓ Longitudinal outcome analysis improves future decision-making without rewriting historical decisions.
+✓ Every outcome evaluation remains fully explainable and auditable.
+Chapter 9
+Intervention Lifecycle, Review & Retirement
+
+9.1 Purpose
+The purpose of this chapter is to define the complete lifecycle of Decision Objects after they have become active interventions.
+Interventions are not permanent.
+They should evolve as the individual's physiology, behaviour and understanding evolve.
+The Decision Intelligence Engine shall therefore continuously review active interventions to determine whether they remain appropriate, require modification or should be retired.
+
+Constitutional Principle
+Every intervention should have a beginning, a purpose and an end.
+
+9.2 Engineering Philosophy
+Health is dynamic.
+Interventions should be equally dynamic.
+An intervention that was highly valuable six months ago may become unnecessary today.
+Conversely, a previously retired intervention may later become appropriate again.
+BioSense shall therefore treat interventions as living entities with defined lifecycles rather than permanent recommendations.
+
+Founder Principle
+Recommendations should evolve with the person, not persist despite them.
+
+9.3 Intervention Lifecycle States
+Every Decision Object shall progress through recognised lifecycle states.
+Suggested lifecycle states include:
+Proposed
+Decision generated.
+Awaiting activation.
+
+Active
+Currently contributing to the user's health strategy.
+
+Under Review
+Outcome evaluation in progress.
+
+Modified
+Intervention adjusted while retaining its original objective.
+
+Deferred
+Temporarily paused.
+Expected to return.
+
+Completed
+Objective successfully achieved.
+
+Retired
+No longer constitutionally appropriate.
+
+Archived
+Preserved for historical analysis.
+No longer participates in active decision-making.
+
+Engineering Rule
+Lifecycle transitions shall preserve complete historical lineage.
+
+9.4 Scheduled Review
+Every active intervention shall possess a Review Schedule.
+Review timing may depend upon:
+intervention category, 
+expected physiological response, 
+confidence, 
+intervention duration, 
+user goals, 
+expected outcome timeline. 
+Review schedules shall remain adaptive.
+They are not fixed.
+
+Constitutional Principle
+Interventions deserve review before repetition.
+
+9.5 Review Triggers
+Review may be initiated by:
+New observations.
+Confidence revision.
+Outcome evaluation.
+Goal changes.
+Safety reassessment.
+Behavioural adoption.
+Physiological deterioration.
+Unexpected improvement.
+Scientific Library updates.
+Manual clinical review where appropriate.
+Reviews remain evidence-driven.
+
+9.6 Modification
+Review may conclude that an intervention remains appropriate but requires refinement.
+Examples include:
+Reducing intervention intensity.
+Changing intervention timing.
+Adjusting sequencing.
+Updating educational content.
+Altering review frequency.
+The original Decision Object remains preserved.
+A revised version becomes active.
+
+Founder Principle
+Improvement should usually occur through refinement rather than replacement.
+
+9.7 Completion
+Some interventions naturally complete.
+Examples include:
+Successful behaviour formation.
+Achievement of target body composition.
+Completion of a blood testing programme.
+Resolution of temporary physiological disruption.
+Completed interventions remain valuable historical information.
+Completion is recognised independently from retirement.
+
+9.8 Retirement
+Retirement occurs when an intervention is no longer justified.
+Examples include:
+Objective achieved.
+Evidence no longer supports the intervention.
+Health Belief retired.
+Confidence falls below constitutional threshold.
+Safer intervention identified.
+User circumstances fundamentally change.
+Retirement is a positive constitutional outcome.
+It does not imply intervention failure.
+
+Constitutional Principle
+An intervention should end when its purpose has been fulfilled or its justification no longer exists.
+
+9.9 Re-Activation
+Previously retired interventions may later become appropriate again.
+Example:
+Weight management intervention retired.
+↓
+Several years later:
+Weight gradually increases.
+↓
+New Decision Object generated.
+Historical intervention history informs future decision-making.
+The previous intervention remains archived.
+The new intervention receives a new Decision Object.
+
+Engineering Rule
+Re-activation creates a new intervention rather than reusing the previous one.
+
+9.10 Intervention Fatigue
+The Decision Intelligence Engine shall monitor for Intervention Fatigue.
+Indicators may include:
+Repeated presentation.
+Declining engagement.
+Lack of behavioural adoption.
+Recommendation saturation.
+Competing priorities.
+Where appropriate, BioSense may:
+defer interventions, 
+reduce intensity, 
+alter sequencing, 
+introduce educational alternatives. 
+The objective is sustained effectiveness rather than persistent repetition.
+
+Founder Principle
+Persistence should never become noise.
+
+9.11 Historical Learning
+Retired and completed interventions remain valuable.
+Historical intervention records may support:
+Longitudinal pattern recognition.
+Behavioural preference modelling.
+Expected Health Impact refinement.
+Future prioritisation.
+Clinical review.
+Historical interventions remain immutable.
+
+9.12 Explainability
+Every lifecycle decision shall answer:
+Why has this intervention changed state? 
+Why has it been modified? 
+Why has it been retired? 
+Which evidence supported this decision? 
+Could the intervention return in future? 
+What historical outcomes influenced this review? 
+
+9.13 Engineering Constraints
+The Intervention Lifecycle Framework shall:
+support complete intervention lifecycles, 
+preserve historical lineage, 
+distinguish completion from retirement, 
+support re-activation, 
+minimise intervention fatigue, 
+remain explainable, 
+remain fully auditable. 
+
+9.14 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Every Decision Object progresses through recognised lifecycle states.
+✓ Review schedules remain adaptive.
+✓ Modification, completion and retirement are explicitly distinguished.
+✓ Re-activation creates new Decision Objects while preserving history.
+✓ Intervention Fatigue is recognised and managed.
+✓ Historical interventions contribute to future learning without being modified.
+✓ Every lifecycle transition remains fully explainable and auditable.
+Chapter 10
+Constitutional Safety Framework & Intervention Guardrails
+
+10.1 Purpose
+The purpose of this chapter is to define the constitutional safeguards governing every intervention generated by the Decision Intelligence Engine.
+Not every possible intervention should be delivered.
+Even evidence-supported recommendations may become inappropriate when viewed within the wider context of constitutional safety, uncertainty, user wellbeing or BioSense's defined scope.
+The Decision Intelligence Engine shall therefore evaluate every intervention against explicit constitutional guardrails before activation.
+
+Constitutional Principle
+The ability to intervene includes the responsibility to recognise when not to intervene.
+
+10.2 Engineering Philosophy
+BioSense exists to improve health.
+Not to maximise recommendations.
+Not to maximise engagement.
+Not to maximise behavioural compliance.
+Every intervention shall therefore satisfy two independent questions:
+Is this intervention likely to improve health? 
+Is BioSense constitutionally permitted to recommend it? 
+Both questions must be answered positively before activation.
+
+Founder Principle
+A good recommendation outside BioSense's authority remains an inappropriate recommendation.
+
+10.3 Constitutional Authority
+The Decision Intelligence Engine shall operate only within the authority granted by the BioSense Constitution.
+It may:
+educate, 
+encourage healthy behaviours, 
+explain biomarkers, 
+recommend evidence collection, 
+recommend discussion with a healthcare professional, 
+support long-term health optimisation. 
+It shall not:
+diagnose disease, 
+prescribe medication, 
+replace clinical judgement, 
+recommend emergency treatment, 
+provide definitive medical conclusions. 
+These boundaries are absolute and shall be enforced deterministically by the Deterministic Safety Rule Engine owned by ENG-010, not left to model judgement (see 10.4a).
+
+Constitutional Principle
+Decision Intelligence cannot exceed constitutional authority, regardless of confidence.
+
+10.4 Safety Validation
+Every Decision Object shall undergo Safety Validation before activation.
+Validation shall consider:
+constitutional authority, 
+intervention category, 
+confidence, 
+Expected Health Impact, 
+intervention burden, 
+user context, 
+conflicting interventions, 
+known safety constraints. 
+Failure of Safety Validation shall prevent activation.
+
+Engineering Rule
+No intervention shall bypass Safety Validation.
+
+10.4a Safety Ownership — Deferral to the ENG-010 Deterministic Safety Rule Engine
+Safety Validation here is not a second safety system. The deterministic safety rule engine defined in ENG-010 is the single safety floor: its rules are authored and reviewed by the medical-advisory function, and the Decision Intelligence Engine may raise caution above that floor but may never present anything below it. ENG-004's Safety Validation adds decision-specific checks on top of the ENG-010 floor, and the absolute authority boundaries of 10.3 (no diagnosis, prescription or emergency treatment) are enforced by that engine deterministically, not by model judgement.
+On error or ambiguity the fail-safe default is to withhold or de-escalate the intervention and, where relevant, to escalate through the constitutional pathway — never to proceed.
+Engineering Rule
+There is one safety floor, owned by ENG-010's deterministic safety rule engine. ENG-004 defers to it and may only raise caution, never lower it.
+10.5 High-Risk Interventions
+Certain intervention categories inherently require greater caution.
+Examples include:
+Medical discussion.
+Supplement guidance.
+Major dietary change.
+High-intensity exercise.
+Rapid weight-loss strategies.
+Repeated laboratory testing.
+Such interventions shall require proportionately stronger constitutional justification.
+
+Founder Principle
+Higher consequence requires higher confidence and stronger governance.
+
+10.6 Vulnerable Contexts
+The Decision Intelligence Engine shall recognise situations in which standard interventions may require modification or suppression.
+Examples include:
+pregnancy, 
+postpartum recovery, 
+acute illness, 
+recent surgery, 
+childhood, 
+advanced age, 
+significant disability, 
+major psychological stress, 
+multiple concurrent medical conditions. 
+Recognition of a vulnerable context shall influence decision-making.
+It shall not independently generate medical advice.
+
+Constitutional Principle
+The same intervention may not be appropriate for every individual or every circumstance.
+
+10.6a Deterministic Enforcement of High-Risk and Vulnerable Contexts
+High-risk categories (10.5 — including supplement dosing such as iron, major dietary or exercise change, rapid weight-loss) and vulnerable contexts (10.6 — pregnancy, postpartum, acute illness, childhood, advanced age and others) shall be handled by deterministic guards in the safety rule engine, not by 'influence' alone. In a high-risk or vulnerable context, the affected interventions are suppressed or require stronger justification and, where relevant, clinical sign-off, per the ENG-001 clinical-governance and 1C regulatory boundaries.
+Vulnerable-context signals are sensitive data with a named provenance — declared or inferred with confidence — handled within the 1C privacy boundary. Where a vulnerable context is uncertain, the engine errs toward suppression.
+Engineering Rule
+High-risk and vulnerable contexts are deterministic guards, not soft influences. Uncertain vulnerability errs toward suppression; sensitive signals are privacy-governed.
+10.7 Uncertainty Safeguards
+Where uncertainty remains substantial, the Decision Intelligence Engine shall favour:
+observation, 
+evidence collection, 
+education, 
+lower intervention intensity, 
+delayed decision-making. 
+It shall avoid presenting uncertain conclusions with unwarranted authority.
+
+Founder Principle
+When uncertainty is high, humility is a safety feature.
+
+10.8 Recommendation Saturation
+Excessive intervention can itself become harmful.
+The Decision Intelligence Engine shall prevent:
+recommendation overload, 
+repeated low-value advice, 
+competing interventions beyond behavioural capacity, 
+excessive notification-driven behaviour. 
+The objective is sustainable health improvement rather than intervention volume.
+
+Constitutional Principle
+Too many good recommendations may collectively become a poor strategy.
+
+10.9 Commercial Independence
+Decision Intelligence shall remain operationally independent from commercial objectives.
+Interventions shall never be prioritised because they:
+increase application usage, 
+encourage subscription renewal, 
+promote commercial partnerships, 
+increase advertising exposure, 
+favour specific products or providers. 
+Commercial considerations shall never influence Decision Objects.
+
+Founder Principle
+Recommendations exist to improve health—not business metrics.
+
+10.10 Human Oversight
+Certain Decision Objects may justify optional expert review.
+Examples include:
+Novel intervention strategies.
+Repeated intervention failure.
+Persistent safety conflicts.
+Unexpected physiological deterioration.
+Emerging scientific uncertainty.
+Human oversight informs governance.
+It does not replace evidence-based decision-making.
+
+10.10a Mandatory Handling for Adverse and High-Risk Cases
+Where the discretionary language of 8.4 ('safety pathways may be triggered') and 10.10 ('optional expert review') meets a genuinely high-consequence case, handling is mandatory, not optional. An Adverse Outcome (8.4) deterministically triggers the Clinical Adverse Event Governance workflow owned by ENG-010 (§8.6a), whose clinical content is governed by the Medical Advisory Function under Constitution 1B/1C; and novel, repeatedly-failing, or deteriorating high-risk cases require clinical review before continued intervention rather than optional oversight.
+Engineering Rule
+Adverse outcomes deterministically trigger the adverse-event process; high-risk and adverse cases require clinical review, not optional oversight.
+10.11 Escalation Pathways
+Where constitutional safety thresholds are reached, the Decision Intelligence Engine shall defer to predefined escalation pathways established within the BioSense Constitution.
+Examples include:
+Red-flag biomarker combinations. 
+Rapid deterioration in objective observations. 
+Serious combinations of physiological indicators. 
+The Decision Intelligence Engine activates the pathway by raising a safety-relevant escalation request.
+It does not redefine it.
+
+Engineering Rule
+Safety escalation consumes constitutional policy rather than creating new safety policy. ENG-004 may raise a safety-relevant escalation request and produce a safety-relevant Decision Object; ENG-010 computes the final Escalation Level (§6.4) and the publication response. Where ENG-004's requested urgency and ENG-010's computed level differ, ENG-010's level governs.
+
+10.12 Explainability
+Every Safety Validation shall answer:
+Why was this intervention considered safe? 
+Which constitutional principles applied? 
+Which constraints limited the intervention? 
+Was intervention intensity modified? 
+Was intervention suppressed? 
+Was referral recommended? 
+Which future evidence could change the safety assessment? 
+
+10.13 Engineering Constraints
+The Constitutional Safety Framework shall:
+preserve constitutional authority, 
+validate every intervention, 
+recognise vulnerable contexts, 
+manage uncertainty, 
+remain commercially independent, 
+prevent intervention overload, 
+remain explainable, 
+remain fully auditable. 
+
+10.14 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Every Decision Object undergoes Safety Validation.
+✓ Constitutional authority explicitly limits intervention behaviour.
+✓ Vulnerable contexts influence intervention selection.
+✓ High uncertainty reduces intervention intensity where appropriate.
+✓ Commercial objectives cannot influence Decision Objects.
+✓ Safety escalation consumes existing constitutional policy.
+✓ Recommendation saturation is actively managed.
+✓ Every safety decision remains fully explainable and auditable.
+Chapter 11
+Governance, Versioning & Decision Lifecycle Management
+
+11.1 Purpose
+The purpose of this chapter is to define the governance framework responsible for the long-term stewardship of the Decision Intelligence Engine.
+Decision Intelligence directly influences the actions BioSense recommends to individuals.
+Changes to decision behaviour therefore require rigorous governance to preserve scientific integrity, reproducibility, explainability and constitutional compliance.
+The governance framework ensures that decision-making evolves through controlled improvement rather than uncontrolled modification.
+
+Constitutional Principle
+Decision Intelligence should evolve through governed refinement rather than uncontrolled optimisation.
+
+11.2 Engineering Philosophy
+Health recommendations influence real-world behaviour.
+Consequently, modifications to the Decision Intelligence Engine must be treated with the same level of governance applied to the Observation Engine and Confidence Engine.
+The platform should continuously improve.
+However, improvement must never compromise:
+reproducibility, 
+explainability, 
+historical traceability, 
+constitutional consistency, 
+scientific integrity. 
+Every decision generated by BioSense should remain reproducible years after it was originally created.
+
+Founder Principle
+Improvement should strengthen trust without erasing history.
+
+11.3 Governance Responsibilities
+Decision Intelligence Governance shall oversee:
+intervention taxonomy, 
+Expected Health Impact methodology, 
+prioritisation logic, 
+timing policies, 
+intervention intensity, 
+conflict resolution, 
+outcome evaluation, 
+lifecycle management, 
+safety guardrails, 
+governance policies. 
+Governance defines how the engine evolves.
+It does not generate individual decisions.
+
+Engineering Rule
+Governance manages the engine.
+The engine manages decisions.
+
+11.4 Decision Versioning
+Every Decision Object shall reference:
+Decision Engine Version, 
+Expected Health Impact Framework Version, 
+Prioritisation Version, 
+Timing Framework Version, 
+Intervention Taxonomy Version, 
+Safety Framework Version, 
+Confidence Engine Version, 
+Dynamic Health Model Version. 
+These references shall allow every historical decision to be reconstructed exactly as it existed when originally generated.
+
+Constitutional Principle
+Every decision shall remain permanently reproducible.
+
+11.4a Decision Reproducibility Manifest & Determinism Scope
+The versions listed in 11.4 are extended into a complete manifest so a past decision can be reconstructed: it shall also reference the Observation-Engine and canonical-dictionary versions (ENG-002), the Canonical Scientific Library version, and an evidence-as-of reference to the exact observation and belief versions used. This manifest is aligned with, and references, the ENG-001, ENG-002 and ENG-003 version manifests, so a single 'as-of' state spans all engines.
+'Reconstructed exactly' is scoped: the deterministic selection, ordering and validation are exactly reproducible from the manifest; any model-assisted reasoning within a decision is captured by a structured reasoning trace so the decision is auditable, even though its prose is not regenerable bit-for-bit.
+Engineering Rule
+Every decision pins a complete cross-engine manifest. Deterministic selection is exactly reproducible; model-assisted reasoning is captured by an auditable trace.
+11.5 Configuration Management
+Certain components of the Decision Intelligence Engine may evolve independently of architectural redesign.
+Examples include:
+prioritisation parameters, 
+Expected Health Impact methodology, 
+intervention burden models, 
+behavioural capacity models, 
+timing rules, 
+review intervals, 
+lifecycle policies. 
+Configuration changes shall remain:
+version-controlled, 
+scientifically justified, 
+documented, 
+fully auditable. 
+
+11.6 Decision Engine Releases
+Every Decision Engine release shall preserve:
+Release Version, 
+Release Date, 
+Engineering rationale, 
+Scientific rationale, 
+Expected behavioural changes, 
+Validation results, 
+Compatibility notes, 
+Migration guidance. 
+Historical Decision Engine versions shall remain available for reconstruction and audit.
+
+Founder Principle
+Every new version should explain why it improves decision-making.
+
+11.7 Scientific Governance
+Changes affecting intervention behaviour shall undergo scientific review where appropriate.
+Examples include:
+revised lifestyle guidance, 
+updated nutritional evidence, 
+new exercise science, 
+behavioural medicine developments, 
+updated clinical guidelines, 
+longevity research. 
+Scientific governance refines intervention strategy.
+It does not replace engineering governance.
+
+11.8 Validation Before Deployment
+No Decision Intelligence revision shall enter production without structured validation.
+Validation may include:
+regression testing, 
+historical replay, 
+synthetic user journeys, 
+intervention consistency testing, 
+safety validation, 
+prioritisation validation, 
+explainability verification, 
+longitudinal simulation. 
+Validation demonstrates that proposed improvements genuinely improve decision quality.
+
+Constitutional Principle
+Every improvement should demonstrate that it makes better decisions—not merely different decisions.
+
+11.9 Historical Reproducibility
+At any future point BioSense shall be capable of reconstructing:
+the Dynamic Health Model, 
+supporting observations, 
+confidence assessments, 
+Decision Objects, 
+intervention priorities, 
+timing decisions, 
+intensity assignments, 
+Expected Health Impact assessments, 
+safety validation, 
+that existed when the original intervention was created.
+Historical reconstruction shall never depend upon the current engine version.
+
+11.10 Change Impact Assessment
+Before deployment, governance shall evaluate:
+Which intervention categories may change? 
+Which users may be affected? 
+Which priorities may shift? 
+Which Decision Objects may require regeneration? 
+Which safety behaviours may change? 
+Which user experiences may differ? 
+Potential impacts shall be documented before release.
+
+Founder Principle
+Understand the consequences of change before introducing it.
+
+11.11 Auditability
+Every governance action shall generate an immutable audit record.
+Examples include:
+prioritisation updates, 
+Expected Health Impact revisions, 
+intervention taxonomy changes, 
+safety framework updates, 
+timing policy revisions, 
+deployment approvals, 
+governance reviews. 
+Audit history shall remain permanently available.
+
+11.12 Regulatory Readiness
+Decision Intelligence Governance shall support future regulatory expectations concerning:
+AI transparency, 
+explainability, 
+algorithm governance, 
+healthcare AI oversight, 
+auditability, 
+intervention accountability, 
+model lifecycle management. 
+The governance architecture shall remain adaptable without compromising constitutional principles.
+
+11.13 Operational Monitoring
+Governance shall continuously monitor:
+intervention effectiveness, 
+prioritisation stability, 
+recommendation diversity, 
+intervention fatigue, 
+safety outcomes, 
+outcome evaluation performance, 
+behavioural adoption, 
+unexpected decision drift. 
+Monitoring supports continuous improvement.
+It shall not automatically modify Decision Objects.
+
+Engineering Rule
+Operational monitoring informs governance decisions but never bypasses them.
+
+11.14 Engineering Constraints
+Decision Intelligence Governance shall:
+preserve reproducibility, 
+preserve explainability, 
+preserve constitutional authority, 
+support controlled evolution, 
+remain scientifically accountable, 
+remain fully auditable, 
+support future regulatory frameworks. 
+
+11.15 Acceptance Criteria
+This chapter shall be considered complete when:
+✓ Every Decision Object is fully version-controlled.
+✓ Configuration changes remain independently governed.
+✓ Decision Engine releases preserve historical traceability.
+✓ Scientific and engineering governance remain complementary but independent.
+✓ Decision behaviour is validated before deployment.
+✓ Historical interventions remain reproducible.
+✓ Governance actions remain fully auditable.
+✓ The Decision Intelligence Engine remains prepared for future regulatory requirements.
+Chapter 12
+End-to-End Decision Intelligence Lifecycle
+
+12.1 Purpose
+The purpose of this chapter is to demonstrate the complete operational lifecycle of the Decision Intelligence Engine within the BioSense Intelligence Platform.
+Previous chapters define the architecture governing intervention classification, prioritisation, timing, intensity, conflict resolution, outcome evaluation and governance.
+This chapter illustrates how those components interact during a realistic longitudinal health journey.
+The objective is to demonstrate that the Decision Intelligence Engine functions as a coherent, explainable and constitutionally governed decision-making system.
+
+Constitutional Principle
+Every intervention should be traceable from evidence to outcome through one continuous and explainable decision lifecycle.
+
+12.2 Introducing the User
+For the purposes of this example we introduce a fictional BioSense user.
+Name: Alex Carter
+Age: 37
+Alex has used BioSense continuously for two years.
+The platform currently contains:
+91 active Health Beliefs 
+17 validated Discoveries 
+8 Behavioural Identity characteristics 
+5 Biological Identity characteristics 
+Recent observations indicate:
+declining sleep consistency, 
+increasing alcohol intake, 
+elevated resting heart rate, 
+stable blood biomarkers, 
+increasing work-related stress. 
+The Confidence Engine considers these understandings well established.
+The Decision Intelligence Engine begins its evaluation.
+
+12.3 Decision Candidates
+The engine generates multiple Decision Candidates.
+Examples include:
+Improve sleep consistency.
+Reduce alcohol consumption.
+Increase aerobic exercise.
+Repeat blood testing.
+Stress-management education.
+Hydration reminder.
+Each Decision Candidate contains:
+supporting Health Beliefs, 
+supporting confidence, 
+Expected Health Impact, 
+intervention category, 
+proposed timing, 
+initial intensity. 
+At this stage none are active.
+
+Constitutional Principle
+Potential interventions should compete before they are communicated.
+
+12.4 Eligibility Assessment
+Each Decision Candidate undergoes Eligibility Assessment.
+Examples:
+Hydration reminder.
+↓
+Eligible.
+
+Repeat blood testing.
+↓
+Eligible.
+
+Increase training volume.
+↓
+Rejected.
+Reason:
+Recovery deficit currently exists.
+
+Vitamin D supplementation.
+↓
+Deferred.
+Reason:
+Recent blood results remain normal.
+Only constitutionally eligible interventions continue.
+
+12.5 Expected Health Impact
+The remaining interventions are evaluated for Expected Health Impact.
+The engine determines:
+Sleep consistency
+↓
+Highest Expected Health Impact.
+
+Alcohol reduction
+↓
+Second highest.
+
+Stress management
+↓
+Third.
+
+Hydration
+↓
+Lower impact.
+
+Educational content
+↓
+Supporting intervention.
+Priority is determined by projected long-term health improvement rather than isolated physiological abnormalities.
+
+Founder Principle
+BioSense prioritises interventions that improve lives, not simply laboratory values.
+
+12.6 Conflict Resolution
+The engine identifies competing interventions.
+Example:
+Increase aerobic training.
+↓
+Recovery deficit.
+Rather than activating both recommendations simultaneously, the engine determines:
+Phase One
+Improve sleep.
+↓
+Reduce alcohol.
+↓
+Improve recovery.
+↓
+Phase Two
+Increase exercise capacity.
+The interventions become a coordinated strategy.
+
+Constitutional Principle
+Interventions should reinforce one another rather than compete for attention.
+
+12.7 Timing & Intensity
+The Decision Intelligence Engine assigns:
+Sleep optimisation
+Timing:
+Immediate.
+Intensity:
+Recommended.
+
+Alcohol reduction
+Timing:
+Near-term.
+Intensity:
+Suggested.
+
+Stress education
+Timing:
+Immediate.
+Intensity:
+Informational.
+Each intervention receives a different constitutional treatment despite sharing the same underlying user.
+
+12.8 Safety Validation
+Every Decision Object undergoes constitutional Safety Validation.
+Checks include:
+constitutional authority, 
+intervention burden, 
+user context, 
+vulnerable circumstances, 
+confidence, 
+Expected Health Impact, 
+intervention interactions. 
+All active interventions pass validation.
+No escalation pathway is required.
+
+Engineering Rule
+No intervention reaches the user before passing Safety Validation.
+
+12.9 User Communication
+The Conversation Engine requests active Decision Objects.
+The Decision Intelligence Engine supplies:
+Decision.
+↓
+Priority.
+↓
+Timing.
+↓
+Intensity.
+↓
+Explanation.
+The Conversation Engine converts this into user-facing language.
+Example:
+"BioSense believes that improving your sleep consistency is currently the single change most likely to improve your long-term health. This recommendation is supported by consistent wearable observations over the past four months, increasing resting heart rate and reduced recovery. We recommend focusing on this before increasing training intensity."
+The wording originates from structured Decision Objects.
+It is not independently generated.
+
+Founder Principle
+The Conversation Engine communicates decisions. It does not create them.
+
+12.10 Outcome Evaluation
+Over the following eight weeks:
+Sleep consistency improves.
+Alcohol consumption decreases.
+Resting heart rate falls.
+Recovery improves.
+Behavioural adoption is confirmed.
+Physiological improvement is observed.
+The Decision Intelligence Engine classifies:
+Sleep intervention.
+↓
+Successful.
+Alcohol intervention.
+↓
+Partially Successful.
+Stress education.
+↓
+Inconclusive.
+The intervention hypotheses are evaluated using new observations.
+No assumptions are made.
+
+12.11 Intervention Review
+Following outcome evaluation:
+Sleep intervention.
+↓
+Completed.
+
+Alcohol intervention.
+↓
+Modified.
+
+Stress education.
+↓
+Continues.
+
+Exercise intervention.
+↓
+Activated.
+Because recovery has improved, a previously deferred intervention now becomes constitutionally appropriate.
+
+Constitutional Principle
+Successful interventions create opportunities for future interventions.
+
+12.12 Longitudinal Evolution
+Over the next three years:
+Several interventions are:
+completed, 
+modified, 
+retired, 
+reactivated, 
+replaced. 
+Expected Health Impact methodology evolves.
+Scientific understanding advances.
+The Decision Intelligence Engine reaches Version 11.
+Despite these changes:
+Every historical Decision Object remains reproducible.
+Every intervention explanation remains available.
+Every prioritisation decision remains auditable.
+No historical recommendation has been rewritten.
+
+12.13 Governance
+During routine governance review:
+A revised behavioural capacity model is approved.
+Validation demonstrates:
+Improved intervention adherence.
+Reduced recommendation fatigue.
+No reduction in health outcomes.
+The revised model becomes active.
+Historical Decision Objects remain unchanged.
+Future interventions use the updated framework.
+
+Constitutional Principle
+Governance improves future decisions without altering past decisions.
+
+12.14 End-to-End Validation
+This example demonstrates that:
+✓ Decision Objects are created from trusted understanding rather than raw observations.
+✓ Every intervention undergoes eligibility assessment, prioritisation, timing and safety validation.
+✓ Expected Health Impact governs recommendation priority.
+✓ Competing interventions are resolved into coordinated strategies.
+✓ Behavioural and physiological outcomes are evaluated independently.
+✓ Intervention lifecycles evolve without losing historical lineage.
+✓ Governance improves future decision-making without rewriting historical decisions.
+✓ Every intervention remains explainable, reproducible and constitutionally governed.
+
+Closing Statement
+The Decision Intelligence Engine is not a recommendation generator.
+It is not a notification engine.
+It is not a behavioural coaching system.
+It is the constitutional authority governing how BioSense converts trusted understanding into purposeful action.
+Every intervention begins with evidence.
+Every intervention is justified through confidence.
+Every intervention competes with alternative possibilities.
+Every intervention is evaluated according to its expected contribution to long-term health.
+Every intervention is reviewed after implementation.
+Every intervention evolves throughout its lifecycle.
+Every intervention remains explainable.
+Every intervention remains accountable.
+Through this architecture, BioSense does not seek to maximise the number of recommendations it delivers.
+It seeks to maximise the quality, relevance and effectiveness of the actions it chooses to recommend.
+The Decision Intelligence Engine therefore transforms trusted understanding into meaningful health improvement while preserving the constitutional principles of scientific integrity, user autonomy and lifelong learning.

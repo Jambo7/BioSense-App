@@ -1,17 +1,15 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import {
   Search,
   Filter,
   Leaf,
   Droplet,
-  Sun,
   Flame,
   Heart,
   Activity,
-  Beaker,
   Pill as PillIcon,
   ArrowRight,
   ArrowLeft,
@@ -24,16 +22,27 @@ import {
   ChevronDown,
   ChevronRight,
   BookOpen,
-  Dumbbell,
   ShieldCheck,
   Check,
   type LucideIcon,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { groupMarkersByCategory, personalisedRec, BIOMARKER_CATEGORIES, categoryForMarker } from '@/lib/biomarkers'
+import {
+  groupMarkersByCategory,
+  personalisedRec,
+  BIOMARKER_CATEGORIES,
+  canonicalMarker,
+} from '@/lib/biomarkers'
+import {
+  getContent,
+  iconForMarker,
+  iconForCategory,
+  markerTone,
+  subForMarker,
+} from '@/lib/biomarker-content'
 import { BiomarkerGuidanceButton } from '@/components/biomarker-guidance'
 import { Card } from '@/components/ui/card'
-import { IconBadge, type IconBadgeTone } from '@/components/ui/icon-badge'
+import { IconBadge } from '@/components/ui/icon-badge'
 import { SparkLine } from '@/components/ui/spark-line'
 
 interface BloodMarker {
@@ -43,6 +52,10 @@ interface BloodMarker {
   refMin?: number
   refMax?: number
   tier: 'T1' | 'T2' | 'T3'
+  /** Real values across past uploads (oldest → newest), when ≥ 2 exist. */
+  series?: number[]
+  /** Real previous result for this marker, when one exists. */
+  prev?: { value: number; date: string }
 }
 
 interface InsightsClientProps {
@@ -60,7 +73,8 @@ interface InsightsClientProps {
 // ── Status mapping ───────────────────────────────────────────────────────
 // T1 → In range  /  T2 → Optimise  /  T3 → Out of range (per v7 spec image 5).
 type Status = 'in_range' | 'optimise' | 'out_of_range' | 'no_data'
-function tierToStatus(tier: 'T1' | 'T2' | 'T3'): Status {
+function tierToStatus(tier?: 'T1' | 'T2' | 'T3'): Status {
+  if (!tier) return 'no_data'
   return tier === 'T1' ? 'in_range' : tier === 'T2' ? 'optimise' : 'out_of_range'
 }
 const STATUS_META: Record<Status, { label: string; cls: string; dot: string }> = {
@@ -68,270 +82,6 @@ const STATUS_META: Record<Status, { label: string; cls: string; dot: string }> =
   optimise:     { label: 'Optimise',     cls: 'bg-[rgba(237,198,138,0.30)] text-[#A77530] ring-1 ring-inset ring-[rgba(217,160,91,0.30)]',  dot: '#D9A05B' },
   out_of_range: { label: 'Out of range', cls: 'bg-[rgba(233,201,201,0.40)] text-[#A85454] ring-1 ring-inset ring-[rgba(201,122,122,0.30)]', dot: '#C97A7A' },
   no_data:      { label: 'No data',      cls: 'bg-[rgba(26,28,26,0.06)]   text-ink-2 ring-1 ring-inset ring-[rgba(26,28,26,0.08)]',         dot: '#8A8C8A' },
-}
-
-// ── Mock biomarker set ────────────────────────────────────────────────────
-// Used when the user hasn't uploaded a real panel yet. Mirrors v7 image 5:
-// Ferritin, Vitamin D, Vitamin B12, Omega-3 Index, CRP, HbA1c, Testosterone.
-const MOCK_MARKERS: (BloodMarker & { icon: LucideIcon; sub: string; series: number[] })[] = [
-  { name: 'Ferritin',         value: 32,  unit: 'µg/L',   refMin: 70,  refMax: 120, tier: 'T2', icon: Beaker,   sub: 'Iron stores',           series: [45, 42, 40, 38, 36, 34, 33, 32] },
-  { name: 'Vitamin D',        value: 42,  unit: 'ng/mL',  refMin: 30,  refMax: 70,  tier: 'T1', icon: Sun,      sub: 'Bone & immune health',  series: [38, 39, 41, 42, 43, 42, 42, 42] },
-  { name: 'Vitamin B12',      value: 512, unit: 'pmol/L', refMin: 200, refMax: 900, tier: 'T1', icon: Beaker,   sub: 'Energy & cognitive',    series: [480, 490, 495, 500, 505, 510, 512, 512] },
-  { name: 'Omega-3 Index',    value: 6.2, unit: '%',      refMin: 8,   refMax: 12,  tier: 'T2', icon: Heart,    sub: 'Heart & brain health',  series: [4.5, 5.0, 5.4, 5.7, 5.9, 6.0, 6.1, 6.2] },
-  { name: 'C-Reactive Protein', value: 1.8, unit: 'mg/L', refMin: 0,   refMax: 3,   tier: 'T1', icon: Flame,    sub: 'Inflammation',          series: [2.5, 2.3, 2.1, 2.0, 1.9, 1.8, 1.8, 1.8] },
-  { name: 'HbA1c',            value: 5.2, unit: '%',      refMin: 4,   refMax: 5.7, tier: 'T1', icon: Droplet,  sub: 'Blood sugar control',   series: [5.4, 5.3, 5.3, 5.2, 5.2, 5.2, 5.2, 5.2] },
-  { name: 'Testosterone',     value: 18.4, unit: 'nmol/L',refMin: 10,  refMax: 35,  tier: 'T1', icon: Activity, sub: 'Hormonal health',       series: [17.5, 17.8, 18.0, 18.2, 18.3, 18.4, 18.4, 18.4] },
-]
-
-// ── Per-biomarker drill-down content (v7 image 6) ─────────────────────────
-// When a single biomarker is selected, the Comparisons / Explanations /
-// Recommendations tabs scope down to that marker. This map holds the
-// reference points, plain-language explanation copy, lifestyle steps and
-// supplement suggestions for each known marker. Unknown (real uploaded)
-// markers fall back to `genericContent()`.
-interface MarkerContent {
-  previousResult?: number
-  previousLabel?: string
-  personalMin?: number
-  personalMax?: number
-  populationAvg?: number
-  populationLabel?: string
-  trendNote: string
-  explainIntro: string
-  whyItMatters: string
-  lowMeans: string
-  highMeans: string
-  factors: string
-  relatesToHealth: string
-  lifestyle: { icon: LucideIcon; title: string; detail: string }[]
-  supplements: { name: string; detail: string; tag: string }[]
-}
-
-function contentKey(name: string): string {
-  const k = name.toLowerCase()
-  if (k.includes('ferritin') || k.includes('iron'))         return 'ferritin'
-  if (k.includes('vitamin d'))                               return 'vitaminD'
-  if (k.includes('b12') || k.includes('vitamin b'))          return 'b12'
-  if (k.includes('omega'))                                   return 'omega3'
-  if (k.includes('crp') || k.includes('c-reactive'))         return 'crp'
-  if (k.includes('hba1c') || k.includes('glucose'))          return 'hba1c'
-  if (k.includes('testosterone') || k.includes('hormone'))   return 'testosterone'
-  return 'generic'
-}
-
-// Stable category-identity colour per biomarker (independent of its status,
-// which is shown separately via the pill). Gives the panel the multi-colour
-// feel from the brief while keeping the red/amber/green status signal intact.
-const MARKER_TONES: Record<string, IconBadgeTone> = {
-  ferritin:     'rose',
-  vitaminD:     'amber',
-  b12:          'violet',
-  omega3:       'sky',
-  crp:          'teal',
-  hba1c:        'sage',
-  testosterone: 'violet',
-  generic:      'sage',
-}
-function markerTone(name: string): IconBadgeTone {
-  return MARKER_TONES[contentKey(name)] ?? 'sage'
-}
-
-const BIOMARKER_CONTENT: Record<string, MarkerContent> = {
-  ferritin: {
-    previousResult: 45,
-    previousLabel: '3 months ago',
-    personalMin: 27,
-    personalMax: 150,
-    populationAvg: 60,
-    populationLabel: 'Women 30–40',
-    trendNote: 'Your ferritin has declined over the last 3 months and is below your optimal range.',
-    explainIntro: 'Ferritin is a protein that stores iron in your body and releases it when needed.',
-    whyItMatters: 'Ferritin reflects your iron stores. Low ferritin can lead to fatigue, poor recovery, weakened immune function and reduced exercise performance.',
-    lowMeans: 'Low levels may cause tiredness, breathlessness, poor concentration and reduced exercise capacity as oxygen transport drops.',
-    highMeans: 'High levels can indicate inflammation, infection or — less commonly — iron overload that may stress the liver over time.',
-    factors: 'Diet (red meat, leafy greens), menstruation and blood loss, gut absorption, inflammation and recent illness all influence ferritin.',
-    relatesToHealth: 'Healthy iron stores support daily energy, athletic recovery, immune resilience and cognitive sharpness.',
-    lifestyle: [
-      { icon: UtensilsCrossed, title: 'Nutrition', detail: 'Focus on iron-rich foods and vitamin C to enhance absorption.' },
-      { icon: Dumbbell,        title: 'Training',  detail: 'Balance intensity and recovery to support iron levels.' },
-      { icon: Moon,            title: 'Sleep',     detail: 'Quality sleep supports iron metabolism and energy.' },
-      { icon: ShieldCheck,     title: 'Stress management', detail: 'Chronic stress can impact iron regulation.' },
-    ],
-    supplements: [
-      { name: 'Iron (bisglycinate)', detail: 'May help increase iron stores.', tag: 'Consider' },
-      { name: 'Vitamin C',           detail: 'Taken with iron to improve absorption.', tag: 'Consider' },
-    ],
-  },
-  vitaminD: {
-    previousResult: 38,
-    previousLabel: '3 months ago',
-    personalMin: 25,
-    personalMax: 80,
-    populationAvg: 35,
-    populationLabel: 'Adults, UK',
-    trendNote: 'Your vitamin D has risen steadily and now sits comfortably within your optimal range.',
-    explainIntro: 'Vitamin D is a hormone-like nutrient your skin makes from sunlight, supporting bone, immune and mood health.',
-    whyItMatters: 'Adequate vitamin D supports calcium absorption, immune defence, mood regulation and muscle function.',
-    lowMeans: 'Low levels can cause fatigue, low mood, frequent illness and weaker bones over time.',
-    highMeans: 'Very high levels — usually from over-supplementation — can raise blood calcium and stress the kidneys.',
-    factors: 'Sun exposure, skin tone, latitude, season, body fat and supplementation all influence vitamin D.',
-    relatesToHealth: 'Healthy vitamin D underpins resilient immunity, strong bones and stable mood through darker months.',
-    lifestyle: [
-      { icon: Sun,             title: 'Daylight',  detail: 'Short, regular daylight exposure helps maintain levels.' },
-      { icon: UtensilsCrossed, title: 'Nutrition', detail: 'Oily fish, eggs and fortified foods support vitamin D.' },
-      { icon: Dumbbell,        title: 'Training',  detail: 'Outdoor activity combines movement with sunlight.' },
-      { icon: Moon,            title: 'Sleep',     detail: 'Consistent rest supports overall hormone balance.' },
-    ],
-    supplements: [
-      { name: 'Vitamin D3', detail: 'Helps maintain healthy vitamin D levels.', tag: 'Maintain' },
-      { name: 'Vitamin K2', detail: 'Helps direct calcium toward your bones.', tag: 'Optional' },
-    ],
-  },
-  b12: {
-    previousResult: 500,
-    previousLabel: '3 months ago',
-    personalMin: 200,
-    personalMax: 900,
-    populationAvg: 450,
-    populationLabel: 'Adults',
-    trendNote: 'Your B12 is stable and well within a healthy range.',
-    explainIntro: 'Vitamin B12 is essential for red blood cell formation, nerve function and energy production.',
-    whyItMatters: 'B12 supports energy, focus and a healthy nervous system; deficiency develops slowly but can be significant.',
-    lowMeans: 'Low levels may cause fatigue, tingling, poor memory and mood changes.',
-    highMeans: 'High levels are usually harmless and often reflect supplementation.',
-    factors: 'Diet (animal foods), gut absorption, age and certain medications influence B12.',
-    relatesToHealth: 'Healthy B12 supports steady energy, clear thinking and long-term nerve health.',
-    lifestyle: [
-      { icon: UtensilsCrossed, title: 'Nutrition', detail: 'Meat, fish, eggs and dairy are rich in B12.' },
-      { icon: Dumbbell,        title: 'Training',  detail: 'Adequate B12 supports recovery and energy.' },
-      { icon: Moon,            title: 'Sleep',     detail: 'Rest supports overall metabolic health.' },
-      { icon: ShieldCheck,     title: 'Stress management', detail: 'Manage stress to protect digestion and absorption.' },
-    ],
-    supplements: [
-      { name: 'Vitamin B12 (methylcobalamin)', detail: 'Supports energy and nerve health.', tag: 'Maintain' },
-    ],
-  },
-  omega3: {
-    previousResult: 5.4,
-    previousLabel: '3 months ago',
-    personalMin: 4,
-    personalMax: 12,
-    populationAvg: 5,
-    populationLabel: 'Western diets',
-    trendNote: 'Your omega-3 index is improving but remains below the optimal zone.',
-    explainIntro: 'The omega-3 index measures EPA and DHA in your red blood cells — key fats for heart and brain health.',
-    whyItMatters: 'A higher omega-3 index is linked to better cardiovascular health, lower inflammation and brain function.',
-    lowMeans: 'Low levels are associated with higher inflammation and reduced cardiovascular protection.',
-    highMeans: 'Very high intakes are generally well tolerated; extremely high doses can thin the blood slightly.',
-    factors: 'Intake of oily fish and omega-3 supplements is the main driver; cooking oils high in omega-6 can offset it.',
-    relatesToHealth: 'A healthy omega-3 index supports your heart, brain and recovery from training.',
-    lifestyle: [
-      { icon: UtensilsCrossed, title: 'Nutrition', detail: 'Eat oily fish 2–3 times per week.' },
-      { icon: Dumbbell,        title: 'Training',  detail: 'Omega-3s support recovery and joint comfort.' },
-      { icon: Flame,           title: 'Inflammation', detail: 'Limit processed, omega-6-heavy foods.' },
-      { icon: ShieldCheck,     title: 'Stress management', detail: 'Lower stress complements anti-inflammatory diet.' },
-    ],
-    supplements: [
-      { name: 'Omega-3 (EPA/DHA)', detail: 'Helps raise your omega-3 index.', tag: 'Consider' },
-    ],
-  },
-  crp: {
-    previousResult: 2.5,
-    previousLabel: '3 months ago',
-    personalMin: 0,
-    personalMax: 5,
-    populationAvg: 2.2,
-    populationLabel: 'Adults',
-    trendNote: 'Your CRP has fallen and now sits within a healthy, low-inflammation range.',
-    explainIntro: 'C-reactive protein (CRP) is made by the liver and rises when there is inflammation in the body.',
-    whyItMatters: 'CRP is a sensitive marker of inflammation, which is linked to recovery, metabolic and cardiovascular health.',
-    lowMeans: 'Low CRP reflects low background inflammation — generally a good sign.',
-    highMeans: 'High levels can indicate infection, injury, or chronic inflammation that warrants attention.',
-    factors: 'Infection, body fat, sleep, stress, smoking and diet all influence CRP.',
-    relatesToHealth: 'Keeping CRP low supports recovery, energy and long-term cardiovascular health.',
-    lifestyle: [
-      { icon: UtensilsCrossed, title: 'Nutrition', detail: 'Anti-inflammatory, whole-food eating helps lower CRP.' },
-      { icon: Moon,            title: 'Sleep',     detail: 'Consistent quality sleep reduces inflammation.' },
-      { icon: ShieldCheck,     title: 'Stress management', detail: 'Lower chronic stress to keep inflammation down.' },
-      { icon: Dumbbell,        title: 'Training',  detail: 'Regular moderate exercise reduces baseline inflammation.' },
-    ],
-    supplements: [
-      { name: 'Omega-3 (EPA/DHA)', detail: 'May help support a healthy inflammatory response.', tag: 'Optional' },
-    ],
-  },
-  hba1c: {
-    previousResult: 5.4,
-    previousLabel: '3 months ago',
-    personalMin: 4,
-    personalMax: 5.7,
-    populationAvg: 5.4,
-    populationLabel: 'Adults',
-    trendNote: 'Your HbA1c is stable and within a healthy range for blood sugar control.',
-    explainIntro: 'HbA1c reflects your average blood sugar over the past 2–3 months.',
-    whyItMatters: 'HbA1c indicates how well your body manages blood sugar, a key driver of long-term metabolic health.',
-    lowMeans: 'Lower values reflect well-controlled blood sugar.',
-    highMeans: 'Higher levels suggest rising blood sugar and increased metabolic risk over time.',
-    factors: 'Diet, body composition, activity, sleep and stress all influence blood sugar control.',
-    relatesToHealth: 'Healthy HbA1c supports stable energy, mood and long-term metabolic health.',
-    lifestyle: [
-      { icon: UtensilsCrossed, title: 'Nutrition', detail: 'Prioritise fibre, protein and fewer refined carbs.' },
-      { icon: Dumbbell,        title: 'Training',  detail: 'Regular activity improves insulin sensitivity.' },
-      { icon: Moon,            title: 'Sleep',     detail: 'Good sleep supports blood sugar regulation.' },
-      { icon: ShieldCheck,     title: 'Stress management', detail: 'Stress hormones can raise blood sugar.' },
-    ],
-    supplements: [
-      { name: 'Magnesium', detail: 'May support healthy glucose metabolism.', tag: 'Optional' },
-    ],
-  },
-  testosterone: {
-    previousResult: 17.5,
-    previousLabel: '3 months ago',
-    personalMin: 10,
-    personalMax: 35,
-    populationAvg: 18,
-    populationLabel: 'Men 30–40',
-    trendNote: 'Your testosterone is stable and within a healthy range.',
-    explainIntro: 'Testosterone is a key hormone for energy, muscle, mood and libido in both men and women.',
-    whyItMatters: 'Balanced testosterone supports strength, recovery, motivation and overall wellbeing.',
-    lowMeans: 'Low levels may cause low energy, reduced strength, low mood and reduced libido.',
-    highMeans: 'Unusually high levels may need investigation depending on the source.',
-    factors: 'Sleep, body composition, training, stress and age all influence testosterone.',
-    relatesToHealth: 'Healthy testosterone supports body composition, recovery and day-to-day drive.',
-    lifestyle: [
-      { icon: Dumbbell,        title: 'Training',  detail: 'Resistance training supports healthy levels.' },
-      { icon: Moon,            title: 'Sleep',     detail: 'Most testosterone is produced during deep sleep.' },
-      { icon: UtensilsCrossed, title: 'Nutrition', detail: 'Adequate protein, fats and micronutrients matter.' },
-      { icon: ShieldCheck,     title: 'Stress management', detail: 'High cortisol can suppress testosterone.' },
-    ],
-    supplements: [
-      { name: 'Vitamin D3', detail: 'Supports healthy testosterone when levels are low.', tag: 'Optional' },
-      { name: 'Zinc',       detail: 'Involved in healthy testosterone production.', tag: 'Optional' },
-    ],
-  },
-}
-
-function genericContent(name: string, sub: string): MarkerContent {
-  return {
-    trendNote: `Your ${name.toLowerCase()} is tracked over time so you can see how it responds to your habits.`,
-    explainIntro: `${name} is one of the markers we track to understand ${sub.toLowerCase() || 'your health'}.`,
-    whyItMatters: `${name} gives insight into ${sub.toLowerCase() || 'your health'} and how it changes over time.`,
-    lowMeans: 'Levels below the optimal range may be worth supporting through lifestyle and, where appropriate, supplementation.',
-    highMeans: 'Levels above the optimal range can have several causes and are best interpreted alongside your other markers.',
-    factors: 'Diet, activity, sleep, stress and your individual physiology all influence this marker.',
-    relatesToHealth: 'Keeping this marker in its optimal range supports your broader health goals.',
-    lifestyle: [
-      { icon: UtensilsCrossed, title: 'Nutrition', detail: 'A balanced, whole-food diet supports healthy levels.' },
-      { icon: Dumbbell,        title: 'Training',  detail: 'Regular activity supports overall health.' },
-      { icon: Moon,            title: 'Sleep',     detail: 'Quality sleep aids recovery and balance.' },
-      { icon: ShieldCheck,     title: 'Stress management', detail: 'Managing stress supports your results.' },
-    ],
-    supplements: [],
-  }
-}
-
-function getContent(name: string, sub: string): MarkerContent {
-  const key = contentKey(name)
-  return BIOMARKER_CONTENT[key] ?? genericContent(name, sub)
 }
 
 // ── Tabs ─────────────────────────────────────────────────────────────────
@@ -343,22 +93,44 @@ const TABS: { id: Tab; label: string }[] = [
   { id: 'recommendations', label: 'Recommendations' },
 ]
 
+// Uploaded markers enriched with display metadata. Always real data —
+// there is no demo/mock fallback; pre-upload states show empty sections.
+type VMarker = BloodMarker & { icon: LucideIcon; sub: string }
+
+// Looser shape used by the drill-downs so catalogue markers the user
+// hasn't uploaded yet can still be explored (Explanations is educational).
+type DrillMarker = {
+  name: string
+  sub: string
+  icon: LucideIcon
+  value?: number
+  unit?: string
+  refMin?: number
+  refMax?: number
+  tier?: 'T1' | 'T2' | 'T3'
+  series?: number[]
+  prev?: { value: number; date: string }
+}
+
+function formatMonthYear(iso: string): string {
+  return new Date(iso).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })
+}
+
 export function InsightsClient({ hasResult, drawDate, markers }: InsightsClientProps) {
   const [tab, setTab] = useState<Tab>('list')
-  // The currently drilled-into biomarker (v7 image 6). `null` → overview
-  // (v7 image 5). Selecting a marker scopes Comparisons / Explanations /
-  // Recommendations to that single marker.
+  // The currently drilled-into biomarker. `null` → overview. Selecting a
+  // marker scopes Comparisons / Explanations / Recommendations to it.
   const [selected, setSelected] = useState<string | null>(null)
 
-  // Real markers preferred; fall back to mock so demo always feels populated.
-  const visible = markers.length > 0
-    ? markers.map((m) => ({
+  const visible: VMarker[] = useMemo(
+    () =>
+      markers.map((m) => ({
         ...m,
         icon: iconForMarker(m.name),
-        sub:  subForMarker(m.name),
-        series: undefined as number[] | undefined,
-      }))
-    : MOCK_MARKERS
+        sub: subForMarker(m.name),
+      })),
+    [markers],
+  )
 
   // Drill into a biomarker from list and jump to Explanations (3rd-June spec).
   function drillInto(name: string) {
@@ -371,7 +143,16 @@ export function InsightsClient({ hasResult, drawDate, markers }: InsightsClientP
     setTab('comparisons')
   }
   const clearSelection = () => setSelected(null)
-  const selectedMarker = visible.find((m) => m.name === selected) ?? null
+
+  // Resolve the selection: an uploaded marker when the user has it, else a
+  // catalogue-only marker (educational content, no values).
+  const selectedMarker: DrillMarker | null = selected
+    ? visible.find((m) => m.name === selected) ?? {
+        name: selected,
+        sub: subForMarker(selected),
+        icon: iconForMarker(selected),
+      }
+    : null
 
   return (
     <div className="max-w-3xl mx-auto fade-up space-y-5">
@@ -432,7 +213,7 @@ export function InsightsClient({ hasResult, drawDate, markers }: InsightsClientP
       </div>
 
       {tab === 'list' && (
-        <ListTab markers={hasResult ? visible : []} hasReal={hasResult} onSelect={drillInto} />
+        <ListTab markers={visible} hasReal={hasResult} onSelect={drillInto} />
       )}
       {tab === 'comparisons' && (
         <ComparisonsTab
@@ -463,8 +244,37 @@ export function InsightsClient({ hasResult, drawDate, markers }: InsightsClientP
   )
 }
 
-// Shared marker shape used across the tabs once enriched with display meta.
-type VMarker = BloodMarker & { icon: LucideIcon; sub: string; series?: number[] }
+// ── Summary line computed from the user's actual results ─────────────────
+function summariseMarkers(markers: VMarker[]): { accent: string; body: string } {
+  const t3 = markers.filter((m) => m.tier === 'T3')
+  const t2 = markers.filter((m) => m.tier === 'T2')
+
+  const nameList = (ms: VMarker[]) => {
+    const names = ms.slice(0, 3).map((m) => m.name)
+    const extra = ms.length - names.length
+    const joined = names.length > 1
+      ? `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`
+      : names[0]
+    return extra > 0 ? `${joined} (+${extra} more)` : joined
+  }
+
+  if (t3.length > 0) {
+    return {
+      accent: 'worth some attention.',
+      body: `${nameList(t3)} ${t3.length === 1 ? 'is' : 'are'} outside the optimal range — open Recommendations for specific actions.`,
+    }
+  }
+  if (t2.length > 0) {
+    return {
+      accent: 'balanced overall.',
+      body: `${nameList(t2)} could be optimised — see Recommendations for next steps.`,
+    }
+  }
+  return {
+    accent: 'in great shape.',
+    body: `All ${markers.length} markers are within their optimal ranges. Keep doing what's working.`,
+  }
+}
 
 // ── Tab 1: BIOMARKER LIST ────────────────────────────────────────────────
 function ListTab({
@@ -476,6 +286,9 @@ function ListTab({
   hasReal: boolean
   onSelect: (name: string) => void
 }) {
+  const [query, setQuery] = useState('')
+  const [attentionOnly, setAttentionOnly] = useState(false)
+
   const counts = markers.reduce(
     (acc, m) => {
       const s = tierToStatus(m.tier)
@@ -485,16 +298,28 @@ function ListTab({
     { in_range: 0, optimise: 0, out_of_range: 0, no_data: 0 } as Record<Status, number>,
   )
 
+  const q = query.trim().toLowerCase()
+  const filtered = markers.filter((m) => {
+    if (attentionOnly && m.tier === 'T1') return false
+    if (q === '') return true
+    return (
+      m.name.toLowerCase().includes(q) ||
+      m.sub.toLowerCase().includes(q) ||
+      canonicalMarker(m.name).toLowerCase().includes(q)
+    )
+  })
+
+  const summary = hasReal && markers.length > 0 ? summariseMarkers(markers) : null
+
   return (
     <div className="space-y-5">
       <HeroIntroCard
         eyebrow="AI summary"
         lead="Your biomarkers look"
-        accent="balanced overall."
+        accent={summary?.accent ?? 'ready to discover.'}
         body={
-          hasReal
-            ? 'Iron stores, vitamin D and inflammation markers could be improved.'
-            : 'Upload your first lab panel to see your real biomarkers in this view.'
+          summary?.body ??
+          'Upload your first lab panel to see your real biomarkers in this view.'
         }
         decoration="leaves"
         cta={
@@ -505,22 +330,31 @@ function ListTab({
       />
 
       <Card variant="glass" padding="lg">
-        {/* Search + filter (visual scaffolding; wiring deferred) */}
+        {/* Search + needs-attention filter */}
         <div className="flex items-center gap-2 mb-4">
           <div className="flex-1 flex items-center gap-2 h-10 rounded-pill bg-white/70 ring-1 ring-inset ring-[rgba(184,168,144,0.22)] px-3.5">
             <Search className="w-4 h-4 text-ink-3" strokeWidth={2} />
             <input
               type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
               placeholder="Search biomarkers..."
               className="flex-1 bg-transparent text-[13px] text-ink placeholder:text-ink-3 outline-none"
             />
           </div>
           <button
             type="button"
-            className="inline-flex items-center gap-1.5 h-10 px-3.5 rounded-pill text-[12px] font-medium text-sage-deep bg-white/70 ring-1 ring-inset ring-[rgba(111,143,107,0.22)] hover:bg-white transition-colors"
+            onClick={() => setAttentionOnly((v) => !v)}
+            className={cn(
+              'inline-flex items-center gap-1.5 h-10 px-3.5 rounded-pill text-[12px] font-medium transition-colors',
+              attentionOnly
+                ? 'btn-sage text-white'
+                : 'text-sage-deep bg-white/70 ring-1 ring-inset ring-[rgba(111,143,107,0.22)] hover:bg-white',
+            )}
+            title="Show only markers that need attention"
           >
             <Filter className="w-3.5 h-3.5" strokeWidth={2} />
-            Filter
+            Needs attention
           </button>
         </div>
 
@@ -529,11 +363,11 @@ function ListTab({
           <LegendChip status="in_range"     count={counts.in_range}     />
           <LegendChip status="optimise"     count={counts.optimise}     />
           <LegendChip status="out_of_range" count={counts.out_of_range} />
-          <LegendChip status="no_data"      count={counts.no_data}      />
+          {counts.no_data > 0 && <LegendChip status="no_data" count={counts.no_data} />}
         </div>
 
         <div className="space-y-5">
-          {groupMarkersByCategory(markers).map(({ category, items }) => {
+          {groupMarkersByCategory(filtered).map(({ category, items }) => {
             if (!hasReal && items.length === 0) {
               return (
                 <div key={category.id}>
@@ -600,6 +434,11 @@ function ListTab({
               </div>
             )
           })}
+          {hasReal && filtered.length === 0 && (
+            <p className="text-[12px] text-ink-3 italic px-1">
+              No markers match {q !== '' ? `"${query.trim()}"` : 'this filter'}.
+            </p>
+          )}
         </div>
       </Card>
     </div>
@@ -614,7 +453,7 @@ function ComparisonsTab({
   onClear,
 }: {
   markers: VMarker[]
-  selected: VMarker | null
+  selected: DrillMarker | null
   onSelect: (name: string) => void
   onClear: () => void
 }) {
@@ -625,6 +464,18 @@ function ComparisonsTab({
         markers={markers}
         onSelect={onSelect}
         onClear={onClear}
+      />
+    )
+  }
+  if (markers.length === 0) {
+    return (
+      <HeroIntroCard
+        eyebrow="Comparisons"
+        lead="See how your results compare"
+        accent="to key reference points."
+        body="Once you upload a blood test, each biomarker is compared against your own baseline, the optimal range and the population average."
+        decoration="leaves"
+        cta={{ label: 'Upload first lab', href: '/blood/upload', icon: Upload }}
       />
     )
   }
@@ -755,22 +606,47 @@ function ComparisonsDrill({
   onSelect,
   onClear,
 }: {
-  marker: VMarker
+  marker: DrillMarker
   markers: VMarker[]
   onSelect: (name: string) => void
   onClear: () => void
 }) {
   const status = tierToStatus(marker.tier)
   const meta = STATUS_META[status]
-  const c = getContent(marker.name, marker.sub)
+  const c = getContent(marker.name)
   const unit = marker.unit ?? ''
+
+  // Catalogue-only marker (not uploaded yet) → no values to compare.
+  if (marker.value == null) {
+    return (
+      <div className="space-y-5">
+        <DrillHeader marker={marker} markers={markers} onSelect={onSelect} onClear={onClear} />
+        <HeroIntroCard
+          eyebrow="No data yet"
+          lead={`No ${marker.name} result`}
+          accent="on file yet."
+          body={`Upload a blood test that includes ${marker.name} and we'll compare it against the optimal range and population average here.`}
+          decoration="leaves"
+          cta={{ label: 'Upload a result', href: '/blood/upload', icon: Upload }}
+        />
+      </div>
+    )
+  }
+
+  // Real reference points only: previous result and personal range come
+  // from the user's actual upload history, never placeholder values.
+  const prevValue = marker.prev?.value
+  const prevLabel = marker.prev ? formatMonthYear(marker.prev.date) : undefined
+  const hasTrend = !!marker.series && marker.series.length >= 2
+  const personalMin = hasTrend ? Math.min(...marker.series!) : undefined
+  const personalMax = hasTrend ? Math.max(...marker.series!) : undefined
 
   // Build a shared scale spanning every reference point so all the bars
   // line up against the same axis.
   const pts: number[] = [marker.value]
-  if (c.previousResult != null) pts.push(c.previousResult)
-  if (c.personalMin != null) pts.push(c.personalMin)
-  if (c.personalMax != null) pts.push(c.personalMax)
+  if (prevValue != null) pts.push(prevValue)
+  if (personalMin != null) pts.push(personalMin)
+  if (personalMax != null) pts.push(personalMax)
   if (marker.refMin != null) pts.push(marker.refMin)
   if (marker.refMax != null) pts.push(marker.refMax)
   if (c.populationAvg != null) pts.push(c.populationAvg)
@@ -804,10 +680,10 @@ function ComparisonsDrill({
               </span>
             </div>
           </div>
-          {marker.series && marker.series.length >= 2 && (
+          {hasTrend && (
             <div className="shrink-0 w-[88px]">
               <SparkLine
-                values={marker.series}
+                values={marker.series!}
                 width={88}
                 height={40}
                 tone={status === 'in_range' ? 'sage' : status === 'optimise' ? 'amber' : 'rose'}
@@ -824,28 +700,29 @@ function ComparisonsDrill({
       <Card variant="glass" padding="lg">
         <div className="text-eyebrow uppercase text-ink-3 mb-4">Comparisons</div>
         <div className="space-y-4">
-          {c.previousResult != null && (
+          {prevValue != null && (
             <CompareRow
               label="Your previous result"
-              sub={c.previousLabel}
-              valueText={`${c.previousResult} ${unit}`}
+              sub={prevLabel}
+              valueText={`${prevValue} ${unit}`}
               scaleMin={scaleMin}
               scaleMax={scaleMax}
               optimalMin={marker.refMin}
               optimalMax={marker.refMax}
-              point={c.previousResult}
+              point={prevValue}
             />
           )}
-          {c.personalMin != null && c.personalMax != null && (
+          {personalMin != null && personalMax != null && (
             <CompareRow
               label="Your personal range"
-              valueText={`${c.personalMin}–${c.personalMax} ${unit}`}
+              sub="Across your uploads"
+              valueText={`${personalMin}–${personalMax} ${unit}`}
               scaleMin={scaleMin}
               scaleMax={scaleMax}
               optimalMin={marker.refMin}
               optimalMax={marker.refMax}
-              rangeMin={c.personalMin}
-              rangeMax={c.personalMax}
+              rangeMin={personalMin}
+              rangeMax={personalMax}
             />
           )}
           {marker.refMin != null && marker.refMax != null && (
@@ -898,7 +775,7 @@ function ExplanationsTab({
   onGoToComparisons,
 }: {
   markers: VMarker[]
-  selected: VMarker | null
+  selected: DrillMarker | null
   onSelect: (name: string) => void
   onClear: () => void
   onGoToComparisons: (name: string) => void
@@ -914,26 +791,75 @@ function ExplanationsTab({
       />
     )
   }
-  return <ExplanationsOverview markers={markers} onSelect={onSelect} />
+  return <ExplanationsCatalogue markers={markers} onSelect={onSelect} />
 }
 
-function ExplanationsOverview({
+// Full catalogue browser: every preset marker, grouped by category, with
+// search — so finding one marker among ~150 takes seconds. Markers the user
+// has uploaded show their value and status; the rest are browsable as
+// educational content ("No data" until a panel includes them).
+function ExplanationsCatalogue({
   markers,
   onSelect,
 }: {
   markers: VMarker[]
   onSelect: (name: string) => void
 }) {
-  const topicIcons: Record<string, LucideIcon> = {
-    iron: Beaker, vitamins: Leaf, lipids: Heart, metabolic: Droplet,
-    inflammation: Flame, hormones: Activity, liver: Beaker, thyroid: Activity,
+  const [query, setQuery] = useState('')
+  const [openCats, setOpenCats] = useState<Set<string>>(new Set())
+
+  // Uploaded markers keyed by canonical name so catalogue rows can show
+  // the user's real value where one exists.
+  const owned = useMemo(() => {
+    const map = new Map<string, VMarker>()
+    for (const m of markers) map.set(canonicalMarker(m.name), m)
+    return map
+  }, [markers])
+
+  const q = query.trim().toLowerCase()
+  const searching = q !== ''
+
+  // Uploaded markers that don't map onto a preset catalogue entry still
+  // deserve a home — surface them in an extra section at the end.
+  const catalogueNames = useMemo(() => {
+    const set = new Set<string>()
+    for (const cat of BIOMARKER_CATEGORIES) {
+      for (const name of cat.markers) set.add(canonicalMarker(name))
+    }
+    return set
+  }, [])
+  const uncatalogued = markers
+    .filter((m) => !catalogueNames.has(canonicalMarker(m.name)))
+    .map((m) => m.name)
+
+  const sections = [
+    ...BIOMARKER_CATEGORIES.map((cat) => ({ cat, allMarkers: cat.markers })),
+    ...(uncatalogued.length > 0
+      ? [{
+          cat: { id: 'other', label: 'Other markers', description: 'Additional biomarkers from your uploads', markers: uncatalogued },
+          allMarkers: uncatalogued,
+        }]
+      : []),
+  ]
+    .map(({ cat, allMarkers }) => {
+      const items = allMarkers.filter(
+        (name) =>
+          !searching ||
+          name.toLowerCase().includes(q) ||
+          subForMarker(name).toLowerCase().includes(q),
+      )
+      return { cat, items }
+    })
+    .filter((s) => s.items.length > 0)
+
+  function toggleCat(id: string) {
+    setOpenCats((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
   }
-  const topics = BIOMARKER_CATEGORIES.map((c) => ({
-    key: c.id,
-    icon: topicIcons[c.id] ?? Beaker,
-    title: c.label,
-    detail: c.description,
-  }))
 
   return (
     <div className="space-y-5">
@@ -941,42 +867,108 @@ function ExplanationsOverview({
         eyebrow="Understand your biomarkers"
         lead="Learn what your biomarkers mean"
         accent="and why they matter."
-        body="Clear, science-backed explanations in plain language."
+        body="Browse every biomarker we track, by category — clear, science-backed explanations in plain language."
         decoration="leaves"
       />
 
       <Card variant="glass" padding="lg">
-        <div className="text-eyebrow uppercase text-ink-3 mb-2.5">Browse topics</div>
+        {/* Search across the full catalogue */}
+        <div className="flex items-center gap-2 h-10 rounded-pill bg-white/70 ring-1 ring-inset ring-[rgba(184,168,144,0.22)] px-3.5 mb-4">
+          <Search className="w-4 h-4 text-ink-3" strokeWidth={2} />
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search all biomarkers, e.g. LDL..."
+            className="flex-1 bg-transparent text-[13px] text-ink placeholder:text-ink-3 outline-none"
+          />
+        </div>
+
         <div className="space-y-2.5">
-          {topics.map((t) => {
-            // Drill straight into the matching biomarker's explanation when
-            // the user actually has it; otherwise hand off to the AI chat.
-            const match = markers.find((m) => categoryForMarker(m.name) === t.key)
-            const inner = (
-              <>
-                <IconBadge icon={t.icon} tone="sage" variant="tint" size="md" />
-                <div className="flex-1 min-w-0">
-                  <div className="font-sans text-[13.5px] font-semibold text-ink leading-tight">
-                    {t.title}
+          {sections.map(({ cat, items }) => {
+            const open = searching || openCats.has(cat.id)
+            const ownedCount = cat.markers.filter((name) => owned.has(canonicalMarker(name))).length
+            return (
+              <div key={cat.id} className="rounded-card tile overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => toggleCat(cat.id)}
+                  className="w-full text-left flex items-center gap-3 sm:gap-4 p-3 sm:p-3.5 group"
+                >
+                  <IconBadge icon={iconForCategory(cat.id)} tone="sage" variant="tint" size="md" />
+                  <div className="flex-1 min-w-0">
+                    <div className="font-sans text-[13.5px] font-semibold text-ink leading-tight">
+                      {cat.label}
+                    </div>
+                    <div className="text-[11.5px] text-ink-3 leading-snug mt-0.5">
+                      {cat.description}
+                    </div>
                   </div>
-                  <div className="text-[11.5px] text-ink-3 leading-snug mt-0.5">
-                    {t.detail}
+                  <span className="text-[10.5px] text-ink-3 font-medium tabular-nums shrink-0">
+                    {ownedCount > 0 ? `${ownedCount} of ${cat.markers.length} tracked` : `${cat.markers.length} markers`}
+                  </span>
+                  <ChevronDown
+                    className={cn('w-4 h-4 text-ink-3 shrink-0 transition-transform', open && 'rotate-180')}
+                    strokeWidth={2.25}
+                  />
+                </button>
+
+                {open && (
+                  <div className="px-2 pb-2 space-y-1">
+                    {items.map((name) => {
+                      const mine = owned.get(canonicalMarker(name))
+                      const status = tierToStatus(mine?.tier)
+                      const meta = STATUS_META[status]
+                      return (
+                        <button
+                          key={name}
+                          type="button"
+                          onClick={() => onSelect(mine?.name ?? name)}
+                          className="w-full text-left flex items-center gap-3 px-2.5 py-2 rounded-[12px] hover:bg-[rgba(26,28,26,0.04)] transition-colors group"
+                        >
+                          <IconBadge icon={iconForMarker(name)} tone={markerTone(name)} variant="tint" size="sm" />
+                          <span className="flex-1 min-w-0">
+                            <span className="block text-[13px] font-medium text-ink truncate leading-tight">{name}</span>
+                            <span className="block text-[10.5px] text-ink-3 truncate leading-tight">{subForMarker(name)}</span>
+                          </span>
+                          {mine ? (
+                            <>
+                              <span className="text-[12px] font-semibold text-ink tabular-nums shrink-0">
+                                {mine.value} <span className="text-[10px] font-normal text-ink-3">{mine.unit}</span>
+                              </span>
+                              <span
+                                className={cn(
+                                  'inline-flex items-center px-2 py-0.5 rounded-pill text-[10px] font-semibold uppercase tracking-wide shrink-0',
+                                  meta.cls,
+                                )}
+                              >
+                                {meta.label}
+                              </span>
+                            </>
+                          ) : (
+                            <span
+                              className={cn(
+                                'inline-flex items-center px-2 py-0.5 rounded-pill text-[10px] font-semibold uppercase tracking-wide shrink-0',
+                                STATUS_META.no_data.cls,
+                              )}
+                            >
+                              No data
+                            </span>
+                          )}
+                          <ChevronRight className="w-4 h-4 text-ink-3 shrink-0 transition-transform group-hover:translate-x-0.5" strokeWidth={2.25} />
+                        </button>
+                      )
+                    })}
                   </div>
-                </div>
-                <ChevronRight className="w-4 h-4 text-ink-3 shrink-0 transition-transform group-hover:translate-x-0.5" strokeWidth={2.25} />
-              </>
-            )
-            const cls = 'w-full text-left flex items-center gap-3 sm:gap-4 p-3 sm:p-3.5 rounded-card tile tile-hover group'
-            return match ? (
-              <button key={t.key} type="button" onClick={() => onSelect(match.name)} className={cls}>
-                {inner}
-              </button>
-            ) : (
-              <Link key={t.key} href="/chat" className={cls} title="Start Learning Mode">
-                {inner}
-              </Link>
+                )}
+              </div>
             )
           })}
+          {sections.length === 0 && (
+            <p className="text-[12px] text-ink-3 italic px-1">
+              No biomarkers match &quot;{query.trim()}&quot;.
+            </p>
+          )}
         </div>
       </Card>
     </div>
@@ -991,26 +983,28 @@ function ExplanationsDrill({
   onClear,
   onGoToComparisons,
 }: {
-  marker: VMarker
+  marker: DrillMarker
   markers: VMarker[]
   onSelect: (name: string) => void
   onClear: () => void
   onGoToComparisons: (name: string) => void
 }) {
-  const c = getContent(marker.name, marker.sub)
+  const c = getContent(marker.name)
   const first = marker.name.split(' ')[0]
 
   return (
     <div className="space-y-5">
       <DrillHeader marker={marker} markers={markers} onSelect={onSelect} onClear={onClear} />
-      <button
-        type="button"
-        onClick={() => onGoToComparisons(marker.name)}
-        className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-pill text-[12px] font-medium text-sage-deep tile tile-hover"
-      >
-        View comparisons for {marker.name}
-        <ArrowRight className="w-3.5 h-3.5" strokeWidth={2.25} />
-      </button>
+      {marker.value != null && (
+        <button
+          type="button"
+          onClick={() => onGoToComparisons(marker.name)}
+          className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-pill text-[12px] font-medium text-sage-deep tile tile-hover"
+        >
+          View comparisons for {marker.name}
+          <ArrowRight className="w-3.5 h-3.5" strokeWidth={2.25} />
+        </button>
+      )}
 
       <Card variant="premium" padding="lg" className="relative overflow-hidden">
         <div className="flex items-start gap-4">
@@ -1082,7 +1076,7 @@ function RecommendationsTab({
   onClear,
 }: {
   markers: VMarker[]
-  selected: VMarker | null
+  selected: DrillMarker | null
   onSelect: (name: string) => void
   onClear: () => void
 }) {
@@ -1093,6 +1087,18 @@ function RecommendationsTab({
         markers={markers}
         onSelect={onSelect}
         onClear={onClear}
+      />
+    )
+  }
+  if (markers.length === 0) {
+    return (
+      <HeroIntroCard
+        eyebrow="Personalised recommendations"
+        lead="Actionable steps to improve"
+        accent="your biomarker health."
+        body="Upload a blood test and you'll get specific, value-aware recommendations for every marker that needs attention."
+        decoration="leaves"
+        cta={{ label: 'Upload first lab', href: '/blood/upload', icon: Upload }}
       />
     )
   }
@@ -1107,21 +1113,13 @@ function RecommendationsOverview({
   onSelect: (name: string) => void
 }) {
   const needsAttention = markers.filter((m) => m.tier === 'T2' || m.tier === 'T3')
-  const focusAreas = needsAttention.length > 0
-    ? needsAttention.slice(0, 5).map((m) => ({
-        key: m.name,
-        icon: m.icon,
-        title: m.name,
-        detail: personalisedRec(m.name, m.value, m.unit ?? '', m.tier),
-        marker: m,
-      }))
-    : markers.slice(0, 3).map((m) => ({
-        key: m.name,
-        icon: m.icon,
-        title: m.name,
-        detail: personalisedRec(m.name, m.value, m.unit ?? '', m.tier),
-        marker: m,
-      }))
+  const focusAreas = (needsAttention.length > 0 ? needsAttention.slice(0, 5) : markers.slice(0, 3)).map((m) => ({
+    key: m.name,
+    icon: m.icon,
+    title: m.name,
+    detail: personalisedRec(m.name, m.value, m.unit ?? '', m.tier, m.refMin, m.refMax),
+    marker: m,
+  }))
 
   const foundations: { key: string; icon: LucideIcon; label: string; detail: string }[] = [
     { key: 'nutrition', icon: UtensilsCrossed, label: 'Nutrition', detail: 'Balanced eating patterns' },
@@ -1215,12 +1213,15 @@ function RecommendationsDrill({
   onSelect,
   onClear,
 }: {
-  marker: VMarker
+  marker: DrillMarker
   markers: VMarker[]
   onSelect: (name: string) => void
   onClear: () => void
 }) {
-  const c = getContent(marker.name, marker.sub)
+  const c = getContent(marker.name)
+  const recText = marker.value != null && marker.tier
+    ? personalisedRec(marker.name, marker.value, marker.unit ?? '', marker.tier, marker.refMin, marker.refMax)
+    : `Upload a blood test that includes ${marker.name} and your recommendations here will be tailored to your exact level.`
 
   return (
     <div className="space-y-5">
@@ -1238,7 +1239,7 @@ function RecommendationsDrill({
               <span className="italic-accent text-[1em] text-sage-deep">your {marker.name.toLowerCase()}.</span>
             </div>
             <p className="text-caption text-ink-2 mt-2 leading-snug max-w-[44ch]">
-              {personalisedRec(marker.name, marker.value, marker.unit ?? '', marker.tier)}
+              {recText}
             </p>
           </div>
           <div className="relative w-[88px] h-[88px] shrink-0">
@@ -1405,7 +1406,7 @@ function DrillHeader({
   onSelect,
   onClear,
 }: {
-  marker: VMarker
+  marker: DrillMarker
   markers: VMarker[]
   onSelect: (name: string) => void
   onClear: () => void
@@ -1431,7 +1432,7 @@ function BiomarkerSelect({
   markers,
   onSelect,
 }: {
-  marker: VMarker
+  marker: DrillMarker
   markers: VMarker[]
   onSelect: (name: string) => void
 }) {
@@ -1453,7 +1454,7 @@ function BiomarkerSelect({
         />
       </button>
 
-      {open && (
+      {open && markers.length > 0 && (
         <>
           {/* Click-away backdrop */}
           <button
@@ -1615,30 +1616,4 @@ function AccordionItem({
       )}
     </div>
   )
-}
-
-// ── Helpers ──────────────────────────────────────────────────────────────
-function iconForMarker(name: string): LucideIcon {
-  const k = name.toLowerCase()
-  if (k.includes('ferritin') || k.includes('iron'))              return Beaker
-  if (k.includes('vitamin d'))                                    return Sun
-  if (k.includes('vitamin b') || k.includes('b12'))              return Beaker
-  if (k.includes('omega'))                                       return Heart
-  if (k.includes('crp') || k.includes('c-reactive'))             return Flame
-  if (k.includes('hba1c') || k.includes('glucose'))              return Droplet
-  if (k.includes('testosterone') || k.includes('hormone'))       return Activity
-  if (k.includes('cholesterol') || k.includes('hdl') || k.includes('ldl')) return Heart
-  return Beaker
-}
-
-function subForMarker(name: string): string {
-  const k = name.toLowerCase()
-  if (k.includes('ferritin'))    return 'Iron stores'
-  if (k.includes('vitamin d'))   return 'Bone & immune health'
-  if (k.includes('vitamin b'))   return 'Energy & cognitive'
-  if (k.includes('omega'))       return 'Heart & brain health'
-  if (k.includes('crp'))         return 'Inflammation'
-  if (k.includes('hba1c'))       return 'Blood sugar control'
-  if (k.includes('testosterone'))return 'Hormonal health'
-  return ''
 }
