@@ -1,0 +1,32 @@
+[
+  {
+    "__EXAMPLE__": "ILLUSTRATIVE ONLY — NOT CLINICALLY REVIEWED. Shows the shape of an anchored file. Do NOT copy these numbers into apob.json. They exist to demonstrate the format for the founder/clinical owner.",
+    "claim_id": "BIOSENSE_APOB_THRESHOLD_SET",
+    "assertion": "Stratum-keyed ApoB target thresholds (mg/dL) for banding, gap-to-target, score and discordance.",
+    "value": {
+      "PRIMARY_PREVENTION_UNSELECTED": { "optimal_max": 80, "above_target_min": 100 },
+      "PRIMARY_PREVENTION_HIGHER_RISK": { "optimal_max": 65, "above_target_min": 80 },
+      "SECONDARY_PREVENTION": { "optimal_max": 55, "above_target_min": 65 }
+    },
+    "unit": "mg/dL",
+    "version": "1.0.0",
+    "effective_date": "2026-08-01",
+    "author": "EXAMPLE — clinical lead name here",
+    "provenance": "EXAMPLE — cite the guideline/paper/consensus this comes from",
+    "evidence_grade": "A",
+    "review_status": "ANCHORED"
+  },
+  {
+    "__EXAMPLE__": "ILLUSTRATIVE ONLY — NOT CLINICALLY REVIEWED.",
+    "claim_id": "APOB_SIGNIFICANT_CHANGE_THRESHOLD",
+    "assertion": "Combined biological + analytical variation below which an ApoB delta is not significant.",
+    "value": 10,
+    "unit": "mg/dL",
+    "version": "1.0.0",
+    "effective_date": "2026-08-01",
+    "author": "EXAMPLE",
+    "provenance": "EXAMPLE",
+    "evidence_grade": "B",
+    "review_status": "ANCHORED"
+  }
+]

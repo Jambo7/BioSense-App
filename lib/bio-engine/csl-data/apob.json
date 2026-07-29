@@ -1,0 +1,122 @@
+[
+  {
+    "claim_id": "BIOSENSE_APOB_THRESHOLD_SET",
+    "assertion": "Stratum-keyed, evidence-anchored ApoB target/band thresholds (mg/dL) used for banding, gap-to-target, score contribution and all Ch.4 discordance.",
+    "value": null,
+    "unit": "mg/dL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "APOB_SIGNIFICANT_CHANGE_THRESHOLD",
+    "assertion": "Combined biological + analytical variation below which an ApoB delta is not a significant trend change.",
+    "value": null,
+    "unit": "mg/dL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "APOB_ACUTE_RECOVERY_WINDOW",
+    "assertion": "Time window after an acute event during which an ApoB value is tagged acute_context (reduced confidence, trend-excluded).",
+    "value": null,
+    "unit": "days",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "APOB_SCORE_GAP_SCALE",
+    "assertion": "Gap-to-target (mg/dL) at which the ApoB score contribution reaches zero. Defines the slope of the continuous monotonic score introduced by amendment A-001. Required because A-001 replaced the band-keyed score with a continuous function of gap-to-target, which needs a scale.",
+    "value": null,
+    "unit": "mg/dL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "APOB_LIFESTYLE_ADDRESSABLE_GAP_CEILING",
+    "assertion": "Gap-to-target ceiling above which a lifestyle recommendation must escalate to clinician discussion.",
+    "value": null,
+    "unit": "mg/dL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "APOB_LOW_INVESTIGATION_THRESHOLD",
+    "assertion": "ApoB value below which the low-ApoB investigation routing pathway activates (never a lipid warning, never a score penalty).",
+    "value": null,
+    "unit": "mg/dL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "APOB_FH_PATTERN_THRESHOLD",
+    "assertion": "Age-stratified ApoB threshold(s) defining the familial-hypercholesterolaemia pattern. FOUNDER DECISION: sensitivity/specificity trade-off (BLOCKER-009 / DL-6.1).",
+    "value": null,
+    "unit": "mg/dL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "BIOSENSE_LDLC_THRESHOLD_SET",
+    "assertion": "LDL-C band thresholds (belongs to the LDL-C biomarker document). Required for ApoB/LDL-C discordance detection.",
+    "value": null,
+    "unit": "mg/dL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "BIOSENSE_LIPID_DRUG_LEXICON",
+    "assertion": "Versioned, maintained list of lipid drug names the narrative validator must never emit (enforces the no-drug-names prohibition).",
+    "value": null,
+    "unit": null,
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "BIOSENSE_PROHIBITED_CONDITION_LEXICON",
+    "assertion": "Versioned, maintained list of condition/gene/instrument names the narrative validator must never emit (enforces FH naming-prohibition, DR-6.2-B).",
+    "value": null,
+    "unit": null,
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  }
+]
