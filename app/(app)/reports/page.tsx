@@ -2,6 +2,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { computeStats, METRICS, type MetricSlug, type SeriesPoint } from '@/lib/trends'
+import { getSavedInsights } from '@/lib/intelligence'
 import { TrendsClient } from './trends-client'
 
 const WINDOW_DAYS = 30
@@ -13,7 +14,7 @@ export default async function TrendsPage() {
   const since = new Date()
   since.setDate(since.getDate() - WINDOW_DAYS)
 
-  const [checkins, scores, weeklyCount, monthlyCount] = await Promise.all([
+  const [checkins, scores, weeklyCount, monthlyCount, savedInsights] = await Promise.all([
     prisma.dailyCheckin.findMany({
       where: { userId: session.user.id, date: { gte: since } },
       orderBy: { date: 'asc' },
@@ -24,6 +25,7 @@ export default async function TrendsPage() {
     }),
     prisma.weeklyReport.count({ where: { userId: session.user.id } }),
     prisma.monthlyReport.count({ where: { userId: session.user.id } }),
+    getSavedInsights(session.user.id),
   ])
 
   // Build a series for each metric.
@@ -58,6 +60,7 @@ export default async function TrendsPage() {
       summaries={summaries}
       windowDays={WINDOW_DAYS}
       reportsCount={weeklyCount + monthlyCount}
+      savedInsights={savedInsights}
     />
   )
 }

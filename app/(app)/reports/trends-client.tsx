@@ -19,8 +19,10 @@ import {
   CalendarRange,
   CalendarClock,
   FileEdit,
+  Bookmark,
   type LucideIcon,
 } from 'lucide-react'
+import type { InsightCard } from '@/lib/intelligence'
 import { cn } from '@/lib/utils'
 import { Card } from '@/components/ui/card'
 import { ScoreRing } from '@/components/ui/score-ring'
@@ -47,6 +49,7 @@ interface TrendsClientProps {
   summaries: MetricSummary[]
   windowDays: number
   reportsCount: number
+  savedInsights: InsightCard[]
 }
 
 // ── Tab definitions per v7 spec ───────────────────────────────────────────
@@ -58,7 +61,7 @@ const TABS: { id: Tab; label: string }[] = [
   { id: 'reports',    label: 'Reports'           },
 ]
 
-export function TrendsClient({ summaries, reportsCount }: TrendsClientProps) {
+export function TrendsClient({ summaries, reportsCount, savedInsights }: TrendsClientProps) {
   const [tab, setTab] = useState<Tab>('goals')
   const [showDiscovery, setShowDiscovery] = useState(false)
 
@@ -135,7 +138,7 @@ export function TrendsClient({ summaries, reportsCount }: TrendsClientProps) {
       {tab === 'goals'      && <GoalsTab />}
       {tab === 'trajectory' && <TrajectoryTab summaries={summaries} />}
       {tab === 'lifestyle'  && <LifestyleTab summaries={summaries} />}
-      {tab === 'reports'    && <ReportsTab reportsCount={reportsCount} />}
+      {tab === 'reports'    && <ReportsTab reportsCount={reportsCount} savedInsights={savedInsights} />}
     </div>
   )
 }
@@ -496,8 +499,75 @@ function LifestyleTab({ summaries }: { summaries: MetricSummary[] }) {
   )
 }
 
+// ── Saved insights (bookmarked from the homepage feed) ───────────────────
+function SavedInsights({ insights }: { insights: InsightCard[] }) {
+  const [items, setItems] = useState(insights)
+
+  const remove = (id: string) => {
+    setItems((prev) => prev.filter((i) => i.id !== id))
+    fetch('/api/intelligence', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'unsave', id }),
+    }).catch(() => {})
+  }
+
+  if (items.length === 0) return null
+
+  return (
+    <Card variant="glass" padding="lg">
+      <div className="flex items-center gap-2 mb-3">
+        <Bookmark className="w-3.5 h-3.5 text-sage-deep" strokeWidth={2.25} />
+        <div className="text-eyebrow uppercase text-ink-3 leading-none">
+          Saved insights
+        </div>
+      </div>
+      <p className="text-caption text-ink-2 leading-snug mb-4">
+        The findings you bookmarked from your intelligence feed.
+      </p>
+      <div className="space-y-2.5">
+        {items.map((i) => (
+          <div key={i.id} className="flex items-start gap-3 p-3 sm:p-3.5 rounded-card tile">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-ink-3">
+                  {i.label}
+                </span>
+                <span className="text-[10.5px] text-ink-3 shrink-0">
+                  {new Date(i.createdAt).toLocaleDateString('en-GB', {
+                    day: 'numeric',
+                    month: 'short',
+                  })}
+                </span>
+              </div>
+              <div className="text-[13px] font-semibold text-ink leading-tight mt-1">
+                {i.title}
+              </div>
+              <p className="text-[12px] text-ink-2 leading-snug mt-1">{i.body}</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => remove(i.id)}
+              aria-label="Remove from saved insights"
+              className="shrink-0 flex items-center justify-center w-8 h-8 rounded-full text-sage-deep bg-[rgba(168,191,163,0.24)] hover:bg-[rgba(168,191,163,0.36)] transition-colors"
+            >
+              <Bookmark className="w-4 h-4" strokeWidth={2.25} fill="currentColor" />
+            </button>
+          </div>
+        ))}
+      </div>
+    </Card>
+  )
+}
+
 // ── Tab 4: REPORTS ───────────────────────────────────────────────────────
-function ReportsTab({ reportsCount }: { reportsCount: number }) {
+function ReportsTab({
+  reportsCount,
+  savedInsights,
+}: {
+  reportsCount: number
+  savedInsights: InsightCard[]
+}) {
   const reports = [
     {
       key: 'weekly',
@@ -538,6 +608,8 @@ function ReportsTab({ reportsCount }: { reportsCount: number }) {
         }
         decoration="leaves"
       />
+
+      <SavedInsights insights={savedInsights} />
 
       <Card variant="glass" padding="lg">
         <div className="space-y-3">

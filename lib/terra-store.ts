@@ -13,6 +13,8 @@
 import type { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import { recalculateHealthScore } from '@/lib/health-score'
+import { dailyBreakdownFromSyncData } from '@/lib/wearable-metrics'
+import { upsertWearableDays } from '@/lib/wearable-days'
 
 export interface TerraTypedPayload {
   type: string
@@ -66,6 +68,16 @@ export async function storeTerraDataPayloads(params: {
       data: nextData as Prisma.InputJsonValue,
     },
   })
+
+  // Persist per-day history before the next payload overwrites this snapshot.
+  try {
+    await upsertWearableDays(
+      referenceId,
+      dailyBreakdownFromSyncData(nextData),
+    )
+  } catch (dayErr) {
+    console.error('[terra] wearable-day persist failed:', dayErr)
+  }
 
   try {
     await recalculateHealthScore(referenceId)

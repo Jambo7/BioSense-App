@@ -207,6 +207,126 @@ export function aggregateWearableMetrics(
   return merged
 }
 
+// ── Per-day breakdown ────────────────────────────────────────────────────────
+// Terra payloads overwrite each other per event type, so the only history we
+// can mine is whatever date range the *current* payload arrays cover (webhook
+// backfills often span 7-28 days). This walks every record, buckets metrics by
+// calendar date, and lets callers persist them into WearableDay rows.
+
+function recordDate(rec: unknown, preferEnd = false): string | null {
+  const start = getPath(rec, 'metadata.start_time')
+  const end = getPath(rec, 'metadata.end_time')
+  const raw = preferEnd ? (end ?? start) : (start ?? end)
+  if (typeof raw !== 'string' || raw.length < 10) return null
+  const d = raw.slice(0, 10)
+  return /^\d{4}-\d{2}-\d{2}$/.test(d) ? d : null
+}
+
+function mergeDay(
+  map: Map<string, WearableMetrics>,
+  date: string,
+  patch: WearableMetrics,
+): void {
+  const prev = map.get(date) ?? {}
+  const next = { ...prev }
+  for (const [k, v] of Object.entries(patch)) {
+    if (v != null) (next as Record<string, number>)[k] = v
+  }
+  map.set(date, next)
+}
+
+/** Extract per-calendar-day metrics from one WearableSync.data JSON blob. */
+export function dailyBreakdownFromSyncData(
+  data: unknown,
+): Map<string, WearableMetrics> {
+  const days = new Map<string, WearableMetrics>()
+  if (!data || typeof data !== 'object') return days
+
+  const dailyArr = getPath(data, 'payloads.daily.data')
+  if (Array.isArray(dailyArr)) {
+    for (const rec of dailyArr) {
+      const date = recordDate(rec)
+      if (!date) continue
+      const m: WearableMetrics = {}
+      m.rhr = num(getPath(rec, 'heart_rate_data.summary.resting_hr_bpm'))
+      m.hrv =
+        num(getPath(rec, 'heart_rate_data.summary.avg_hrv_rmssd')) ??
+        num(getPath(rec, 'heart_rate_data.summary.avg_hrv_sdnn'))
+      const steps =
+        num(getPath(rec, 'distance_data.steps')) ??
+        num(getPath(rec, 'distance_data.summary.steps'))
+      if (steps != null && steps > 0) m.steps = Math.round(steps)
+      const activitySec =
+        num(getPath(rec, 'active_durations_data.activity_seconds')) ??
+        num(getPath(rec, 'active_durations_data.moderate_intensity_seconds')) ??
+        num(getPath(rec, 'active_durations_data.vigorous_intensity_seconds'))
+      if (activitySec != null && activitySec > 0) {
+        m.activeMinutes = Math.round(activitySec / 60)
+      }
+      m.recovery =
+        num(getPath(rec, 'scores.recovery')) ?? num(getPath(rec, 'scores.readiness'))
+      const avgStress =
+        num(getPath(rec, 'stress_data.avg_stress_level'))
+      if (avgStress != null && avgStress <= 100) m.stress = avgStress
+      mergeDay(days, date, m)
+    }
+  }
+
+  // Sleep is attributed to the wake date (end_time) so "last night" lands on today.
+  const sleepArr = getPath(data, 'payloads.sleep.data')
+  if (Array.isArray(sleepArr)) {
+    for (const rec of sleepArr) {
+      const date = recordDate(rec, true)
+      if (!date) continue
+      const m: WearableMetrics = {}
+      const eff = num(getPath(rec, 'sleep_durations_data.sleep_efficiency'))
+      m.sleepScore =
+        num(getPath(rec, 'scores.sleep')) ??
+        (eff != null ? (eff <= 1 ? Math.round(eff * 100) : Math.round(eff)) : undefined)
+      const asleepSec =
+        num(getPath(rec, 'sleep_durations_data.asleep.duration_asleep_state_seconds')) ??
+        num(getPath(rec, 'sleep_durations_data.asleep_duration_seconds'))
+      if (asleepSec != null && asleepSec > 0) {
+        m.sleepHours = Math.round((asleepSec / 3600) * 10) / 10
+      }
+      m.hrv =
+        num(getPath(rec, 'heart_rate_data.summary.avg_hrv_rmssd')) ??
+        num(getPath(rec, 'heart_rate_data.summary.avg_hrv_sdnn'))
+      m.rhr = num(getPath(rec, 'heart_rate_data.summary.resting_hr_bpm'))
+      m.recovery =
+        num(getPath(rec, 'scores.recovery')) ?? num(getPath(rec, 'scores.readiness'))
+      mergeDay(days, date, m)
+    }
+  }
+
+  const activityArr = getPath(data, 'payloads.activity.data')
+  if (Array.isArray(activityArr)) {
+    for (const rec of activityArr) {
+      const date = recordDate(rec)
+      if (!date) continue
+      const existing = days.get(date)
+      const m: WearableMetrics = {}
+      const steps =
+        num(getPath(rec, 'distance_data.summary.steps')) ??
+        num(getPath(rec, 'distance_data.steps'))
+      if ((existing?.steps == null || existing.steps === 0) && steps != null && steps > 0) {
+        m.steps = Math.round(steps)
+      }
+      const aSec = num(getPath(rec, 'active_durations_data.activity_seconds'))
+      if (existing?.activeMinutes == null && aSec != null && aSec > 0) {
+        m.activeMinutes = Math.round(aSec / 60)
+      }
+      mergeDay(days, date, m)
+    }
+  }
+
+  // Drop days that carry nothing.
+  for (const [date, m] of days) {
+    if (Object.values(m).every((v) => v == null)) days.delete(date)
+  }
+  return days
+}
+
 /** Compact one-line summary for reports / chat. */
 export function formatWearableMetricsSummary(m: WearableMetrics): string {
   const parts: string[] = []

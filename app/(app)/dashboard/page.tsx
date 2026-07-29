@@ -6,7 +6,12 @@ import {
   getBioAgeUnlockStatus,
   getLatestBiologicalAge,
 } from '@/lib/maturity'
+import { getIntelligenceFeed } from '@/lib/intelligence'
 import { DashboardClient } from './dashboard-client'
+
+function daysAgo(days: number): Date {
+  return new Date(Date.now() - days * 86400000)
+}
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions)
@@ -24,6 +29,8 @@ export default async function DashboardPage() {
     wearables,
     bioUnlock,
     latestBioAge,
+    scoreHistory,
+    intelligence,
   ] = await Promise.all([
     prisma.user.findUnique({ where: { id: userId } }),
     prisma.dailyCheckin.findFirst({
@@ -51,12 +58,35 @@ export default async function DashboardPage() {
     }),
     getBioAgeUnlockStatus(userId),
     getLatestBiologicalAge(userId),
+    prisma.healthScore.findMany({
+      where: {
+        userId,
+        date: { gte: daysAgo(90) },
+      },
+      orderBy: { date: 'asc' },
+      select: { date: true, score: true },
+    }),
+    getIntelligenceFeed(userId),
   ])
 
   const today = new Date().toISOString().split('T')[0]
   const hasCheckinToday = latestCheckin
     ? new Date(latestCheckin.date).toISOString().split('T')[0] === today
     : false
+
+  // Real trajectory: downsample score history to ≤24 points for the chart.
+  const step = Math.max(1, Math.ceil(scoreHistory.length / 24))
+  const scoreSeries = scoreHistory
+    .filter((_, i) => i % step === 0 || i === scoreHistory.length - 1)
+    .map((s) => Math.round(s.score))
+  const scoreSeriesDays =
+    scoreHistory.length >= 2
+      ? Math.round(
+          (scoreHistory[scoreHistory.length - 1].date.getTime() -
+            scoreHistory[0].date.getTime()) /
+            86400000,
+        )
+      : 0
 
   return (
     <DashboardClient
@@ -90,6 +120,9 @@ export default async function DashboardPage() {
         deltaYears: latestBioAge?.delta ?? null,
         calendarAge: latestBioAge?.calendarAge ?? user?.age ?? null,
       }}
+      scoreSeries={scoreSeries}
+      scoreSeriesDays={scoreSeriesDays}
+      intelligence={intelligence}
     />
   )
 }

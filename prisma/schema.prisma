@@ -111,6 +111,8 @@ model User {
   learnedFacts     LearnedFact[]
   learningProgress LearningProgress[]
   userGoals        UserGoal[]
+  insights         Insight[]
+  wearableDays     WearableDay[]
 }
 
 // NextAuth required models
@@ -302,6 +304,51 @@ model UserGoal {
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+}
+
+// ── Latest Intelligence ────────────────────────────────────────────────────
+// One row per generated insight. Insights are persistent objects so the
+// homepage feed can show NEW badges (seenAt null) and users can save the ones
+// they want to keep (savedAt). dedupeKey stops the same finding being
+// re-created; if nothing new is found, the previous insight simply stays.
+model Insight {
+  id        String    @id @default(cuid())
+  userId    String
+  type      String // NEW_DISCOVERY | WHATS_CHANGED | OPPORTUNITY | PROJECTION | WATCH_LIST | LONG_TERM_TREND | LEARNED
+  title     String
+  body      String
+  data      Json? // optional chart series / metric deltas for rendering
+  dedupeKey String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  seenAt    DateTime?
+  savedAt   DateTime?
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, dedupeKey])
+  @@index([userId, type, createdAt])
+}
+
+// Daily wearable metric history. Terra payloads previously overwrote each
+// other on WearableSync.data, so no per-day history survived; this table keeps
+// one row per user per day so week-over-week and trend insights are possible.
+model WearableDay {
+  id            String   @id @default(cuid())
+  userId        String
+  date          DateTime @db.Date
+  hrv           Float?
+  rhr           Float?
+  steps         Int?
+  activeMinutes Int?
+  sleepHours    Float?
+  sleepScore    Float?
+  recovery      Float?
+  stress        Float?
+  updatedAt     DateTime @updatedAt
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@index([userId, date])
 }
 
 // ── Learning Mode ──────────────────────────────────────────────────────────

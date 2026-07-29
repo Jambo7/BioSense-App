@@ -1,12 +1,11 @@
 'use client'
 
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 import {
   ArrowRight,
   ChevronRight,
-  CheckCircle2,
   Moon,
-  Activity,
   Sun,
   Sunrise,
   Sunset,
@@ -16,16 +15,23 @@ import {
   TrendingDown,
   Heart,
   BatteryCharging,
-  Droplet,
   Lock,
+  Lightbulb,
+  Target,
+  Sparkles,
+  Eye,
+  Brain,
+  Bookmark,
+  CheckCircle2,
   type LucideIcon,
 } from 'lucide-react'
 import { scoreLabel } from '@/lib/score'
 import type { WearableMetrics } from '@/lib/wearable-metrics'
+import type { InsightCard, InsightType } from '@/lib/intelligence'
 import { Card } from '@/components/ui/card'
 import { ScoreRing } from '@/components/ui/score-ring'
 import { IconBadge } from '@/components/ui/icon-badge'
-import { SparkLine, BarStrip } from '@/components/ui/spark-line'
+import { SparkLine } from '@/components/ui/spark-line'
 import { cn } from '@/lib/utils'
 
 // ── Time-of-day greeting context ──────────────────────────────────────────
@@ -39,9 +45,6 @@ function timeContext() {
 }
 
 // ── Greeting hero headline ────────────────────────────────────────────────
-// A short, evocative serif line for the top-of-page welcome (matches the
-// brief, e.g. "You're holding steady ground."). State-aware on the
-// long-term trajectory so it always feels personal.
 function greetingHeadline(delta: number, hasData: boolean): { lead: string; accent: string } {
   if (!hasData)    return { lead: "Let's begin",     accent: 'your health story.' }
   if (delta >= 4)  return { lead: "You're trending", accent: 'in the right direction.' }
@@ -50,9 +53,6 @@ function greetingHeadline(delta: number, hasData: boolean): { lead: string; acce
 }
 
 // ── Long-term trajectory copy ─────────────────────────────────────────────
-// Picks a state-aware headline for the long-term Health Score card —
-// "improving / holding steady / declining" with a serif accent on the
-// verb so it carries the visual rhythm of the hero block.
 function trajectoryCopy(
   score: number | null,
   trajectoryDelta: number,
@@ -139,6 +139,12 @@ interface DashboardClientProps {
   connectedWearables: string[]
   wearableMetrics: WearableMetrics
   bioAge: BioAgeProps
+  /** Real Health Score history (oldest → newest), for the trajectory chart. */
+  scoreSeries: number[]
+  /** Days between the first and last point of scoreSeries. */
+  scoreSeriesDays: number
+  /** Latest Intelligence feed — persisted, deduped insights from real data. */
+  intelligence: InsightCard[]
 }
 
 // Maps a 0-100 daily stress level (Garmin/Samsung scale) to a display band.
@@ -148,143 +154,18 @@ function stressBandFromLevel(level: number): string {
   return 'High'
 }
 
-// ── Driver impact tagging ────────────────────────────────────────────────
-type Impact = 'high' | 'medium' | 'low'
-type Driver = {
-  key: string
-  label: string
-  reason: string
-  impact: Impact
-  delta: number
-  icon: LucideIcon
-  tone: Tone
-  /** 7-day pattern shown as a tiny bar strip at the bottom of each
-   *  driver card. Values are abstract (0..1) — the BarStrip normalises. */
-  pattern: number[]
-}
-
-function topDrivers(checkins: Checkin[]): Driver[] {
-  if (checkins.length < 2) {
-    // Friendly defaults match v7 image 2: four drivers, three tones, plus a
-    // 7-day mock pattern at the bottom of each card.
-    return [
-      { key: 'sleep_timing',     label: 'Sleep timing',     reason: 'Inconsistent bedtime is reducing recovery and increasing stress.', impact: 'high',   delta:  10, icon: Moon,     tone: 'violet', pattern: [0.4, 0.6, 0.3, 0.5, 0.7, 0.4, 0.3] },
-      { key: 'stress',           label: 'Stress load',      reason: 'Elevated stress over the past 3 days is impacting HRV.',           impact: 'high',   delta:  9,  icon: Wind,     tone: 'teal',   pattern: [0.5, 0.4, 0.6, 0.5, 0.8, 0.9, 0.85] },
-      { key: 'activity_balance', label: 'Activity balance', reason: 'Great training consistency, but recovery days low.',                impact: 'medium', delta: -6,  icon: Activity, tone: 'sky',    pattern: [0.6, 0.7, 0.65, 0.5, 0.7, 0.8, 0.75] },
-      { key: 'nutrition',        label: 'Nutrition',        reason: 'Protein intake is good. Hydration could be better.',                impact: 'low',    delta:  2,  icon: Droplet,  tone: 'amber',  pattern: [0.6, 0.65, 0.7, 0.6, 0.65, 0.7, 0.75] },
-    ]
-  }
-  const recent = checkins.slice(0, 3)
-  const older  = checkins.slice(3, 7)
-  const avg = (arr: Checkin[], k: keyof Checkin) =>
-    arr.length ? arr.reduce((s, c) => s + (c[k] as number), 0) / arr.length : 0
-  const dSleep  = avg(recent, 'sleep')  - avg(older, 'sleep')
-  const dStress = avg(recent, 'stress') - avg(older, 'stress')
-  const dEnergy = avg(recent, 'energy') - avg(older, 'energy')
-  const dMood   = avg(recent, 'mood')   - avg(older, 'mood')
-
-  // Tiny deterministic helper — turns a driver delta into a 7-bar pattern
-  // that visually echoes the driver's trajectory.
-  const patternFromDelta = (d: number): number[] => {
-    const base = 0.5 + Math.tanh(d / 8) * 0.25
-    return Array.from({ length: 7 }, (_, i) => {
-      const t = i / 6
-      const trend = base + (t - 0.5) * Math.sign(d) * 0.25
-      const jitter = (Math.sin((d + i) * 1.7) + 1) * 0.06
-      return Math.max(0.15, Math.min(0.95, trend + jitter))
-    })
-  }
-
-  const raw: Driver[] = [
-    {
-      key: 'sleep_timing',
-      label: 'Sleep timing',
-      reason: dSleep < 0 ? 'Inconsistent bedtime is reducing recovery.' : 'Consistent bedtime supports recovery.',
-      impact: 'low',
-      delta: Math.round(dSleep * 6),
-      icon: Moon,
-      tone: 'violet',
-      pattern: patternFromDelta(dSleep * 6),
-    },
-    {
-      key: 'stress',
-      label: 'Stress load',
-      reason: dStress > 0 ? 'Elevated stress is impacting HRV.' : 'Calm levels support better resilience.',
-      impact: 'low',
-      delta: Math.round(-dStress * 5),
-      icon: Wind,
-      tone: 'teal',
-      pattern: patternFromDelta(-dStress * 5),
-    },
-    {
-      key: 'activity_balance',
-      label: 'Activity balance',
-      reason: dMood < 0 ? 'More intensity, less recovery.' : 'Balanced training and recovery.',
-      impact: 'low',
-      delta: Math.round(dMood * 4),
-      icon: Activity,
-      tone: 'sky',
-      pattern: patternFromDelta(dMood * 4),
-    },
-    {
-      key: 'nutrition',
-      label: 'Nutrition',
-      reason: dEnergy < 0 ? 'Energy dips may signal hydration or fuelling gaps.' : 'Steady energy points to good fuelling.',
-      impact: 'low',
-      delta: Math.round(dEnergy * 3),
-      icon: Droplet,
-      tone: 'amber',
-      pattern: patternFromDelta(dEnergy * 3),
-    },
-  ]
-
-  const ranked = raw.sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta)).slice(0, 4)
-  return ranked.map((d) => {
-    const mag = Math.abs(d.delta)
-    const impact: Impact = mag >= 8 ? 'high' : mag >= 4 ? 'medium' : 'low'
-    return { ...d, impact }
-  })
-}
-
-// Impact pill mapping — soft tonal fills, no ring, generous padding.
-// Per v7-polish: pills are sentence-case status tags ("Needs attention" /
-// "Watch" / "In range") rather than UPPERCASE "MEDIUM IMPACT" labels —
-// matches the brief's smoother, less-shouty pill treatment.
-const IMPACT_STYLE: Record<Impact, string> = {
-  high:   'bg-[rgba(217,160,91,0.18)] text-[#A77530]',
-  medium: 'bg-[rgba(237,198,138,0.32)] text-[#A77530]',
-  low:    'bg-[rgba(168,191,163,0.28)] text-sage-deep',
-}
-const IMPACT_LABEL: Record<Impact, string> = {
-  high:   'Needs attention',
-  medium: 'Watch',
-  low:    'In range',
-}
-
-// ── Long-term trajectory mock series ──────────────────────────────────────
-// 12-point smooth trend representing ~90 days of weekly Health Score
-// snapshots. End value = current score. Real version reads from a
-// `healthScoreSnapshot` table; this fallback keeps the chart populated
-// until that table exists.
-function trajectorySeries(currentScore: number, seed: string): number[] {
-  let h = 0
-  for (let i = 0; i < seed.length; i++) h = ((h << 5) - h + seed.charCodeAt(i)) | 0
-  const rand = () => { h = (h * 9301 + 49297) % 233280; return Math.abs(h) / 233280 }
-  // Start ~10 pts below current, walk upward with small jitter.
-  const series: number[] = []
-  let v = Math.max(15, currentScore - 12 - rand() * 6)
-  for (let i = 0; i < 11; i++) {
-    const drift = (currentScore - v) * 0.12 + (rand() - 0.45) * 4
-    v = Math.max(15, Math.min(100, v + drift))
-    series.push(Math.round(v))
-  }
-  series.push(currentScore)
-  return series
+// ── Latest Intelligence card styling ──────────────────────────────────────
+const INSIGHT_ICONS: Record<InsightType, { icon: LucideIcon; tone: Tone }> = {
+  NEW_DISCOVERY:   { icon: Lightbulb, tone: 'violet' },
+  WHATS_CHANGED:   { icon: TrendingUp, tone: 'sky' },
+  OPPORTUNITY:     { icon: Target, tone: 'sage' },
+  PROJECTION:      { icon: Sparkles, tone: 'teal' },
+  WATCH_LIST:      { icon: Eye, tone: 'amber' },
+  LONG_TERM_TREND: { icon: Leaf, tone: 'sage' },
+  LEARNED:         { icon: Brain, tone: 'ink' },
 }
 
 // ── Locked-preview sample data ────────────────────────────────────────────
-// Seeds the dashboard with attractive-but-fake metrics for brand-new accounts
-// so the locked preview reads like a real, thriving dashboard behind the blur.
 const DEMO_CHECKINS: Checkin[] = [
   { date: '', energy: 8, sleep: 8, mood: 8, stress: 3 },
   { date: '', energy: 7, sleep: 8, mood: 7, stress: 3 },
@@ -293,31 +174,32 @@ const DEMO_CHECKINS: Checkin[] = [
   { date: '', energy: 6, sleep: 6, mood: 7, stress: 5 },
   { date: '', energy: 6, sleep: 7, mood: 6, stress: 5 },
 ]
+const DEMO_SERIES = [58, 60, 59, 62, 63, 65, 64, 67, 69, 70, 72, 74]
 
 // ── Component ─────────────────────────────────────────────────────────────
 export function DashboardClient({
   user,
   healthScore,
-  scoreBreakdown,
+  hasCheckinToday,
   checkinCount,
   recentCheckins,
   hasBlood,
   connectedWearables,
   wearableMetrics,
   bioAge: bioAgeProp,
+  scoreSeries,
+  scoreSeriesDays,
+  intelligence,
 }: DashboardClientProps) {
   // Fresh account: nothing connected, no check-ins, no blood, no score yet.
-  // Show a guided welcome instead of a dashboard full of placeholder numbers.
+  // Keep the full dashboard but render the hero cards as a locked, blurred
+  // preview seeded with sample data.
   const isNewUser =
     healthScore == null &&
     checkinCount === 0 &&
     connectedWearables.length === 0 &&
     !hasBlood
 
-  // Fresh account (nothing connected, no check-ins, blood or score): keep the
-  // full dashboard but render the hero cards as a locked, blurred preview
-  // seeded with sample data. A frosted padlock panel + CTA invites the user to
-  // connect a wearable — the preview doubles as a marketing teaser.
   const locked = isNewUser
   const displayScore = locked ? 74 : healthScore
   const displayCheckins = locked ? DEMO_CHECKINS : recentCheckins
@@ -325,12 +207,15 @@ export function DashboardClient({
   const ctx = timeContext()
   const sl = displayScore != null ? scoreLabel(displayScore) : null
   const hasData = displayScore != null
-  const drivers = topDrivers(displayCheckins)
 
-  // Trajectory: derives a delta over the long-window proxy. Real version
-  // subtracts a stored 90-day-old snapshot.
+  // Trajectory delta — from real score history when we have it, otherwise
+  // from the recent check-in composite.
   const longTermDelta = (() => {
-    if (displayCheckins.length < 4) return 6
+    if (locked) return 6
+    if (scoreSeries.length >= 3) {
+      return Math.round(scoreSeries[scoreSeries.length - 1] - scoreSeries[0])
+    }
+    if (displayCheckins.length < 4) return 0
     const recent = displayCheckins.slice(0, 3)
     const older  = displayCheckins.slice(3, 7)
     const avgRecent = recent.reduce((s, c) => s + (c.energy + c.sleep + c.mood + (10 - c.stress)) / 4, 0) / recent.length
@@ -339,7 +224,11 @@ export function DashboardClient({
   })()
   const trajectory = trajectoryCopy(displayScore, longTermDelta)
   const hero = greetingHeadline(longTermDelta, hasData)
-  const series = trajectorySeries(displayScore ?? 55, `traj-${user.name}`)
+
+  // Trajectory chart: real Health Score history. Demo walk only behind the
+  // locked blur; real accounts with <3 points get a "still building" note.
+  const series = locked ? DEMO_SERIES : scoreSeries
+  const showChart = series.length >= 3
 
   // Biological age: real stored value after unlock gate; otherwise progress.
   const bioUnlocked = !locked && bioAgeProp.unlocked && bioAgeProp.value != null
@@ -361,12 +250,11 @@ export function DashboardClient({
           : `Day ${Math.min(bioAgeProp.trackingDays, bioAgeProp.unlockDays)} of ${bioAgeProp.unlockDays}`,
       }
 
-  // Real wearable data (when a device is connected). On the locked new-user
-  // preview we intentionally ignore it (there is none).
+  // Real wearable data (when a device is connected).
   const wm = locked ? null : wearableMetrics
 
   // Daily readiness — a logged check-in takes priority; otherwise fall back to
-  // the wearable's own recovery/readiness score so the headline reflects real data.
+  // the wearable's own recovery/readiness score.
   const latest = displayCheckins[0]
   const readiness = latest
     ? Math.round(((latest.energy + latest.sleep + latest.mood + (10 - latest.stress)) / 40) * 100)
@@ -375,8 +263,6 @@ export function DashboardClient({
       : null
   const readinessText = readinessCopy(readiness)
 
-  // Today's sub-stats — prefer real wearable data, then check-in-derived
-  // estimates, then spec defaults.
   const sleepHours =
     wm?.sleepHours ??
     (latest ? Math.round((4 + (latest.sleep / 10) * 5) * 10) / 10 : 6.7)
@@ -400,12 +286,7 @@ export function DashboardClient({
 
   return (
     <div className="space-y-5 stagger">
-      {/* ── 1 / Greeting hero ─────────────────────────────────────────────
-          Per the brief: an uppercase time-of-day eyebrow, a large serif
-          headline that speaks to the user's trajectory, and a calm
-          descriptive subline. Generous vertical padding gives the welcome
-          room to breathe and lets the first card sit lower down the page,
-          over the open wall of the background photo. */}
+      {/* ── 1 / Greeting hero ───────────────────────────────────────────── */}
       <header className="pt-4 pb-5 sm:pt-5 sm:pb-6">
         <div className="flex items-center gap-1.5 text-eyebrow uppercase text-sage-deep">
           <ctx.Icon className="w-3.5 h-3.5" strokeWidth={2.25} />
@@ -419,21 +300,13 @@ export function DashboardClient({
           <span className="italic-accent text-sage-deep">{hero.accent}</span>
         </h1>
         <p className="mt-2.5 text-[14px] sm:text-[15px] text-ink-2 leading-snug max-w-[42ch]">
-          Here&apos;s your personalised health overview.
+          Here&apos;s your latest health intelligence.
         </p>
       </header>
 
-      {/* ── 2 / Long-term HEALTH SCORE ──────────────────────────────────
-          Per v7 doc, the Health Score must read as a LONG-TERM measure
-          (biological age + trajectory), distinct from today's readiness.
-          This card carries the biological-age stat + a 90-day trajectory
-          line + a key insight callout. */}
+      {/* ── 2 / Long-term HEALTH SCORE ──────────────────────────────────── */}
       <Card variant="premium" padding="lg" className="relative overflow-hidden">
         <div className={cn(locked && 'blur-[3px] pointer-events-none select-none')}>
-        {/* Header row: eyebrow + Long-term pill on the left; View-score
-            button on the right. `flex-wrap` lets the button drop below on
-            very narrow viewports rather than squashing the eyebrow into
-            two lines. */}
         <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 mb-3">
           <div className="flex items-center gap-2 min-w-0 shrink-0">
             <div className="flex items-center gap-1.5 text-eyebrow uppercase text-sage-deep whitespace-nowrap">
@@ -461,7 +334,7 @@ export function DashboardClient({
           {trajectory.body}
         </p>
 
-        {/* Stats row — two mini-stats side-by-side (matches brief image2). */}
+        {/* Stats row — two mini-stats side-by-side. */}
         <div className="mt-4 grid grid-cols-2 gap-2.5">
           <MiniStat
             eyebrow="Health score"
@@ -486,27 +359,41 @@ export function DashboardClient({
           />
         </div>
 
-        {/* Trajectory chart — full-width row below stats. Dots visible at
-            every data point + a highlighted dot at "today" (per brief
-            image2). X-axis time markers below. */}
-        <div className="mt-4">
-          <SparkLine
-            values={series}
-            width={320}
-            height={110}
-            tone="sage"
-            showFill
-            showDots
-            highlightLast
-            className="w-full h-auto"
-          />
-          <div className="flex items-center justify-between mt-1.5 text-[9.5px] uppercase tracking-[0.10em] text-ink-3">
-            <span>90d ago</span>
-            <span>60d</span>
-            <span>30d</span>
-            <span>Today</span>
+        {/* Trajectory chart — real Health Score history. */}
+        {showChart ? (
+          <div className="mt-4">
+            <SparkLine
+              values={series}
+              width={320}
+              height={110}
+              tone="sage"
+              showFill
+              showDots
+              highlightLast
+              className="w-full h-auto"
+            />
+            <div className="flex items-center justify-between mt-1.5 text-[9.5px] uppercase tracking-[0.10em] text-ink-3">
+              {locked || scoreSeriesDays >= 80 ? (
+                <>
+                  <span>90d ago</span>
+                  <span>60d</span>
+                  <span>30d</span>
+                  <span>Today</span>
+                </>
+              ) : (
+                <>
+                  <span>{Math.max(scoreSeriesDays, 1)}d ago</span>
+                  <span>Today</span>
+                </>
+              )}
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="mt-4 rounded-[16px] tile px-3.5 py-3 text-[12px] text-ink-2 leading-snug">
+            Your trajectory chart appears once a few days of score history have
+            built up — keep checking in.
+          </div>
+        )}
 
         {/* Bottom callout: key insight + weekly update meta */}
         <div className="mt-4 -mx-7 sm:-mx-8 -mb-7 sm:-mb-8 px-7 sm:px-8 py-3 bg-[linear-gradient(180deg,rgba(168,191,163,0.18)_0%,rgba(168,191,163,0.10)_100%)] border-t border-[rgba(111,143,107,0.20)] flex items-start gap-3">
@@ -518,15 +405,15 @@ export function DashboardClient({
               </div>
               <p className="text-[12px] text-ink-2 leading-snug mt-0.5 max-w-[52ch]">
                 {longTermDelta >= 0
-                  ? 'Your consistent habits over the last 90 days are driving your health in the right direction.'
+                  ? 'Your consistent habits are driving your trajectory in the right direction.'
                   : 'A few weeks of inconsistency are showing in your trajectory — small daily wins will turn it around.'}
               </p>
             </div>
             <div className="text-right shrink-0 hidden sm:block">
               <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-ink-3">
-                Score updated weekly
+                Updates with your data
               </div>
-              <div className="text-[11px] text-ink-2 mt-0.5">Next update in 5 days</div>
+              <div className="text-[11px] text-ink-2 mt-0.5">Check-ins, wearables, blood</div>
             </div>
           </div>
         </div>
@@ -539,9 +426,34 @@ export function DashboardClient({
         )}
       </Card>
 
-      {/* ── 3 / TODAY'S READINESS ───────────────────────────────────────
-          Separate "Short-term" card so users see daily readiness without
-          confusing it with the long-term score. Donut + 4 sub-stats grid. */}
+      {/* ── 3 / Daily check-in nudge ────────────────────────────────────────
+          The feed replaces the old daily-focus blocks, but check-ins remain
+          the fuel for pattern detection — keep a single low-key entry point. */}
+      {!locked && !hasCheckinToday && (
+        <Link
+          href="/checkin"
+          className="group flex items-center gap-3 rounded-[20px] tile tile-hover px-4 py-3.5"
+        >
+          <IconBadge icon={CheckCircle2} tone="sage" variant="tint" size="md" />
+          <div className="flex-1 min-w-0">
+            <div className="text-[13px] font-semibold text-ink leading-tight">
+              30-second check-in
+            </div>
+            <p className="text-[11.5px] text-ink-3 leading-snug mt-0.5">
+              Today&apos;s check-in feeds tomorrow&apos;s discoveries.
+            </p>
+          </div>
+          <ChevronRight className="w-4 h-4 text-ink-3 shrink-0 group-hover:text-ink-2 transition-colors" strokeWidth={2.25} />
+        </Link>
+      )}
+
+      {/* ── 4 / LATEST INTELLIGENCE ─────────────────────────────────────────
+          The core of the new homepage: a feed of persisted insights derived
+          from the user's real data. NEW badges clear once viewed; the
+          bookmark keeps an insight in the saved list (Reports page). */}
+      <LatestIntelligence cards={intelligence} locked={locked} />
+
+      {/* ── 5 / TODAY'S READINESS ───────────────────────────────────────── */}
       <Card variant="premium" padding="lg" className="relative overflow-hidden">
         <div className={cn(locked && 'blur-[3px] pointer-events-none select-none')}>
         <div className="flex items-start justify-between gap-3 mb-3">
@@ -565,7 +477,6 @@ export function DashboardClient({
         </p>
 
         <div className="mt-4 grid grid-cols-[auto_minmax(0,1fr)] gap-4 sm:gap-6 items-center">
-          {/* LEFT — donut with "Today's readiness" label underneath */}
           <div className="relative shrink-0 flex flex-col items-center">
             <div className="relative">
               <ScoreRing
@@ -589,9 +500,6 @@ export function DashboardClient({
             </div>
           </div>
 
-          {/* RIGHT — 4 vertical sub-stat rows per v7 image 2.
-              Each row uses a distinct tone so the column reads as a
-              colour-coded summary, matching the brief. */}
           <div className="grid grid-cols-1 gap-2.5">
             <SubStat icon={Moon}             label="Sleep"    tone="ink"   value={`${Math.floor(sleepHours)}h ${Math.round((sleepHours % 1) * 60).toString().padStart(2,'0')}m`} arrow={sleepHours >= 7 ? 'up' : 'down'} />
             <SubStat icon={Heart}            label="HRV"      tone="sage"  value={`${hrvMs} ms`}                arrow={hrvMs >= 55 ? 'up' : 'down'} />
@@ -600,7 +508,6 @@ export function DashboardClient({
           </div>
         </div>
 
-        {/* Bottom row: snapshot label + breakdown link */}
         <div className="mt-4 -mx-7 sm:-mx-8 -mb-7 sm:-mb-8 px-7 sm:px-8 py-3 bg-[rgba(232,226,214,0.30)] border-t border-line flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <BatteryCharging className="w-3.5 h-3.5 text-ink-3" strokeWidth={2.25} />
@@ -622,216 +529,166 @@ export function DashboardClient({
           />
         )}
       </Card>
-
-      {/* ── 4 / Why this matters — drivers behind today's score ─────────
-          Per v7 image 2 this surfaces FOUR drivers with impact tags.
-          Layout: 2 cols on mobile → 4 cols on sm+ so cards never crush. */}
-      <Card variant="glass" padding="lg" className="relative overflow-hidden">
-        <div className="flex items-start justify-between gap-3 mb-4">
-          <div className="flex-1 min-w-0">
-            <div className="text-eyebrow uppercase text-ink-3 leading-none">
-              Why this matters
-            </div>
-            <p className="text-caption text-ink-2 mt-1.5 leading-snug">
-              The key drivers impacting both your long-term health and today&apos;s readiness.
-            </p>
-          </div>
-          <Link
-            href="/insights"
-            className="text-[12px] font-medium text-sage-deep hover:underline whitespace-nowrap shrink-0"
-          >
-            View all insights →
-          </Link>
-        </div>
-
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
-          {drivers.map((d) => (
-            <div
-              key={d.key}
-              className={cn(
-                'rounded-[20px] p-3.5 sm:p-4 flex flex-col',
-                /* Soft glassy tile — lifted off the parent card with a faint
-                   sage glow rather than a hard ring (site-wide premium feel). */
-                'tile',
-              )}
-            >
-              <div className="flex items-start justify-between gap-2">
-                <IconBadge icon={d.icon} tone={d.tone} variant="tint" size="md" />
-                {/* Status pill sits inline with the icon (per v7 image2)
-                    so the reason text gets full width below. */}
-                <span
-                  className={cn(
-                    'inline-flex shrink-0 items-center px-2 py-0.5 rounded-pill text-[10px] font-medium whitespace-nowrap',
-                    IMPACT_STYLE[d.impact],
-                  )}
-                >
-                  {IMPACT_LABEL[d.impact]}
-                </span>
-              </div>
-              <div className="text-[13px] font-semibold text-ink mt-3 leading-tight">
-                {d.label}
-              </div>
-              <div className="text-[11px] text-ink-3 leading-snug mt-1.5 line-clamp-3 flex-1">
-                {d.reason}
-              </div>
-              {/* 7-day pattern strip at the bottom of every driver card
-                  (per v7 image2). Tone-matched to the driver. */}
-              <div className="mt-3">
-                <BarStrip
-                  values={d.pattern}
-                  highlightIndex={d.pattern.length - 1}
-                  highlightTone={d.tone === 'ink' ? 'sage' : d.tone}
-                  height={20}
-                />
-              </div>
-            </div>
-          ))}
-        </div>
-      </Card>
-
-      {/* ── 5 / What to do today ─────────────────────────────────────────
-          Per v7 image2: personalised actions for today. LEFT is a big
-          sage tile that names the day's primary focus and links to the
-          full recommendation; RIGHT is a stack of three quick wins, each
-          tappable. Generated from the driver mix above so the prioritised
-          focus aligns with the highest-impact driver. */}
-      <Card variant="glass" padding="lg" className="relative overflow-hidden">
-        <div className="flex items-start justify-between gap-3 mb-4">
-          <div className="flex-1 min-w-0">
-            <div className="text-eyebrow uppercase text-ink-3 leading-none">
-              What to do today
-            </div>
-            <p className="text-caption text-ink-2 mt-1.5 leading-snug">
-              Personalised recommendations based on your data and goals.
-            </p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-[1.05fr_1fr] gap-3 sm:gap-4">
-          {/* LEFT — primary focus tile */}
-          <Link
-            href="/insights"
-            className={cn(
-              'group rounded-[20px] p-4 sm:p-5 flex flex-col justify-between',
-              'bg-[linear-gradient(180deg,rgba(168,191,163,0.22)_0%,rgba(168,191,163,0.10)_100%)]',
-              'shadow-[inset_0_1px_0_rgba(255,255,255,0.70),0_1px_2px_rgba(26,28,26,0.04)]',
-              'min-h-[160px]',
-            )}
-          >
-            <div>
-              <IconBadge icon={CheckCircle2} tone="sage" variant="tint" size="md" />
-              <div className="font-serif text-[18px] sm:text-[20px] text-ink leading-tight tracking-tight mt-3">
-                Prioritise recovery today
-              </div>
-              <p className="text-[12.5px] text-ink-2 leading-snug mt-2 max-w-[34ch]">
-                A low-moderate intensity session, mobility or a walk would be
-                ideal — your body needs the breathing room.
-              </p>
-            </div>
-            <div className="inline-flex w-fit items-center gap-1.5 mt-4 px-3 py-1.5 rounded-pill bg-white/80 text-[12px] font-medium text-sage-deep shadow-[inset_0_1px_0_rgba(255,255,255,0.80),0_1px_2px_rgba(26,28,26,0.05)] group-hover:bg-white">
-              View recommendation details
-              <ArrowRight className="w-3 h-3" strokeWidth={2.25} />
-            </div>
-          </Link>
-
-          {/* RIGHT — 3 quick-win rows */}
-          <div className="grid grid-cols-1 gap-2.5">
-            <QuickWin
-              icon={Moon}
-              tone="ink"
-              title="Aim for an earlier bedtime"
-              body="Your recovery improves 32% when you sleep before 10:30pm."
-              href="/insights"
-            />
-            <QuickWin
-              icon={Wind}
-              tone="amber"
-              title="Manage stress load"
-              body="Try 10 minutes of breathing or mindfulness today."
-              href="/insights"
-            />
-            <QuickWin
-              icon={Droplet}
-              tone="sage"
-              title="Hydrate consistently"
-              body="You tend to under-hydrate on high stress days."
-              href="/insights"
-            />
-          </div>
-        </div>
-      </Card>
-
-      {/* ── 6 / Long-term progress ──────────────────────────────────────
-          Per v7 image2: a low-key summary at the bottom of the home
-          screen showing the 4 long-window metrics with sparklines. Acts
-          as the gateway into the full Trends page (the "View trends"
-          link in the header). */}
-      <Card variant="glass" padding="lg" className="relative overflow-hidden">
-        <div className="flex items-start justify-between gap-3 mb-4">
-          <div className="flex-1 min-w-0">
-            <div className="text-eyebrow uppercase text-ink-3 leading-none">
-              Long-term progress
-            </div>
-            <p className="text-caption text-ink-2 mt-1.5 leading-snug">
-              You&apos;re building better health, one consistent choice at a
-              time.
-            </p>
-          </div>
-          <Link
-            href="/reports"
-            className="text-[12px] font-medium text-sage-deep hover:underline whitespace-nowrap shrink-0"
-          >
-            View trends →
-          </Link>
-        </div>
-
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
-          <ProgressStat
-            label="Health Score"
-            value="+6 pts"
-            caption="vs 90 days ago"
-            series={[48, 50, 52, 51, 53, 55, 56, 58, 60, 62, 63, displayScore ?? 61]}
-          />
-          <ProgressStat
-            label="Biological age"
-            value={
-              bioUnlocked
-                ? bio.deltaYears > 0
-                  ? `-${bio.deltaYears.toFixed(1)} yrs`
-                  : 'Holding'
-                : (bio.progressLabel ?? 'Locked')
-            }
-            caption={bioUnlocked ? 'vs calendar age' : 'unlock with tracking'}
-            series={
-              bioUnlocked && bio.value != null
-                ? [40, 39.6, 39.3, 38.9, 38.6, 38.2, 37.7, 37.2, 36.6, 36.0, 35.3, bio.value].map(
-                    (v) => -v,
-                  )
-                : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-            }
-          />
-          <ProgressStat
-            label="Biomarkers"
-            value="5 improving"
-            caption="vs 90 days ago"
-            series={[1, 1, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5]}
-          />
-          <ProgressStat
-            label="Body composition"
-            value="Improving"
-            caption="vs 90 days ago"
-            series={[0.45, 0.46, 0.48, 0.49, 0.51, 0.53, 0.55, 0.57, 0.58, 0.60, 0.62, 0.64]}
-          />
-        </div>
-      </Card>
     </div>
   )
 }
 
+// ── Latest Intelligence feed ──────────────────────────────────────────────
+function LatestIntelligence({
+  cards,
+  locked,
+}: {
+  cards: InsightCard[]
+  locked: boolean
+}) {
+  const [savedIds, setSavedIds] = useState<Set<string>>(
+    () => new Set(cards.filter((c) => c.saved).map((c) => c.id)),
+  )
+
+  // Clear NEW badges shortly after the feed has actually been on screen.
+  // Badges stay visible for this visit; they're gone next time.
+  useEffect(() => {
+    if (locked || !cards.some((c) => c.isNew)) return
+    const t = setTimeout(() => {
+      fetch('/api/intelligence', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'seen' }),
+      }).catch(() => {})
+    }, 4000)
+    return () => clearTimeout(t)
+  }, [cards, locked])
+
+  const toggleSave = (id: string) => {
+    const saving = !savedIds.has(id)
+    setSavedIds((prev) => {
+      const next = new Set(prev)
+      if (saving) next.add(id)
+      else next.delete(id)
+      return next
+    })
+    fetch('/api/intelligence', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: saving ? 'save' : 'unsave', id }),
+    }).catch(() => {
+      // Roll back on network failure so the icon doesn't lie.
+      setSavedIds((prev) => {
+        const next = new Set(prev)
+        if (saving) next.delete(id)
+        else next.add(id)
+        return next
+      })
+    })
+  }
+
+  return (
+    <Card variant="glass" padding="lg" className="relative overflow-hidden">
+      <div className="flex items-start justify-between gap-3 mb-4">
+        <div className="flex-1 min-w-0">
+          <div className="text-eyebrow uppercase text-ink-3 leading-none">
+            Latest intelligence
+          </div>
+          <p className="text-caption text-ink-2 mt-1.5 leading-snug">
+            What BioSense has found in your data recently.
+          </p>
+        </div>
+        <Link
+          href="/insights"
+          className="text-[12px] font-medium text-sage-deep hover:underline whitespace-nowrap shrink-0"
+        >
+          View all insights →
+        </Link>
+      </div>
+
+      {cards.length === 0 ? (
+        <div className="rounded-[20px] tile p-4 sm:p-5 flex items-start gap-3">
+          <IconBadge icon={Sparkles} tone="sage" variant="tint" size="md" />
+          <div className="flex-1 min-w-0">
+            <div className="text-[13px] font-semibold text-ink leading-tight">
+              Your feed is warming up
+            </div>
+            <p className="text-[12px] text-ink-3 leading-snug mt-1 max-w-[52ch]">
+              BioSense surfaces discoveries here as your data builds — check in
+              daily and keep your wearable synced, and the first insights
+              usually land within a week.
+            </p>
+          </div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-2.5">
+          {cards.map((card) => {
+            const { icon, tone } = INSIGHT_ICONS[card.type] ?? {
+              icon: Sparkles,
+              tone: 'sage' as Tone,
+            }
+            const series = Array.isArray(card.data?.series)
+              ? (card.data.series as number[])
+              : null
+            const saved = savedIds.has(card.id)
+            return (
+              <div
+                key={card.id}
+                className="rounded-[20px] tile p-4 flex items-start gap-3"
+              >
+                <IconBadge icon={icon} tone={tone} variant="tint" size="md" />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-ink-3">
+                      {card.label}
+                    </span>
+                    {card.isNew && (
+                      <span className="inline-flex items-center px-2 py-[1px] rounded-pill text-[9px] font-bold uppercase tracking-[0.10em] text-white bg-grad-sage shadow-button">
+                        New
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-[13.5px] font-semibold text-ink leading-tight mt-1.5">
+                    {card.title}
+                  </div>
+                  <p className="text-[12px] text-ink-2 leading-snug mt-1">
+                    {card.body}
+                  </p>
+                  {series && series.length >= 3 && (
+                    <div className="mt-2.5 max-w-[220px]">
+                      <SparkLine
+                        values={series}
+                        width={220}
+                        height={34}
+                        tone={tone === 'amber' ? 'amber' : 'sage'}
+                        showFill
+                        className="w-full h-auto"
+                      />
+                    </div>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => toggleSave(card.id)}
+                  aria-label={saved ? 'Remove from saved insights' : 'Save this insight'}
+                  className={cn(
+                    'shrink-0 flex items-center justify-center w-8 h-8 rounded-full transition-colors',
+                    saved
+                      ? 'text-sage-deep bg-[rgba(168,191,163,0.24)]'
+                      : 'text-ink-3 hover:text-sage-deep hover:bg-[rgba(168,191,163,0.16)]',
+                  )}
+                >
+                  <Bookmark
+                    className="w-4 h-4"
+                    strokeWidth={2.25}
+                    fill={saved ? 'currentColor' : 'none'}
+                  />
+                </button>
+              </div>
+            )
+          })}
+        </div>
+      )}
+    </Card>
+  )
+}
+
 // ── Locked preview overlay ────────────────────────────────────────────────
-// Frosted panel shown over hero cards for brand-new accounts. The card behind
-// renders blurred sample data; this invites the user to connect a wearable to
-// unlock the real thing (and teases what they'll get once they do).
 function LockedOverlay({ title, subtitle }: { title: string; subtitle: string }) {
   return (
     <div className="absolute inset-0 z-10 flex items-center justify-center p-5 bg-[rgba(247,245,240,0.45)]">
@@ -921,85 +778,11 @@ function SubStat({
           {value}
         </div>
       </div>
-      {/* Arrow lives on the far right (matches v7 image 2 layout). */}
       {arrow === 'up' ? (
         <TrendingUp className={cn('w-3.5 h-3.5 shrink-0', isPositive ? 'text-sage-deep' : 'text-[#A85454]')} strokeWidth={2.5} />
       ) : (
         <TrendingDown className={cn('w-3.5 h-3.5 shrink-0', isPositive ? 'text-sage-deep' : 'text-[#A85454]')} strokeWidth={2.5} />
       )}
-    </div>
-  )
-}
-
-// ── Quick-win row (used in "What to do today") ──────────────────────────
-function QuickWin({
-  icon: Icon,
-  tone,
-  title,
-  body,
-  href,
-}: {
-  icon: LucideIcon
-  tone: 'sage' | 'amber' | 'rose' | 'ink'
-  title: string
-  body: string
-  href: string
-}) {
-  return (
-    <Link
-      href={href}
-      className={cn(
-        'group rounded-[18px] px-3.5 py-3 flex items-center gap-3',
-        'tile tile-hover',
-      )}
-    >
-      <IconBadge icon={Icon} tone={tone} variant="tint" size="md" />
-      <div className="flex-1 min-w-0">
-        <div className="text-[13px] font-semibold text-ink leading-tight">
-          {title}
-        </div>
-        <p className="text-[11.5px] text-ink-3 leading-snug mt-0.5">
-          {body}
-        </p>
-      </div>
-      <ChevronRight className="w-4 h-4 text-ink-3 shrink-0 group-hover:text-ink-2 transition-colors" strokeWidth={2.25} />
-    </Link>
-  )
-}
-
-// ── Progress stat card (used in "Long-term progress") ───────────────────
-function ProgressStat({
-  label,
-  value,
-  caption,
-  series,
-}: {
-  label: string
-  value: string
-  caption: string
-  series: number[]
-}) {
-  return (
-    <div className="rounded-[18px] tile p-3.5">
-      <div className="text-[10px] uppercase tracking-[0.10em] text-ink-3 leading-none">
-        {label}
-      </div>
-      <div className="text-[15px] font-semibold text-ink leading-tight mt-1 tabular-nums">
-        {value}
-      </div>
-      <div className="mt-2 -mx-0.5">
-        <SparkLine
-          values={series}
-          width={140}
-          height={32}
-          tone="sage"
-          showFill
-          className="w-full h-auto"
-        />
-      </div>
-      <div className="text-[10.5px] text-ink-3 leading-none mt-1.5">
-        {caption}
-      </div>
     </div>
   )
 }
