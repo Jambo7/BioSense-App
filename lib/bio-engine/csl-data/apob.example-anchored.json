@@ -1,8 +1,23 @@
 [
   {
-    "__EXAMPLE__": "ILLUSTRATIVE ONLY — NOT CLINICALLY REVIEWED. Shows the shape of an anchored file. Do NOT copy these numbers into apob.json. They exist to demonstrate the format for the founder/clinical owner.",
+    "__README__": "ILLUSTRATIVE TEMPLATE — NOT CLINICALLY REVIEWED. This is the complete shape of an anchored ApoB file: every claim, every required field. The NUMBERS ARE PLACEHOLDERS to show format only — do NOT copy them into apob.json. Replace each value + audit field with your reviewed science, set review_status to ANCHORED, and the matching feature switches on. Leave a claim as DECLARED (or value null) to keep its feature off.",
+    "__required_fields__": {
+      "claim_id": "Fixed identifier — do NOT change; the engine binds to it.",
+      "assertion": "Plain-English description of what this claim asserts (shown in the audit/review surface).",
+      "value": "The science. number | string | object | null. null = feature stays off.",
+      "unit": "Unit of the value, or null (e.g. lexicon lists have no unit).",
+      "version": "Semver. Must NOT be 0.0.0 to anchor. Bump when the science changes.",
+      "effective_date": "ISO date (YYYY-MM-DD) the value takes effect. Required to anchor.",
+      "author": "Named clinical owner who signed off. Required to anchor.",
+      "provenance": "Citation — guideline / paper / consensus the value comes from. Required to anchor.",
+      "evidence_grade": "Your grading, e.g. A | B | C | expert-consensus.",
+      "review_status": "ANCHORED to switch on. DECLARED = off. (VERSIONED also usable.)"
+    }
+  },
+
+  {
     "claim_id": "BIOSENSE_APOB_THRESHOLD_SET",
-    "assertion": "Stratum-keyed ApoB target thresholds (mg/dL) for banding, gap-to-target, score and discordance.",
+    "assertion": "Stratum-keyed ApoB target/band thresholds (mg/dL) for banding, gap-to-target, score contribution and Ch.4 discordance. THIS IS THE ONE HARD BLOCKER — until it anchors, ApoB shows values and abstains.",
     "value": {
       "PRIMARY_PREVENTION_UNSELECTED": { "optimal_max": 80, "above_target_min": 100 },
       "PRIMARY_PREVENTION_HIGHER_RISK": { "optimal_max": 65, "above_target_min": 80 },
@@ -17,9 +32,8 @@
     "review_status": "ANCHORED"
   },
   {
-    "__EXAMPLE__": "ILLUSTRATIVE ONLY — NOT CLINICALLY REVIEWED.",
     "claim_id": "APOB_SIGNIFICANT_CHANGE_THRESHOLD",
-    "assertion": "Combined biological + analytical variation below which an ApoB delta is not significant.",
+    "assertion": "Combined biological + analytical variation below which an ApoB delta is not a significant trend change.",
     "value": 10,
     "unit": "mg/dL",
     "version": "1.0.0",
@@ -27,6 +41,106 @@
     "author": "EXAMPLE",
     "provenance": "EXAMPLE",
     "evidence_grade": "B",
+    "review_status": "ANCHORED"
+  },
+  {
+    "claim_id": "APOB_ACUTE_RECOVERY_WINDOW",
+    "assertion": "Time window after an acute event during which an ApoB value is tagged acute_context (reduced confidence, trend-excluded).",
+    "value": 42,
+    "unit": "days",
+    "version": "1.0.0",
+    "effective_date": "2026-08-01",
+    "author": "EXAMPLE",
+    "provenance": "EXAMPLE",
+    "evidence_grade": "B",
+    "review_status": "ANCHORED"
+  },
+  {
+    "claim_id": "APOB_SCORE_GAP_SCALE",
+    "assertion": "Gap-to-target (mg/dL) at which the ApoB score contribution reaches zero (slope of the continuous score, amendment A-001).",
+    "value": 40,
+    "unit": "mg/dL",
+    "version": "1.0.0",
+    "effective_date": "2026-08-01",
+    "author": "EXAMPLE",
+    "provenance": "EXAMPLE",
+    "evidence_grade": "C",
+    "review_status": "ANCHORED"
+  },
+  {
+    "claim_id": "APOB_LIFESTYLE_ADDRESSABLE_GAP_CEILING",
+    "assertion": "Gap-to-target ceiling above which a lifestyle recommendation must escalate to clinician discussion.",
+    "value": 30,
+    "unit": "mg/dL",
+    "version": "1.0.0",
+    "effective_date": "2026-08-01",
+    "author": "EXAMPLE",
+    "provenance": "EXAMPLE",
+    "evidence_grade": "B",
+    "review_status": "ANCHORED"
+  },
+  {
+    "claim_id": "APOB_LOW_INVESTIGATION_THRESHOLD",
+    "assertion": "ApoB value below which the low-ApoB investigation routing pathway activates (never a lipid warning, never a score penalty).",
+    "value": 40,
+    "unit": "mg/dL",
+    "version": "1.0.0",
+    "effective_date": "2026-08-01",
+    "author": "EXAMPLE",
+    "provenance": "EXAMPLE",
+    "evidence_grade": "C",
+    "review_status": "ANCHORED"
+  },
+  {
+    "claim_id": "APOB_FH_PATTERN_THRESHOLD",
+    "assertion": "Age-stratified ApoB threshold(s) defining the familial-hypercholesterolaemia pattern. FOUNDER DECISION: sensitivity/specificity trade-off.",
+    "value": { "under_30": 130, "30_to_50": 150, "over_50": 165 },
+    "unit": "mg/dL",
+    "version": "1.0.0",
+    "effective_date": "2026-08-01",
+    "author": "EXAMPLE",
+    "provenance": "EXAMPLE — founder decision + clinical input",
+    "evidence_grade": "expert-consensus",
+    "review_status": "ANCHORED"
+  },
+  {
+    "claim_id": "BIOSENSE_LDLC_THRESHOLD_SET",
+    "assertion": "LDL-C band thresholds (belongs to the LDL-C document). Required for ApoB/LDL-C discordance detection.",
+    "value": {
+      "PRIMARY_PREVENTION_UNSELECTED": { "optimal_max": 100, "above_target_min": 130 },
+      "PRIMARY_PREVENTION_HIGHER_RISK": { "optimal_max": 70, "above_target_min": 100 },
+      "SECONDARY_PREVENTION": { "optimal_max": 55, "above_target_min": 70 }
+    },
+    "unit": "mg/dL",
+    "version": "1.0.0",
+    "effective_date": "2026-08-01",
+    "author": "EXAMPLE",
+    "provenance": "EXAMPLE",
+    "evidence_grade": "A",
+    "review_status": "ANCHORED"
+  },
+  {
+    "claim_id": "BIOSENSE_LIPID_DRUG_LEXICON",
+    "assertion": "Versioned list of lipid drug names the narrative validator must never emit.",
+    "value": ["EXAMPLE_DRUG_A", "EXAMPLE_DRUG_B"],
+    "unit": null,
+    "version": "1.0.0",
+    "effective_date": "2026-08-01",
+    "author": "EXAMPLE",
+    "provenance": "EXAMPLE — maintained internal list",
+    "evidence_grade": "expert-consensus",
+    "review_status": "ANCHORED"
+  },
+  {
+    "claim_id": "BIOSENSE_PROHIBITED_CONDITION_LEXICON",
+    "assertion": "Versioned list of condition/gene/instrument names the narrative validator must never emit.",
+    "value": ["EXAMPLE_CONDITION_A", "EXAMPLE_GENE_B"],
+    "unit": null,
+    "version": "1.0.0",
+    "effective_date": "2026-08-01",
+    "author": "EXAMPLE",
+    "provenance": "EXAMPLE — maintained internal list",
+    "evidence_grade": "expert-consensus",
     "review_status": "ANCHORED"
   }
 ]

@@ -65,11 +65,6 @@ export function TrendsClient({ summaries, reportsCount, savedInsights }: TrendsC
   const [tab, setTab] = useState<Tab>('goals')
   const [showDiscovery, setShowDiscovery] = useState(false)
 
-  const sleepSummary = summaries.find((s) => s.slug === 'sleep')
-  const recoveryPct = sleepSummary?.delta != null && sleepSummary.delta > 0
-    ? Math.min(50, Math.round(sleepSummary.delta * 3))
-    : 31
-
   return (
     <div className="max-w-3xl mx-auto fade-up space-y-5">
       <header className="relative pt-2 pb-1">
@@ -105,9 +100,9 @@ export function TrendsClient({ summaries, reportsCount, savedInsights }: TrendsC
 
       {showDiscovery && (
         <DiscoveryCard
-          headline="You recover"
-          accent={`${recoveryPct}% better when you sleep before 10:30pm.`}
-          detail="Consistent early sleep has the biggest positive impact on your recovery."
+          headline="You recover better"
+          accent="when your sleep is consistent and earlier."
+          detail="Consistent, earlier sleep tends to have the biggest positive impact on your recovery."
         />
       )}
 

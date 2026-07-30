@@ -257,7 +257,7 @@ function genWatchList(days: DayRow[]): InsightCandidate | null {
       return {
         type: 'WATCH_LIST',
         title: 'Resting heart rate drifting up',
-        body: `Your resting heart rate has been drifting upward for about ${spanDays} days — roughly ${Math.round(lastAvg - firstAvg)} bpm above where it started. Not an alarm, but worth watching: extra sleep and easier training days usually bring it back down.`,
+        body: `Your resting heart rate has been drifting upward over the last couple of weeks — a little higher than where it started. Not an alarm, but worth watching: extra sleep and easier training days usually bring it back down.`,
         data: { series: rhr.map((p) => p.y), metric: 'rhr' },
         dedupeKey: `watch:rhr:${isoWeekKey()}`,
       }
@@ -267,7 +267,6 @@ function genWatchList(days: DayRow[]): InsightCandidate | null {
   const hrv = metricSeries(days, 'hrv')
   if (hrv.length >= 8) {
     const slope = slopePerDay(hrv)
-    const spanDays = hrv[hrv.length - 1].x - hrv[0].x
     const firstAvg = avg(hrv.slice(0, 3).map((p) => p.y))
     const lastAvg = avg(hrv.slice(-3).map((p) => p.y))
     const dropPct = firstAvg > 0 ? (firstAvg - lastAvg) / firstAvg : 0
@@ -275,7 +274,7 @@ function genWatchList(days: DayRow[]): InsightCandidate | null {
       return {
         type: 'WATCH_LIST',
         title: 'HRV trending down',
-        body: `Your HRV has slipped about ${Math.round(dropPct * 100)}% over the last ${spanDays} days. That often tracks with accumulated stress or lighter sleep — worth keeping an eye on recovery this week.`,
+        body: `Your HRV has been trending down over the last couple of weeks. That often tracks with accumulated stress or lighter sleep — worth keeping an eye on recovery this week.`,
         data: { series: hrv.map((p) => p.y), metric: 'hrv' },
         dedupeKey: `watch:hrv:${isoWeekKey()}`,
       }
@@ -347,25 +346,22 @@ function genProjection(scores: ScoreRow[]): InsightCandidate | null {
   const slope = slopePerDay(
     sorted.map((s) => ({ x: (s.date.getTime() - first) / 86400000, y: s.score })),
   )
-  const current = sorted[sorted.length - 1].score
-  const projected = Math.max(0, Math.min(100, current + slope * 60))
-  if (Math.abs(projected - current) < 2) return null
+  // Only speak when the trend is meaningful over the whole window.
+  const projectedShift = slope * 60
+  if (Math.abs(projectedShift) < 2) return null
 
-  const targetDate = new Date(Date.now() + 60 * 86400000)
-  const dateLabel = targetDate.toLocaleDateString('en-GB', {
-    day: 'numeric',
-    month: 'long',
-  })
-  const rising = projected > current
+  const rising = slope > 0
+  // Deliberately generic and directional — no projected number, no target
+  // date, no precise percentage. We describe the direction of travel from the
+  // user's own trend, not a claimed outcome we can't honestly guarantee.
   return {
     type: 'PROJECTION',
-    title: rising
-      ? `On track for a score of ~${Math.round(projected)}`
-      : 'Your trend is pointing down',
-    body: `If the last few weeks continue, your Health Score is on course to reach about ${Math.round(projected)} by ${dateLabel} (from ${Math.round(current)} today). This is a projection from your own recent trend — not a promise — and it updates as your data does.`,
+    title: rising ? 'Your trajectory is heading the right way' : 'Your trajectory is easing off',
+    body: rising
+      ? 'If your recent habits hold, your Health Score looks set to keep building over the coming weeks. This is the direction your own data is pointing — not a fixed target — and it moves as your data does.'
+      : 'Your recent trend has your Health Score drifting gently downward. Nothing dramatic — a run of consistent days usually turns the direction back around.',
     data: {
       series: sorted.slice(-14).map((s) => Math.round(s.score)),
-      projected: Math.round(projected),
     },
     dedupeKey: `projection:score:${monthKey()}`,
   }
