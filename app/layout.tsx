@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { DM_Sans, DM_Serif_Display } from 'next/font/google'
 import './globals.css'
 import { Providers } from './providers'
@@ -22,6 +22,23 @@ export const metadata: Metadata = {
   title: 'BioSense — Understand your biology. Live your best.',
   description:
     'Personalised health intelligence. Sleep better, recover faster, perform stronger.',
+  appleWebApp: {
+    capable: true,
+    title: 'BioSense',
+    statusBarStyle: 'default',
+  },
+  formatDetection: {
+    telephone: false,
+  },
+}
+
+/** Safe-area aware viewport for the Capacitor / iOS shell. */
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  viewportFit: 'cover',
+  themeColor: '#F7F5F0',
 }
 
 export default function RootLayout({

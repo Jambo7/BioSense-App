@@ -1,0 +1,22 @@
+{
+  "name": "biosense-ios",
+  "version": "0.1.0",
+  "private": true,
+  "description": "BioSense iOS shell (Capacitor) — loads the production web app for TestFlight.",
+  "scripts": {
+    "sync": "npx cap sync ios",
+    "open": "npx cap open ios",
+    "add:ios": "npx cap add ios"
+  },
+  "dependencies": {
+    "@capacitor/app": "^7.1.0",
+    "@capacitor/core": "^7.4.3",
+    "@capacitor/ios": "^7.4.3",
+    "@capacitor/splash-screen": "^7.0.3",
+    "@capacitor/status-bar": "^7.0.3"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.4.3",
+    "typescript": "^5.8.3"
+  }
+}

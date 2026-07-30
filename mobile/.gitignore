@@ -1,0 +1,10 @@
+node_modules/
+.DS_Store
+*.log
+
+# Local Xcode / CocoaPods noise (keep the ios/ project itself in git once generated on a Mac)
+ios/App/Pods/
+ios/App/build/
+ios/DerivedData/
+ios/**/xcuserdata/
+*.xcworkspace/xcuserdata/

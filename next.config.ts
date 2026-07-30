@@ -5,7 +5,12 @@ const nextConfig: NextConfig = {
   output: 'standalone',
   experimental: {
     serverActions: {
-      allowedOrigins: ['localhost:3000'],
+      allowedOrigins: [
+        'localhost:3000',
+        'bio-sense-app-navy.vercel.app',
+        'capacitor://localhost',
+        'ai.biosense.app',
+      ],
     },
   },
   // Required for pdf-parse (native binary)

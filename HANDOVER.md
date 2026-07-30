@@ -2,7 +2,7 @@
 
 > Living context doc for collaborators (human or AI agents) working across multiple
 > machines. Read this first to get up to speed, and update the **Recent changes** and
-> **Open items** sections as work progresses. **Last updated: 2026-06-26.**
+> **Open items** sections as work progresses. **Last updated: 2026-07-30.**
 
 ---
 
@@ -85,10 +85,10 @@ pushed to Neon — only run `npx prisma db push` after editing `prisma/schema.pr
 - **Health score:** `lib/score.ts` (pure calc) + `lib/health-score.ts` (recalc + persist).
   Combines today's check-in with aggregated wearable metrics. Recalculated on check-in
   submit AND on fresh wearable data.
-- **Mobile readiness:** `lib/api-auth.ts` `getRequestUser()` accepts either a NextAuth
-  cookie session OR a `Bearer` token, so the same API routes serve web and a future
-  mobile app. Mobile login/refresh: `/api/auth/mobile/{login,refresh}`. JSON read
-  endpoints exist for dashboard, reports, blood, insights, profile.
+- **Mobile / iOS:** Backend dual auth is ready (`lib/api-auth.ts` Bearer + cookies;
+  `/api/auth/mobile/{login,refresh}` + JSON APIs). The **iOS TestFlight shell** lives in
+  `mobile/` (Capacitor → production URL). See `mobile/README.md` for Xcode / TestFlight
+  steps. Bundle ID: `ai.biosense.app`. Needs a Mac to Archive; Windows can sync only.
 
 ---
 
@@ -122,7 +122,9 @@ pushed to Neon — only run `npx prisma db push` after editing `prisma/schema.pr
       finalised privacy policy.
 - [ ] **Company incorporation** before finalising the privacy policy for provider submission.
 - [ ] **Custom-domain email** (e.g. hello@bio-sense.ai) — Google Workspace recommended.
-- [ ] **Native mobile app** (iOS first, Android later) — backend is prepped; app not built yet.
+- [ ] **TestFlight upload** — iOS Capacitor shell is in `mobile/`; Neil creates the App Store
+      Connect app + signs in Xcode on a Mac, then Archive → TestFlight (see `mobile/README.md`).
+- [ ] **HealthKit / APNs** — not in the WebView shell; use Bearer APIs when we build that.
 
 ---
 
@@ -140,6 +142,8 @@ keys are optional locally — those features skip gracefully when blank.
 
 ## 8. Recent changes (most recent first)
 
+- 2026-07-30 — Capacitor iOS shell (`mobile/`) for TestFlight; loads production web app.
+  App icon + camera/photo usage strings. Web viewport / apple-web-app meta for the shell.
 - 2026-06-26 — Added `npm run lock`/`unlock` secret workflow; secrets now travel as an
   encrypted `.env.enc` blob in the repo.
 - 2026-06-22 — Tap-to-preview live metrics window for connected wearables.
