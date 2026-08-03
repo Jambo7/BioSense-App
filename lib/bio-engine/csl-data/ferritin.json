@@ -1,0 +1,141 @@
+[
+  {
+    "claim_id": "BIOSENSE_FERRITIN_THRESHOLD_SET",
+    "assertion": "Ferritin BioSense wellness band / threshold set from SCL-010.",
+    "value": {
+      "DEFAULT": {
+        "format": "wellness_bands",
+        "direction": "TARGET_BAND",
+        "wellness_bands": [
+          {
+            "id": "LOW_STORAGE",
+            "lt": 15
+          },
+          {
+            "id": "BELOW_OPTIMAL",
+            "gte": 15,
+            "lt": 29
+          },
+          {
+            "id": "OPTIMAL_REFERENCE",
+            "gte": 30,
+            "lt": 150
+          },
+          {
+            "id": "ABOVE_REFERENCE",
+            "gte": 151,
+            "lt": 200
+          },
+          {
+            "id": "HIGH_FLAG",
+            "gte": 200
+          },
+          {
+            "id": "LOW_STORAGE",
+            "lt": 30
+          },
+          {
+            "id": "BELOW_OPTIMAL",
+            "gte": 30,
+            "lt": 49
+          },
+          {
+            "id": "OPTIMAL_REFERENCE",
+            "gte": 50,
+            "lt": 250
+          },
+          {
+            "id": "ABOVE_REFERENCE",
+            "gte": 251,
+            "lt": 300
+          },
+          {
+            "id": "HIGH_FLAG",
+            "gte": 300
+          }
+        ],
+        "optimal_max": 15,
+        "above_target_min": 15
+      }
+    },
+    "unit": "µg/L",
+    "version": "1.0.0",
+    "effective_date": "2026-07-31",
+    "author": "BioSense Scientific Authoring (Origin BioSense Technologies FZCO)",
+    "provenance": "SCL-010 Scientific Configuration Pack v1.0.0 — Ferritin",
+    "evidence_grade": "B",
+    "review_status": "ANCHORED"
+  },
+  {
+    "claim_id": "FERRITIN_SCORE_GAP_SCALE",
+    "assertion": "Gap-to-target scale for Ferritin continuous score (product decision; not set in SCL pack).",
+    "value": null,
+    "unit": "µg/L",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "FERRITIN_SIGNIFICANT_CHANGE_THRESHOLD",
+    "assertion": "Significant-change / RCV threshold for Ferritin. Numeric delta not specified in SCL-010; qualitative only.",
+    "value": null,
+    "unit": "µg/L",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "FERRITIN_ACUTE_RECOVERY_WINDOW",
+    "assertion": "Acute-context recovery window (days) for Ferritin.",
+    "value": null,
+    "unit": "days",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "FERRITIN_LIFESTYLE_ADDRESSABLE_GAP_CEILING",
+    "assertion": "Gap ceiling above which Ferritin escalates from lifestyle to clinician discussion.",
+    "value": null,
+    "unit": "µg/L",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "FERRITIN_LOW_INVESTIGATION_THRESHOLD",
+    "assertion": "Low-end investigation threshold for Ferritin.",
+    "value": null,
+    "unit": "µg/L",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "FERRITIN_FH_PATTERN_THRESHOLD",
+    "assertion": "Pattern-referral threshold for Ferritin. Unanchored unless the SCL pack defines one.",
+    "value": null,
+    "unit": "µg/L",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  }
+]

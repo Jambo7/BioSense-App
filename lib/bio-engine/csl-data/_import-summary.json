@@ -1,0 +1,218 @@
+[
+  {
+    "scl": "SCL-001",
+    "analyte": "APOB_TOTAL",
+    "banding": "ANCHORED",
+    "bands": 5,
+    "unit": "mg/dL",
+    "direction": "LOWER_BETTER",
+    "file": "lib\\bio-engine\\csl-data\\apob-total.json"
+  },
+  {
+    "scl": "SCL-002",
+    "analyte": "HBA1C",
+    "banding": "ANCHORED",
+    "bands": 6,
+    "unit": "%",
+    "direction": "LOWER_BETTER",
+    "file": "lib\\bio-engine\\csl-data\\hba1c.json"
+  },
+  {
+    "scl": "SCL-003",
+    "analyte": "LDL_C",
+    "banding": "ANCHORED",
+    "bands": 5,
+    "unit": "mg/dL",
+    "direction": "LOWER_BETTER",
+    "file": "lib\\bio-engine\\csl-data\\ldl-c.json"
+  },
+  {
+    "scl": "SCL-004",
+    "analyte": "HDL_C",
+    "banding": "DECLARED",
+    "bands": 10,
+    "unit": "mg/dL",
+    "direction": "HIGHER_BETTER",
+    "file": "lib\\bio-engine\\csl-data\\hdl-c.json"
+  },
+  {
+    "scl": "SCL-005",
+    "analyte": "TRIGLYCERIDES",
+    "banding": "ANCHORED",
+    "bands": 9,
+    "unit": "mg/dL",
+    "direction": "LOWER_BETTER",
+    "file": "lib\\bio-engine\\csl-data\\triglycerides.json"
+  },
+  {
+    "scl": "SCL-006",
+    "analyte": "HS_CRP",
+    "banding": "DECLARED",
+    "bands": 3,
+    "unit": "mg/L",
+    "direction": "LOWER_BETTER",
+    "file": "lib\\bio-engine\\csl-data\\hs-crp.json"
+  },
+  {
+    "scl": "SCL-007",
+    "analyte": "NON_HDL_C",
+    "banding": "DECLARED",
+    "bands": 0,
+    "unit": "mg/dL",
+    "direction": "LOWER_BETTER",
+    "file": "lib\\bio-engine\\csl-data\\non-hdl-c.json"
+  },
+  {
+    "scl": "SCL-008",
+    "analyte": "TOTAL_CHOLESTEROL",
+    "banding": "DECLARED",
+    "bands": 3,
+    "unit": "mg/dL",
+    "direction": "LOWER_BETTER",
+    "file": "lib\\bio-engine\\csl-data\\total-cholesterol.json"
+  },
+  {
+    "scl": "SCL-009",
+    "analyte": "FASTING_GLUCOSE",
+    "banding": "ANCHORED",
+    "bands": 6,
+    "unit": "mg/dL",
+    "direction": "LOWER_BETTER",
+    "file": "lib\\bio-engine\\csl-data\\fasting-glucose.json"
+  },
+  {
+    "scl": "SCL-010",
+    "analyte": "FERRITIN",
+    "banding": "ANCHORED",
+    "bands": 10,
+    "unit": "µg/L",
+    "direction": "TARGET_BAND",
+    "file": "lib\\bio-engine\\csl-data\\ferritin.json"
+  },
+  {
+    "scl": "SCL-011",
+    "analyte": "VITAMIN_D",
+    "banding": "ANCHORED",
+    "bands": 2,
+    "unit": "ng/mL",
+    "direction": "TARGET_BAND",
+    "file": "lib\\bio-engine\\csl-data\\vitamin-d.json"
+  },
+  {
+    "scl": "SCL-012",
+    "analyte": "VITAMIN_B12",
+    "banding": "ANCHORED",
+    "bands": 2,
+    "unit": "pg/mL",
+    "direction": "TARGET_BAND",
+    "file": "lib\\bio-engine\\csl-data\\vitamin-b12.json"
+  },
+  {
+    "scl": "SCL-013",
+    "analyte": "FOLATE",
+    "banding": "ANCHORED",
+    "bands": 2,
+    "unit": "ng/mL",
+    "direction": "TARGET_BAND",
+    "file": "lib\\bio-engine\\csl-data\\folate.json"
+  },
+  {
+    "scl": "SCL-014",
+    "analyte": "ALT",
+    "banding": "DECLARED",
+    "bands": 1,
+    "unit": "U/L",
+    "direction": "LOWER_BETTER",
+    "file": "lib\\bio-engine\\csl-data\\alt.json"
+  },
+  {
+    "scl": "SCL-015",
+    "analyte": "AST",
+    "banding": "DECLARED",
+    "bands": 2,
+    "unit": "U/L",
+    "direction": "LOWER_BETTER",
+    "file": "lib\\bio-engine\\csl-data\\ast.json"
+  },
+  {
+    "scl": "SCL-016",
+    "analyte": "EGFR",
+    "banding": "ANCHORED",
+    "bands": 0,
+    "unit": "mL/min/1.73m²",
+    "direction": "HIGHER_BETTER",
+    "file": "lib\\bio-engine\\csl-data\\egfr.json"
+  },
+  {
+    "scl": "SCL-017",
+    "analyte": "TSH",
+    "banding": "ANCHORED",
+    "bands": 2,
+    "unit": "mIU/L",
+    "direction": "TARGET_BAND",
+    "file": "lib\\bio-engine\\csl-data\\tsh.json"
+  },
+  {
+    "scl": "SCL-018",
+    "analyte": "FREE_T4",
+    "banding": "DECLARED",
+    "bands": 0,
+    "unit": "ng/dL",
+    "direction": "TARGET_BAND",
+    "file": "lib\\bio-engine\\csl-data\\free-t4.json"
+  },
+  {
+    "scl": "SCL-019",
+    "analyte": "HAEMOGLOBIN",
+    "banding": "DECLARED",
+    "bands": 0,
+    "unit": "g/dL",
+    "direction": "TARGET_BAND",
+    "file": "lib\\bio-engine\\csl-data\\haemoglobin.json"
+  },
+  {
+    "scl": "SCL-020",
+    "analyte": "WBC",
+    "banding": "ANCHORED",
+    "bands": 2,
+    "unit": "×10⁹/L",
+    "direction": "TARGET_BAND",
+    "file": "lib\\bio-engine\\csl-data\\wbc.json"
+  },
+  {
+    "scl": "SCL-021",
+    "analyte": "GGT",
+    "banding": "DECLARED",
+    "bands": 0,
+    "unit": "U/L",
+    "direction": "LOWER_BETTER",
+    "file": "lib\\bio-engine\\csl-data\\ggt.json"
+  },
+  {
+    "scl": "SCL-022",
+    "analyte": "ALP",
+    "banding": "ANCHORED",
+    "bands": 1,
+    "unit": "U/L",
+    "direction": "TARGET_BAND",
+    "file": "lib\\bio-engine\\csl-data\\alp.json"
+  },
+  {
+    "scl": "SCL-023",
+    "analyte": "BILIRUBIN",
+    "banding": "DECLARED",
+    "bands": 2,
+    "unit": "mg/dL",
+    "direction": "LOWER_BETTER",
+    "file": "lib\\bio-engine\\csl-data\\bilirubin.json"
+  },
+  {
+    "scl": "SCL-024",
+    "analyte": "ALBUMIN",
+    "banding": "DECLARED",
+    "bands": 1,
+    "unit": "g/dL",
+    "direction": "HIGHER_BETTER",
+    "file": "lib\\bio-engine\\csl-data\\albumin.json"
+  }
+]

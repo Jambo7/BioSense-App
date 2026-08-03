@@ -9,6 +9,7 @@
     "start": "next start",
     "lint": "eslint",
     "test:engine": "tsx lib/bio-engine/tests/safety-suite.ts",
+    "import:scl": "node scripts/import-scl-packs.mjs && node scripts/patch-scl-thresholds.mjs",
     "mobile:install": "npm --prefix mobile install",
     "mobile:sync": "npm --prefix mobile run sync",
     "mobile:open": "npm --prefix mobile run open",

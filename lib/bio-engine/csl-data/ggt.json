@@ -1,0 +1,117 @@
+[
+  {
+    "claim_id": "BIOSENSE_GGT_THRESHOLD_SET",
+    "assertion": "GGT BioSense wellness band / threshold set from SCL-021.",
+    "value": {
+      "PRIMARY_PREVENTION_UNSELECTED": {
+        "optimal_max": 20,
+        "above_target_min": 20,
+        "wellness_bands": [
+          {
+            "id": "OPTIMAL",
+            "lt": 20
+          },
+          {
+            "id": "ELEVATED",
+            "gte": 20
+          }
+        ],
+        "direction": "LOWER_BETTER"
+      },
+      "DEFAULT": {
+        "optimal_max": 20,
+        "above_target_min": 20,
+        "wellness_bands": [
+          {
+            "id": "OPTIMAL",
+            "lt": 20
+          },
+          {
+            "id": "ELEVATED",
+            "gte": 20
+          }
+        ],
+        "direction": "LOWER_BETTER"
+      }
+    },
+    "unit": "U/L",
+    "version": "1.0.0",
+    "effective_date": "2026-08-01",
+    "author": "BioSense Scientific Authoring (Origin BioSense Technologies FZCO)",
+    "provenance": "SCL-021 GGT Sci Config Pack v1.0",
+    "evidence_grade": "B",
+    "review_status": "ANCHORED"
+  },
+  {
+    "claim_id": "GGT_SCORE_GAP_SCALE",
+    "assertion": "Gap-to-target scale for GGT continuous score (product decision; not set in SCL pack).",
+    "value": null,
+    "unit": "U/L",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "GGT_SIGNIFICANT_CHANGE_THRESHOLD",
+    "assertion": "Significant-change / RCV threshold for GGT. Numeric delta not specified in SCL-021; qualitative only.",
+    "value": null,
+    "unit": "U/L",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "GGT_ACUTE_RECOVERY_WINDOW",
+    "assertion": "Acute-context recovery window (days) for GGT.",
+    "value": null,
+    "unit": "days",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "GGT_LIFESTYLE_ADDRESSABLE_GAP_CEILING",
+    "assertion": "Gap ceiling above which GGT escalates from lifestyle to clinician discussion.",
+    "value": null,
+    "unit": "U/L",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "GGT_LOW_INVESTIGATION_THRESHOLD",
+    "assertion": "Low-end investigation threshold for GGT.",
+    "value": null,
+    "unit": "U/L",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "GGT_FH_PATTERN_THRESHOLD",
+    "assertion": "Pattern-referral threshold for GGT. Unanchored unless the SCL pack defines one.",
+    "value": null,
+    "unit": "U/L",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  }
+]

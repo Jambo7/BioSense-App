@@ -1,0 +1,103 @@
+[
+  {
+    "claim_id": "BIOSENSE_FOLATE_THRESHOLD_SET",
+    "assertion": "Folate BioSense wellness band / threshold set from SCL-013.",
+    "value": {
+      "DEFAULT": {
+        "format": "wellness_bands",
+        "direction": "TARGET_BAND",
+        "wellness_bands": [
+          {
+            "id": "DEFICIENT_V",
+            "lt": 3
+          },
+          {
+            "id": "HIGH_FLAG_V",
+            "gte": 40
+          }
+        ],
+        "optimal_max": 40,
+        "above_target_min": 3
+      }
+    },
+    "unit": "ng/mL",
+    "version": "1.0.0",
+    "effective_date": "2026-08-01",
+    "author": "BioSense Scientific Authoring (Origin BioSense Technologies FZCO)",
+    "provenance": "SCL-013 Scientific Configuration Pack v1.0.0 — Folate",
+    "evidence_grade": "B",
+    "review_status": "ANCHORED"
+  },
+  {
+    "claim_id": "FOLATE_SCORE_GAP_SCALE",
+    "assertion": "Gap-to-target scale for Folate continuous score (product decision; not set in SCL pack).",
+    "value": null,
+    "unit": "ng/mL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "FOLATE_SIGNIFICANT_CHANGE_THRESHOLD",
+    "assertion": "Significant-change / RCV threshold for Folate. Numeric delta not specified in SCL-013; qualitative only.",
+    "value": null,
+    "unit": "ng/mL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "FOLATE_ACUTE_RECOVERY_WINDOW",
+    "assertion": "Acute-context recovery window (days) for Folate.",
+    "value": null,
+    "unit": "days",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "FOLATE_LIFESTYLE_ADDRESSABLE_GAP_CEILING",
+    "assertion": "Gap ceiling above which Folate escalates from lifestyle to clinician discussion.",
+    "value": null,
+    "unit": "ng/mL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "FOLATE_LOW_INVESTIGATION_THRESHOLD",
+    "assertion": "Low-end investigation threshold for Folate.",
+    "value": null,
+    "unit": "ng/mL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "FOLATE_FH_PATTERN_THRESHOLD",
+    "assertion": "Pattern-referral threshold for Folate. Unanchored unless the SCL pack defines one.",
+    "value": null,
+    "unit": "ng/mL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  }
+]

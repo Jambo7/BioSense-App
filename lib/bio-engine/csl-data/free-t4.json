@@ -1,0 +1,127 @@
+[
+  {
+    "claim_id": "BIOSENSE_FREE_T4_THRESHOLD_SET",
+    "assertion": "Free T4 BioSense wellness band / threshold set from SCL-018.",
+    "value": {
+      "PRIMARY_PREVENTION_UNSELECTED": {
+        "optimal_max": 11.5,
+        "above_target_min": 11.5,
+        "wellness_bands": [
+          {
+            "id": "LOW",
+            "lt": 11.5
+          },
+          {
+            "id": "OPTIMAL",
+            "gte": 11.5,
+            "lt": 19.0001
+          },
+          {
+            "id": "HIGH",
+            "gte": 19
+          }
+        ],
+        "direction": "TARGET_BAND"
+      },
+      "DEFAULT": {
+        "optimal_max": 11.5,
+        "above_target_min": 11.5,
+        "wellness_bands": [
+          {
+            "id": "LOW",
+            "lt": 11.5
+          },
+          {
+            "id": "OPTIMAL",
+            "gte": 11.5,
+            "lt": 19.0001
+          },
+          {
+            "id": "HIGH",
+            "gte": 19
+          }
+        ],
+        "direction": "TARGET_BAND"
+      }
+    },
+    "unit": "ng/dL",
+    "version": "1.0.0",
+    "effective_date": "2026-08-01",
+    "author": "BioSense Scientific Authoring (Origin BioSense Technologies FZCO)",
+    "provenance": "SCL-018 Free T4 Sci Config Pack v1.0 §0 band table",
+    "evidence_grade": "B",
+    "review_status": "ANCHORED"
+  },
+  {
+    "claim_id": "FREE_T4_SCORE_GAP_SCALE",
+    "assertion": "Gap-to-target scale for Free T4 continuous score (product decision; not set in SCL pack).",
+    "value": null,
+    "unit": "ng/dL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "FREE_T4_SIGNIFICANT_CHANGE_THRESHOLD",
+    "assertion": "Significant-change / RCV threshold for Free T4. Numeric delta not specified in SCL-018; qualitative only.",
+    "value": null,
+    "unit": "ng/dL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "FREE_T4_ACUTE_RECOVERY_WINDOW",
+    "assertion": "Acute-context recovery window (days) for Free T4.",
+    "value": null,
+    "unit": "days",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "FREE_T4_LIFESTYLE_ADDRESSABLE_GAP_CEILING",
+    "assertion": "Gap ceiling above which Free T4 escalates from lifestyle to clinician discussion.",
+    "value": null,
+    "unit": "ng/dL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "FREE_T4_LOW_INVESTIGATION_THRESHOLD",
+    "assertion": "Low-end investigation threshold for Free T4.",
+    "value": null,
+    "unit": "ng/dL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "FREE_T4_FH_PATTERN_THRESHOLD",
+    "assertion": "Pattern-referral threshold for Free T4. Unanchored unless the SCL pack defines one.",
+    "value": null,
+    "unit": "ng/dL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  }
+]

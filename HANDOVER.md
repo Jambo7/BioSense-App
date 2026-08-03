@@ -142,6 +142,9 @@ keys are optional locally — those features skip gracefully when blank.
 
 ## 8. Recent changes (most recent first)
 
+- 2026-08-03 — Imported SCL-001…024 scientific config packs into CSL data + biomarker
+  registry. ApoB banding live from Neil’s pack (optimal &lt;65 / above ≥80). Score/FH/RCV
+  claims still DECLARED where the packs left them unspecified.
 - 2026-07-30 — Capacitor iOS shell (`mobile/`) for TestFlight; loads production web app.
   App icon + camera/photo usage strings. Web viewport / apple-web-app meta for the shell.
 - 2026-06-26 — Added `npm run lock`/`unlock` secret workflow; secrets now travel as an

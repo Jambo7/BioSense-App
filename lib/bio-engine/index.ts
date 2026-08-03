@@ -5,10 +5,18 @@
  * versioned scientific data; the AI layer only renders the resulting narrative
  * contract and can never override it.
  *
- * Import side-effect: registering the ApoB tenant config.
+ * Import side-effect: register all SCL-001..024 packs, then overlay the richer
+ * ApoB tenant config (recommendation ladder, structural nulls).
  */
 
-import './apob-config'
+import { registerAllSclPacks } from './scl-registry.generated'
+import { registerBiomarkerConfig } from './config'
+import { APOB_CONFIG } from './apob-config'
+
+// Register every SCL pack, then re-apply the richer ApoB tenant config
+// (FH ladder, structural nulls) so the generated registry does not dilute it.
+registerAllSclPacks()
+registerBiomarkerConfig(APOB_CONFIG)
 
 export * from './types'
 export { ingest, type RawResult } from './ingest'
@@ -61,5 +69,6 @@ export {
   registerBiomarkerConfig,
   type BiomarkerConfig,
 } from './config'
-export { APOB_CONFIG } from './apob-config'
+export { APOB_CONFIG }
+export { SCL_REGISTRY, registerAllSclPacks } from './scl-registry.generated'
 export { composeConfidence, deriveReducerContext } from './confidence'

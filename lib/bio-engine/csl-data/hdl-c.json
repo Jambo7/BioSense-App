@@ -1,0 +1,239 @@
+[
+  {
+    "claim_id": "BIOSENSE_HDL_C_THRESHOLD_SET",
+    "assertion": "HDL Cholesterol BioSense wellness band / threshold set from SCL-004.",
+    "value": {
+      "MALE": {
+        "PRIMARY_PREVENTION_UNSELECTED": {
+          "optimal_max": 60,
+          "above_target_min": 40,
+          "wellness_bands": [
+            {
+              "id": "BELOW_OPTIMAL",
+              "lt": 40
+            },
+            {
+              "id": "FAVOURABLE",
+              "gte": 40,
+              "lt": 60
+            },
+            {
+              "id": "OPTIMAL_REFERENCE",
+              "gte": 60,
+              "lt": 81
+            },
+            {
+              "id": "HIGH_MONITOR",
+              "gte": 81,
+              "lt": 91
+            }
+          ],
+          "direction": "TARGET_BAND"
+        },
+        "DEFAULT": {
+          "optimal_max": 60,
+          "above_target_min": 40,
+          "wellness_bands": [
+            {
+              "id": "BELOW_OPTIMAL",
+              "lt": 40
+            },
+            {
+              "id": "FAVOURABLE",
+              "gte": 40,
+              "lt": 60
+            },
+            {
+              "id": "OPTIMAL_REFERENCE",
+              "gte": 60,
+              "lt": 81
+            },
+            {
+              "id": "HIGH_MONITOR",
+              "gte": 81,
+              "lt": 91
+            }
+          ],
+          "direction": "TARGET_BAND"
+        }
+      },
+      "FEMALE": {
+        "PRIMARY_PREVENTION_UNSELECTED": {
+          "optimal_max": 60,
+          "above_target_min": 50,
+          "wellness_bands": [
+            {
+              "id": "BELOW_OPTIMAL",
+              "lt": 50
+            },
+            {
+              "id": "FAVOURABLE",
+              "gte": 50,
+              "lt": 60
+            },
+            {
+              "id": "OPTIMAL_REFERENCE",
+              "gte": 60,
+              "lt": 91
+            },
+            {
+              "id": "HIGH_MONITOR",
+              "gte": 91,
+              "lt": 111
+            }
+          ],
+          "direction": "TARGET_BAND"
+        },
+        "DEFAULT": {
+          "optimal_max": 60,
+          "above_target_min": 50,
+          "wellness_bands": [
+            {
+              "id": "BELOW_OPTIMAL",
+              "lt": 50
+            },
+            {
+              "id": "FAVOURABLE",
+              "gte": 50,
+              "lt": 60
+            },
+            {
+              "id": "OPTIMAL_REFERENCE",
+              "gte": 60,
+              "lt": 91
+            },
+            {
+              "id": "HIGH_MONITOR",
+              "gte": 91,
+              "lt": 111
+            }
+          ],
+          "direction": "TARGET_BAND"
+        }
+      },
+      "DEFAULT": {
+        "PRIMARY_PREVENTION_UNSELECTED": {
+          "optimal_max": 60,
+          "above_target_min": 40,
+          "wellness_bands": [
+            {
+              "id": "BELOW_OPTIMAL",
+              "lt": 40
+            },
+            {
+              "id": "FAVOURABLE",
+              "gte": 40,
+              "lt": 60
+            },
+            {
+              "id": "OPTIMAL_REFERENCE",
+              "gte": 60,
+              "lt": 81
+            }
+          ],
+          "direction": "TARGET_BAND"
+        },
+        "DEFAULT": {
+          "optimal_max": 60,
+          "above_target_min": 40,
+          "wellness_bands": [
+            {
+              "id": "BELOW_OPTIMAL",
+              "lt": 40
+            },
+            {
+              "id": "FAVOURABLE",
+              "gte": 40,
+              "lt": 60
+            },
+            {
+              "id": "OPTIMAL_REFERENCE",
+              "gte": 60,
+              "lt": 81
+            }
+          ],
+          "direction": "TARGET_BAND"
+        }
+      }
+    },
+    "unit": "mg/dL",
+    "version": "1.0.0",
+    "effective_date": "2026-07-31",
+    "author": "BioSense Scientific Authoring (Origin BioSense Technologies FZCO)",
+    "provenance": "SCL-004 HDL-C Sci Config Pack v1.0 §0.2 / §11",
+    "evidence_grade": "B",
+    "review_status": "ANCHORED"
+  },
+  {
+    "claim_id": "HDL_C_SCORE_GAP_SCALE",
+    "assertion": "Gap-to-target scale for HDL Cholesterol continuous score (product decision; not set in SCL pack).",
+    "value": null,
+    "unit": "mg/dL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "HDL_C_SIGNIFICANT_CHANGE_THRESHOLD",
+    "assertion": "Significant-change / RCV threshold for HDL Cholesterol. Numeric delta not specified in SCL-004; qualitative only.",
+    "value": null,
+    "unit": "mg/dL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "HDL_C_ACUTE_RECOVERY_WINDOW",
+    "assertion": "Acute-context recovery window (days) for HDL Cholesterol.",
+    "value": null,
+    "unit": "days",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "HDL_C_LIFESTYLE_ADDRESSABLE_GAP_CEILING",
+    "assertion": "Gap ceiling above which HDL Cholesterol escalates from lifestyle to clinician discussion.",
+    "value": null,
+    "unit": "mg/dL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "HDL_C_LOW_INVESTIGATION_THRESHOLD",
+    "assertion": "Low-end investigation threshold for HDL Cholesterol.",
+    "value": null,
+    "unit": "mg/dL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "HDL_C_FH_PATTERN_THRESHOLD",
+    "assertion": "Pattern-referral threshold for HDL Cholesterol. Unanchored unless the SCL pack defines one.",
+    "value": null,
+    "unit": "mg/dL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  }
+]

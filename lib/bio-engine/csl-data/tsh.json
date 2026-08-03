@@ -1,0 +1,103 @@
+[
+  {
+    "claim_id": "BIOSENSE_TSH_THRESHOLD_SET",
+    "assertion": "TSH BioSense wellness band / threshold set from SCL-017.",
+    "value": {
+      "DEFAULT": {
+        "format": "wellness_bands",
+        "direction": "TARGET_BAND",
+        "wellness_bands": [
+          {
+            "id": "SUPPRESSED_LOW_FLAG_V",
+            "lt": 0.1
+          },
+          {
+            "id": "HIGH_FLAG_V",
+            "gte": 10
+          }
+        ],
+        "optimal_max": 10,
+        "above_target_min": 0.1
+      }
+    },
+    "unit": "mIU/L",
+    "version": "1.0.0",
+    "effective_date": "2026-08-01",
+    "author": "BioSense Scientific Authoring (Origin BioSense Technologies FZCO)",
+    "provenance": "SCL-017 Scientific Configuration Pack v1.0.0 — TSH",
+    "evidence_grade": "B",
+    "review_status": "ANCHORED"
+  },
+  {
+    "claim_id": "TSH_SCORE_GAP_SCALE",
+    "assertion": "Gap-to-target scale for TSH continuous score (product decision; not set in SCL pack).",
+    "value": null,
+    "unit": "mIU/L",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "TSH_SIGNIFICANT_CHANGE_THRESHOLD",
+    "assertion": "Significant-change / RCV threshold for TSH. Numeric delta not specified in SCL-017; qualitative only.",
+    "value": null,
+    "unit": "mIU/L",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "TSH_ACUTE_RECOVERY_WINDOW",
+    "assertion": "Acute-context recovery window (days) for TSH.",
+    "value": null,
+    "unit": "days",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "TSH_LIFESTYLE_ADDRESSABLE_GAP_CEILING",
+    "assertion": "Gap ceiling above which TSH escalates from lifestyle to clinician discussion.",
+    "value": null,
+    "unit": "mIU/L",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "TSH_LOW_INVESTIGATION_THRESHOLD",
+    "assertion": "Low-end investigation threshold for TSH.",
+    "value": null,
+    "unit": "mIU/L",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "TSH_FH_PATTERN_THRESHOLD",
+    "assertion": "Pattern-referral threshold for TSH. Unanchored unless the SCL pack defines one.",
+    "value": null,
+    "unit": "mIU/L",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  }
+]

@@ -1,0 +1,239 @@
+[
+  {
+    "claim_id": "BIOSENSE_ALT_THRESHOLD_SET",
+    "assertion": "ALT BioSense wellness band / threshold set from SCL-014.",
+    "value": {
+      "MALE": {
+        "PRIMARY_PREVENTION_UNSELECTED": {
+          "optimal_max": 30,
+          "above_target_min": 40,
+          "wellness_bands": [
+            {
+              "id": "LOW_CONTEXT_FLAG",
+              "lt": 10
+            },
+            {
+              "id": "OPTIMAL",
+              "gte": 10,
+              "lt": 31
+            },
+            {
+              "id": "HIGH_NORMAL_WATCH",
+              "gte": 30,
+              "lt": 41
+            },
+            {
+              "id": "BORDERLINE_ELEVATED",
+              "gte": 40,
+              "lt": 81
+            },
+            {
+              "id": "MILD_ELEVATED",
+              "gte": 80,
+              "lt": 201
+            }
+          ],
+          "direction": "LOWER_BETTER"
+        },
+        "DEFAULT": {
+          "optimal_max": 30,
+          "above_target_min": 40,
+          "wellness_bands": [
+            {
+              "id": "LOW_CONTEXT_FLAG",
+              "lt": 10
+            },
+            {
+              "id": "OPTIMAL",
+              "gte": 10,
+              "lt": 31
+            },
+            {
+              "id": "HIGH_NORMAL_WATCH",
+              "gte": 30,
+              "lt": 41
+            },
+            {
+              "id": "BORDERLINE_ELEVATED",
+              "gte": 40,
+              "lt": 81
+            },
+            {
+              "id": "MILD_ELEVATED",
+              "gte": 80,
+              "lt": 201
+            }
+          ],
+          "direction": "LOWER_BETTER"
+        }
+      },
+      "FEMALE": {
+        "PRIMARY_PREVENTION_UNSELECTED": {
+          "optimal_max": 19,
+          "above_target_min": 40,
+          "wellness_bands": [
+            {
+              "id": "LOW_CONTEXT_FLAG",
+              "lt": 10
+            },
+            {
+              "id": "OPTIMAL",
+              "gte": 10,
+              "lt": 20
+            },
+            {
+              "id": "HIGH_NORMAL_WATCH",
+              "gte": 19,
+              "lt": 41
+            },
+            {
+              "id": "BORDERLINE_ELEVATED",
+              "gte": 40,
+              "lt": 81
+            }
+          ],
+          "direction": "LOWER_BETTER"
+        },
+        "DEFAULT": {
+          "optimal_max": 19,
+          "above_target_min": 40,
+          "wellness_bands": [
+            {
+              "id": "LOW_CONTEXT_FLAG",
+              "lt": 10
+            },
+            {
+              "id": "OPTIMAL",
+              "gte": 10,
+              "lt": 20
+            },
+            {
+              "id": "HIGH_NORMAL_WATCH",
+              "gte": 19,
+              "lt": 41
+            },
+            {
+              "id": "BORDERLINE_ELEVATED",
+              "gte": 40,
+              "lt": 81
+            }
+          ],
+          "direction": "LOWER_BETTER"
+        }
+      },
+      "DEFAULT": {
+        "PRIMARY_PREVENTION_UNSELECTED": {
+          "optimal_max": 40,
+          "above_target_min": 40,
+          "wellness_bands": [
+            {
+              "id": "OPTIMAL",
+              "lt": 41
+            },
+            {
+              "id": "BORDERLINE_ELEVATED",
+              "gte": 40,
+              "lt": 81
+            }
+          ],
+          "direction": "LOWER_BETTER"
+        },
+        "DEFAULT": {
+          "optimal_max": 40,
+          "above_target_min": 40,
+          "wellness_bands": [
+            {
+              "id": "OPTIMAL",
+              "lt": 41
+            },
+            {
+              "id": "BORDERLINE_ELEVATED",
+              "gte": 40,
+              "lt": 81
+            }
+          ],
+          "direction": "LOWER_BETTER"
+        }
+      }
+    },
+    "unit": "U/L",
+    "version": "1.0.0",
+    "effective_date": "2026-08-01",
+    "author": "BioSense Scientific Authoring (Origin BioSense Technologies FZCO)",
+    "provenance": "SCL-014 ALT Sci Config Pack v1.0 §0.2 / §11 (Prati ULN_ref 30/19; conventional 40)",
+    "evidence_grade": "B",
+    "review_status": "ANCHORED"
+  },
+  {
+    "claim_id": "ALT_SCORE_GAP_SCALE",
+    "assertion": "Gap-to-target scale for ALT continuous score (product decision; not set in SCL pack).",
+    "value": null,
+    "unit": "U/L",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "ALT_SIGNIFICANT_CHANGE_THRESHOLD",
+    "assertion": "Significant-change / RCV threshold for ALT. Numeric delta not specified in SCL-014; qualitative only.",
+    "value": null,
+    "unit": "U/L",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "ALT_ACUTE_RECOVERY_WINDOW",
+    "assertion": "Acute-context recovery window (days) for ALT.",
+    "value": null,
+    "unit": "days",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "ALT_LIFESTYLE_ADDRESSABLE_GAP_CEILING",
+    "assertion": "Gap ceiling above which ALT escalates from lifestyle to clinician discussion.",
+    "value": null,
+    "unit": "U/L",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "ALT_LOW_INVESTIGATION_THRESHOLD",
+    "assertion": "Low-end investigation threshold for ALT.",
+    "value": null,
+    "unit": "U/L",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "ALT_FH_PATTERN_THRESHOLD",
+    "assertion": "Pattern-referral threshold for ALT. Unanchored unless the SCL pack defines one.",
+    "value": null,
+    "unit": "U/L",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  }
+]

@@ -1,0 +1,103 @@
+[
+  {
+    "claim_id": "BIOSENSE_VITAMIN_B12_THRESHOLD_SET",
+    "assertion": "Vitamin B12 BioSense wellness band / threshold set from SCL-012.",
+    "value": {
+      "DEFAULT": {
+        "format": "wellness_bands",
+        "direction": "TARGET_BAND",
+        "wellness_bands": [
+          {
+            "id": "LOW_V",
+            "lt": 200
+          },
+          {
+            "id": "HIGH_FLAG_V",
+            "gte": 1000
+          }
+        ],
+        "optimal_max": 1000,
+        "above_target_min": 200
+      }
+    },
+    "unit": "pg/mL",
+    "version": "1.0.0",
+    "effective_date": "2026-08-01",
+    "author": "BioSense Scientific Authoring (Origin BioSense Technologies FZCO)",
+    "provenance": "SCL-012 Scientific Configuration Pack v1.0.0 — Vitamin B12",
+    "evidence_grade": "B",
+    "review_status": "ANCHORED"
+  },
+  {
+    "claim_id": "VITAMIN_B12_SCORE_GAP_SCALE",
+    "assertion": "Gap-to-target scale for Vitamin B12 continuous score (product decision; not set in SCL pack).",
+    "value": null,
+    "unit": "pg/mL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "VITAMIN_B12_SIGNIFICANT_CHANGE_THRESHOLD",
+    "assertion": "Significant-change / RCV threshold for Vitamin B12. Numeric delta not specified in SCL-012; qualitative only.",
+    "value": null,
+    "unit": "pg/mL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "VITAMIN_B12_ACUTE_RECOVERY_WINDOW",
+    "assertion": "Acute-context recovery window (days) for Vitamin B12.",
+    "value": null,
+    "unit": "days",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "VITAMIN_B12_LIFESTYLE_ADDRESSABLE_GAP_CEILING",
+    "assertion": "Gap ceiling above which Vitamin B12 escalates from lifestyle to clinician discussion.",
+    "value": null,
+    "unit": "pg/mL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "VITAMIN_B12_LOW_INVESTIGATION_THRESHOLD",
+    "assertion": "Low-end investigation threshold for Vitamin B12.",
+    "value": null,
+    "unit": "pg/mL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "VITAMIN_B12_FH_PATTERN_THRESHOLD",
+    "assertion": "Pattern-referral threshold for Vitamin B12. Unanchored unless the SCL pack defines one.",
+    "value": null,
+    "unit": "pg/mL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  }
+]

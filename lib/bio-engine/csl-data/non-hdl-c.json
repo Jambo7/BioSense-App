@@ -1,0 +1,147 @@
+[
+  {
+    "claim_id": "BIOSENSE_NON_HDL_C_THRESHOLD_SET",
+    "assertion": "Non-HDL Cholesterol BioSense wellness band / threshold set from SCL-007.",
+    "value": {
+      "PRIMARY_PREVENTION_UNSELECTED": {
+        "optimal_max": 130,
+        "above_target_min": 160,
+        "wellness_bands": [
+          {
+            "id": "OPTIMAL",
+            "lt": 130
+          },
+          {
+            "id": "ABOVE_OPTIMAL",
+            "gte": 130,
+            "lt": 160
+          },
+          {
+            "id": "ELEVATED",
+            "gte": 160,
+            "lt": 190
+          },
+          {
+            "id": "HIGH",
+            "gte": 190,
+            "lt": 220
+          },
+          {
+            "id": "SIGNIFICANTLY_ELEVATED",
+            "gte": 220
+          }
+        ],
+        "direction": "LOWER_BETTER"
+      },
+      "DEFAULT": {
+        "optimal_max": 130,
+        "above_target_min": 160,
+        "wellness_bands": [
+          {
+            "id": "OPTIMAL",
+            "lt": 130
+          },
+          {
+            "id": "ABOVE_OPTIMAL",
+            "gte": 130,
+            "lt": 160
+          },
+          {
+            "id": "ELEVATED",
+            "gte": 160,
+            "lt": 190
+          },
+          {
+            "id": "HIGH",
+            "gte": 190,
+            "lt": 220
+          },
+          {
+            "id": "SIGNIFICANTLY_ELEVATED",
+            "gte": 220
+          }
+        ],
+        "direction": "LOWER_BETTER"
+      }
+    },
+    "unit": "mg/dL",
+    "version": "1.0.0",
+    "effective_date": "2026-07-31",
+    "author": "BioSense Scientific Authoring (Origin BioSense Technologies FZCO)",
+    "provenance": "SCL-007 Non-HDL-C Sci Config Pack v1.0 §0.2 / §11",
+    "evidence_grade": "B",
+    "review_status": "ANCHORED"
+  },
+  {
+    "claim_id": "NON_HDL_C_SCORE_GAP_SCALE",
+    "assertion": "Gap-to-target scale for Non-HDL Cholesterol continuous score (product decision; not set in SCL pack).",
+    "value": null,
+    "unit": "mg/dL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "NON_HDL_C_SIGNIFICANT_CHANGE_THRESHOLD",
+    "assertion": "Significant-change / RCV threshold for Non-HDL Cholesterol. Numeric delta not specified in SCL-007; qualitative only.",
+    "value": null,
+    "unit": "mg/dL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "NON_HDL_C_ACUTE_RECOVERY_WINDOW",
+    "assertion": "Acute-context recovery window (days) for Non-HDL Cholesterol.",
+    "value": null,
+    "unit": "days",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "NON_HDL_C_LIFESTYLE_ADDRESSABLE_GAP_CEILING",
+    "assertion": "Gap ceiling above which Non-HDL Cholesterol escalates from lifestyle to clinician discussion.",
+    "value": null,
+    "unit": "mg/dL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "NON_HDL_C_LOW_INVESTIGATION_THRESHOLD",
+    "assertion": "Low-end investigation threshold for Non-HDL Cholesterol.",
+    "value": null,
+    "unit": "mg/dL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "NON_HDL_C_FH_PATTERN_THRESHOLD",
+    "assertion": "Pattern-referral threshold for Non-HDL Cholesterol. Unanchored unless the SCL pack defines one.",
+    "value": null,
+    "unit": "mg/dL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  }
+]

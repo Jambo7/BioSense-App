@@ -1,0 +1,127 @@
+[
+  {
+    "claim_id": "BIOSENSE_TOTAL_CHOLESTEROL_THRESHOLD_SET",
+    "assertion": "Total Cholesterol BioSense wellness band / threshold set from SCL-008.",
+    "value": {
+      "PRIMARY_PREVENTION_UNSELECTED": {
+        "optimal_max": 200,
+        "above_target_min": 240,
+        "wellness_bands": [
+          {
+            "id": "DESIRABLE",
+            "lt": 200
+          },
+          {
+            "id": "BORDERLINE_HIGH",
+            "gte": 200,
+            "lt": 240
+          },
+          {
+            "id": "HIGH",
+            "gte": 240
+          }
+        ],
+        "direction": "LOWER_BETTER"
+      },
+      "DEFAULT": {
+        "optimal_max": 200,
+        "above_target_min": 240,
+        "wellness_bands": [
+          {
+            "id": "DESIRABLE",
+            "lt": 200
+          },
+          {
+            "id": "BORDERLINE_HIGH",
+            "gte": 200,
+            "lt": 240
+          },
+          {
+            "id": "HIGH",
+            "gte": 240
+          }
+        ],
+        "direction": "LOWER_BETTER"
+      }
+    },
+    "unit": "mg/dL",
+    "version": "1.0.0",
+    "effective_date": "2026-07-31",
+    "author": "BioSense Scientific Authoring (Origin BioSense Technologies FZCO)",
+    "provenance": "SCL-008 Total Cholesterol Sci Config Pack v1.0 §0.2",
+    "evidence_grade": "B",
+    "review_status": "ANCHORED"
+  },
+  {
+    "claim_id": "TOTAL_CHOLESTEROL_SCORE_GAP_SCALE",
+    "assertion": "Gap-to-target scale for Total Cholesterol continuous score (product decision; not set in SCL pack).",
+    "value": null,
+    "unit": "mg/dL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "TOTAL_CHOLESTEROL_SIGNIFICANT_CHANGE_THRESHOLD",
+    "assertion": "Significant-change / RCV threshold for Total Cholesterol. Numeric delta not specified in SCL-008; qualitative only.",
+    "value": null,
+    "unit": "mg/dL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "TOTAL_CHOLESTEROL_ACUTE_RECOVERY_WINDOW",
+    "assertion": "Acute-context recovery window (days) for Total Cholesterol.",
+    "value": null,
+    "unit": "days",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "TOTAL_CHOLESTEROL_LIFESTYLE_ADDRESSABLE_GAP_CEILING",
+    "assertion": "Gap ceiling above which Total Cholesterol escalates from lifestyle to clinician discussion.",
+    "value": null,
+    "unit": "mg/dL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "TOTAL_CHOLESTEROL_LOW_INVESTIGATION_THRESHOLD",
+    "assertion": "Low-end investigation threshold for Total Cholesterol.",
+    "value": null,
+    "unit": "mg/dL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "TOTAL_CHOLESTEROL_FH_PATTERN_THRESHOLD",
+    "assertion": "Pattern-referral threshold for Total Cholesterol. Unanchored unless the SCL pack defines one.",
+    "value": null,
+    "unit": "mg/dL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  }
+]

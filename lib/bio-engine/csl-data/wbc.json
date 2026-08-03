@@ -1,0 +1,103 @@
+[
+  {
+    "claim_id": "BIOSENSE_WBC_THRESHOLD_SET",
+    "assertion": "White Blood Cell Count BioSense wellness band / threshold set from SCL-020.",
+    "value": {
+      "DEFAULT": {
+        "format": "wellness_bands",
+        "direction": "TARGET_BAND",
+        "wellness_bands": [
+          {
+            "id": "LOW_FLAG_V",
+            "lt": 4
+          },
+          {
+            "id": "MARKED_HIGH_FLAG",
+            "gte": 30
+          }
+        ],
+        "optimal_max": 30,
+        "above_target_min": 4
+      }
+    },
+    "unit": "×10⁹/L",
+    "version": "1.0.0",
+    "effective_date": "2026-08-01",
+    "author": "BioSense Scientific Authoring (Origin BioSense Technologies FZCO)",
+    "provenance": "SCL-020 Scientific Configuration Pack v1.0.0 — White Blood Cell Count",
+    "evidence_grade": "B",
+    "review_status": "ANCHORED"
+  },
+  {
+    "claim_id": "WBC_SCORE_GAP_SCALE",
+    "assertion": "Gap-to-target scale for White Blood Cell Count continuous score (product decision; not set in SCL pack).",
+    "value": null,
+    "unit": "×10⁹/L",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "WBC_SIGNIFICANT_CHANGE_THRESHOLD",
+    "assertion": "Significant-change / RCV threshold for White Blood Cell Count. Numeric delta not specified in SCL-020; qualitative only.",
+    "value": null,
+    "unit": "×10⁹/L",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "WBC_ACUTE_RECOVERY_WINDOW",
+    "assertion": "Acute-context recovery window (days) for White Blood Cell Count.",
+    "value": null,
+    "unit": "days",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "WBC_LIFESTYLE_ADDRESSABLE_GAP_CEILING",
+    "assertion": "Gap ceiling above which White Blood Cell Count escalates from lifestyle to clinician discussion.",
+    "value": null,
+    "unit": "×10⁹/L",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "WBC_LOW_INVESTIGATION_THRESHOLD",
+    "assertion": "Low-end investigation threshold for White Blood Cell Count.",
+    "value": null,
+    "unit": "×10⁹/L",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "WBC_FH_PATTERN_THRESHOLD",
+    "assertion": "Pattern-referral threshold for White Blood Cell Count. Unanchored unless the SCL pack defines one.",
+    "value": null,
+    "unit": "×10⁹/L",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  }
+]

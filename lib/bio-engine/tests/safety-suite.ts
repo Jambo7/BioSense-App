@@ -8,10 +8,11 @@
  *
  * Run with: npm run test:engine
  *
- * Note on structure: Part 1 exercises the current (unanchored) ship state. Part 3
- * registers a test claim source with fully-populated audit fields to prove each
- * feature activates on anchoring with no code change. The test values are
- * arbitrary and carry no clinical meaning.
+ * Note on structure: Part 1 exercises the production ship state after SCL-001
+ * ApoB banding was anchored from Neil's pack (optimal <65 / above ≥80). Score /
+ * FH / RCV stay disabled until those claims are filled. Part 3 registers a test
+ * claim source to prove remaining features activate on anchoring with no code
+ * change. Part-3 test values are arbitrary and carry no clinical meaning.
  */
 import {
   ingest,
@@ -69,33 +70,42 @@ function apobObs(
   }) as CanonicalObservation
 }
 
-// ═══ PART 1 — unanchored (current ship state) ═══════════════════════════════
-section('PART 1 — unanchored: display value, abstain on interpretation')
+// ═══ PART 1 — production ship state (SCL-001 banding anchored) ═════════════
+section('PART 1 — SCL-001 anchored banding; score/FH still disabled')
 
 const obs1 = apobObs(1.1, 'g/L')
 check(obs1.trust_tier === 'VERIFIED', 'verified accredited-lab upload is VERIFIED (PI-1)')
 check(Math.abs((obs1.value_canonical ?? 0) - 110) < 1e-9, '1.1 g/L normalises to 110 mg/dL')
 
 const out1 = interpret(obs1)
-check(out1.abstained, 'abstains while thresholds unanchored (PI-5)')
-check(out1.is_error === false, 'abstention is not an error')
-check(out1.band === null && out1.gap_to_target === null, 'no band, no gap')
-check(out1.score_contribution === null, 'score EXCLUDED, not 0 (null-gap safety)')
-check(out1.disabled_features.includes('banding'), 'banding reported disabled')
-check(out1.disabled_features.includes('fh_pattern_pathway'), 'FH pathway reported disabled')
-check(out1.recommendations.length === 0, 'no recommendations while inert')
+check(out1.abstained === false, 'interprets once SCL-001 thresholds are anchored')
+check(out1.is_error === false, 'interpretation is not an error')
+check(out1.band === 'ABOVE_TARGET', 'ApoB 110 mg/dL is ABOVE_TARGET under SCL-001 (≥80)')
+check(
+  out1.gap_to_target != null && Math.abs(out1.gap_to_target - 45) < 1e-6,
+  'gap is 110 − 65 (optimal_max)',
+)
+check(out1.score_contribution === null, 'score EXCLUDED until APOB_SCORE_GAP_SCALE anchored')
+check(!out1.disabled_features.includes('banding'), 'banding enabled from SCL-001')
+check(out1.disabled_features.includes('fh_pattern_pathway'), 'FH pathway still disabled (no ApoB FH cut)')
 check(
   out1.narrative_forbidden.includes('NUMERIC_RISK_ESTIMATE'),
-  'standing prohibitions ride on every payload, even abstentions',
+  'standing prohibitions ride on every payload',
 )
 check(out1.structural_nulls.apob_derived_risk_score === null, 'risk score structurally null')
 check(out1.structural_nulls.low_value_penalty === 0, 'low_value_penalty structurally 0')
-check(/can't interpret it yet/.test(deterministicTemplate(out1)), 'safe deterministic template')
+check(deterministicTemplate(out1).length > 0, 'deterministic template renders')
+
+const optimal = interpret(apobObs(60, 'mg/dL'))
+check(optimal.band === 'AT_TARGET', 'ApoB 60 is AT_TARGET under SCL-001 (<65)')
+
+const near = interpret(apobObs(70, 'mg/dL'))
+check(near.band === 'NEAR_TARGET', 'ApoB 70 is NEAR_TARGET under SCL-001 (65–79)')
 
 const noUnit = apobObs(90, null)
 check(noUnit.value_canonical === null, 'missing unit → never guessed')
 
-const paed = interpret(apobObs(110, 'g/L' as string, { age: sv(9) }))
+const paed = interpret(apobObs(110, 'mg/dL', { age: sv(9) }))
 check(paed.abstained, 'paediatric value abstains (out of scope)')
 
 const noAge = interpret(apobObs(1.1, 'g/L', { age: { ...sv(0), missingness: 'UNKNOWN' } }))

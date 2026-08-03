@@ -1,0 +1,127 @@
+[
+  {
+    "claim_id": "BIOSENSE_HS_CRP_THRESHOLD_SET",
+    "assertion": "hs-CRP BioSense wellness band / threshold set from SCL-006.",
+    "value": {
+      "PRIMARY_PREVENTION_UNSELECTED": {
+        "optimal_max": 1,
+        "above_target_min": 3,
+        "wellness_bands": [
+          {
+            "id": "LOW_FAVOURABLE",
+            "lt": 1
+          },
+          {
+            "id": "INTERMEDIATE",
+            "gte": 1,
+            "lt": 3
+          },
+          {
+            "id": "HIGH",
+            "gte": 3
+          }
+        ],
+        "direction": "LOWER_BETTER"
+      },
+      "DEFAULT": {
+        "optimal_max": 1,
+        "above_target_min": 3,
+        "wellness_bands": [
+          {
+            "id": "LOW_FAVOURABLE",
+            "lt": 1
+          },
+          {
+            "id": "INTERMEDIATE",
+            "gte": 1,
+            "lt": 3
+          },
+          {
+            "id": "HIGH",
+            "gte": 3
+          }
+        ],
+        "direction": "LOWER_BETTER"
+      }
+    },
+    "unit": "mg/L",
+    "version": "1.0.0",
+    "effective_date": "2026-07-31",
+    "author": "BioSense Scientific Authoring (Origin BioSense Technologies FZCO)",
+    "provenance": "SCL-006 hs-CRP Sci Config Pack v1.0 §0.2",
+    "evidence_grade": "B",
+    "review_status": "ANCHORED"
+  },
+  {
+    "claim_id": "HS_CRP_SCORE_GAP_SCALE",
+    "assertion": "Gap-to-target scale for hs-CRP continuous score (product decision; not set in SCL pack).",
+    "value": null,
+    "unit": "mg/L",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "HS_CRP_SIGNIFICANT_CHANGE_THRESHOLD",
+    "assertion": "Significant-change / RCV threshold for hs-CRP. Numeric delta not specified in SCL-006; qualitative only.",
+    "value": null,
+    "unit": "mg/L",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "HS_CRP_ACUTE_RECOVERY_WINDOW",
+    "assertion": "Acute-context recovery window (days) for hs-CRP.",
+    "value": null,
+    "unit": "days",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "HS_CRP_LIFESTYLE_ADDRESSABLE_GAP_CEILING",
+    "assertion": "Gap ceiling above which hs-CRP escalates from lifestyle to clinician discussion.",
+    "value": null,
+    "unit": "mg/L",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "HS_CRP_LOW_INVESTIGATION_THRESHOLD",
+    "assertion": "Low-end investigation threshold for hs-CRP.",
+    "value": null,
+    "unit": "mg/L",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "HS_CRP_FH_PATTERN_THRESHOLD",
+    "assertion": "Pattern-referral threshold for hs-CRP. Unanchored unless the SCL pack defines one.",
+    "value": null,
+    "unit": "mg/L",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  }
+]

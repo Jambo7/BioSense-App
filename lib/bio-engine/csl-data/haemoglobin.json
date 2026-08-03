@@ -1,0 +1,183 @@
+[
+  {
+    "claim_id": "BIOSENSE_HAEMOGLOBIN_THRESHOLD_SET",
+    "assertion": "Haemoglobin BioSense wellness band / threshold set from SCL-019.",
+    "value": {
+      "MALE": {
+        "PRIMARY_PREVENTION_UNSELECTED": {
+          "optimal_max": 13,
+          "above_target_min": 13,
+          "wellness_bands": [
+            {
+              "id": "LOW",
+              "lt": 13
+            },
+            {
+              "id": "OPTIMAL",
+              "gte": 13
+            }
+          ],
+          "direction": "HIGHER_BETTER"
+        },
+        "DEFAULT": {
+          "optimal_max": 13,
+          "above_target_min": 13,
+          "wellness_bands": [
+            {
+              "id": "LOW",
+              "lt": 13
+            },
+            {
+              "id": "OPTIMAL",
+              "gte": 13
+            }
+          ],
+          "direction": "HIGHER_BETTER"
+        }
+      },
+      "FEMALE": {
+        "PRIMARY_PREVENTION_UNSELECTED": {
+          "optimal_max": 12,
+          "above_target_min": 12,
+          "wellness_bands": [
+            {
+              "id": "LOW",
+              "lt": 12
+            },
+            {
+              "id": "OPTIMAL",
+              "gte": 12
+            }
+          ],
+          "direction": "HIGHER_BETTER"
+        },
+        "DEFAULT": {
+          "optimal_max": 12,
+          "above_target_min": 12,
+          "wellness_bands": [
+            {
+              "id": "LOW",
+              "lt": 12
+            },
+            {
+              "id": "OPTIMAL",
+              "gte": 12
+            }
+          ],
+          "direction": "HIGHER_BETTER"
+        }
+      },
+      "DEFAULT": {
+        "PRIMARY_PREVENTION_UNSELECTED": {
+          "optimal_max": 12,
+          "above_target_min": 12,
+          "wellness_bands": [
+            {
+              "id": "LOW",
+              "lt": 12
+            },
+            {
+              "id": "OPTIMAL",
+              "gte": 12
+            }
+          ],
+          "direction": "HIGHER_BETTER"
+        },
+        "DEFAULT": {
+          "optimal_max": 12,
+          "above_target_min": 12,
+          "wellness_bands": [
+            {
+              "id": "LOW",
+              "lt": 12
+            },
+            {
+              "id": "OPTIMAL",
+              "gte": 12
+            }
+          ],
+          "direction": "HIGHER_BETTER"
+        }
+      }
+    },
+    "unit": "g/dL",
+    "version": "1.0.0",
+    "effective_date": "2026-08-01",
+    "author": "BioSense Scientific Authoring (Origin BioSense Technologies FZCO)",
+    "provenance": "SCL-019 Haemoglobin Sci Config Pack v1.0",
+    "evidence_grade": "B",
+    "review_status": "ANCHORED"
+  },
+  {
+    "claim_id": "HAEMOGLOBIN_SCORE_GAP_SCALE",
+    "assertion": "Gap-to-target scale for Haemoglobin continuous score (product decision; not set in SCL pack).",
+    "value": null,
+    "unit": "g/dL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "HAEMOGLOBIN_SIGNIFICANT_CHANGE_THRESHOLD",
+    "assertion": "Significant-change / RCV threshold for Haemoglobin. Numeric delta not specified in SCL-019; qualitative only.",
+    "value": null,
+    "unit": "g/dL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "HAEMOGLOBIN_ACUTE_RECOVERY_WINDOW",
+    "assertion": "Acute-context recovery window (days) for Haemoglobin.",
+    "value": null,
+    "unit": "days",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "HAEMOGLOBIN_LIFESTYLE_ADDRESSABLE_GAP_CEILING",
+    "assertion": "Gap ceiling above which Haemoglobin escalates from lifestyle to clinician discussion.",
+    "value": null,
+    "unit": "g/dL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "HAEMOGLOBIN_LOW_INVESTIGATION_THRESHOLD",
+    "assertion": "Low-end investigation threshold for Haemoglobin.",
+    "value": null,
+    "unit": "g/dL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "HAEMOGLOBIN_FH_PATTERN_THRESHOLD",
+    "assertion": "Pattern-referral threshold for Haemoglobin. Unanchored unless the SCL pack defines one.",
+    "value": null,
+    "unit": "g/dL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  }
+]

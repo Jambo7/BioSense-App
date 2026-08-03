@@ -1,0 +1,99 @@
+[
+  {
+    "claim_id": "BIOSENSE_ALP_THRESHOLD_SET",
+    "assertion": "Alkaline Phosphatase BioSense wellness band / threshold set from SCL-022.",
+    "value": {
+      "DEFAULT": {
+        "format": "wellness_bands",
+        "direction": "TARGET_BAND",
+        "wellness_bands": [
+          {
+            "id": "LOW_FLAG_V",
+            "lt": 30
+          }
+        ],
+        "optimal_max": 0,
+        "above_target_min": 30
+      }
+    },
+    "unit": "U/L",
+    "version": "1.0.0",
+    "effective_date": "2026-08-01",
+    "author": "BioSense Scientific Authoring (Origin BioSense Technologies FZCO)",
+    "provenance": "SCL-022 Scientific Configuration Pack v1.0.0 — Alkaline Phosphatase",
+    "evidence_grade": "B",
+    "review_status": "ANCHORED"
+  },
+  {
+    "claim_id": "ALP_SCORE_GAP_SCALE",
+    "assertion": "Gap-to-target scale for Alkaline Phosphatase continuous score (product decision; not set in SCL pack).",
+    "value": null,
+    "unit": "U/L",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "ALP_SIGNIFICANT_CHANGE_THRESHOLD",
+    "assertion": "Significant-change / RCV threshold for Alkaline Phosphatase. Numeric delta not specified in SCL-022; qualitative only.",
+    "value": null,
+    "unit": "U/L",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "ALP_ACUTE_RECOVERY_WINDOW",
+    "assertion": "Acute-context recovery window (days) for Alkaline Phosphatase.",
+    "value": null,
+    "unit": "days",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "ALP_LIFESTYLE_ADDRESSABLE_GAP_CEILING",
+    "assertion": "Gap ceiling above which Alkaline Phosphatase escalates from lifestyle to clinician discussion.",
+    "value": null,
+    "unit": "U/L",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "ALP_LOW_INVESTIGATION_THRESHOLD",
+    "assertion": "Low-end investigation threshold for Alkaline Phosphatase.",
+    "value": null,
+    "unit": "U/L",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "ALP_FH_PATTERN_THRESHOLD",
+    "assertion": "Pattern-referral threshold for Alkaline Phosphatase. Unanchored unless the SCL pack defines one.",
+    "value": null,
+    "unit": "U/L",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  }
+]

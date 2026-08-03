@@ -1,0 +1,117 @@
+[
+  {
+    "claim_id": "BIOSENSE_BILIRUBIN_THRESHOLD_SET",
+    "assertion": "Bilirubin BioSense wellness band / threshold set from SCL-023.",
+    "value": {
+      "PRIMARY_PREVENTION_UNSELECTED": {
+        "optimal_max": 20,
+        "above_target_min": 20,
+        "wellness_bands": [
+          {
+            "id": "OPTIMAL",
+            "lt": 20
+          },
+          {
+            "id": "ELEVATED",
+            "gte": 20
+          }
+        ],
+        "direction": "LOWER_BETTER"
+      },
+      "DEFAULT": {
+        "optimal_max": 20,
+        "above_target_min": 20,
+        "wellness_bands": [
+          {
+            "id": "OPTIMAL",
+            "lt": 20
+          },
+          {
+            "id": "ELEVATED",
+            "gte": 20
+          }
+        ],
+        "direction": "LOWER_BETTER"
+      }
+    },
+    "unit": "mg/dL",
+    "version": "1.0.0",
+    "effective_date": "2026-08-01",
+    "author": "BioSense Scientific Authoring (Origin BioSense Technologies FZCO)",
+    "provenance": "SCL-023 Bilirubin Sci Config Pack v1.0",
+    "evidence_grade": "B",
+    "review_status": "ANCHORED"
+  },
+  {
+    "claim_id": "BILIRUBIN_SCORE_GAP_SCALE",
+    "assertion": "Gap-to-target scale for Bilirubin continuous score (product decision; not set in SCL pack).",
+    "value": null,
+    "unit": "mg/dL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "BILIRUBIN_SIGNIFICANT_CHANGE_THRESHOLD",
+    "assertion": "Significant-change / RCV threshold for Bilirubin. Numeric delta not specified in SCL-023; qualitative only.",
+    "value": null,
+    "unit": "mg/dL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "BILIRUBIN_ACUTE_RECOVERY_WINDOW",
+    "assertion": "Acute-context recovery window (days) for Bilirubin.",
+    "value": null,
+    "unit": "days",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "BILIRUBIN_LIFESTYLE_ADDRESSABLE_GAP_CEILING",
+    "assertion": "Gap ceiling above which Bilirubin escalates from lifestyle to clinician discussion.",
+    "value": null,
+    "unit": "mg/dL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "BILIRUBIN_LOW_INVESTIGATION_THRESHOLD",
+    "assertion": "Low-end investigation threshold for Bilirubin.",
+    "value": null,
+    "unit": "mg/dL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "BILIRUBIN_FH_PATTERN_THRESHOLD",
+    "assertion": "Pattern-referral threshold for Bilirubin. Unanchored unless the SCL pack defines one.",
+    "value": null,
+    "unit": "mg/dL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  }
+]

@@ -1,0 +1,147 @@
+[
+  {
+    "claim_id": "BIOSENSE_LDL_C_THRESHOLD_SET",
+    "assertion": "LDL Cholesterol BioSense wellness band / threshold set from SCL-003.",
+    "value": {
+      "PRIMARY_PREVENTION_UNSELECTED": {
+        "optimal_max": 100,
+        "above_target_min": 130,
+        "wellness_bands": [
+          {
+            "id": "OPTIMAL",
+            "lt": 100
+          },
+          {
+            "id": "ABOVE_OPTIMAL",
+            "gte": 100,
+            "lt": 129
+          },
+          {
+            "id": "ELEVATED",
+            "gte": 130,
+            "lt": 159
+          },
+          {
+            "id": "HIGH",
+            "gte": 160,
+            "lt": 189
+          },
+          {
+            "id": "SIGNIFICANTLY_ELEVATED",
+            "gte": 190
+          }
+        ],
+        "direction": "LOWER_BETTER"
+      },
+      "DEFAULT": {
+        "optimal_max": 100,
+        "above_target_min": 130,
+        "wellness_bands": [
+          {
+            "id": "OPTIMAL",
+            "lt": 100
+          },
+          {
+            "id": "ABOVE_OPTIMAL",
+            "gte": 100,
+            "lt": 129
+          },
+          {
+            "id": "ELEVATED",
+            "gte": 130,
+            "lt": 159
+          },
+          {
+            "id": "HIGH",
+            "gte": 160,
+            "lt": 189
+          },
+          {
+            "id": "SIGNIFICANTLY_ELEVATED",
+            "gte": 190
+          }
+        ],
+        "direction": "LOWER_BETTER"
+      }
+    },
+    "unit": "mg/dL",
+    "version": "1.0.0",
+    "effective_date": "2026-07-31",
+    "author": "BioSense Scientific Authoring (Origin BioSense Technologies FZCO)",
+    "provenance": "SCL-003 Scientific Configuration Pack v1.0.0 — LDL Cholesterol",
+    "evidence_grade": "B",
+    "review_status": "ANCHORED"
+  },
+  {
+    "claim_id": "LDL_C_SCORE_GAP_SCALE",
+    "assertion": "Gap-to-target scale for LDL Cholesterol continuous score (product decision; not set in SCL pack).",
+    "value": null,
+    "unit": "mg/dL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "LDL_C_SIGNIFICANT_CHANGE_THRESHOLD",
+    "assertion": "Significant-change / RCV threshold for LDL Cholesterol. Numeric delta not specified in SCL-003; qualitative only.",
+    "value": null,
+    "unit": "mg/dL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "LDL_C_ACUTE_RECOVERY_WINDOW",
+    "assertion": "Acute-context recovery window (days) for LDL Cholesterol.",
+    "value": null,
+    "unit": "days",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "LDL_C_LIFESTYLE_ADDRESSABLE_GAP_CEILING",
+    "assertion": "Gap ceiling above which LDL Cholesterol escalates from lifestyle to clinician discussion.",
+    "value": null,
+    "unit": "mg/dL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "LDL_C_LOW_INVESTIGATION_THRESHOLD",
+    "assertion": "Low-end investigation threshold for LDL Cholesterol.",
+    "value": null,
+    "unit": "mg/dL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "LDL_C_FH_PATTERN_THRESHOLD",
+    "assertion": "Pattern-referral threshold for LDL Cholesterol. Unanchored unless the SCL pack defines one.",
+    "value": null,
+    "unit": "mg/dL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  }
+]

@@ -1,0 +1,183 @@
+[
+  {
+    "claim_id": "BIOSENSE_TRIGLYCERIDES_THRESHOLD_SET",
+    "assertion": "Triglycerides BioSense wellness band / threshold set from SCL-005.",
+    "value": {
+      "PRIMARY_PREVENTION_UNSELECTED": {
+        "optimal_max": 100,
+        "above_target_min": 150,
+        "wellness_bands": [
+          {
+            "id": "OPTIMAL",
+            "lt": 100
+          },
+          {
+            "id": "FAVOURABLE",
+            "gte": 100,
+            "lt": 149
+          },
+          {
+            "id": "ABOVE_OPTIMAL",
+            "gte": 150,
+            "lt": 199
+          },
+          {
+            "id": "HIGH",
+            "gte": 200,
+            "lt": 499
+          },
+          {
+            "id": "VERY_HIGH_FLAG",
+            "gte": 500
+          },
+          {
+            "id": "OPTIMAL",
+            "lt": 150
+          },
+          {
+            "id": "ABOVE_OPTIMAL",
+            "gte": 150,
+            "lt": 174
+          },
+          {
+            "id": "HIGH_RECHECK",
+            "gte": 175,
+            "lt": 499
+          },
+          {
+            "id": "VERY_HIGH_FLAG",
+            "gte": 500
+          }
+        ],
+        "direction": "LOWER_BETTER"
+      },
+      "DEFAULT": {
+        "optimal_max": 100,
+        "above_target_min": 150,
+        "wellness_bands": [
+          {
+            "id": "OPTIMAL",
+            "lt": 100
+          },
+          {
+            "id": "FAVOURABLE",
+            "gte": 100,
+            "lt": 149
+          },
+          {
+            "id": "ABOVE_OPTIMAL",
+            "gte": 150,
+            "lt": 199
+          },
+          {
+            "id": "HIGH",
+            "gte": 200,
+            "lt": 499
+          },
+          {
+            "id": "VERY_HIGH_FLAG",
+            "gte": 500
+          },
+          {
+            "id": "OPTIMAL",
+            "lt": 150
+          },
+          {
+            "id": "ABOVE_OPTIMAL",
+            "gte": 150,
+            "lt": 174
+          },
+          {
+            "id": "HIGH_RECHECK",
+            "gte": 175,
+            "lt": 499
+          },
+          {
+            "id": "VERY_HIGH_FLAG",
+            "gte": 500
+          }
+        ],
+        "direction": "LOWER_BETTER"
+      }
+    },
+    "unit": "mg/dL",
+    "version": "1.0.0",
+    "effective_date": "2026-07-31",
+    "author": "BioSense Scientific Authoring (Origin BioSense Technologies FZCO)",
+    "provenance": "SCL-005 Scientific Configuration Pack v1.0.0 — Triglycerides",
+    "evidence_grade": "B",
+    "review_status": "ANCHORED"
+  },
+  {
+    "claim_id": "TRIGLYCERIDES_SCORE_GAP_SCALE",
+    "assertion": "Gap-to-target scale for Triglycerides continuous score (product decision; not set in SCL pack).",
+    "value": null,
+    "unit": "mg/dL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "TRIGLYCERIDES_SIGNIFICANT_CHANGE_THRESHOLD",
+    "assertion": "Significant-change / RCV threshold for Triglycerides. Numeric delta not specified in SCL-005; qualitative only.",
+    "value": null,
+    "unit": "mg/dL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "TRIGLYCERIDES_ACUTE_RECOVERY_WINDOW",
+    "assertion": "Acute-context recovery window (days) for Triglycerides.",
+    "value": null,
+    "unit": "days",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "TRIGLYCERIDES_LIFESTYLE_ADDRESSABLE_GAP_CEILING",
+    "assertion": "Gap ceiling above which Triglycerides escalates from lifestyle to clinician discussion.",
+    "value": null,
+    "unit": "mg/dL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "TRIGLYCERIDES_LOW_INVESTIGATION_THRESHOLD",
+    "assertion": "Low-end investigation threshold for Triglycerides.",
+    "value": null,
+    "unit": "mg/dL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "TRIGLYCERIDES_FH_PATTERN_THRESHOLD",
+    "assertion": "Pattern-referral threshold for Triglycerides. Unanchored unless the SCL pack defines one.",
+    "value": null,
+    "unit": "mg/dL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  }
+]

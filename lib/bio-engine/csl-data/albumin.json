@@ -1,0 +1,117 @@
+[
+  {
+    "claim_id": "BIOSENSE_ALBUMIN_THRESHOLD_SET",
+    "assertion": "Albumin BioSense wellness band / threshold set from SCL-024.",
+    "value": {
+      "PRIMARY_PREVENTION_UNSELECTED": {
+        "optimal_max": 4,
+        "above_target_min": 4,
+        "wellness_bands": [
+          {
+            "id": "LOW",
+            "lt": 4
+          },
+          {
+            "id": "OPTIMAL",
+            "gte": 4
+          }
+        ],
+        "direction": "HIGHER_BETTER"
+      },
+      "DEFAULT": {
+        "optimal_max": 4,
+        "above_target_min": 4,
+        "wellness_bands": [
+          {
+            "id": "LOW",
+            "lt": 4
+          },
+          {
+            "id": "OPTIMAL",
+            "gte": 4
+          }
+        ],
+        "direction": "HIGHER_BETTER"
+      }
+    },
+    "unit": "g/dL",
+    "version": "1.0.0",
+    "effective_date": "2026-08-01",
+    "author": "BioSense Scientific Authoring (Origin BioSense Technologies FZCO)",
+    "provenance": "SCL-024 Albumin Sci Config Pack v1.0",
+    "evidence_grade": "B",
+    "review_status": "ANCHORED"
+  },
+  {
+    "claim_id": "ALBUMIN_SCORE_GAP_SCALE",
+    "assertion": "Gap-to-target scale for Albumin continuous score (product decision; not set in SCL pack).",
+    "value": null,
+    "unit": "g/dL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "ALBUMIN_SIGNIFICANT_CHANGE_THRESHOLD",
+    "assertion": "Significant-change / RCV threshold for Albumin. Numeric delta not specified in SCL-024; qualitative only.",
+    "value": null,
+    "unit": "g/dL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "ALBUMIN_ACUTE_RECOVERY_WINDOW",
+    "assertion": "Acute-context recovery window (days) for Albumin.",
+    "value": null,
+    "unit": "days",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "ALBUMIN_LIFESTYLE_ADDRESSABLE_GAP_CEILING",
+    "assertion": "Gap ceiling above which Albumin escalates from lifestyle to clinician discussion.",
+    "value": null,
+    "unit": "g/dL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "ALBUMIN_LOW_INVESTIGATION_THRESHOLD",
+    "assertion": "Low-end investigation threshold for Albumin.",
+    "value": null,
+    "unit": "g/dL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  },
+  {
+    "claim_id": "ALBUMIN_FH_PATTERN_THRESHOLD",
+    "assertion": "Pattern-referral threshold for Albumin. Unanchored unless the SCL pack defines one.",
+    "value": null,
+    "unit": "g/dL",
+    "version": "0.0.0",
+    "effective_date": null,
+    "author": null,
+    "provenance": null,
+    "evidence_grade": null,
+    "review_status": "DECLARED"
+  }
+]
