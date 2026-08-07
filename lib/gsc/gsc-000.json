@@ -1,0 +1,36 @@
+{
+  "document_id": "GSC-000",
+  "title": "Global Scientific Configuration Architecture",
+  "version": "1.0",
+  "status": "READY_FOR_FOUNDER_REVIEW",
+  "role": "architecture",
+  "assertion": "GSC owns prioritisation, weighting, confidence and synthesis as versioned config. SCL owns scientific truth. GSC never edits or contradicts SCL.",
+  "library": [
+    { "id": "GSC-001", "role": "health_score_methodology", "required_for": ["ENG-001"] },
+    { "id": "GSC-002", "role": "biological_age_methodology", "required_for": ["ENG-001"] },
+    { "id": "GSC-003", "role": "confidence_calibration", "status": "PENDING", "required_for": ["GSC-001", "GSC-002"] },
+    { "id": "GSC-004", "role": "cross_domain_weighting", "status": "PENDING", "required_for": ["GSC-001", "GSC-002"] },
+    { "id": "GSC-005", "role": "intervention_prioritisation", "status": "PENDING" },
+    { "id": "GSC-006", "role": "behavioural_capacity", "status": "PENDING" },
+    { "id": "GSC-007", "role": "intervention_burden", "status": "PENDING" },
+    { "id": "GSC-008", "role": "freshness_longitudinal", "status": "PENDING", "required_for": ["GSC-001", "GSC-002"] },
+    { "id": "GSC-009", "role": "evidence_fusion_conflict", "status": "PENDING", "required_for": ["GSC-001", "GSC-002"] }
+  ],
+  "invariants": {
+    "scl_wins_on_scientific_truth": true,
+    "gsc_is_versioned_config_not_runtime_code": true,
+    "engines_pin_method_versions": true,
+    "no_silent_rewrite_of_past_outputs": true
+  },
+  "implementation_order": [
+    "SCL packs",
+    "GSC-003",
+    "GSC-004",
+    "GSC-008",
+    "GSC-009",
+    "GSC-001 ENG-001 wire-up",
+    "GSC-002 ENG-001 wire-up",
+    "GSC-006 + GSC-007 → GSC-005 recommendations"
+  ],
+  "source": "docs/gsc/GSC-000/GSC-000_Global_Sci_Config_Arch.md"
+}

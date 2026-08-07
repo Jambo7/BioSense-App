@@ -142,6 +142,9 @@ keys are optional locally — those features skip gracefully when blank.
 
 ## 8. Recent changes (most recent first)
 
+- 2026-08-07 — Ingested GSC-000/001/002 (architecture + Health Score + Biological Age
+  methodologies) into docs/gsc + lib/gsc pins. Full score/bio-age rewrite still blocked on
+  GSC-003/004/008/009 (no numeric weights in 001/002 by design). Interim engines remain.
 - 2026-08-03 — Imported SCL-001…024 scientific config packs into CSL data + biomarker
   registry. ApoB banding live from Neil’s pack (optimal &lt;65 / above ≥80). Score/FH/RCV
   claims still DECLARED where the packs left them unspecified.

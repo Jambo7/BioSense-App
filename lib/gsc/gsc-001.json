@@ -1,0 +1,52 @@
+{
+  "document_id": "GSC-001",
+  "title": "Health Score Methodology",
+  "version": "1.0",
+  "status": "READY_FOR_FREEZE",
+  "method_version_key": "HEALTH_SCORE_METHOD_VERSION",
+  "composition_form": "biosense_present_health_composition",
+  "scale": { "min": 0, "max": 100, "mapping_curve": null },
+  "conditioning": {
+    "form": "multiplicative",
+    "order": ["freshness", "confidence"],
+    "apply_before_cross_domain_weight": true
+  },
+  "composition_order": [
+    "weighted_central_tendency",
+    "negative_protection_term",
+    "bounded_saturating_transfer"
+  ],
+  "domains": [
+    { "id": "blood_biomarkers", "timescale": "weeks_to_months" },
+    { "id": "wearable_physiology", "timescale": "daily" },
+    { "id": "sleep", "timescale": "nightly" },
+    { "id": "recovery", "timescale": "days" },
+    { "id": "activity", "timescale": "days_to_weeks" },
+    { "id": "body_composition", "timescale": "months" },
+    { "id": "nutrition", "timescale": "weeks" },
+    { "id": "subjective_wellbeing", "timescale": "days" },
+    { "id": "behavioural_history", "timescale": "months" },
+    { "id": "longitudinal_trends", "timescale": "months_to_years" }
+  ],
+  "rules": {
+    "impute_missing_domains": false,
+    "missing_is_neutral": false,
+    "fixed_domain_weights": false,
+    "negative_protection_overrides_domain_bound": true,
+    "low_confidence_must_not_hide_material_negatives": true,
+    "composes_validated_understanding_only": true,
+    "never_emits_recommendations": true,
+    "never_clinical_risk_claim": true
+  },
+  "owned_elsewhere": {
+    "domain_weights": "GSC-004",
+    "materiality_threshold": "GSC-004",
+    "confidence_curves": "GSC-003",
+    "freshness_decay": "GSC-008",
+    "conflict_fusion": "GSC-009",
+    "composition_coefficients": "GSC-001_calibration"
+  },
+  "blocked_until": ["GSC-003", "GSC-004", "GSC-008", "GSC-009"],
+  "note": "GSC-001 freezes form only. No pillar weight percentages are published. Live app still uses the interim JARVIS-derived score in lib/score.ts until sibling GSCs land.",
+  "source": "docs/gsc/GSC-001/GSC-001_Health_Score_Methodology.md"
+}

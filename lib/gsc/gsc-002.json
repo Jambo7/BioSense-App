@@ -1,0 +1,54 @@
+{
+  "document_id": "GSC-002",
+  "title": "Biological Age Methodology",
+  "version": "1.0",
+  "status": "READY_FOR_FREEZE",
+  "method_version_key": "BIOLOGICAL_AGE_METHOD_VERSION",
+  "estimation_form": "biosense_biological_ageing_composition",
+  "stages": ["domain_departure", "condition", "compose", "express"],
+  "output_unit": "years",
+  "departure_sign": {
+    "younger": "negative",
+    "older": "positive",
+    "on_trajectory": 0
+  },
+  "domains": [
+    "cardiovascular",
+    "metabolic",
+    "inflammation",
+    "body_composition",
+    "recovery",
+    "sleep",
+    "physical_activity",
+    "behavioural_consistency",
+    "nutrition",
+    "validated_ageing_biomarkers"
+  ],
+  "priors": {
+    "sparse_evidence_default": "chronological_age",
+    "cold_start_reference": "population_reference_only"
+  },
+  "bounds": {
+    "type": "person_relative_to_chronological_age",
+    "max_acceleration_years": null,
+    "max_reduction_years": null,
+    "saturation_curve": null
+  },
+  "rules": {
+    "no_imputation_of_missing_domains": true,
+    "no_single_clock_sole_determinant": true,
+    "never_safety_trigger": true,
+    "decoupled_from_health_score": true,
+    "sustained_evidence_gate_required": true
+  },
+  "owned_elsewhere": {
+    "ageing_relevance_weights": "GSC-004",
+    "confidence": "GSC-003",
+    "longitudinal_durability_thresholds": "GSC-008",
+    "conflict_fusion": "GSC-009",
+    "population_reference_and_trajectory": "SCL"
+  },
+  "blocked_until": ["GSC-003", "GSC-004", "GSC-008", "GSC-009"],
+  "note": "GSC-002 freezes form only. No numeric weights or unlock thresholds published. Live app still uses interim lib/bio-age.ts until sibling GSCs land.",
+  "source": "docs/gsc/GSC-002/GSC-002_Biological_Age_Methodology.md"
+}
