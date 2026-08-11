@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { useEffect, useState, useEffectEvent } from 'react'
+import { createPortal } from 'react-dom'
 import { cn } from '@/lib/utils'
 import { BrandWordmark } from '@/components/brand-mark'
 import {
@@ -69,6 +70,7 @@ export function AppNav() {
   const pathname = usePathname()
   const router = useRouter()
   const [pendingHref, setPendingHref] = useState<string | null>(null)
+  const [portalEl, setPortalEl] = useState<HTMLElement | null>(null)
 
   const clearPending = useEffectEvent(() => {
     setPendingHref(null)
@@ -85,10 +87,127 @@ export function AppNav() {
     clearPending()
   }, [pathname, clearPending])
 
+  // Mount the tab bar on document.body so parent transforms / scroll
+  // containers cannot drag it off the physical bottom of the screen.
+  useEffect(() => {
+    setPortalEl(document.body)
+  }, [])
+
   const tabActive = (item: NavItem) =>
     pendingHref
       ? pendingHref === item.href || (item.matchPaths?.includes(pendingHref) ?? false)
       : isActive(pathname, item)
+
+  const mobileTabBar = (
+      <nav
+        className="lg:hidden tabbar-pill fixed bottom-0 left-0 right-0 z-40 overflow-visible rounded-none border-x-0"
+        style={{
+          paddingBottom: 'max(20px, env(safe-area-inset-bottom, 0px))',
+        }}
+      >
+        <div className="flex items-end justify-around max-w-3xl mx-auto px-1 pt-2 pb-1">
+          {navItems.map((item) => {
+            const active = tabActive(item)
+            const Icon = item.icon
+            const onTabClick = () => setPendingHref(item.href)
+
+            if (item.center) {
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  prefetch
+                  aria-label={item.label}
+                  data-tour={item.tourId}
+                  onClick={onTabClick}
+                  className="flex-1 flex flex-col items-center justify-end gap-0.5 relative min-h-[52px]"
+                >
+                  <div className="relative -mt-8 mb-0.5">
+                    <span
+                      aria-hidden
+                      className={cn(
+                        'absolute -inset-2.5 rounded-full pointer-events-none',
+                        'bg-[radial-gradient(circle,rgba(168,191,163,0.45)_0%,rgba(168,191,163,0.15)_45%,transparent_75%)]',
+                        active ? 'opacity-100' : 'opacity-70',
+                      )}
+                    />
+                    <div
+                      className={cn(
+                        'relative w-[56px] h-[56px] rounded-full flex items-center justify-center',
+                        'bg-[linear-gradient(180deg,#8DB389_0%,#6F8F6B_55%,#5A7556_100%)]',
+                        'ring-[4px] ring-white',
+                        'transition-transform duration-150 active:scale-[0.96]',
+                        active && 'scale-[1.03]',
+                        pendingHref === item.href && 'opacity-90',
+                      )}
+                      style={{
+                        boxShadow:
+                          'inset 0 1px 0 rgba(255,255,255,0.30), 0 2px 4px rgba(40,56,38,0.18), 0 10px 24px -4px rgba(111,143,107,0.55)',
+                      }}
+                    >
+                      <Image
+                        src="/biosense-mark-white.png"
+                        alt=""
+                        width={30}
+                        height={30}
+                        priority
+                        className="relative block select-none [filter:drop-shadow(0_1px_1px_rgba(0,0,0,0.18))]"
+                      />
+                    </div>
+                  </div>
+                  <span
+                    className={cn(
+                      'text-[10px] leading-none',
+                      active ? 'text-sage-deep font-semibold' : 'text-ink-2 font-medium',
+                    )}
+                  >
+                    {item.label}
+                  </span>
+                </Link>
+              )
+            }
+
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                prefetch
+                data-tour={item.tourId}
+                onClick={onTabClick}
+                className={cn(
+                  'flex-1 flex flex-col items-center justify-center gap-1 py-1.5 transition-colors duration-150 relative min-h-[52px]',
+                  pendingHref === item.href && !active && 'opacity-70',
+                )}
+              >
+                <div className="relative w-9 h-9 flex items-center justify-center">
+                  {active && (
+                    <span
+                      className="absolute inset-0 rounded-full bg-[linear-gradient(180deg,rgba(168,191,163,0.40)_0%,rgba(111,143,107,0.22)_100%)] ring-1 ring-inset ring-[rgba(168,191,163,0.45)]"
+                      aria-hidden
+                    />
+                  )}
+                  <Icon
+                    className={cn(
+                      'w-[19px] h-[19px] relative transition-transform duration-150',
+                      active ? 'text-sage-deep scale-105' : 'text-ink-3',
+                    )}
+                    strokeWidth={active ? 2.25 : 1.85}
+                  />
+                </div>
+                <span
+                  className={cn(
+                    'text-[10px] leading-none transition-colors duration-150',
+                    active ? 'text-sage-deep font-semibold' : 'text-ink-3',
+                  )}
+                >
+                  {item.label}
+                </span>
+              </Link>
+            )
+          })}
+        </div>
+      </nav>
+  )
 
   return (
     <>
@@ -199,121 +318,7 @@ export function AppNav() {
         </div>
       </header>
 
-      {/* ── Mobile bottom tab bar ──
-          Edge-to-edge bar that hugs the bottom of the screen — matches the
-          v7 docx reference images (image1 + image2 both show this shape,
-          not a floating pill). The bar carries a soft sage halo above its
-          top edge so it still reads as "lifted" from the page, and the
-          central Ask CTA overhangs above the bar's top edge via the
-          `-mt-7` on the button itself. `overflow-visible` on the bar lets
-          that CTA extend up cleanly. */}
-      <nav
-        className="lg:hidden tabbar-pill fixed bottom-0 left-0 right-0 z-40 overflow-visible rounded-none border-x-0"
-        style={{ paddingBottom: 'max(34px, env(safe-area-inset-bottom, 0px))' }}
-      >
-        <div className="flex items-end justify-around max-w-3xl mx-auto px-1 pt-2 pb-1">
-          {navItems.map((item) => {
-            const active = tabActive(item)
-            const Icon = item.icon
-            const onTabClick = () => setPendingHref(item.href)
-
-            // ── Central floating CTA (Ask) ─────────────────────────────
-            if (item.center) {
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  prefetch
-                  aria-label={item.label}
-                  data-tour={item.tourId}
-                  onClick={onTabClick}
-                  className="flex-1 flex flex-col items-center justify-end gap-0.5 relative min-h-[52px]"
-                >
-                  <div className="relative -mt-8 mb-0.5">
-                    <span
-                      aria-hidden
-                      className={cn(
-                        'absolute -inset-2.5 rounded-full pointer-events-none',
-                        'bg-[radial-gradient(circle,rgba(168,191,163,0.45)_0%,rgba(168,191,163,0.15)_45%,transparent_75%)]',
-                        active ? 'opacity-100' : 'opacity-70',
-                      )}
-                    />
-                    <div
-                      className={cn(
-                        'relative w-[56px] h-[56px] rounded-full flex items-center justify-center',
-                        'bg-[linear-gradient(180deg,#8DB389_0%,#6F8F6B_55%,#5A7556_100%)]',
-                        'ring-[4px] ring-white',
-                        'transition-transform duration-150 active:scale-[0.96]',
-                        active && 'scale-[1.03]',
-                        pendingHref === item.href && 'opacity-90',
-                      )}
-                      style={{
-                        boxShadow:
-                          'inset 0 1px 0 rgba(255,255,255,0.30), 0 2px 4px rgba(40,56,38,0.18), 0 10px 24px -4px rgba(111,143,107,0.55)',
-                      }}
-                    >
-                      <Image
-                        src="/biosense-mark-white.png"
-                        alt=""
-                        width={30}
-                        height={30}
-                        priority
-                        className="relative block select-none [filter:drop-shadow(0_1px_1px_rgba(0,0,0,0.18))]"
-                      />
-                    </div>
-                  </div>
-                  <span
-                    className={cn(
-                      'text-[10px] leading-none',
-                      active ? 'text-sage-deep font-semibold' : 'text-ink-2 font-medium',
-                    )}
-                  >
-                    {item.label}
-                  </span>
-                </Link>
-              )
-            }
-
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                prefetch
-                data-tour={item.tourId}
-                onClick={onTabClick}
-                className={cn(
-                  'flex-1 flex flex-col items-center justify-center gap-1 py-1.5 transition-colors duration-150 relative min-h-[52px]',
-                  pendingHref === item.href && !active && 'opacity-70',
-                )}
-              >
-                <div className="relative w-9 h-9 flex items-center justify-center">
-                  {active && (
-                    <span
-                      className="absolute inset-0 rounded-full bg-[linear-gradient(180deg,rgba(168,191,163,0.40)_0%,rgba(111,143,107,0.22)_100%)] ring-1 ring-inset ring-[rgba(168,191,163,0.45)]"
-                      aria-hidden
-                    />
-                  )}
-                  <Icon
-                    className={cn(
-                      'w-[19px] h-[19px] relative transition-transform duration-150',
-                      active ? 'text-sage-deep scale-105' : 'text-ink-3',
-                    )}
-                    strokeWidth={active ? 2.25 : 1.85}
-                  />
-                </div>
-                <span
-                  className={cn(
-                    'text-[10px] leading-none transition-colors duration-150',
-                    active ? 'text-sage-deep font-semibold' : 'text-ink-3',
-                  )}
-                >
-                  {item.label}
-                </span>
-              </Link>
-            )
-          })}
-        </div>
-      </nav>
+      {portalEl ? createPortal(mobileTabBar, portalEl) : mobileTabBar}
     </>
   )
 }
