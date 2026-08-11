@@ -85,7 +85,22 @@ html, body {
   color: var(--ink);
   font-family: var(--font-dm-sans), system-ui, sans-serif;
   font-feature-settings: 'cv11' on, 'ss03' on;
-  overflow-x: hidden;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+  overscroll-behavior-x: none;
+  /* Cap the layout to the visual viewport so the iOS Capacitor WKWebView
+     cannot pan sideways when content is slightly wider than the screen. */
+  position: relative;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  min-height: 100%;
+  min-height: 100dvh;
 }
 
 ::selection { background: var(--sage-tint); color: var(--ink); }
@@ -259,6 +274,8 @@ html, body {
      over the photo when scrolled. Drawn as a top-fading gradient via the
      ::before so the bar itself can stay fully transparent. */
   position: relative;
+  /* Capacitor uses contentInset never — keep the sticky header below the notch. */
+  padding-top: env(safe-area-inset-top, 0px);
 }
 .glass-nav::before {
   content: "";

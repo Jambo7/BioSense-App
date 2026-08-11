@@ -18,7 +18,10 @@ const config: CapacitorConfig = {
     cleartext: false,
   },
   ios: {
-    contentInset: 'automatic',
+    // 'automatic' was causing the WKWebView to pan/offset (content wider than
+    // the screen). Default 'never' + CSS safe-area insets keeps layout locked.
+    contentInset: 'never',
+    zoomEnabled: false,
     preferredContentMode: 'mobile',
     scheme: 'BioSense',
     backgroundColor: '#F7F5F0',

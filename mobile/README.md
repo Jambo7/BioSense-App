@@ -10,6 +10,13 @@ Backend mobile APIs (Bearer login etc.) were already in place. This folder is th
 | Bundle ID | `ai.biosense.app` |
 | Display name | BioSense |
 | Version | 1.0 (build 1) |
+| App icon | Real S-mark (`public/biosense-mark.png` → `mobile/resources/icon.png`) |
+
+Regenerate icon after brand updates:
+
+```bash
+python mobile/scripts/make-app-icon.py
+```
 
 > Building / uploading to TestFlight **requires a Mac** with Xcode. This Windows machine can sync the project; it cannot Archive.
 

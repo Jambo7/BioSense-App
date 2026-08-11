@@ -75,7 +75,7 @@ export function AppNav() {
           defined header rectangle, no border, no blur). A very soft
           top-down scrim drawn from inside `.glass-nav::before` keeps text
           legible when content scrolls under the bar. */}
-      <header className="glass-nav sticky top-0 z-40 h-[60px] flex items-center justify-between px-4 sm:px-6 gap-3">
+      <header className="glass-nav sticky top-0 z-40 min-h-[60px] flex items-center justify-between px-4 sm:px-6 gap-3 w-full max-w-full overflow-x-clip box-border">
         {/* Wordmark */}
         <Link href="/dashboard" className="flex items-center group shrink-0">
           <BrandWordmark height={28} priority />
