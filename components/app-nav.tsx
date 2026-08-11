@@ -1,8 +1,9 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import Image from 'next/image'
+import { useEffect, useState, useEffectEvent } from 'react'
 import { cn } from '@/lib/utils'
 import { BrandWordmark } from '@/components/brand-mark'
 import {
@@ -66,6 +67,28 @@ function isActive(pathname: string, item: (typeof navItems)[number]) {
 
 export function AppNav() {
   const pathname = usePathname()
+  const router = useRouter()
+  const [pendingHref, setPendingHref] = useState<string | null>(null)
+
+  const clearPending = useEffectEvent(() => {
+    setPendingHref(null)
+  })
+
+  // Warm the five primary tabs so the first tap feels instant.
+  useEffect(() => {
+    for (const item of navItems) {
+      router.prefetch(item.href)
+    }
+  }, [router])
+
+  useEffect(() => {
+    clearPending()
+  }, [pathname, clearPending])
+
+  const tabActive = (item: NavItem) =>
+    pendingHref
+      ? pendingHref === item.href || (item.matchPaths?.includes(pendingHref) ?? false)
+      : isActive(pathname, item)
 
   return (
     <>
@@ -185,47 +208,44 @@ export function AppNav() {
           `-mt-7` on the button itself. `overflow-visible` on the bar lets
           that CTA extend up cleanly. */}
       <nav
-        className="lg:hidden tabbar-pill fixed bottom-0 left-0 right-0 z-40 pb-[env(safe-area-inset-bottom)] overflow-visible rounded-none border-x-0"
+        className="lg:hidden tabbar-pill fixed bottom-0 left-0 right-0 z-40 overflow-visible rounded-none border-x-0"
+        style={{ paddingBottom: 'max(34px, env(safe-area-inset-bottom, 0px))' }}
       >
-        <div className="flex items-stretch justify-around max-w-3xl mx-auto px-1 pt-1.5">
+        <div className="flex items-end justify-around max-w-3xl mx-auto px-1 pt-2 pb-1">
           {navItems.map((item) => {
-            const active = isActive(pathname, item)
+            const active = tabActive(item)
             const Icon = item.icon
+            const onTabClick = () => setPendingHref(item.href)
 
             // ── Central floating CTA (Ask) ─────────────────────────────
-            // Solid sage-gradient disc with the brand S in white.
-            // White "notch" ring punches it cleanly out of the glass tab
-            // bar (Stealth pattern). Soft sage halo behind the button
-            // breathes — faster when on /chat so the button signals the
-            // active destination.
             if (item.center) {
               return (
                 <Link
                   key={item.href}
                   href={item.href}
+                  prefetch
                   aria-label={item.label}
                   data-tour={item.tourId}
-                  className="flex-1 flex flex-col items-center justify-end gap-1 py-2 relative"
+                  onClick={onTabClick}
+                  className="flex-1 flex flex-col items-center justify-end gap-0.5 relative min-h-[52px]"
                 >
-                  <div className="relative -mt-7">
-                    {/* Soft sage halo behind the button */}
+                  <div className="relative -mt-8 mb-0.5">
                     <span
                       aria-hidden
                       className={cn(
-                        'absolute -inset-3 rounded-full pointer-events-none',
-                        'bg-[radial-gradient(circle,rgba(168,191,163,0.55)_0%,rgba(168,191,163,0.20)_45%,transparent_75%)]',
-                        'blur-md',
-                        active ? 'animate-mark-halo-fast' : 'animate-mark-halo',
+                        'absolute -inset-2.5 rounded-full pointer-events-none',
+                        'bg-[radial-gradient(circle,rgba(168,191,163,0.45)_0%,rgba(168,191,163,0.15)_45%,transparent_75%)]',
+                        active ? 'opacity-100' : 'opacity-70',
                       )}
                     />
-                    {/* The button itself */}
                     <div
                       className={cn(
-                        'relative w-[60px] h-[60px] rounded-full flex items-center justify-center',
+                        'relative w-[56px] h-[56px] rounded-full flex items-center justify-center',
                         'bg-[linear-gradient(180deg,#8DB389_0%,#6F8F6B_55%,#5A7556_100%)]',
-                        'ring-[5px] ring-white',
-                        'transition-transform active:scale-[0.96]',
+                        'ring-[4px] ring-white',
+                        'transition-transform duration-150 active:scale-[0.96]',
                         active && 'scale-[1.03]',
+                        pendingHref === item.href && 'opacity-90',
                       )}
                       style={{
                         boxShadow:
@@ -235,8 +255,8 @@ export function AppNav() {
                       <Image
                         src="/biosense-mark-white.png"
                         alt=""
-                        width={32}
-                        height={32}
+                        width={30}
+                        height={30}
                         priority
                         className="relative block select-none [filter:drop-shadow(0_1px_1px_rgba(0,0,0,0.18))]"
                       />
@@ -244,7 +264,7 @@ export function AppNav() {
                   </div>
                   <span
                     className={cn(
-                      'text-[10px] leading-none mt-1',
+                      'text-[10px] leading-none',
                       active ? 'text-sage-deep font-semibold' : 'text-ink-2 font-medium',
                     )}
                   >
@@ -254,13 +274,17 @@ export function AppNav() {
               )
             }
 
-            // ── Regular flat tab item ──────────────────────────────────
             return (
               <Link
                 key={item.href}
                 href={item.href}
+                prefetch
                 data-tour={item.tourId}
-                className="flex-1 flex flex-col items-center justify-center gap-1 py-2 transition-colors relative"
+                onClick={onTabClick}
+                className={cn(
+                  'flex-1 flex flex-col items-center justify-center gap-1 py-1.5 transition-colors duration-150 relative min-h-[52px]',
+                  pendingHref === item.href && !active && 'opacity-70',
+                )}
               >
                 <div className="relative w-9 h-9 flex items-center justify-center">
                   {active && (
@@ -271,7 +295,7 @@ export function AppNav() {
                   )}
                   <Icon
                     className={cn(
-                      'w-[19px] h-[19px] relative transition-all',
+                      'w-[19px] h-[19px] relative transition-transform duration-150',
                       active ? 'text-sage-deep scale-105' : 'text-ink-3',
                     )}
                     strokeWidth={active ? 2.25 : 1.85}
@@ -279,7 +303,7 @@ export function AppNav() {
                 </div>
                 <span
                   className={cn(
-                    'text-[10px] leading-none transition-colors',
+                    'text-[10px] leading-none transition-colors duration-150',
                     active ? 'text-sage-deep font-semibold' : 'text-ink-3',
                   )}
                 >

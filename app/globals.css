@@ -303,14 +303,29 @@ body {
    the top edge — no harsh bottom-border line, no boxed-in container feel.
    Pill class name kept for backwards compatibility with the JSX. */
 .tabbar-pill {
-  background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: blur(28px) saturate(1.4);
-  -webkit-backdrop-filter: blur(28px) saturate(1.4);
+  background: rgba(255, 255, 255, 0.97);
+  /* Soft blur is fine on desktop; on phones (esp. Capacitor WKWebView)
+     backdrop-filter is a major frame-time cost during tab switches. */
   border-top: 1px solid rgba(184, 168, 144, 0.18);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.80),
     0 -2px 4px rgba(26, 28, 26, 0.03),
     0 -10px 32px -6px rgba(111, 143, 107, 0.22);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .tabbar-pill {
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(28px) saturate(1.4);
+    -webkit-backdrop-filter: blur(28px) saturate(1.4);
+  }
+}
+
+/* Hide heavy ambient orbs on touch / native shell. */
+@media (hover: none), (pointer: coarse) {
+  .ambient-bg-desktop {
+    display: none;
+  }
 }
 
 /* ─── Floating shadow utilities ─────────────────────────────────────────── */
