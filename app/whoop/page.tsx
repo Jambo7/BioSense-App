@@ -13,21 +13,21 @@ export const metadata: Metadata = {
 
 export default function WhoopUxPage() {
   return (
-    <main className="min-h-screen bg-[#E8E2D6] text-ink">
-      <header className="border-b border-line bg-white/90">
+    <main className="relative z-10 min-h-screen bg-[#E8E2D6] text-[#1A1C1A]">
+      <header className="border-b border-[rgba(26,28,26,0.08)] bg-white">
         <div className="mx-auto max-w-6xl px-5 py-5 flex items-center justify-between gap-4">
           <BrandWordmark height={22} priority />
-          <span className="text-[11px] uppercase tracking-wide text-ink-3">WHOOP API application</span>
+          <span className="text-[11px] uppercase tracking-wide text-[#8A8C8A]">WHOOP API application</span>
         </div>
       </header>
 
       <article className="mx-auto max-w-6xl px-5 py-10 space-y-8">
         <section className="max-w-2xl">
-          <p className="text-eyebrow uppercase text-sage-deep">Product UI</p>
-          <h1 className="mt-2 font-serif text-[32px] sm:text-[40px] leading-[1.1] tracking-tight">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#5A7556]">Product UI</p>
+          <h1 className="mt-2 font-serif text-[32px] sm:text-[40px] leading-[1.1] tracking-tight text-[#1A1C1A]">
             BioSense × WHOOP
           </h1>
-          <p className="mt-4 text-[15px] text-ink-2 leading-relaxed">
+          <p className="mt-4 text-[15px] text-[#5A5C5A] leading-relaxed">
             These are the live BioSense screens — same layout, type, and components as production.
             Example values are shown so reviewers can see where WHOOP recovery, sleep and strain land
             after a member taps Connect.

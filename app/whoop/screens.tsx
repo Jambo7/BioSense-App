@@ -43,9 +43,8 @@ function Phone({
     <figure className="space-y-3">
       <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-ink-3">{title}</p>
       <div className="mx-auto w-[min(100%,390px)] rounded-[40px] bg-[#1A1C1A] p-[10px] shadow-[0_24px_64px_-20px_rgba(26,28,26,0.45)]">
-        <div className="relative rounded-[30px] bg-off-white overflow-hidden h-[760px]">
-          <div className="absolute inset-0 page-texture page-texture-waves pointer-events-none opacity-80" />
-          <div className="relative h-full overflow-hidden flex flex-col">
+        <div className="relative rounded-[30px] bg-[#FAFAF8] overflow-hidden h-[760px]">
+          <div className="relative z-10 h-full overflow-hidden flex flex-col">
             {children}
           </div>
         </div>
