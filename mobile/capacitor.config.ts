@@ -4,8 +4,8 @@ import type { CapacitorConfig } from '@capacitor/cli'
  * Thin native shell for TestFlight / App Store.
  *
  * Loads the live Next.js app so NextAuth cookies, SSR pages, Terra OAuth and
- * Stripe all keep working. A full native rewrite (Bearer APIs) can come later
- * when we need HealthKit / APNs.
+ * Stripe all keep working. HealthKit and local notifications are native plugins
+ * called from the web UI via Capacitor.
  *
  * Change `server.url` only if the production host moves.
  */

@@ -102,6 +102,22 @@ export function metricsFromSyncData(data: unknown): WearableMetrics {
   const m: WearableMetrics = {}
   if (!data || typeof data !== 'object') return m
 
+  const rec = data as Record<string, unknown>
+  if (rec.source === 'healthkit') {
+    const latest = rec.latest
+    if (latest && typeof latest === 'object') {
+      const l = latest as Record<string, unknown>
+      if (typeof l.hrv === 'number') m.hrv = l.hrv
+      if (typeof l.rhr === 'number') m.rhr = l.rhr
+      if (typeof l.steps === 'number') m.steps = l.steps
+      if (typeof l.activeMinutes === 'number') m.activeMinutes = l.activeMinutes
+      if (typeof l.sleepHours === 'number') m.sleepHours = l.sleepHours
+    }
+    if (m.steps === 0) delete m.steps
+    if (m.activeMinutes === 0) delete m.activeMinutes
+    return m
+  }
+
   // --- Daily summary: steps, resting HR, HRV, active time, recovery ---
   const daily = latestMeaningful(getPath(data, 'payloads.daily.data'), dailyHasSignal)
   if (daily) {
@@ -241,6 +257,23 @@ export function dailyBreakdownFromSyncData(
 ): Map<string, WearableMetrics> {
   const days = new Map<string, WearableMetrics>()
   if (!data || typeof data !== 'object') return days
+
+  const rec = data as Record<string, unknown>
+  if (rec.source === 'healthkit' && Array.isArray(rec.days)) {
+    for (const row of rec.days) {
+      if (!row || typeof row !== 'object') continue
+      const d = row as Record<string, unknown>
+      if (typeof d.date !== 'string') continue
+      mergeDay(days, d.date, {
+        steps: typeof d.steps === 'number' ? d.steps : undefined,
+        rhr: typeof d.rhr === 'number' ? d.rhr : undefined,
+        hrv: typeof d.hrv === 'number' ? d.hrv : undefined,
+        activeMinutes: typeof d.activeMinutes === 'number' ? d.activeMinutes : undefined,
+        sleepHours: typeof d.sleepHours === 'number' ? d.sleepHours : undefined,
+      })
+    }
+    return days
+  }
 
   const dailyArr = getPath(data, 'payloads.daily.data')
   if (Array.isArray(dailyArr)) {

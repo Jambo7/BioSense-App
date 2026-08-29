@@ -48,6 +48,10 @@
 	<string>BioSense needs the camera to photograph blood test results for analysis.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>BioSense needs photo access so you can upload blood test images.</string>
+	<key>NSHealthShareUsageDescription</key>
+	<string>BioSense reads Apple Health (including Apple Watch) for steps, heart rate, HRV, exercise minutes and sleep so we can personalise your health score and insights. Data stays on your account and is not sold.</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>BioSense does not write data into Apple Health. This description is required by iOS when HealthKit is enabled.</string>
 	<!-- Export compliance: no custom encryption beyond HTTPS -->
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>

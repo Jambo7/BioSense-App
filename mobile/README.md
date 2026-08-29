@@ -72,6 +72,13 @@ cd mobile && npx cap sync ios && npx cap open ios
 
 ## What this is / isn’t
 
-**Is:** installable TestFlight app with the real BioSense UI, login, wearables, blood upload, chat.
+**Is:** installable TestFlight app with the real BioSense UI, login, wearables, blood upload, chat, **Apple Health (HealthKit)** and **daily local reminders**.
 
-**Isn’t yet:** HealthKit sync, Apple Push (APNs), offline-native UI. Those need a deeper native pass later; Bearer APIs under `/api/auth/mobile/*` are ready for that.
+**Still later:** remote Apple Push (APNs from the server), offline-native UI. Bearer APIs under `/api/auth/mobile/*` remain available.
+
+### Apple Health (new TestFlight required)
+
+1. In Xcode: **Signing & Capabilities → + Capability → HealthKit** (the entitlements file is already in the project; confirm it appears).
+2. Archive **build 2** and upload to TestFlight.
+3. On iPhone: Wearables → Apple Health → **Connect** → allow the Health categories.
+4. Notifications → **Remind me each morning** for a 9:00 check-in ping (on-device only).

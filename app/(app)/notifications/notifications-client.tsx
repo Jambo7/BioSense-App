@@ -1,11 +1,15 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Bell, ChevronRight } from 'lucide-react'
+import { toast } from 'sonner'
 import { Card, CardLabel } from '@/components/ui/card'
 import { IconBadge } from '@/components/ui/icon-badge'
+import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { isNativeIos } from '@/lib/native/healthkit'
+import { localRemindersEnabled, setLocalReminders } from '@/lib/native/reminders'
 
 type Notif = {
   id: string
@@ -18,6 +22,14 @@ type Notif = {
 
 export function NotificationsClient({ initial }: { initial: Notif[] }) {
   const [items, setItems] = useState(initial)
+  const [nativeIos, setNativeIos] = useState(false)
+  const [remindersOn, setRemindersOn] = useState(false)
+  const [reminderBusy, setReminderBusy] = useState(false)
+
+  useEffect(() => {
+    setNativeIos(isNativeIos())
+    setRemindersOn(localRemindersEnabled())
+  }, [])
 
   async function markRead(id: string) {
     setItems((prev) =>
@@ -45,9 +57,37 @@ export function NotificationsClient({ initial }: { initial: Notif[] }) {
           Your <span className="italic-accent">updates.</span>
         </h1>
         <p className="text-body-sm text-ink-2 mt-2">
-          Push notifications from BioSense appear here. Tap to jump to the relevant section.
+          In-app updates appear here. On iPhone you can also turn on a daily check-in reminder.
         </p>
       </header>
+
+      {nativeIos && (
+        <Card padding="md" variant="soft">
+          <CardLabel className="mb-1">Daily reminder</CardLabel>
+          <p className="text-caption text-ink-2 mb-3 leading-relaxed">
+            A local 9:00 reminder on this iPhone. It does not go through our servers.
+          </p>
+          <Button
+            variant={remindersOn ? 'subtle' : 'ghost'}
+            size="sm"
+            loading={reminderBusy}
+            onClick={async () => {
+              setReminderBusy(true)
+              try {
+                await setLocalReminders(!remindersOn)
+                setRemindersOn(!remindersOn)
+                toast.success(remindersOn ? 'Reminder off' : 'Daily check-in reminder on (9:00)')
+              } catch (err) {
+                toast.error(err instanceof Error ? err.message : 'Could not update reminders')
+              } finally {
+                setReminderBusy(false)
+              }
+            }}
+          >
+            {remindersOn ? 'Turn reminder off' : 'Remind me each morning'}
+          </Button>
+        </Card>
+      )}
 
       {items.length === 0 ? (
         <Card padding="lg" variant="soft" className="text-center">

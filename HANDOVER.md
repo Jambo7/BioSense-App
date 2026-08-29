@@ -124,7 +124,9 @@ pushed to Neon — only run `npx prisma db push` after editing `prisma/schema.pr
 - [ ] **Custom-domain email** (e.g. hello@bio-sense.ai) — Google Workspace recommended.
 - [ ] **TestFlight upload** — iOS Capacitor shell is in `mobile/`; Neil creates the App Store
       Connect app + signs in Xcode on a Mac, then Archive → TestFlight (see `mobile/README.md`).
-- [ ] **HealthKit / APNs** — not in the WebView shell; use Bearer APIs when we build that.
+      **Build 2** adds HealthKit + local reminders — must re-Archive.
+- [ ] **Remote APNs** — daily reminders are on-device local notifications. Server-pushed alerts
+      still need an Apple Push key.
 
 ---
 
@@ -142,6 +144,8 @@ keys are optional locally — those features skip gracefully when blank.
 
 ## 8. Recent changes (most recent first)
 
+- 2026-08-25 — Wrote docs/data-flow.md: current hosting / subprocessors statement for
+  partner questionnaires (Neon us-east-1, Vercel, Terra, OpenAI, Resend; R2 unused).
 - 2026-08-07 — Ingested GSC-000/001/002 (architecture + Health Score + Biological Age
   methodologies) into docs/gsc + lib/gsc pins. Full score/bio-age rewrite still blocked on
   GSC-003/004/008/009 (no numeric weights in 001/002 by design). Interim engines remain.

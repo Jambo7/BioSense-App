@@ -13,6 +13,11 @@ const nextConfig: NextConfig = {
       ],
     },
   },
+  transpilePackages: [
+    '@capacitor/core',
+    '@capacitor/app',
+    '@capacitor/local-notifications',
+  ],
   // Required for pdf-parse (native binary)
   serverExternalPackages: ['pdf-parse'],
 }
