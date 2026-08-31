@@ -28,7 +28,7 @@ export async function syncAppleHealthKit(days = 14): Promise<{ dayCount: number;
     return {
       dayCount: 0,
       error: unimplemented
-        ? 'Open BioSense from the TestFlight app (not Safari) and try Connect again'
+        ? 'Apple Health could not reach HealthKit in this app build. Fully close BioSense and try Connect again. If it still fails, a new TestFlight archive is needed.'
         : raw,
     }
   }
