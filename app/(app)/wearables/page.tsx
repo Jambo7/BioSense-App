@@ -6,7 +6,6 @@ import { toast } from 'sonner'
 import {
   ExternalLink,
   CheckCircle2,
-  Upload,
   Watch,
   Smartphone,
   Activity,
@@ -23,7 +22,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardLabel } from '@/components/ui/card'
 import { IconBadge } from '@/components/ui/icon-badge'
 import { Pill } from '@/components/ui/pill'
-import { healthKitPluginReady, isNativeIos } from '@/lib/native/healthkit'
+import { cn } from '@/lib/utils'
 import { syncAppleHealthKit } from '@/lib/native/apple-sync'
 
 const WEARABLES = [
@@ -34,7 +33,7 @@ const WEARABLES = [
   { id: 'strava',  name: 'Strava',         Icon: Activity,   image: '/wearables/strava.png',  desc: 'Running, cycling, workouts, activities', type: 'oauth' },
   { id: 'samsung', name: 'Samsung Health', Icon: Smartphone, image: '/wearables/samsung.png', desc: 'Steps, heart rate, sleep (Android)',  type: 'oauth' },
   { id: 'google',  name: 'Google Health',  Icon: Activity,   image: '/wearables/google.png',  desc: 'Steps, heart rate, sleep (Google Health / Fit)', type: 'oauth' },
-  { id: 'apple',   name: 'Apple Health',   Icon: Smartphone, image: '/wearables/apple.png',   desc: 'Apple Watch and iPhone Health data',  type: 'upload' },
+  { id: 'apple',   name: 'Apple Health',   Icon: Smartphone, image: '/wearables/apple.png',   desc: 'Apple Watch and iPhone Health data',  type: 'healthkit' },
 ]
 
 function WearableThumb({
@@ -186,15 +185,6 @@ export default function WearablesPage() {
   const [expanded, setExpanded] = useState<string | null>(null)
   const [previews, setPreviews] = useState<Record<string, PreviewState>>({})
 
-  const [nativeIos, setNativeIos] = useState(false)
-
-  useEffect(() => {
-    setNativeIos(isNativeIos())
-    void healthKitPluginReady().then((ok) => {
-      if (ok) setNativeIos(true)
-    })
-  }, [])
-
   useEffect(() => {
     const load = () =>
       fetch('/api/wearables', { cache: 'no-store' })
@@ -273,31 +263,6 @@ export default function WearablesPage() {
       setConnected(await res2.json())
     } catch {
       toast.error('Apple Health sync failed')
-    } finally {
-      setLoading(null)
-    }
-  }
-
-  async function handleAppleUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (!file) return
-
-    setLoading('apple')
-    const fd = new FormData()
-    fd.append('file', file)
-
-    try {
-      const res = await fetch('/api/wearables/apple/upload', { method: 'POST', body: fd })
-      const data = await res.json()
-      if (res.ok) {
-        toast.success(`Apple Health imported — ${data.recordCount} records`)
-        const res2 = await fetch('/api/wearables', { cache: 'no-store' })
-        setConnected(await res2.json())
-      } else {
-        toast.error(data.error || 'Import failed')
-      }
-    } catch {
-      toast.error('Upload failed')
     } finally {
       setLoading(null)
     }
@@ -395,7 +360,7 @@ export default function WearablesPage() {
                 <div className="shrink-0 flex items-center gap-1.5">
                   {conn ? (
                     <>
-                      {nativeIos && w.id === 'apple' && (
+                      {w.id === 'apple' && (
                         <Button
                           variant="ghost"
                           size="sm"
@@ -427,7 +392,7 @@ export default function WearablesPage() {
                         )}
                       />
                     </>
-                  ) : w.id === 'apple' && nativeIos ? (
+                  ) : w.id === 'apple' ? (
                     <Button
                       variant="ghost"
                       size="sm"
@@ -436,25 +401,7 @@ export default function WearablesPage() {
                     >
                       Connect
                     </Button>
-                  ) : w.type === 'upload' ? (
-                  <label className="cursor-pointer inline-block">
-                    <input
-                      type="file"
-                      accept=".json,application/json"
-                      className="hidden"
-                      onChange={handleAppleUpload}
-                    />
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      loading={loading === w.id}
-                      className="pointer-events-none"
-                    >
-                      <Upload className="w-3.5 h-3.5" />
-                      Upload JSON
-                    </Button>
-                  </label>
-                ) : (
+                  ) : (
                   <Button
                     variant="ghost"
                     size="sm"
@@ -489,10 +436,9 @@ export default function WearablesPage() {
             to authorise via OAuth. Data syncs automatically every few hours.
           </p>
           <p>
-            <strong className="text-ink">Apple Health</strong> — in the BioSense iPhone app,
-            tap Connect and allow Health access. Apple Watch data already in Health
-            (steps, HRV, resting heart rate, exercise minutes, sleep) syncs into your score.
-            On the website you can still upload a Health Auto Export JSON file.
+            <strong className="text-ink">Apple Health</strong> — tap Connect and allow Health
+            access. Apple Watch data already in Health (steps, HRV, resting heart rate,
+            exercise minutes, sleep) syncs into your score.
           </p>
         </div>
       </Card>

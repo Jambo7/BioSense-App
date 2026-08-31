@@ -12,10 +12,6 @@ async function postDays(days: HealthKitDay[]): Promise<{ dayCount: number } | nu
 }
 
 export async function syncAppleHealthKit(days = 14): Promise<{ dayCount: number; error?: string }> {
-  if (!isNativeIos()) {
-    return { dayCount: 0, error: 'Apple Health sync needs the BioSense iPhone app' }
-  }
-
   try {
     const { available } = await BiosenseHealth.available()
     if (!available) {
@@ -27,8 +23,14 @@ export async function syncAppleHealthKit(days = 14): Promise<{ dayCount: number;
     if (!result) return { dayCount: 0, error: 'Could not save Apple Health data' }
     return { dayCount: result.dayCount }
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Apple Health sync failed'
-    return { dayCount: 0, error: message }
+    const raw = err instanceof Error ? err.message : 'Apple Health sync failed'
+    const unimplemented = /not implemented|unimplemented/i.test(raw)
+    return {
+      dayCount: 0,
+      error: unimplemented
+        ? 'Open BioSense from the TestFlight app (not Safari) and try Connect again'
+        : raw,
+    }
   }
 }
 
