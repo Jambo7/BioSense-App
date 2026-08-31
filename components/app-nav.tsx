@@ -102,10 +102,10 @@ export function AppNav() {
       <nav
         className="app-tabbar tabbar-pill z-50 overflow-visible rounded-none border-x-0"
         style={{
-          paddingBottom: 'max(8px, env(safe-area-inset-bottom, 0px))',
+          paddingBottom: 'max(10px, env(safe-area-inset-bottom, 0px))',
         }}
       >
-        <div className="flex items-end justify-around max-w-3xl mx-auto px-1 pt-2 pb-1">
+        <div className="grid grid-cols-5 w-full items-end gap-0 px-2 pt-3 pb-1.5">
           {navItems.map((item) => {
             const active = tabActive(item)
             const Icon = item.icon
@@ -120,9 +120,9 @@ export function AppNav() {
                   aria-label={item.label}
                   data-tour={item.tourId}
                   onClick={onTabClick}
-                  className="flex-1 flex flex-col items-center justify-end gap-0.5 relative min-h-[52px]"
+                  className="min-w-0 flex flex-col items-center justify-end gap-0.5 relative pt-1"
                 >
-                  <div className="relative -mt-8 mb-0.5">
+                  <div className="relative -mt-5 mb-0.5">
                     <span
                       aria-hidden
                       className={cn(
@@ -133,7 +133,7 @@ export function AppNav() {
                     />
                     <div
                       className={cn(
-                        'relative w-[56px] h-[56px] rounded-full flex items-center justify-center',
+                        'relative w-12 h-12 rounded-full flex items-center justify-center',
                         'bg-[linear-gradient(180deg,#8DB389_0%,#6F8F6B_55%,#5A7556_100%)]',
                         'ring-[4px] ring-white',
                         'transition-transform duration-150 active:scale-[0.96]',
@@ -148,8 +148,8 @@ export function AppNav() {
                       <Image
                         src="/biosense-mark-white.png"
                         alt=""
-                        width={30}
-                        height={30}
+                        width={26}
+                        height={26}
                         priority
                         className="relative block select-none [filter:drop-shadow(0_1px_1px_rgba(0,0,0,0.18))]"
                       />
@@ -157,7 +157,7 @@ export function AppNav() {
                   </div>
                   <span
                     className={cn(
-                      'text-[10px] leading-none',
+                      'text-[9px] leading-tight text-center px-0.5 max-w-full',
                       active ? 'text-sage-deep font-semibold' : 'text-ink-2 font-medium',
                     )}
                   >
@@ -175,7 +175,7 @@ export function AppNav() {
                 data-tour={item.tourId}
                 onClick={onTabClick}
                 className={cn(
-                  'flex-1 flex flex-col items-center justify-center gap-1 py-1.5 transition-colors duration-150 relative min-h-[52px]',
+                  'min-w-0 flex flex-col items-center justify-end gap-1 py-1 transition-colors duration-150 relative',
                   pendingHref === item.href && !active && 'opacity-70',
                 )}
               >
@@ -196,7 +196,7 @@ export function AppNav() {
                 </div>
                 <span
                   className={cn(
-                    'text-[10px] leading-none transition-colors duration-150',
+                    'text-[9px] leading-tight text-center px-0.5 max-w-full transition-colors duration-150',
                     active ? 'text-sage-deep font-semibold' : 'text-ink-3',
                   )}
                 >
