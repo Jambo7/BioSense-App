@@ -1,16 +1,8 @@
 import Capacitor
 import HealthKit
 
-@objc(BiosenseHealthPlugin)
-public class BiosenseHealthPlugin: CAPPlugin, CAPBridgedPlugin {
-    public let identifier = "BiosenseHealthPlugin"
-    public let jsName = "BiosenseHealth"
-    public let pluginMethods: [CAPPluginMethod] = [
-        CAPPluginMethod(name: "available", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "requestAuthorization", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "queryDays", returnType: CAPPluginReturnPromise),
-    ]
-
+final class BiosenseHealthKit {
+    static let shared = BiosenseHealthKit()
     private let store = HKHealthStore()
 
     private var readTypes: Set<HKObjectType> {
@@ -33,35 +25,41 @@ public class BiosenseHealthPlugin: CAPPlugin, CAPBridgedPlugin {
         return types
     }
 
-    @objc func available(_ call: CAPPluginCall) {
-        call.resolve(["available": HKHealthStore.isHealthDataAvailable()])
+    func isAvailable() -> Bool {
+        HKHealthStore.isHealthDataAvailable()
     }
 
-    @objc func requestAuthorization(_ call: CAPPluginCall) {
-        guard HKHealthStore.isHealthDataAvailable() else {
-            call.reject("Health data is not available on this device")
+    func requestAuthorization(completion: @escaping (Result<Bool, Error>) -> Void) {
+        guard isAvailable() else {
+            completion(.failure(NSError(domain: "BiosenseHealth", code: 1, userInfo: [
+                NSLocalizedDescriptionKey: "Health data is not available on this device",
+            ])))
             return
         }
         store.requestAuthorization(toShare: Set<HKSampleType>(), read: readTypes) { ok, err in
             if let err = err {
-                call.reject(err.localizedDescription)
+                completion(.failure(err))
                 return
             }
-            call.resolve(["granted": ok])
+            completion(.success(ok))
         }
     }
 
-    @objc func queryDays(_ call: CAPPluginCall) {
-        guard HKHealthStore.isHealthDataAvailable() else {
-            call.reject("Health data is not available on this device")
+    func queryDays(_ dayCount: Int, completion: @escaping (Result<[[String: Any]], Error>) -> Void) {
+        guard isAvailable() else {
+            completion(.failure(NSError(domain: "BiosenseHealth", code: 1, userInfo: [
+                NSLocalizedDescriptionKey: "Health data is not available on this device",
+            ])))
             return
         }
 
-        let dayCount = max(1, min(call.getInt("days") ?? 14, 31))
+        let daysWanted = max(1, min(dayCount, 31))
         let cal = Calendar.current
         let end = Date()
-        guard let start = cal.date(byAdding: .day, value: -(dayCount - 1), to: cal.startOfDay(for: end)) else {
-            call.reject("Could not compute date range")
+        guard let start = cal.date(byAdding: .day, value: -(daysWanted - 1), to: cal.startOfDay(for: end)) else {
+            completion(.failure(NSError(domain: "BiosenseHealth", code: 2, userInfo: [
+                NSLocalizedDescriptionKey: "Could not compute date range",
+            ])))
             return
         }
 
@@ -143,7 +141,6 @@ public class BiosenseHealthPlugin: CAPPlugin, CAPBridgedPlugin {
                     }
                     guard asleep else { continue }
                     let hours = sample.endDate.timeIntervalSince(sample.startDate) / 3600.0
-                    // Attribute overnight sleep to the wake calendar day.
                     let k = key(sample.endDate)
                     var row = buckets[k] ?? [:]
                     row["sleepHours"] = (row["sleepHours"] ?? 0) + hours
@@ -173,7 +170,45 @@ public class BiosenseHealthPlugin: CAPPlugin, CAPBridgedPlugin {
                 for (k, v) in row { out[k] = v }
                 return out
             }
-            call.resolve(["days": days])
+            completion(.success(days))
+        }
+    }
+}
+
+@objc(BiosenseHealthPlugin)
+public class BiosenseHealthPlugin: CAPPlugin, CAPBridgedPlugin {
+    public let identifier = "BiosenseHealthPlugin"
+    public let jsName = "BiosenseHealth"
+    public let pluginMethods: [CAPPluginMethod] = [
+        CAPPluginMethod(name: "available", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "requestAuthorization", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "queryDays", returnType: CAPPluginReturnPromise),
+    ]
+
+    @objc func available(_ call: CAPPluginCall) {
+        call.resolve(["available": BiosenseHealthKit.shared.isAvailable()])
+    }
+
+    @objc func requestAuthorization(_ call: CAPPluginCall) {
+        BiosenseHealthKit.shared.requestAuthorization { result in
+            switch result {
+            case .success(let granted):
+                call.resolve(["granted": granted])
+            case .failure(let err):
+                call.reject(err.localizedDescription)
+            }
+        }
+    }
+
+    @objc func queryDays(_ call: CAPPluginCall) {
+        let dayCount = call.getInt("days") ?? 14
+        BiosenseHealthKit.shared.queryDays(dayCount) { result in
+            switch result {
+            case .success(let days):
+                call.resolve(["days": days])
+            case .failure(let err):
+                call.reject(err.localizedDescription)
+            }
         }
     }
 }

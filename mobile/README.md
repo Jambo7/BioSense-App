@@ -9,7 +9,7 @@ Backend mobile APIs (Bearer login etc.) were already in place. This folder is th
 |---|---|
 | Bundle ID | `ai.biosense.app` |
 | Display name | BioSense |
-| Version | 1.0 (build 1) |
+| Version | 1.0 (build 4) |
 | App icon | Real S-mark (`public/biosense-mark.png` → `mobile/resources/icon.png`) |
 
 Regenerate icon after brand updates:
@@ -37,8 +37,8 @@ python mobile/scripts/make-app-icon.py
 ```bash
 cd mobile
 npm install
-npx cap sync ios
-npx cap open ios          # opens Xcode
+npm run sync
+npx cap open ios
 ```
 
 In Xcode:
@@ -76,9 +76,6 @@ cd mobile && npx cap sync ios && npx cap open ios
 
 **Still later:** remote Apple Push (APNs from the server), offline-native UI. Bearer APIs under `/api/auth/mobile/*` remain available.
 
-### Apple Health (new TestFlight required)
+### Apple Health (one more TestFlight — build 4)
 
-1. In Xcode: **Signing & Capabilities → + Capability → HealthKit** (the entitlements file is already in the project; confirm it appears).
-2. Archive **build 2** and upload to TestFlight.
-3. On iPhone: Wearables → Apple Health → **Connect** → allow the Health categories.
-4. Notifications → **Remind me each morning** for a 9:00 check-in ping (on-device only).
+The live website cannot read HealthKit. Neil archives **1.0 (4)** once from latest `main`. After testers install that build, Wearables → Apple Health → Connect. No further Mac work for Apple Health unless native code changes again.

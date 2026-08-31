@@ -7,19 +7,30 @@ type NativeCap = {
   PluginHeaders?: Array<{ name: string }>
 }
 
+type HealthHandler = { postMessage: (body: unknown) => void }
+
 function windowCap(): NativeCap | undefined {
   if (typeof window === 'undefined') return undefined
   return (window as unknown as { Capacitor?: NativeCap }).Capacitor
+}
+
+function healthHandler(): HealthHandler | undefined {
+  if (typeof window === 'undefined') return undefined
+  return (
+    window as unknown as {
+      webkit?: { messageHandlers?: { biosenseHealth?: HealthHandler } }
+    }
+  ).webkit?.messageHandlers?.biosenseHealth
 }
 
 function iosBridgePresent(): boolean {
   if (typeof window === 'undefined') return false
   const handlers = (
     window as unknown as {
-      webkit?: { messageHandlers?: { bridge?: unknown } }
+      webkit?: { messageHandlers?: { bridge?: unknown; biosenseHealth?: unknown } }
     }
   ).webkit?.messageHandlers
-  return Boolean(handlers?.bridge)
+  return Boolean(handlers?.biosenseHealth || handlers?.bridge)
 }
 
 export function isIosDevice(): boolean {
@@ -56,19 +67,10 @@ export interface BiosenseHealthPlugin {
   queryDays(options: { days?: number }): Promise<{ days: HealthKitDay[] }>
 }
 
-/**
- * Next.js can evaluate registerPlugin before Capacitor has attached PluginHeaders,
- * which makes HealthKit look "unimplemented" even inside TestFlight.
- * Call the injected native bridge at tap-time instead.
- */
-function healthPluginExported(): boolean {
-  return Boolean(windowCap()?.PluginHeaders?.some((h) => h.name === 'BiosenseHealth'))
-}
-
 function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
   return new Promise((resolve, reject) => {
     const t = window.setTimeout(() => {
-      reject(new Error(`${label} timed out. A new TestFlight build with HealthKit is needed.`))
+      reject(new Error(`${label} timed out. Install TestFlight 1.0 (4), then try Connect again.`))
     }, ms)
     promise.then(
       (v) => {
@@ -83,26 +85,41 @@ function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise
   })
 }
 
+function callScriptHandler<T>(method: string, options: Record<string, unknown>): Promise<T> {
+  const handler = healthHandler()
+  if (!handler) {
+    return Promise.reject(new Error('missing handler'))
+  }
+  const win = window as unknown as {
+    __biosenseHealthCb?: Record<string, { resolve: (v: T) => void; reject: (e: Error) => void }>
+  }
+  win.__biosenseHealthCb = win.__biosenseHealthCb || {}
+  const id = `hk_${Date.now()}_${Math.random().toString(16).slice(2)}`
+  return new Promise<T>((resolve, reject) => {
+    win.__biosenseHealthCb![id] = { resolve, reject }
+    handler.postMessage({ id, method, options })
+  })
+}
+
 async function nativeCall<T>(method: string, options: Record<string, unknown> = {}): Promise<T> {
+  const timeoutMs = method === 'requestAuthorization' ? 90_000 : 12_000
+
+  if (healthHandler()) {
+    return withTimeout(callScriptHandler<T>(method, options), timeoutMs, 'Apple Health')
+  }
+
   const cap = windowCap()
-  const timeoutMs = method === 'requestAuthorization' ? 90_000 : 8_000
-
-  if (!healthPluginExported()) {
-    throw new Error(
-      'This app build cannot read Apple Health. Install the new TestFlight (1.0, build 4) after it is archived from Xcode, then tap Connect again.',
+  const exported = Boolean(cap?.PluginHeaders?.some((h) => h.name === 'BiosenseHealth'))
+  if (exported && typeof cap?.nativePromise === 'function') {
+    return withTimeout(
+      cap.nativePromise('BiosenseHealth', method, options) as Promise<T>,
+      timeoutMs,
+      'Apple Health',
     )
   }
 
-  if (typeof cap?.nativePromise !== 'function') {
-    throw new Error(
-      'Apple Health is not hooked up in this app session. Fully close BioSense and open it from TestFlight again.',
-    )
-  }
-
-  return withTimeout(
-    cap.nativePromise('BiosenseHealth', method, options) as Promise<T>,
-    timeoutMs,
-    'Apple Health',
+  throw new Error(
+    'Apple Health is not in this app yet. Install TestFlight 1.0 (4) when Neil has uploaded it, then tap Connect.',
   )
 }
 
@@ -112,7 +129,6 @@ export const BiosenseHealth: BiosenseHealthPlugin = {
   queryDays: (options) => nativeCall('queryDays', options),
 }
 
-/** True when the native HealthKit plugin is actually answering (TestFlight / App Store). */
 export async function healthKitPluginReady(): Promise<boolean> {
   try {
     const { available } = await BiosenseHealth.available()
