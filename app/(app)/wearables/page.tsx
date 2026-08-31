@@ -23,7 +23,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardLabel } from '@/components/ui/card'
 import { IconBadge } from '@/components/ui/icon-badge'
 import { Pill } from '@/components/ui/pill'
-import { isNativeIos } from '@/lib/native/healthkit'
+import { healthKitPluginReady, isNativeIos } from '@/lib/native/healthkit'
 import { syncAppleHealthKit } from '@/lib/native/apple-sync'
 
 const WEARABLES = [
@@ -190,6 +190,9 @@ export default function WearablesPage() {
 
   useEffect(() => {
     setNativeIos(isNativeIos())
+    void healthKitPluginReady().then((ok) => {
+      if (ok) setNativeIos(true)
+    })
   }, [])
 
   useEffect(() => {

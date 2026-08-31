@@ -1,7 +1,25 @@
 import { Capacitor, registerPlugin } from '@capacitor/core'
 
 export function isNativeIos(): boolean {
-  return Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'ios'
+  if (typeof window === 'undefined') return false
+  try {
+    if (Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'ios') return true
+  } catch {
+    /* ignore */
+  }
+  const cap = (window as unknown as { Capacitor?: { isNativePlatform?: () => boolean; getPlatform?: () => string } })
+    .Capacitor
+  return Boolean(cap?.isNativePlatform?.() && cap.getPlatform?.() === 'ios')
+}
+
+/** True when the native HealthKit plugin is actually answering (TestFlight / App Store). */
+export async function healthKitPluginReady(): Promise<boolean> {
+  try {
+    const { available } = await BiosenseHealth.available()
+    return Boolean(available)
+  } catch {
+    return false
+  }
 }
 
 export interface HealthKitDay {

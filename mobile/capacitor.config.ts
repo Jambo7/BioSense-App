@@ -16,6 +16,7 @@ const config: CapacitorConfig = {
   server: {
     url: 'https://bio-sense-app-navy.vercel.app',
     cleartext: false,
+    allowNavigation: ['bio-sense-app-navy.vercel.app'],
   },
   ios: {
     // 'automatic' was causing the WKWebView to pan/offset (content wider than
