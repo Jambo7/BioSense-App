@@ -57,19 +57,21 @@ export async function persistAppleHealthKit(
 
   const sorted = [...days].sort((a, b) => a.date.localeCompare(b.date))
   const latest = sorted[sorted.length - 1]
-  const payload = {
-    source: 'healthkit',
-    latest: latest
-      ? {
-          steps: latest.steps,
-          rhr: latest.rhr,
-          hrv: latest.hrv,
-          activeMinutes: latest.activeMinutes,
-          sleepHours: latest.sleepHours,
-        }
-      : {},
-    days,
-  }
+  const payload: Prisma.InputJsonValue = JSON.parse(
+    JSON.stringify({
+      source: 'healthkit',
+      latest: latest
+        ? {
+            steps: latest.steps,
+            rhr: latest.rhr,
+            hrv: latest.hrv,
+            activeMinutes: latest.activeMinutes,
+            sleepHours: latest.sleepHours,
+          }
+        : {},
+      days,
+    }),
+  )
 
   await prisma.wearableSync.upsert({
     where: { userId_provider: { userId, provider: 'apple' } },
@@ -77,11 +79,11 @@ export async function persistAppleHealthKit(
       userId,
       provider: 'apple',
       lastSync: new Date(),
-      data: payload as Prisma.InputJsonValue,
+      data: payload,
     },
     update: {
       lastSync: new Date(),
-      data: payload as Prisma.InputJsonValue,
+      data: payload,
     },
   })
 
