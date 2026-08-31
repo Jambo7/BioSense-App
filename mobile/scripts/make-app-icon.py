@@ -57,6 +57,7 @@ def main() -> None:
     bbox = mark.getbbox()
     if bbox:
         mark = mark.crop(bbox)
+    mark_src = mark.copy()
 
     canvas = gradient_bg().convert("RGBA")
     canvas = Image.alpha_composite(canvas, shine_layer())
@@ -88,9 +89,73 @@ def main() -> None:
         out_rgb.save(path, "PNG")
         print("wrote", path)
 
-    preview = ROOT / "mobile" / "resources" / "icon-preview.png"
-    out_rgb.save(preview, "PNG")
-    print("wrote", preview)
+    downloads = Path.home() / "Downloads"
+    downloads.mkdir(parents=True, exist_ok=True)
+    square = downloads / "BioSense-App-Icon.png"
+    out_rgb.save(square, "PNG")
+    print("wrote", square)
+
+    # Home-screen preview only — Apple still needs the square file above.
+    r = 228
+    mask = Image.new("L", (SIZE, SIZE), 0)
+    ImageDraw.Draw(mask).rounded_rectangle((0, 0, SIZE - 1, SIZE - 1), radius=r, fill=255)
+    mask = mask.filter(ImageFilter.GaussianBlur(1.2))
+    preview = Image.new("RGBA", (SIZE, SIZE), (0, 0, 0, 0))
+    preview.paste(out_rgb.convert("RGBA"), (0, 0))
+    preview.putalpha(mask)
+    home = downloads / "BioSense-App-Icon-homescreen.png"
+    preview.save(home, "PNG")
+    print("wrote", home)
+
+    cream = (247, 245, 240)
+    splash_size = 2732
+    splash = Image.new("RGB", (splash_size, splash_size), cream)
+    s_mark = mark_src.copy()
+    s_target = int(splash_size * 0.22)
+    s_ratio = min(s_target / s_mark.width, s_target / s_mark.height)
+    s_w = max(1, int(s_mark.width * s_ratio))
+    s_h = max(1, int(s_mark.height * s_ratio))
+    s_mark = s_mark.resize((s_w, s_h), Image.Resampling.LANCZOS)
+    splash.paste(
+        s_mark,
+        ((splash_size - s_w) // 2, (splash_size - s_h) // 2),
+        s_mark,
+    )
+
+    splash_paths = [
+        ROOT / "mobile" / "resources" / "splash.png",
+        ROOT
+        / "mobile"
+        / "ios"
+        / "App"
+        / "App"
+        / "Assets.xcassets"
+        / "Splash.imageset"
+        / "splash-2732x2732.png",
+        ROOT
+        / "mobile"
+        / "ios"
+        / "App"
+        / "App"
+        / "Assets.xcassets"
+        / "Splash.imageset"
+        / "splash-2732x2732-1.png",
+        ROOT
+        / "mobile"
+        / "ios"
+        / "App"
+        / "App"
+        / "Assets.xcassets"
+        / "Splash.imageset"
+        / "splash-2732x2732-2.png",
+    ]
+    for path in splash_paths:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        splash.save(path, "PNG")
+        print("wrote", path)
+
+    splash.save(downloads / "BioSense-Launch-Splash.png", "PNG")
+    print("wrote", downloads / "BioSense-Launch-Splash.png")
 
 
 if __name__ == "__main__":
