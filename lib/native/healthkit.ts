@@ -1,4 +1,4 @@
-import { Capacitor, registerPlugin } from '@capacitor/core'
+import { Capacitor } from '@capacitor/core'
 
 type NativeCap = {
   nativePromise?: (plugin: string, method: string, options?: unknown) => Promise<unknown>
@@ -61,21 +61,49 @@ export interface BiosenseHealthPlugin {
  * which makes HealthKit look "unimplemented" even inside TestFlight.
  * Call the injected native bridge at tap-time instead.
  */
+function healthPluginExported(): boolean {
+  return Boolean(windowCap()?.PluginHeaders?.some((h) => h.name === 'BiosenseHealth'))
+}
+
+function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const t = window.setTimeout(() => {
+      reject(new Error(`${label} timed out. A new TestFlight build with HealthKit is needed.`))
+    }, ms)
+    promise.then(
+      (v) => {
+        window.clearTimeout(t)
+        resolve(v)
+      },
+      (err) => {
+        window.clearTimeout(t)
+        reject(err)
+      },
+    )
+  })
+}
+
 async function nativeCall<T>(method: string, options: Record<string, unknown> = {}): Promise<T> {
   const cap = windowCap()
-  if (typeof cap?.nativePromise === 'function') {
-    return (await cap.nativePromise('BiosenseHealth', method, options)) as T
-  }
-  if (!iosBridgePresent()) {
+  const timeoutMs = method === 'requestAuthorization' ? 90_000 : 8_000
+
+  if (!healthPluginExported()) {
     throw new Error(
-      'Apple Health needs the BioSense iPhone app with HealthKit. Install the latest TestFlight build and try Connect again.',
+      'This TestFlight build cannot read Apple Health yet. Archive a new iOS build from Xcode and install it, then tap Connect again.',
     )
   }
-  const plugin = registerPlugin<BiosenseHealthPlugin>('BiosenseHealth')
-  const fn = plugin[method as keyof BiosenseHealthPlugin] as (
-    opts?: Record<string, unknown>,
-  ) => Promise<T>
-  return fn(options)
+
+  if (typeof cap?.nativePromise !== 'function') {
+    throw new Error(
+      'Apple Health is not hooked up in this app session. Fully close BioSense and open it from TestFlight again.',
+    )
+  }
+
+  return withTimeout(
+    cap.nativePromise('BiosenseHealth', method, options) as Promise<T>,
+    timeoutMs,
+    'Apple Health',
+  )
 }
 
 export const BiosenseHealth: BiosenseHealthPlugin = {

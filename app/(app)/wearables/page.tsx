@@ -10,7 +10,6 @@ import {
   Smartphone,
   Activity,
   Plug,
-  Info,
   ChevronDown,
   HeartPulse,
   Footprints,
@@ -19,7 +18,7 @@ import {
   RefreshCw,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Card, CardLabel } from '@/components/ui/card'
+import { Card } from '@/components/ui/card'
 import { IconBadge } from '@/components/ui/icon-badge'
 import { Pill } from '@/components/ui/pill'
 import { cn } from '@/lib/utils'
@@ -295,7 +294,8 @@ export default function WearablesPage() {
               <span className="italic-accent">your wearables.</span>
             </h1>
             <p className="text-body text-ink-2 mt-2 leading-relaxed max-w-[58ch]">
-              Auto-enrich your health score with real-time HRV, sleep, recovery and activity.
+              Connect a wearable to pull HRV, sleep, recovery and activity into your score.
+              Apple Health reads from the Health app on this iPhone.
             </p>
           </div>
         </div>
@@ -424,24 +424,6 @@ export default function WearablesPage() {
           )
         })}
       </div>
-
-      <Card variant="soft" padding="md">
-        <div className="flex items-center gap-2 mb-3">
-          <Info className="w-4 h-4 text-sage-deep" />
-          <CardLabel className="mb-0">How it works</CardLabel>
-        </div>
-        <div className="space-y-3 text-body-sm text-ink-2 leading-relaxed">
-          <p>
-            <strong className="text-ink">Oura, Whoop, Garmin, Fitbit, Samsung</strong> — click Connect
-            to authorise via OAuth. Data syncs automatically every few hours.
-          </p>
-          <p>
-            <strong className="text-ink">Apple Health</strong> — tap Connect and allow Health
-            access. Apple Watch data already in Health (steps, HRV, resting heart rate,
-            exercise minutes, sleep) syncs into your score.
-          </p>
-        </div>
-      </Card>
     </div>
   )
 }
