@@ -4,7 +4,7 @@
   "private": true,
   "description": "BioSense iOS shell (Capacitor) — loads the production web app for TestFlight.",
   "scripts": {
-    "sync": "npx cap sync ios",
+    "sync": "npx cap sync ios && node scripts/patch-ios-plugins.cjs",
     "open": "npx cap open ios",
     "add:ios": "npx cap add ios"
   },

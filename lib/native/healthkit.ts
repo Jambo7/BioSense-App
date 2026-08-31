@@ -89,7 +89,7 @@ async function nativeCall<T>(method: string, options: Record<string, unknown> = 
 
   if (!healthPluginExported()) {
     throw new Error(
-      'This TestFlight build cannot read Apple Health yet. Archive a new iOS build from Xcode and install it, then tap Connect again.',
+      'This app build cannot read Apple Health. Install the new TestFlight (1.0, build 4) after it is archived from Xcode, then tap Connect again.',
     )
   }
 
