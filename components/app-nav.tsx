@@ -100,7 +100,7 @@ export function AppNav() {
 
   const mobileTabBar = (
       <nav
-        className="lg:hidden tabbar-pill z-40 overflow-visible rounded-none border-x-0"
+        className="app-tabbar tabbar-pill z-50 overflow-visible rounded-none border-x-0"
         style={{
           paddingBottom: 'max(8px, env(safe-area-inset-bottom, 0px))',
         }}

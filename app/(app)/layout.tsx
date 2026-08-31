@@ -17,7 +17,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   if (!session.user.onboardingDone) redirect('/onboarding')
 
   return (
-    <div className="min-h-screen relative bg-off-white max-w-full overflow-x-clip">
+    <div className="min-h-screen relative bg-off-white">
       {/* Drifting sage + amber orbs (deepest layer). Hidden on coarse
           pointers — blur/filter animations are expensive in iOS WKWebView. */}
       <div className="ambient-bg ambient-bg-desktop" aria-hidden>
@@ -40,8 +40,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <TourProvider>
         <div className="relative z-10">
           <AppNav />
-          {/* Extra bottom pad so content clears the tab bar + home indicator. */}
-          <main className="max-w-5xl mx-auto px-4 sm:px-6 pb-36 lg:pb-16 pt-5 sm:pt-8">
+          <main className="max-w-5xl mx-auto px-4 sm:px-6 pb-36 lg:pb-16 pt-5 sm:pt-8 max-w-full overflow-x-clip">
             {children}
           </main>
 

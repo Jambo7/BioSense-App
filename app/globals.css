@@ -267,10 +267,16 @@ body {
 .glass-nav {
   background: transparent;
   border-bottom: none;
-  /* Must stay sticky — do not set position here or it overrides the header. */
-  /* Notch / status bar + a little air so the Connections pill is not clipped. */
   padding-top: calc(env(safe-area-inset-top, 0px) + 8px);
   padding-bottom: 8px;
+}
+
+/* iPhone / Capacitor often report 0 for env(safe-area) until layout settles.
+   Always keep enough room under the status bar on small screens. */
+@media (max-width: 1023px) {
+  .glass-nav {
+    padding-top: max(54px, calc(env(safe-area-inset-top, 0px) + 10px));
+  }
 }
 .glass-nav::before {
   content: "";
@@ -298,15 +304,10 @@ body {
    the top edge — no harsh bottom-border line, no boxed-in container feel.
    Pill class name kept for backwards compatibility with the JSX. */
 html.is-ios .glass-nav {
-  padding-top: max(calc(env(safe-area-inset-top, 0px) + 8px), 52px);
+  padding-top: max(calc(env(safe-area-inset-top, 0px) + 10px), 54px);
 }
 
 .tabbar-pill {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  /* Opaque — translucent bars show page texture in the home-indicator gap. */
   background: #FFFFFF;
   border-top: 1px solid rgba(184, 168, 144, 0.18);
   box-shadow:
@@ -315,6 +316,24 @@ html.is-ios .glass-nav {
     0 1px 0 0 #FFFFFF,
     0 40px 0 0 #FFFFFF,
     0 80px 0 0 #FFFFFF;
+}
+
+.app-tabbar {
+  display: flex;
+  flex-direction: column;
+  position: fixed !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100%;
+  margin: 0;
+  transform: none;
+}
+
+@media (min-width: 1024px) and (hover: hover) and (pointer: fine) {
+  .app-tabbar {
+    display: none !important;
+  }
 }
 
 .tabbar-pill::after {
