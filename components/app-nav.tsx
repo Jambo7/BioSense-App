@@ -100,9 +100,9 @@ export function AppNav() {
 
   const mobileTabBar = (
       <nav
-        className="lg:hidden tabbar-pill fixed bottom-0 left-0 right-0 z-40 overflow-visible rounded-none border-x-0"
+        className="lg:hidden tabbar-pill z-40 overflow-visible rounded-none border-x-0"
         style={{
-          paddingBottom: 'max(20px, env(safe-area-inset-bottom, 0px))',
+          paddingBottom: 'max(8px, env(safe-area-inset-bottom, 0px))',
         }}
       >
         <div className="flex items-end justify-around max-w-3xl mx-auto px-1 pt-2 pb-1">
@@ -217,7 +217,7 @@ export function AppNav() {
           defined header rectangle, no border, no blur). A very soft
           top-down scrim drawn from inside `.glass-nav::before` keeps text
           legible when content scrolls under the bar. */}
-      <header className="glass-nav sticky top-0 z-40 min-h-[60px] flex items-center justify-between px-4 sm:px-6 gap-3 w-full max-w-full overflow-x-clip box-border">
+      <header className="glass-nav sticky top-0 z-40 flex items-center justify-between px-4 sm:px-6 gap-3 w-full max-w-full box-border">
         {/* Wordmark */}
         <Link href="/dashboard" className="flex items-center group shrink-0">
           <BrandWordmark height={28} priority />

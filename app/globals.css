@@ -87,13 +87,8 @@ html, body {
   font-feature-settings: 'cv11' on, 'ss03' on;
   width: 100%;
   max-width: 100%;
-  overflow-x: clip;
   overscroll-behavior-x: none;
-  /* Stop iOS rubber-band from yanking fixed chrome (tab bar) off the bottom. */
   overscroll-behavior-y: none;
-  /* Cap the layout to the visual viewport so the iOS Capacitor WKWebView
-     cannot pan sideways when content is slightly wider than the screen. */
-  position: relative;
 }
 
 html {
@@ -272,12 +267,10 @@ body {
 .glass-nav {
   background: transparent;
   border-bottom: none;
-  /* Subtle scrim BEHIND the bar contents so dark text always reads cleanly
-     over the photo when scrolled. Drawn as a top-fading gradient via the
-     ::before so the bar itself can stay fully transparent. */
-  position: relative;
-  /* Capacitor uses contentInset never — keep the sticky header below the notch. */
-  padding-top: env(safe-area-inset-top, 0px);
+  /* Must stay sticky — do not set position here or it overrides the header. */
+  /* Notch / status bar + a little air so the Connections pill is not clipped. */
+  padding-top: calc(env(safe-area-inset-top, 0px) + 8px);
+  padding-bottom: 8px;
 }
 .glass-nav::before {
   content: "";
@@ -304,13 +297,18 @@ body {
    Reads as "lifted" from the page via a soft sage halo radiating UP from
    the top edge — no harsh bottom-border line, no boxed-in container feel.
    Pill class name kept for backwards compatibility with the JSX. */
+html.is-ios .glass-nav {
+  padding-top: max(calc(env(safe-area-inset-top, 0px) + 8px), 52px);
+}
+
 .tabbar-pill {
-  position: relative;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
   /* Opaque — translucent bars show page texture in the home-indicator gap. */
   background: #FFFFFF;
   border-top: 1px solid rgba(184, 168, 144, 0.18);
-  /* Soft lift above + solid white paint BELOW the bar so overscroll / safe-area
-     never reveals the page behind the chrome. */
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.90),
     0 -6px 20px -10px rgba(26, 28, 26, 0.10),

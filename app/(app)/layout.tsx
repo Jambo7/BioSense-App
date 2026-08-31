@@ -17,7 +17,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   if (!session.user.onboardingDone) redirect('/onboarding')
 
   return (
-    <div className="min-h-screen relative bg-off-white">
+    <div className="min-h-screen relative bg-off-white max-w-full overflow-x-clip">
       {/* Drifting sage + amber orbs (deepest layer). Hidden on coarse
           pointers — blur/filter animations are expensive in iOS WKWebView. */}
       <div className="ambient-bg ambient-bg-desktop" aria-hidden>
