@@ -2,8 +2,9 @@ import { NextResponse } from 'next/server'
 import { encode } from 'next-auth/jwt'
 import { prisma } from '@/lib/prisma'
 import { getRequestUser } from '@/lib/api-auth'
+import { sessionMaxAgeSeconds } from '@/lib/security-baseline'
 
-const MAX_AGE = 30 * 24 * 60 * 60 // 30 days
+const MAX_AGE = sessionMaxAgeSeconds()
 
 /**
  * Refreshes a mobile bearer token. The client calls this with its current

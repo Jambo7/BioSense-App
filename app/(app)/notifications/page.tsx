@@ -8,7 +8,7 @@ export default async function NotificationsPage() {
   if (!session) return null
 
   const notifications = await prisma.notificationLog.findMany({
-    where: { userId: session.user.id },
+    where: { userId: session.user.id, result: 'SENT' },
     orderBy: { sentAt: 'desc' },
     take: 50,
   })

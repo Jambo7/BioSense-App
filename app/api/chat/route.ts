@@ -14,6 +14,9 @@ import {
 } from '@/lib/maturity'
 import { MATURITY } from '@/lib/maturity-config'
 import { degradedChatReply, sanitizeChatReply } from '@/lib/chat-safety'
+import { classifyUserMessage, safetyTemplate } from '@/lib/safety-gate'
+import { hitRateLimit } from '@/lib/rate-limit'
+import { TSB } from '@/lib/security-baseline'
 import { z } from 'zod'
 
 const schema = z.object({
@@ -31,6 +34,30 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
     const { message, history } = schema.parse(body)
+
+    const limited = await hitRateLimit({
+      key: `chat:${authed.id}`,
+      limit: TSB.chatPerUserPerMinute,
+      windowMs: 60 * 1000,
+    })
+    if (!limited.ok) {
+      return NextResponse.json(
+        { error: 'Too many messages. Wait a moment and try again.' },
+        { status: 429 },
+      )
+    }
+
+    const blocked = classifyUserMessage(message)
+    if (blocked) {
+      const reply = safetyTemplate(blocked)
+      await prisma.chatMessage.createMany({
+        data: [
+          { userId: authed.id, role: 'user', content: message },
+          { userId: authed.id, role: 'assistant', content: reply },
+        ],
+      })
+      return NextResponse.json({ reply, safety: blocked })
+    }
 
     // Gather user context
     const [
@@ -104,7 +131,7 @@ export async function POST(req: NextRequest) {
 
     const bioAgeSummary = bioUnlock.unlocked
       ? latestBioAge
-        ? `Unlocked — bio age ${latestBioAge.bioAge} (calendar ${latestBioAge.calendarAge}, delta ${latestBioAge.delta >= 0 ? '+' : ''}${latestBioAge.delta})`
+        ? `Unlocked — wellness estimate ${latestBioAge.bioAge} (calendar ${latestBioAge.calendarAge}, delta ${latestBioAge.delta >= 0 ? '+' : ''}${latestBioAge.delta}). Not a clinical or diagnostic age.`
         : `Unlocked (day ${bioUnlock.trackingDays}/${bioUnlock.unlockDays}) but not enough signals yet (need ≥${MATURITY.BIO_AGE_MIN_SIGNALS} of HRV/RHR/sleep/energy)`
       : `Locked — day ${bioUnlock.trackingDays} of ${bioUnlock.unlockDays} tracking`
 
@@ -160,6 +187,7 @@ ${wearableSummary}
 
 BIOLOGICAL AGE:
 ${bioAgeSummary}
+(Wellness estimate from available signals only.)
 
 LAST 7 CHECK-INS (energy/sleep/mood/stress out of 10):
 ${checkinSummary}

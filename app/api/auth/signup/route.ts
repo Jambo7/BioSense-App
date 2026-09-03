@@ -3,18 +3,42 @@ import bcrypt from 'bcryptjs'
 import { prisma } from '@/lib/prisma'
 import { sendWelcomeEmail } from '@/lib/notifications'
 import { z } from 'zod'
+import { hitRateLimit, clientIp } from '@/lib/rate-limit'
+import { TSB } from '@/lib/security-baseline'
 
 const schema = z.object({
   name: z.string().min(2),
   country: z.string().min(2),
   email: z.string().email(),
-  password: z.string().min(8),
+  password: z
+    .string()
+    .min(TSB.passwordMinLength)
+    .regex(/[A-Z]/, 'Must contain an uppercase letter')
+    .regex(/[0-9]/, 'Must contain a number'),
 })
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
     const { name, country, email, password } = schema.parse(body)
+    const ip = clientIp(req)
+
+    const emailLimit = await hitRateLimit({
+      key: `signup-email:${email.toLowerCase()}`,
+      limit: TSB.signupPerEmailPerHour,
+      windowMs: 60 * 60 * 1000,
+    })
+    const ipLimit = await hitRateLimit({
+      key: `signup-ip:${ip}`,
+      limit: TSB.signupPerIpPerHour,
+      windowMs: 60 * 60 * 1000,
+    })
+    if (!emailLimit.ok || !ipLimit.ok) {
+      return NextResponse.json(
+        { error: 'Too many signup attempts. Try again later.' },
+        { status: 429 },
+      )
+    }
 
     const existing = await prisma.user.findUnique({
       where: { email: email.toLowerCase() },
@@ -43,7 +67,7 @@ export async function POST(req: NextRequest) {
     // it even if they drop off mid-onboarding. Fail soft — never block signup.
     try {
       const firstName = name.split(' ')[0] ?? name
-      await sendWelcomeEmail(user.email, firstName)
+      await sendWelcomeEmail(user.id, firstName)
       await prisma.user.update({
         where: { id: user.id },
         data: { welcomeEmailSentAt: new Date() },

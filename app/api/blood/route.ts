@@ -5,6 +5,7 @@ import { callClaude, BLOOD_ANALYSIS_PROMPT } from '@/lib/claude'
 import { categoryForMarker } from '@/lib/biomarkers'
 import { recountTiers, sanitizeBloodMarkers } from '@/lib/blood-sanity'
 import { recalculateHealthScore } from '@/lib/health-score'
+import { enforceOutputSafety } from '@/lib/safety-gate'
 import OpenAI from 'openai'
 
 async function parsePdf(buffer: Buffer): Promise<string> {
@@ -24,6 +25,7 @@ async function analyseImage(buffer: Buffer, mime: string): Promise<string> {
   const res = await client.chat.completions.create({
     model: process.env.OPENAI_MODEL ?? 'gpt-4o',
     max_tokens: 2000,
+    store: false,
     messages: [
       { role: 'system', content: BLOOD_ANALYSIS_PROMPT },
       {
@@ -127,7 +129,7 @@ export async function POST(req: NextRequest) {
         const sanitized = sanitizeBloodMarkers(enriched)
         markers = sanitized.markers
         rejectedMarkers = sanitized.rejected
-        aiSummary = parsed.summary ?? ''
+        aiSummary = enforceOutputSafety(parsed.summary ?? '')
         const tiers = recountTiers(sanitized.markers)
         // Prefer recount from kept markers; fall back to model counts only if tiers absent.
         t1Count = tiers.t1Count || parsed.t1Count || 0
@@ -135,7 +137,7 @@ export async function POST(req: NextRequest) {
         t3Count = tiers.t3Count || parsed.t3Count || 0
       }
     } catch {
-      aiSummary = aiResponse
+      aiSummary = enforceOutputSafety(aiResponse)
     }
 
     if (markers.length === 0 && rejectedMarkers > 0) {

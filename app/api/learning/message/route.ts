@@ -10,6 +10,7 @@ import {
   type LearningMessage,
 } from '@/lib/learning'
 import { z } from 'zod'
+import { classifyUserMessage, safetyTemplate } from '@/lib/safety-gate'
 
 const schema = z.object({
   sessionId: z.string().min(1),
@@ -31,6 +32,16 @@ export async function POST(req: NextRequest) {
     }
     if (ls.status !== 'active') {
       return NextResponse.json({ error: 'This session has ended' }, { status: 409 })
+    }
+
+    const blocked = classifyUserMessage(message)
+    if (blocked) {
+      return NextResponse.json({
+        reply: safetyTemplate(blocked),
+        chips: [],
+        facts: [],
+        done: true,
+      })
     }
 
     const sectionMeta = SECTION_BY_ID[ls.section]

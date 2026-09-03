@@ -13,6 +13,7 @@ export default function ConsentPage() {
   const router = useRouter()
   const { update } = useSession()
   const [accepted, setAccepted] = useState(false)
+  const [marketing, setMarketing] = useState(false)
   const [loading, setLoading] = useState(false)
 
   async function handleAccept() {
@@ -22,7 +23,11 @@ export default function ConsentPage() {
     }
     setLoading(true)
     try {
-      const res = await fetch('/api/user/consent', { method: 'POST' })
+      const res = await fetch('/api/user/consent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ marketing }),
+      })
       if (!res.ok) throw new Error()
       await update({ refresh: true })
       router.push('/onboarding')
@@ -90,8 +95,27 @@ export default function ConsentPage() {
           <a href="/consent-agreement" target="_blank" className="text-sage-deep underline font-medium">
             User Consent Agreement
           </a>
-          . I understand that BioSense provides educational insights only and does not provide
-          medical advice.
+          . I understand BioSense is a wellness education service: health analysis,
+          personalisation and connected sources are part of that service, not optional
+          add-ons. Insights are educational only and not medical advice.
+        </span>
+      </label>
+
+      <label className="flex items-start gap-3 cursor-pointer mb-6">
+        <button
+          type="button"
+          onClick={() => setMarketing(!marketing)}
+          className={cn(
+            'mt-0.5 w-[18px] h-[18px] rounded-[5px] flex-shrink-0 border flex items-center justify-center transition-all',
+            marketing
+              ? 'bg-sage border-sage'
+              : 'bg-white border-line-2 hover:border-sage',
+          )}
+        >
+          {marketing && <Check className="w-3 h-3 text-white" strokeWidth={3.5} />}
+        </button>
+        <span className="text-body-sm text-ink leading-relaxed">
+          Optional — send me marketing emails. You can turn this off anytime in Profile.
         </span>
       </label>
 

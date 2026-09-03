@@ -5,10 +5,22 @@
 import { callClaude, BIOSENSE_SYSTEM_PROMPT } from './claude'
 import { getWeeklyStats } from './patterns'
 import { prisma } from './prisma'
+import { outputViolatesSafety, safetyTemplate } from './safety-gate'
 import {
   aggregateWearableMetrics,
   formatWearableMetricsSummary,
 } from './wearable-metrics'
+
+function sanitizeReportContent(content: object): object {
+  try {
+    if (outputViolatesSafety(JSON.stringify(content))) {
+      return { summary: safetyTemplate('OUTPUT_PROHIBITED') }
+    }
+  } catch {
+    return { summary: safetyTemplate('OUTPUT_PROHIBITED') }
+  }
+  return content
+}
 
 const WEEKLY_REPORT_PROMPT = `${BIOSENSE_SYSTEM_PROMPT}
 
@@ -110,9 +122,9 @@ Top patterns: ${patterns.map((p) => p.description).join(' | ') || 'none yet'}`
   let content: object = {}
   try {
     const match = response.match(/\{[\s\S]*\}/)
-    if (match) content = JSON.parse(match[0])
+    if (match) content = sanitizeReportContent(JSON.parse(match[0]))
   } catch {
-    content = { summary: response }
+    content = sanitizeReportContent({ summary: response })
   }
 
   const report = await prisma.weeklyReport.upsert({
@@ -175,7 +187,7 @@ ${stats ? `Average scores — energy: ${stats.avgEnergy.toFixed(1)}, sleep: ${st
 Health score: ${score?.score ?? 'N/A'}
 Wearables: ${wearables.map((w) => w.provider).join(', ') || 'none'} (${wearableLine})
 Blood uploads (recent): ${bloodResults.length}
-Biological age delta: ${bioAge ? `${bioAge.delta > 0 ? '+' : ''}${bioAge.delta.toFixed(1)} years vs calendar age` : 'Not unlocked / not calculated'}
+Biological age (wellness estimate) vs calendar: ${bioAge ? `${bioAge.delta > 0 ? '+' : ''}${bioAge.delta.toFixed(1)} years` : 'Not unlocked / not calculated'}
 Key patterns: ${patterns.map((p) => `${p.description} (${p.confidence})`).join(' | ') || 'none yet'}`
 
   const response = await callClaude(
@@ -187,9 +199,9 @@ Key patterns: ${patterns.map((p) => `${p.description} (${p.confidence})`).join('
   let content: object = {}
   try {
     const match = response.match(/\{[\s\S]*\}/)
-    if (match) content = JSON.parse(match[0])
+    if (match) content = sanitizeReportContent(JSON.parse(match[0]))
   } catch {
-    content = { summary: response }
+    content = sanitizeReportContent({ summary: response })
   }
 
   const report = await prisma.monthlyReport.upsert({

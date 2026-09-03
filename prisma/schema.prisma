@@ -89,6 +89,13 @@ model User {
   subscriptionId     String?
   subscriptionStatus SubscriptionStatus @default(FREE)
   stripeCustomerId   String?
+  cancelAtPeriodEnd  Boolean            @default(false)
+  /// Optional product emails (weekly report, insight alerts). Service mail always allowed.
+  notifyProductEmail Boolean            @default(true)
+  /// Promotional / win-back. Off until the member opts in.
+  notifyMarketingEmail Boolean          @default(false)
+  /// Hard bounce or complaint — automated email stops until cleared.
+  emailSuppressedAt  DateTime?
   pushSubscription   String?
   createdAt          DateTime           @default(now())
   updatedAt          DateTime           @updatedAt
@@ -106,6 +113,7 @@ model User {
   patterns       Pattern[]
   consents       Consent[]
   notifLogs      NotificationLog[]
+  preferenceChanges PreferenceChange[]
 
   learningSessions LearningSession[]
   learnedFacts     LearnedFact[]
@@ -265,29 +273,79 @@ model Pattern {
 }
 
 model Consent {
-  id              String   @id @default(cuid())
+  id              String    @id @default(cuid())
   userId          String
   tcVersion       String
   privacyVersion  String
   consentVersion  String
-  dataConsentFlag Boolean  @default(true)
+  dataConsentFlag Boolean   @default(true)
   ipAddress       String?
-  createdAt       DateTime @default(now())
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// SERVICE | MARKETING
+  purpose         String    @default("SERVICE")
+  /// GRANTED | WITHDRAWN
+  status          String    @default("GRANTED")
+  withdrawnAt     DateTime?
+  createdAt       DateTime  @default(now())
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, purpose, createdAt])
+}
+
+/// Survives account delete. Used for processor follow-up and backup restore discipline.
+model DeletionRecord {
+  id           String   @id @default(cuid())
+  emailHash    String
+  processors   Json
+  createdAt    DateTime @default(now())
+
+  @@index([emailHash])
+}
+
+/// Best-effort abuse windows (serverless-safe via Postgres).
+model AbuseWindow {
+  key     String   @id
+  count   Int      @default(0)
+  resetAt DateTime
 }
 
 model NotificationLog {
-  id      String    @id @default(cuid())
-  userId  String
-  trigger String
-  message String
-  channel String
-  url     String?
-  readAt  DateTime?
-  sentAt  DateTime  @default(now())
-  user    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                 String    @id @default(cuid())
+  userId             String
+  trigger            String
+  message            String
+  channel            String
+  url                String?
+  /// SERVICE | PRODUCT | MARKETING
+  category           String    @default("SERVICE")
+  template           String?
+  providerId         String?
+  /// SENT | SUPPRESSED | FAILED
+  result             String    @default("SENT")
+  suppressionReason  String?
+  readAt             DateTime?
+  sentAt             DateTime  @default(now())
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, sentAt])
+}
+
+model PreferenceChange {
+  id        String   @id @default(cuid())
+  userId    String
+  field     String
+  previous  String
+  next      String
+  source    String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+model ProcessedWebhook {
+  id        String   @id
+  source    String
+  createdAt DateTime @default(now())
 }
 
 model UserGoal {

@@ -2,6 +2,8 @@ import { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import bcrypt from 'bcryptjs'
 import { prisma } from './prisma'
+import { TSB, sessionMaxAgeSeconds } from './security-baseline'
+import { hitRateLimit, isRateLimited } from './rate-limit'
 
 const isDev = process.env.NODE_ENV !== 'production'
 const DEV_USER_EMAIL = 'dev@biosense.local'
@@ -17,14 +19,33 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null
 
+        const email = credentials.email.toLowerCase()
+        const failKey = `login-fail:${email}`
+        const locked = await isRateLimited(failKey, TSB.loginFailuresBeforeFriction)
+        if (locked.locked) return null
+
         const user = await prisma.user.findUnique({
-          where: { email: credentials.email.toLowerCase() },
+          where: { email },
         })
 
-        if (!user || !user.password) return null
+        if (!user || !user.password) {
+          await hitRateLimit({
+            key: failKey,
+            limit: TSB.loginFailuresBeforeFriction,
+            windowMs: TSB.loginFailureWindowMinutes * 60 * 1000,
+          })
+          return null
+        }
 
         const isValid = await bcrypt.compare(credentials.password, user.password)
-        if (!isValid) return null
+        if (!isValid) {
+          await hitRateLimit({
+            key: failKey,
+            limit: TSB.loginFailuresBeforeFriction,
+            windowMs: TSB.loginFailureWindowMinutes * 60 * 1000,
+          })
+          return null
+        }
 
         return {
           id: user.id,
@@ -70,7 +91,7 @@ export const authOptions: NextAuthOptions = {
   ],
   session: {
     strategy: 'jwt',
-    maxAge: 30 * 24 * 60 * 60, // 30 days
+    maxAge: sessionMaxAgeSeconds(),
   },
   callbacks: {
     async jwt({ token, user, trigger, session }) {

@@ -275,7 +275,7 @@ function TrajectoryTab({ summaries }: { summaries: MetricSummary[] }) {
       tone: 'sage' as const,
     },
     {
-      eyebrow: 'Biological age',
+      eyebrow: 'Age estimate',
       from: '47',
       to:   '45',
       delta: '-2 years',

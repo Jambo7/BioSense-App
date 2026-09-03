@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { generateWeeklyReport } from '@/lib/reports'
 import { isCronAuthorized } from '@/lib/cron-auth'
+import { sendWeeklyReportEmail } from '@/lib/notifications'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -32,7 +33,14 @@ async function handle(req: NextRequest) {
   for (const user of users) {
     try {
       const report = await generateWeeklyReport(user.id, period)
-      if (report) generated++
+      if (report) {
+        generated++
+        try {
+          await sendWeeklyReportEmail(user.id)
+        } catch (mailErr) {
+          console.error(`Weekly report email failed for ${user.id}:`, mailErr)
+        }
+      }
     } catch (err) {
       errors.push(user.id)
       console.error(`Weekly report failed for ${user.id}:`, err)

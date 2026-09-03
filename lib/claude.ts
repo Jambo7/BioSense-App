@@ -33,6 +33,7 @@ export async function callClaude(
       const res = await getClient().chat.completions.create({
         model: MODEL,
         max_tokens: maxTokens,
+        store: false,
         messages: [
           { role: 'system', content: system },
           { role: 'user', content: user },
@@ -84,7 +85,9 @@ PROHIBITED LANGUAGE (never use):
 If a user appears to be in acute distress or danger, only say:
 "If you are feeling unwell, consider seeking urgent medical attention."
 
-You must never pretend to be a doctor, nurse, or any medical professional.`
+You must never pretend to be a doctor, nurse, or any medical professional.
+
+BIOLOGICAL AGE (BAG-06): If you mention Biological Age, call it a wellness estimate from the user's available health and wearable signals. Never call it a clinical test, diagnosis, medical assessment, or the user's true physiological age.`
 
 // ── Learning Mode ──────────────────────────────────────────────────────────
 

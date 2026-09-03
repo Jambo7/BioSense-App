@@ -68,7 +68,7 @@ function trajectoryCopy(
     return {
       lead: 'Your long-term health',
       accent: 'is improving.',
-      body: 'Your Health Score reflects your biological age and overall health trajectory.',
+      body: 'Your Health Score is a wellness view of recent data — not a clinical assessment.',
     }
   }
   if (trajectoryDelta <= -4) {
@@ -81,7 +81,7 @@ function trajectoryCopy(
   return {
     lead: 'Your long-term health',
     accent: 'is holding steady.',
-    body: 'Your Health Score reflects your biological age and overall health trajectory.',
+      body: 'Your Health Score is a wellness view of recent data — not a clinical assessment.',
   }
 }
 
@@ -344,20 +344,24 @@ export function DashboardClient({
             tone="sage"
           />
           <MiniStat
-            eyebrow="Biological age"
+            eyebrow="Age estimate"
             value={bioUnlocked ? `${bio.value}` : '—'}
             caption={
               bioUnlocked
                 ? bio.deltaYears > 0
-                  ? `${bio.deltaYears.toFixed(1)} yrs younger (vs ${bio.age})`
+                  ? `${bio.deltaYears.toFixed(1)} yrs younger (estimate vs ${bio.age})`
                   : bio.deltaYears < 0
-                    ? `${Math.abs(bio.deltaYears).toFixed(1)} yrs older (vs ${bio.age})`
-                    : `Matching your actual age (${bio.age})`
+                    ? `${Math.abs(bio.deltaYears).toFixed(1)} yrs older (estimate vs ${bio.age})`
+                    : `Matching your age (${bio.age}) — wellness estimate`
                 : (bio.progressLabel ?? 'Unlock with tracking')
             }
             tone={bioUnlocked && bio.deltaYears >= 0 ? 'sage' : 'amber'}
           />
         </div>
+        <p className="text-[11px] text-ink-3 mt-2 leading-snug max-w-[52ch]">
+          Age estimate is a wellness figure from your available health and wearable
+          signals. It is not a clinical test or medical age.
+        </p>
 
         {/* Trajectory chart — real Health Score history. */}
         {showChart ? (
@@ -421,7 +425,7 @@ export function DashboardClient({
         {locked && (
           <LockedOverlay
             title="Unlock your Health Score"
-            subtitle="See your biological age and full 90-day health trajectory."
+            subtitle="See your age estimate and 90-day health trajectory."
           />
         )}
       </Card>
@@ -709,7 +713,7 @@ function LockedOverlay({ title, subtitle }: { title: string; subtitle: string })
         </Link>
         <div className="flex items-center gap-1.5 text-[11px] text-ink-3 mt-2.5">
           <Lock className="w-3 h-3" strokeWidth={2.25} />
-          Biological age unlocks after 14 days of tracking
+          Age estimate unlocks after 14 days of tracking
         </div>
       </div>
     </div>

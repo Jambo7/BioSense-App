@@ -3,8 +3,8 @@
  *
  * GSC-000/001/002 define architecture and method *form*. Numeric weights,
  * freshness curves and confidence calibration are owned by GSC-003/004/008/009
- * (not yet delivered). Until those land, ENG continues to use the interim
- * score/bio-age implementations in lib/score.ts and lib/bio-age.ts.
+ * (not yet delivered). Launch Biological Age is BAG-06: wellness estimate via
+ * lib/bio-age.ts. Full GSC-002 composition waits on GSC-003/004/008/009.
  */
 import gsc000 from './gsc-000.json'
 import gsc001 from './gsc-001.json'

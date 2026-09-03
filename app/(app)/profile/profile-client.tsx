@@ -36,11 +36,17 @@ interface ProfileData {
   age: number | null
   subscriptionStatus: string
   createdAt: string
+  notifyProductEmail: boolean
+  notifyMarketingEmail: boolean
 }
 
 export function ProfileClient({ user }: { user: ProfileData }) {
   const [editing, setEditing] = useState(false)
   const [saving, setSaving] = useState(false)
+
+  const [notifyProductEmail, setNotifyProductEmail] = useState(user.notifyProductEmail)
+  const [notifyMarketingEmail, setNotifyMarketingEmail] = useState(user.notifyMarketingEmail)
+  const [prefBusy, setPrefBusy] = useState(false)
 
   const [form, setForm] = useState({
     name: user.name ?? '',
@@ -68,6 +74,25 @@ export function ProfileClient({ user }: { user: ProfileData }) {
     }
   }
 
+  async function savePrefs(next: { notifyProductEmail?: boolean; notifyMarketingEmail?: boolean }) {
+    setPrefBusy(true)
+    try {
+      const res = await fetch('/api/user/profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(next),
+      })
+      if (!res.ok) throw new Error()
+      if (next.notifyProductEmail != null) setNotifyProductEmail(next.notifyProductEmail)
+      if (next.notifyMarketingEmail != null) setNotifyMarketingEmail(next.notifyMarketingEmail)
+      toast.success('Email preferences saved')
+    } catch {
+      toast.error('Could not save preferences')
+    } finally {
+      setPrefBusy(false)
+    }
+  }
+
   async function handleExport() {
     const res = await fetch('/api/account/export')
     if (!res.ok) return toast.error('Export failed')
@@ -81,11 +106,20 @@ export function ProfileClient({ user }: { user: ProfileData }) {
   }
 
   async function handleDeleteAccount() {
-    if (!window.confirm('Permanently delete your account and all data? This cannot be undone.'))
+    if (!window.confirm('Permanently delete your account and BioSense-held data? This cannot be undone.'))
       return
-    const res = await fetch('/api/account', { method: 'DELETE' })
+    const password = window.prompt('Enter your password to confirm deletion')
+    if (!password) return
+    const res = await fetch('/api/account', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password }),
+    })
     if (res.ok) window.location.href = '/login'
-    else toast.error('Failed to delete account')
+    else {
+      const body = (await res.json().catch(() => null)) as { error?: string } | null
+      toast.error(body?.error ?? 'Failed to delete account')
+    }
   }
 
   const initials = (user.name ?? user.email)
@@ -196,6 +230,35 @@ export function ProfileClient({ user }: { user: ProfileData }) {
         </div>
       </Card>
 
+      {/* Email preferences */}
+      <Card variant="soft">
+        <CardLabel className="mb-2">Emails</CardLabel>
+        <p className="text-caption text-ink-2 mb-3 leading-relaxed">
+          Account, billing and security emails always send. You can turn optional product and
+          marketing mail off.
+        </p>
+        <label className="flex items-start gap-2 text-body-sm text-ink mb-2">
+          <input
+            type="checkbox"
+            className="mt-1"
+            checked={notifyProductEmail}
+            disabled={prefBusy}
+            onChange={(e) => void savePrefs({ notifyProductEmail: e.target.checked })}
+          />
+          Product emails (weekly report ready, similar alerts)
+        </label>
+        <label className="flex items-start gap-2 text-body-sm text-ink">
+          <input
+            type="checkbox"
+            className="mt-1"
+            checked={notifyMarketingEmail}
+            disabled={prefBusy}
+            onChange={(e) => void savePrefs({ notifyMarketingEmail: e.target.checked })}
+          />
+          Marketing and offers
+        </label>
+      </Card>
+
       {/* Data & privacy */}
       <Card variant="soft">
         <div className="flex items-center gap-2 mb-3">
@@ -204,7 +267,8 @@ export function ProfileClient({ user }: { user: ProfileData }) {
         </div>
         <p className="text-body-sm text-ink-2 mb-4 leading-relaxed">
           Under UAE Federal Decree-Law No. 45 of 2021 (PDPL), you have the right to access,
-          export, correct and delete your personal data at any time.
+          export, correct and delete your personal data at any time. Withdrawing service
+          consent ends the account (use Delete). Marketing can be turned off above.
         </p>
         <div className="flex flex-wrap gap-2">
           <Button variant="subtle" size="sm" onClick={handleExport}>

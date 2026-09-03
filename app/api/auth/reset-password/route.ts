@@ -4,6 +4,8 @@ import bcrypt from 'bcryptjs'
 import { prisma } from '@/lib/prisma'
 import { resetPasswordSchema } from '@/lib/validations'
 import { z } from 'zod'
+import { hitRateLimit } from '@/lib/rate-limit'
+import { TSB } from '@/lib/security-baseline'
 
 const schema = resetPasswordSchema.extend({
   email: z.string().email(),
@@ -17,6 +19,18 @@ export async function POST(req: NextRequest) {
     const lower = email.toLowerCase()
 
     const hashed = crypto.createHash('sha256').update(token).digest('hex')
+    const attempt = await hitRateLimit({
+      key: `pwreset-try:${lower}`,
+      limit: TSB.passwordResetVerifyAttempts,
+      windowMs: 60 * 60 * 1000,
+    })
+    if (!attempt.ok) {
+      return NextResponse.json(
+        { error: 'Too many attempts. Request a new reset link later.' },
+        { status: 429 },
+      )
+    }
+
     const record = await prisma.verificationToken.findUnique({ where: { token: hashed } })
 
     if (!record || record.identifier !== lower || record.expires < new Date()) {

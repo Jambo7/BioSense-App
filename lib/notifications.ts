@@ -1,43 +1,15 @@
 /**
- * Notification delivery — Web Push + Resend email fallback
+ * Branded email templates. Sending goes through lib/comms.ts so preferences
+ * and the audit log are applied.
  */
-import { Resend } from 'resend'
-
-// Lazily construct the client so simply importing this module never throws
-// when RESEND_API_KEY is absent (e.g. during build/page-data collection).
-let _resend: Resend | null = null
-function getResend(): Resend {
-  if (!_resend) _resend = new Resend(process.env.RESEND_API_KEY)
-  return _resend
-}
-
-export interface NotificationPayload {
-  title: string
-  body: string
-  url?: string
-  tag?: string
-}
-
-export async function sendEmail(to: string, subject: string, html: string) {
-  if (!process.env.RESEND_API_KEY) {
-    console.warn('Resend not configured — skipping email')
-    return
-  }
-
-  await getResend().emails.send({
-    from: process.env.EMAIL_FROM ?? 'BioSense <noreply@biosense.app>',
-    to,
-    subject,
-    html,
-  })
-}
+import { dispatchEmail } from '@/lib/comms'
 
 /**
  * Branded welcome email — sent once when a user completes account creation.
  * Copy is the client-approved text; {{FirstName}} is substituted from `name`.
  * Light, calm, sage-accented template that matches the in-app brand.
  */
-export async function sendWelcomeEmail(to: string, firstName: string) {
+export async function sendWelcomeEmail(userId: string, firstName: string) {
   const appUrl = process.env.NEXTAUTH_URL ?? 'https://biosense.app'
   const name = firstName?.trim() || 'there'
 
@@ -121,13 +93,22 @@ export async function sendWelcomeEmail(to: string, firstName: string) {
     </table>
   </div>`
 
-  await sendEmail(to, 'Welcome to BioSense', html)
+  await dispatchEmail({
+    userId,
+    category: 'SERVICE',
+    trigger: 'welcome',
+    template: 'welcome_v1',
+    subject: 'Welcome to BioSense',
+    html,
+    message: 'Welcome to BioSense',
+    url: '/dashboard',
+  })
 }
 
 /**
  * Branded password-reset email. `url` is a one-time, time-limited link.
  */
-export async function sendPasswordResetEmail(to: string, name: string, url: string) {
+export async function sendPasswordResetEmail(userId: string, name: string, url: string) {
   const firstName = name?.trim().split(' ')[0] || 'there'
   const html = `
   <div style="background:#F4F6F2;padding:28px 0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
@@ -156,40 +137,42 @@ export async function sendPasswordResetEmail(to: string, name: string, url: stri
     </table>
   </div>`
 
-  await sendEmail(to, 'Reset your BioSense password', html)
+  await dispatchEmail({
+    userId,
+    category: 'SERVICE',
+    trigger: 'password_reset',
+    template: 'password_reset_v1',
+    subject: 'Reset your BioSense password',
+    html,
+    message: 'Password reset link',
+    url: '/reset-password',
+  })
 }
 
-export async function sendWeeklyReportEmail(
-  to: string,
-  name: string,
-  reportContent: Record<string, unknown>,
-) {
+export async function sendWeeklyReportEmail(userId: string) {
+  const appUrl = process.env.NEXTAUTH_URL ?? 'https://biosense.app'
   const html = `
-    <div style="font-family: system-ui, sans-serif; max-width: 600px; margin: 0 auto; background: #030508; color: #1A1A16; padding: 32px; border-radius: 12px;">
-      <div style="margin-bottom: 24px;">
-        <span style="font-size: 11px; font-weight: bold; letter-spacing: 0.1em; text-transform: uppercase; color: #4f6b57;">Weekly Health Report</span>
-        <h1 style="font-size: 24px; font-weight: bold; color: #1A1A16; margin: 8px 0 4px;">${reportContent.headline ?? 'Your weekly health summary'}</h1>
-        <p style="color: #90ae9a; font-size: 13px;">Hi ${name}, here's your personalised health intelligence for this week.</p>
-      </div>
+  <div style="background:#F4F6F2;padding:28px 0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="max-width:520px;margin:0 auto;background:#ffffff;border-radius:20px;border:1px solid #E7E9E2;overflow:hidden;">
+      <tr>
+        <td style="padding:30px;">
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#6F8F6B;">BioSense</div>
+          <h1 style="font-size:22px;line-height:1.3;font-weight:700;color:#1A1A16;margin:14px 0 12px;">Your weekly report is ready</h1>
+          <p style="font-size:14px;line-height:1.7;color:#3A3F37;margin:0 0 18px;">Open BioSense to view this week&rsquo;s summary. We keep the detail in your signed-in account, not in this email.</p>
+          <a href="${appUrl}/dashboard" style="display:inline-block;padding:12px 24px;background:linear-gradient(180deg,#7DA277 0%,#6F8F6B 100%);color:#ffffff;font-weight:700;font-size:14px;text-decoration:none;border-radius:999px;">Open BioSense</a>
+        </td>
+      </tr>
+    </table>
+  </div>`
 
-      ${reportContent.whatChanged ? `
-      <div style="background: #0c1210; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
-        <div style="font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.08em; color: #4f6b57; margin-bottom: 8px;">What Changed</div>
-        <p style="color: #1A1A16; font-size: 13px; line-height: 1.7;">${reportContent.whatChanged}</p>
-      </div>` : ''}
-
-      ${reportContent.actions ? `
-      <div style="background: #0c1210; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
-        <div style="font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.08em; color: #4f6b57; margin-bottom: 8px;">3 Actions This Week</div>
-        ${(reportContent.actions as string[]).map((a, i) => `<div style="color: #1A1A16; font-size: 13px; padding: 6px 0; border-bottom: 1px solid rgba(26,26,22,0.07);">${i + 1}. ${a}</div>`).join('')}
-      </div>` : ''}
-
-      <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid rgba(26,26,22,0.07);">
-        <p style="font-size: 11px; color: #2c4132; line-height: 1.6;">This report is for educational purposes only and is not medical advice. BioSense does not provide diagnoses or treatment recommendations. Always consult a qualified healthcare professional.</p>
-        <a href="${process.env.NEXTAUTH_URL}/dashboard" style="display: inline-block; margin-top: 16px; padding: 10px 20px; background: #4dc88c; color: #030508; font-weight: bold; font-size: 13px; text-decoration: none; border-radius: 8px;">View full dashboard →</a>
-      </div>
-    </div>
-  `
-
-  await sendEmail(to, `Your weekly BioSense report`, html)
+  await dispatchEmail({
+    userId,
+    category: 'PRODUCT',
+    trigger: 'weekly_report',
+    template: 'weekly_report_ready_v1',
+    subject: 'Your weekly BioSense report is ready',
+    html,
+    message: 'Weekly report ready',
+    url: '/dashboard',
+  })
 }

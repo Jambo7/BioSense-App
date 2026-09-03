@@ -17,6 +17,8 @@ export default async function ProfilePage() {
       age: true,
       subscriptionStatus: true,
       createdAt: true,
+      notifyProductEmail: true,
+      notifyMarketingEmail: true,
     },
   })
 

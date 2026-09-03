@@ -1,6 +1,7 @@
 /**
- * Biological age calculation — ported from JARVIS jarvis.js calcBiologicalAge()
- * Uses VO2max, HRV, RHR, sleep quality weighted average
+ * Biological age — launch engine under BAG-06 (approved 3 Sep 2026).
+ * Wellness estimate from HRV, RHR, VO2max and sleep. Not a clinical age.
+ * Ported from JARVIS calcBiologicalAge(); full GSC-002 composition is later.
  */
 
 interface BioAgeInput {

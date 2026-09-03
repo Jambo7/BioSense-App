@@ -3,13 +3,15 @@ import { encode } from 'next-auth/jwt'
 import bcrypt from 'bcryptjs'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
+import { hitRateLimit, isRateLimited } from '@/lib/rate-limit'
+import { sessionMaxAgeSeconds, TSB } from '@/lib/security-baseline'
 
 const schema = z.object({
   email: z.string().email(),
   password: z.string().min(1),
 })
 
-const MAX_AGE = 30 * 24 * 60 * 60 // 30 days, matching the web session
+const MAX_AGE = sessionMaxAgeSeconds()
 
 /**
  * Token login for native mobile clients (iOS/Android).
@@ -36,13 +38,30 @@ export async function POST(req: Request) {
   }
 
   const { email, password } = parsed.data
-  const user = await prisma.user.findUnique({ where: { email: email.toLowerCase() } })
+  const lower = email.toLowerCase()
+  const failKey = `login-fail:${lower}`
+  const locked = await isRateLimited(failKey, TSB.loginFailuresBeforeFriction)
+  if (locked.locked) {
+    return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 })
+  }
+
+  const user = await prisma.user.findUnique({ where: { email: lower } })
   if (!user || !user.password) {
+    await hitRateLimit({
+      key: failKey,
+      limit: TSB.loginFailuresBeforeFriction,
+      windowMs: TSB.loginFailureWindowMinutes * 60 * 1000,
+    })
     return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 })
   }
 
   const valid = await bcrypt.compare(password, user.password)
   if (!valid) {
+    await hitRateLimit({
+      key: failKey,
+      limit: TSB.loginFailuresBeforeFriction,
+      windowMs: TSB.loginFailureWindowMinutes * 60 * 1000,
+    })
     return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 })
   }
 

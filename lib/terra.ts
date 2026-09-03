@@ -213,6 +213,16 @@ export interface TerraWebhookPayload {
   [key: string]: unknown
 }
 
+/** Asks Terra to drop the connection so they stop collecting for this user. */
+export async function deauthenticateTerraUser(terraUserId: string): Promise<boolean> {
+  const { devId, apiKey } = getTerraCredentials()
+  const res = await fetch(
+    `${TERRA_API_BASE}/auth/deauthenticateUser?user_id=${encodeURIComponent(terraUserId)}`,
+    { method: 'DELETE', headers: { 'dev-id': devId, 'x-api-key': apiKey } },
+  )
+  return res.ok || res.status === 404
+}
+
 /** Resolves our internal User.id from a webhook payload, if present. */
 export function getReferenceId(payload: TerraWebhookPayload): string | null {
   return payload.user?.reference_id ?? payload.reference_id ?? null

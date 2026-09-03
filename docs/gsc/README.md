@@ -12,6 +12,8 @@ Neil’s GSC packs. Architecture + methodologies for Health Score and Biological
 | GSC-008 | Freshness / longitudinal | **pending** |
 | GSC-009 | Evidence fusion / conflict | **pending** |
 
+**Launch (BAG-06, approved 3 Sep 2026):** Biological Age is a wellness estimate (interim `lib/bio-age.ts`). GSC-002 remains the target-state methodology.
+
 Machine-readable pins: `lib/gsc/`.
 
 **Important:** GSC-001/002 deliberately publish **no numeric weights**. Full replacement of `lib/score.ts` / `lib/bio-age.ts` waits on GSC-003/004/008/009.

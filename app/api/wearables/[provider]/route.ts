@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getRequestUser } from '@/lib/api-auth'
 import { metricsFromSyncData } from '@/lib/wearable-metrics'
+import { deauthenticateTerraUser } from '@/lib/terra'
 
 export const dynamic = 'force-dynamic'
 
@@ -44,6 +45,20 @@ export async function DELETE(
   if (!authed) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { provider } = await params
+
+  const sync = await prisma.wearableSync.findUnique({
+    where: { userId_provider: { userId: authed.id, provider } },
+    select: { data: true },
+  })
+  const data = sync?.data
+  if (data && typeof data === 'object' && !Array.isArray(data)) {
+    const terraUserId = (data as Record<string, unknown>).terraUserId
+    if (typeof terraUserId === 'string' && terraUserId) {
+      await deauthenticateTerraUser(terraUserId).catch((err) =>
+        console.error('[wearables] Terra deauth failed', err),
+      )
+    }
+  }
 
   await prisma.wearableSync.deleteMany({
     where: { userId: authed.id, provider },

@@ -20,6 +20,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Webhook signature failed' }, { status: 400 })
   }
 
+  const seen = await prisma.processedWebhook.findUnique({
+    where: { id: `stripe:${event.id}` },
+  })
+  if (seen) return NextResponse.json({ received: true, duplicate: true })
+
   switch (event.type) {
     case 'checkout.session.completed': {
       const session = event.data.object as Stripe.Checkout.Session
@@ -30,6 +35,7 @@ export async function POST(req: NextRequest) {
           data: {
             subscriptionId: session.subscription as string,
             subscriptionStatus: 'ACTIVE',
+            cancelAtPeriodEnd: false,
           },
         })
       }
@@ -43,8 +49,10 @@ export async function POST(req: NextRequest) {
         await prisma.user.update({
           where: { id: userId },
           data: {
+            subscriptionId: sub.id,
+            cancelAtPeriodEnd: Boolean(sub.cancel_at_period_end),
             subscriptionStatus:
-              sub.status === 'active'
+              sub.status === 'active' || sub.status === 'trialing'
                 ? 'ACTIVE'
                 : sub.status === 'past_due'
                   ? 'PAST_DUE'
@@ -55,18 +63,42 @@ export async function POST(req: NextRequest) {
       break
     }
 
+    case 'invoice.payment_failed': {
+      const invoice = event.data.object as Stripe.Invoice
+      const customerId =
+        typeof invoice.customer === 'string' ? invoice.customer : invoice.customer?.id
+      if (customerId) {
+        const userId = await getUserIdFromCustomer(customerId)
+        if (userId) {
+          await prisma.user.update({
+            where: { id: userId },
+            data: { subscriptionStatus: 'PAST_DUE' },
+          })
+        }
+      }
+      break
+    }
+
     case 'customer.subscription.deleted': {
       const sub = event.data.object as Stripe.Subscription
       const userId = await getUserIdFromCustomer(sub.customer as string)
       if (userId) {
         await prisma.user.update({
           where: { id: userId },
-          data: { subscriptionStatus: 'CANCELLED', subscriptionId: null },
+          data: {
+            subscriptionStatus: 'CANCELLED',
+            subscriptionId: null,
+            cancelAtPeriodEnd: false,
+          },
         })
       }
       break
     }
   }
+
+  await prisma.processedWebhook.create({
+    data: { id: `stripe:${event.id}`, source: 'stripe' },
+  })
 
   return NextResponse.json({ received: true })
 }
