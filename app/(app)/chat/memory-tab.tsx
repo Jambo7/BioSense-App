@@ -126,7 +126,7 @@ export function MemoryTab() {
           <div className="flex-1 min-w-0">
             <CardLabel className="mb-0">My understanding</CardLabel>
             <p className="text-caption text-ink-2 leading-snug">
-              {overall}% overall — built from your answers over time.
+              {overall}% overall, built from your answers over time.
             </p>
           </div>
         </div>

@@ -210,7 +210,7 @@ export function LearningTab() {
                 </span>
               </div>
               <p className="text-body-sm text-ink leading-snug font-medium">
-                One question at a time. Stop whenever you like — everything saves as we go.
+                One question at a time. Stop whenever you like. Everything saves as we go.
               </p>
             </div>
             <div className="shrink-0">
@@ -282,7 +282,7 @@ export function LearningTab() {
                 <div className="min-w-0">
                   <div className="text-body-sm font-semibold text-ink">That&apos;s enough for now.</div>
                   <p className="text-caption text-ink-2 leading-snug mt-0.5">
-                    We&apos;ve learned a lot already — it&apos;s all saved and you can continue whenever you like.
+                    We&apos;ve learned a lot already. It&apos;s all saved and you can continue whenever you like.
                   </p>
                 </div>
               </div>
@@ -383,7 +383,7 @@ export function LearningTab() {
           <div className="space-y-2 max-h-[320px] overflow-y-auto no-scrollbar pr-1">
             {sessionFacts.length === 0 && (
               <p className="text-caption text-ink-3 italic">
-                I&apos;ll save what I learn here as we chat — you can edit or delete anything.
+                I&apos;ll save what I learn here as we chat. You can edit or delete anything.
               </p>
             )}
             {sessionFacts.map((f) => (
@@ -431,7 +431,7 @@ function EnterScreen({
         </h1>
         <p className="text-body-sm text-ink-2 mt-2 max-w-[44ch] mx-auto leading-relaxed">
           The more BioSense learns about you, the more personalised your insights become. A few
-          short, conversational questions at a time — never a long form.
+          short, conversational questions at a time, never a long form.
         </p>
 
         <div className="grid sm:grid-cols-3 gap-2.5 mt-5 text-left">
@@ -465,7 +465,7 @@ function EnterScreen({
           <div className="flex-1 min-w-0">
             <CardLabel className="mb-0">My understanding</CardLabel>
             <p className="text-caption text-ink-2 leading-snug">
-              {loading ? 'Loading…' : `${overall}% overall — built from your answers over time.`}
+              {loading ? 'Loading…' : `${overall}% overall, built from your answers over time.`}
             </p>
           </div>
         </div>

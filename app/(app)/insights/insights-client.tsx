@@ -1,28 +1,42 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import Link from 'next/link'
+import { useSearchParams, useRouter } from 'next/navigation'
 import {
   Brain,
+  Check,
+  ChevronRight,
+  FlaskConical,
+  GraduationCap,
+  Link2,
   Sparkles,
-  Moon,
-  Wind,
-  Activity,
-  Heart,
-  Leaf,
   TrendingUp,
-  ArrowRight,
-  CalendarDays,
+  Watch,
+  User,
+  Sun,
+  Moon,
+  Footprints,
+  Heart,
+  Bookmark,
+  Clock,
+  RefreshCw,
   type LucideIcon,
 } from 'lucide-react'
 import { Card } from '@/components/ui/card'
-import { IconBadge, type IconBadgeTone } from '@/components/ui/icon-badge'
-import type { WearableMetrics } from '@/lib/wearable-metrics'
+import { PrivacyStrip } from '@/components/privacy-strip'
+import { SourceRow } from '@/components/source-status'
+import { IconBadge } from '@/components/ui/icon-badge'
+import type { InsightCard } from '@/lib/intelligence'
 import { cn } from '@/lib/utils'
 
-type Checkin = { date: string; energy: number; sleep: number; mood: number; stress: number }
-type Tone = IconBadgeTone
-type Impact = 'high' | 'medium' | 'low' | 'moderate'
+type Tab = 'latest' | 'patterns' | 'predictions' | 'learned'
+const TABS: { id: Tab; label: string }[] = [
+  { id: 'latest', label: 'Latest Intelligence' },
+  { id: 'patterns', label: 'Patterns & Connections' },
+  { id: 'predictions', label: 'Predictions' },
+  { id: 'learned', label: 'Learned Intelligence' },
+]
 
 type PatternRow = {
   id: string
@@ -30,703 +44,627 @@ type PatternRow = {
   description: string
   confidence: 'HIGH' | 'MEDIUM' | 'LOW'
   scoreImpact: number | null
+  discoveredAt: string
 }
 
-type LearnedFact = { id: string; section: string; text: string }
-
-const IMPACT_STYLE: Record<Impact, string> = {
-  high:     'bg-[rgba(168,84,84,0.14)] text-[#A85454] ring-1 ring-inset ring-[rgba(168,84,84,0.22)]',
-  medium:   'bg-[rgba(167,117,48,0.14)] text-[#A77530] ring-1 ring-inset ring-[rgba(167,117,48,0.22)]',
-  moderate: 'bg-[rgba(167,117,48,0.14)] text-[#A77530] ring-1 ring-inset ring-[rgba(167,117,48,0.22)]',
-  low:      'bg-[rgba(111,143,107,0.14)] text-sage-deep ring-1 ring-inset ring-[rgba(111,143,107,0.24)]',
-}
-const IMPACT_LABEL: Record<Impact, string> = {
-  high:     'High',
-  medium:   'Medium',
-  moderate: 'Moderate',
-  low:      'Low',
+type LearnedFact = {
+  id: string
+  section: string
+  text: string
+  createdAt: string
+  confidence: string
 }
 
-type Tab = 'today' | 'patterns' | 'predictions' | 'knows'
-const TABS: { id: Tab; label: string }[] = [
-  { id: 'today',       label: 'Today'                  },
-  { id: 'patterns',    label: 'Patterns & Connections' },
-  { id: 'predictions', label: 'Predictions'            },
-  { id: 'knows',       label: 'Knows about you'        },
-]
+function confLabel(c: string) {
+  if (c === 'HIGH' || c === 'High') return 'Strong'
+  if (c === 'MEDIUM' || c === 'Medium') return 'Moderate'
+  return 'Emerging'
+}
 
-interface InsightsClientProps {
-  healthScore: number | null
-  recentCheckins: Checkin[]
+function confTone(c: string) {
+  if (c === 'HIGH') return 'text-sage-deep'
+  if (c === 'MEDIUM') return 'text-[#A77530]'
+  return 'text-[#7A6490]'
+}
+
+function patternKind(c: string) {
+  if (c === 'HIGH') return 'Strong connection'
+  if (c === 'MEDIUM') return 'Emerging connection'
+  return 'Changing connection'
+}
+
+function monthsBetween(iso: string) {
+  const then = new Date(iso).getTime()
+  const days = Math.max(1, Math.round((Date.now() - then) / 86400000))
+  if (days < 21) return `${days} day${days === 1 ? '' : 's'}`
+  if (days < 60) return `${Math.round(days / 7)} weeks`
+  return `${Math.round(days / 30)} months`
+}
+
+export function InsightsClient(props: {
   patterns: PatternRow[]
   learnedFacts: LearnedFact[]
-  wearableMetrics: WearableMetrics
+  wearableConnected: boolean
   checkinCount: number
   patternMinCheckins: number
-}
+  intelligence: InsightCard[]
+  hasBlood: boolean
+  hasProfile: boolean
+  learningStarted: boolean
+}) {
+  const search = useSearchParams()
+  const router = useRouter()
+  const initial = (search.get('tab') as Tab) || 'latest'
+  const [tab, setTab] = useState<Tab>(TABS.some((t) => t.id === initial) ? initial : 'latest')
 
-export function InsightsClient({
-  healthScore,
-  recentCheckins,
-  patterns,
-  learnedFacts,
-  wearableMetrics,
-  checkinCount,
-  patternMinCheckins,
-}: InsightsClientProps) {
-  const [tab, setTab] = useState<Tab>('today')
-  const primary = pickPrimaryInsight({
-    patterns,
-    checkins: recentCheckins,
-    wearableMetrics,
-    healthScore,
-    checkinCount,
-    patternMinCheckins,
-  })
+  function setTabId(id: Tab) {
+    setTab(id)
+    router.replace(`/insights?tab=${id}`, { scroll: false })
+  }
 
   return (
     <div className="max-w-3xl mx-auto fade-up space-y-5">
-      <header className="relative pt-2 pb-1">
-        <div>
-          <div className="flex items-center gap-2 text-eyebrow uppercase text-sage-deep mb-2">
-            <Brain className="w-3.5 h-3.5" strokeWidth={2.25} />
-            <span>Insights</span>
-          </div>
-          <h1 className="font-sans text-[28px] sm:text-[34px] text-ink tracking-tight leading-[1.04] max-w-[18ch] font-bold">
-            Understand what&apos;s
-            <br />
-            <span className="italic-accent text-[1.02em] text-sage-deep font-normal">
-              driving your health.
-            </span>
+      <header className="pt-1 flex items-start justify-between gap-4">
+        <div className="min-w-0">
+          <div className="text-eyebrow uppercase text-sage-deep mb-2">Insights</div>
+          <h1 className="font-sans text-[28px] sm:text-[34px] font-bold text-ink tracking-tight leading-[1.06] max-w-[22ch]">
+            {tab === 'latest' && (
+              <>
+                Here is what BioSense is{' '}
+                <span className="italic-accent text-sage-deep font-normal">noticing now.</span>
+              </>
+            )}
+            {tab === 'patterns' && props.patterns.length === 0 && (
+              <>
+                We&apos;re learning what{' '}
+                <span className="italic-accent text-sage-deep font-normal">drives your health.</span>
+              </>
+            )}
+            {tab === 'patterns' && props.patterns.length > 0 && (
+              <>
+                Here is what BioSense has{' '}
+                <span className="italic-accent text-sage-deep font-normal">learned about you.</span>
+              </>
+            )}
+            {tab === 'predictions' && (
+              <>
+                We&apos;re learning where{' '}
+                <span className="italic-accent text-sage-deep font-normal">your health may be heading.</span>
+              </>
+            )}
+            {tab === 'learned' && (
+              <>
+                A lifetime of insights,{' '}
+                <span className="italic-accent text-sage-deep font-normal">built about you.</span>
+              </>
+            )}
           </h1>
+          <p className="text-[14px] text-ink-2 mt-2 leading-relaxed max-w-[50ch]">
+            BioSense looks across your sleep, recovery, activity, biomarkers and habits over time.
+          </p>
         </div>
+        <HeroArt kind={tab === 'predictions' ? 'path' : tab === 'learned' ? 'tree' : 'nodes'} />
       </header>
 
-      {primary && (
-        <Card variant="premium" padding="lg" className="relative overflow-hidden">
-          <div className="flex items-start gap-3">
-            <IconBadge icon={Sparkles} tone="sage" variant="tint" size="md" />
-            <div className="flex-1 min-w-0">
-              <div className="text-eyebrow uppercase text-sage-deep mb-1">Primary insight</div>
-              <div className="font-serif text-[20px] sm:text-[22px] text-ink leading-snug tracking-tight">
-                {primary.title}
-              </div>
-              <p className="text-[13px] text-ink-2 leading-snug mt-1.5">{primary.body}</p>
-            </div>
-          </div>
-        </Card>
-      )}
-
-      <div className="relative -mx-1 px-1">
-        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
-          {TABS.map((t) => {
-            const active = t.id === tab
-            return (
-              <button
-                key={t.id}
-                type="button"
-                onClick={() => setTab(t.id)}
-                className={cn(
-                  'shrink-0 h-9 px-3.5 rounded-pill text-[12.5px] font-medium transition-all',
-                  active
-                    ? 'btn-sage text-white'
-                    : 'text-ink-2 tile tile-hover',
-                )}
-              >
-                {t.label}
-              </button>
-            )
-          })}
-        </div>
+      <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+        {TABS.map((t) => (
+          <button
+            key={t.id}
+            type="button"
+            onClick={() => setTabId(t.id)}
+            className={cn(
+              'shrink-0 h-9 px-3.5 rounded-pill text-[12.5px] font-medium',
+              tab === t.id ? 'btn-sage text-white' : 'tile text-ink-2',
+            )}
+          >
+            {t.label}
+          </button>
+        ))}
       </div>
 
-      {tab === 'today' && (
-        <TodayTab checkins={recentCheckins} wearableMetrics={wearableMetrics} />
-      )}
+      {tab === 'latest' && <LatestTab cards={props.intelligence} />}
       {tab === 'patterns' && (
         <PatternsTab
-          patterns={patterns}
-          checkinCount={checkinCount}
-          patternMinCheckins={patternMinCheckins}
+          patterns={props.patterns}
+          wearableConnected={props.wearableConnected}
+          hasProfile={props.hasProfile}
+          hasBlood={props.hasBlood}
+          learningStarted={props.learningStarted}
+          checkinCount={props.checkinCount}
+          min={props.patternMinCheckins}
         />
       )}
-      {tab === 'predictions' && <PredictionsTab patterns={patterns} checkinCount={checkinCount} />}
-      {tab === 'knows' && <KnowsTab facts={learnedFacts} />}
+      {tab === 'predictions' && (
+        <PredictionsTab
+          cards={props.intelligence}
+          wearableConnected={props.wearableConnected}
+          hasBlood={props.hasBlood}
+          learningStarted={props.learningStarted}
+        />
+      )}
+      {tab === 'learned' && (
+        <LearnedTab
+          facts={props.learnedFacts}
+          saved={props.intelligence.filter((c) => c.saved)}
+          patterns={props.patterns}
+          wearableConnected={props.wearableConnected}
+          hasProfile={props.hasProfile}
+          hasBlood={props.hasBlood}
+        />
+      )}
     </div>
   )
 }
 
-function pickPrimaryInsight(input: {
-  patterns: PatternRow[]
-  checkins: Checkin[]
-  wearableMetrics: WearableMetrics
-  healthScore: number | null
-  checkinCount: number
-  patternMinCheckins: number
-}): { title: string; body: string } | null {
-  const { patterns, checkins, wearableMetrics: wm, healthScore, checkinCount, patternMinCheckins } =
-    input
-
-  const top = [...patterns].sort((a, b) => {
-    const rank = (c: string) => (c === 'HIGH' ? 3 : c === 'MEDIUM' ? 2 : 1)
-    return rank(b.confidence) - rank(a.confidence) || (b.scoreImpact ?? 0) - (a.scoreImpact ?? 0)
-  })[0]
-  if (top) {
-    return {
-      title: top.description,
-      body: `Strongest association in your data so far (${top.confidence.toLowerCase()} confidence). Educational only — not a diagnosis.`,
-    }
-  }
-
-  if (wm.recovery != null && wm.recovery < 45) {
-    return {
-      title: 'Recovery looks lower than usual on your latest wearable sync.',
-      body: 'Worth watching sleep and strain over the next couple of days as you keep logging.',
-    }
-  }
-  if (wm.hrv != null && checkins[0] && checkins[0].stress >= 7) {
-    return {
-      title: 'Higher stress check-ins are showing up alongside your latest HRV reading.',
-      body: 'Keep tracking both — patterns often become clearer after a week of consistent data.',
-    }
-  }
-  if (checkins.length >= 2) {
-    const dEnergy = checkins[0].energy - checkins[1].energy
-    if (dEnergy <= -2) {
-      return {
-        title: 'Energy dipped versus yesterday’s check-in.',
-        body: 'A single day isn’t a pattern yet — a few more check-ins will show whether this sticks.',
-      }
-    }
-  }
-  if (healthScore != null && checkinCount < patternMinCheckins) {
-    return {
-      title: `Health score is ${Math.round(healthScore)} — patterns unlock at ${patternMinCheckins} check-ins.`,
-      body: `You’ve logged ${checkinCount}. Keep going to unlock sleep/stress ↔ energy/mood associations.`,
-    }
-  }
-  if (checkinCount === 0 && !wm.hrv && !wm.steps) {
-    return {
-      title: 'Connect a wearable or log a check-in to start.',
-      body: 'Insights stay empty until we have real data — we won’t invent patterns.',
-    }
-  }
-  return {
-    title: 'Still gathering signal.',
-    body: 'As check-ins and wearables accumulate, your primary insight will focus on the strongest real association — not a demo script.',
-  }
-}
-
-function EmptyState({
-  title,
-  body,
-  href,
-  cta,
-}: {
-  title: string
-  body: string
-  href?: string
-  cta?: string
-}) {
-  return (
-    <Card variant="glass" padding="lg">
-      <div className="flex flex-col items-start gap-3 py-2">
-        <div className="flex items-center justify-center w-10 h-10 rounded-full bg-[rgba(111,143,107,0.12)] ring-1 ring-[rgba(111,143,107,0.22)]">
-          <Leaf className="w-4 h-4 text-sage-deep" strokeWidth={2.25} />
-        </div>
-        <div>
-          <div className="font-sans text-[15px] font-semibold text-ink">{title}</div>
-          <p className="text-[13px] text-ink-2 leading-snug mt-1 max-w-[46ch]">{body}</p>
-        </div>
-        {href && cta && (
-          <Link
-            href={href}
-            className="inline-flex items-center gap-1.5 mt-1 px-3.5 h-9 rounded-pill text-white bg-grad-sage text-[12.5px] font-medium"
-          >
-            {cta}
-            <ArrowRight className="w-3.5 h-3.5" strokeWidth={2.25} />
-          </Link>
-        )}
-      </div>
-    </Card>
-  )
-}
-
-function TodayTab({
-  checkins,
-  wearableMetrics,
-}: {
-  checkins: Checkin[]
-  wearableMetrics: WearableMetrics
-}) {
-  const drivers = todayDrivers(checkins, wearableMetrics)
-  if (drivers.length === 0) {
+function LatestTab({ cards }: { cards: InsightCard[] }) {
+  if (cards.length === 0) {
     return (
-      <div className="space-y-5">
-        <HeroIntroCard
-          eyebrow="Why it matters"
-          lead="Here's what's"
-          accent="influencing your health today."
-          body="These are the key factors impacting your recovery and wellbeing right now."
-          decoration="leaves"
-        />
-        <EmptyState
-          title="Not enough recent data yet"
-          body="Log a few daily check-ins or connect a wearable so we can show what’s moving your score today."
-          href="/checkin"
-          cta="Log today’s check-in"
-        />
-      </div>
+      <Card padding="lg">
+        <h2 className="font-sans text-[20px] font-bold text-ink">Your feed is warming up</h2>
+        <p className="text-[13px] text-ink-2 mt-2 leading-relaxed">
+          Home shows the most useful findings first. This page will list every intelligence item
+          as soon as BioSense has enough of your own data to speak honestly.
+        </p>
+      </Card>
     )
   }
-
-  const focus = drivers
-    .filter((d) => d.impact === 'high' || d.impact === 'moderate' || d.impact === 'medium')
-    .slice(0, 2)
-    .map((d) => d.label.toLowerCase())
-
   return (
-    <div className="space-y-5">
-      <HeroIntroCard
-        eyebrow="Why it matters"
-        lead="Here's what's"
-        accent="influencing your health today."
-        body="These are the key factors impacting your recovery and wellbeing right now."
-        decoration="leaves"
-      />
-
-      <Card variant="glass" padding="lg">
-        <div className="space-y-3">
-          {drivers.map((d) => (
-            <div
-              key={d.key}
-              className="flex items-start gap-3 sm:gap-4 p-3 sm:p-3.5 rounded-card tile"
-            >
-              <IconBadge icon={d.icon} tone={d.tone} variant="tint" size="md" />
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="font-sans text-[14px] font-semibold text-ink leading-tight">
-                    {d.label}
-                  </div>
-                  <span className="text-[10px] uppercase tracking-[0.10em] text-ink-3 shrink-0 hidden sm:block">
-                    Impact
-                  </span>
-                </div>
-                <p className="text-[12.5px] text-ink-2 leading-snug mt-1">{d.reason}</p>
+    <div className="space-y-2.5">
+      {cards.map((card) => (
+        <Link key={card.id} href={`/insights/item/${card.id}`} className="block">
+          <Card padding="md" className="tile-hover flex items-start gap-3">
+            <IconBadge icon={Sparkles} tone="sage" variant="tint" size="md" />
+            <div className="flex-1 min-w-0">
+              <div className="text-[10px] font-bold uppercase tracking-[0.12em] text-sage-deep">
+                {card.label}
+                {card.isNew ? ' · New' : ''}
               </div>
-              <span
-                className={cn(
-                  'inline-flex items-center px-2 py-0.5 rounded-pill text-[10.5px] font-semibold uppercase tracking-wide shrink-0 self-start mt-1',
-                  IMPACT_STYLE[d.impact],
-                )}
-              >
-                {IMPACT_LABEL[d.impact]}
-              </span>
+              <div className="text-[15px] font-semibold text-ink mt-1">{card.title}</div>
+              <p className="text-[13px] text-ink-2 mt-1 leading-snug">{card.body}</p>
+              <div className="text-[12.5px] font-semibold text-sage-deep mt-2 inline-flex items-center gap-0.5">
+                View detail <ChevronRight className="w-3.5 h-3.5" />
+              </div>
             </div>
-          ))}
-        </div>
-
-        {focus.length > 0 && (
-          <div className="mt-4 flex items-start gap-2.5 rounded-card tile px-3.5 py-3">
-            <Sparkles className="w-3.5 h-3.5 text-sage-deep mt-0.5 shrink-0" strokeWidth={2.25} />
-            <p className="text-[12.5px] text-ink leading-snug flex-1 min-w-0">
-              Focusing on{' '}
-              <span className="font-semibold text-sage-deep">{focus.join(' and ')}</span>{' '}
-              looks like the highest-leverage move from your recent data.
-            </p>
-          </div>
-        )}
-      </Card>
+          </Card>
+        </Link>
+      ))}
     </div>
   )
 }
 
 function PatternsTab({
   patterns,
+  wearableConnected,
+  hasProfile,
+  hasBlood,
+  learningStarted,
   checkinCount,
-  patternMinCheckins,
+  min,
 }: {
   patterns: PatternRow[]
+  wearableConnected: boolean
+  hasProfile: boolean
+  hasBlood: boolean
+  learningStarted: boolean
   checkinCount: number
-  patternMinCheckins: number
+  min: number
 }) {
-  const iconFor = (type: string): { icon: LucideIcon; tone: Tone } => {
-    if (type.includes('sleep')) return { icon: Moon, tone: 'violet' }
-    if (type.includes('stress')) return { icon: Wind, tone: 'teal' }
-    if (type.includes('mood')) return { icon: Heart, tone: 'rose' }
-    return { icon: Activity, tone: 'sky' }
+  if (patterns.length === 0) {
+    return (
+      <div className="space-y-3">
+        <Card padding="lg">
+          <h2 className="font-sans text-[20px] font-bold text-ink tracking-tight">
+            We&apos;re starting to learn what{' '}
+            <span className="italic-accent text-sage-deep font-normal">affects you.</span>
+          </h2>
+          <p className="text-[13px] text-ink-2 mt-2">
+            The more data and context you share, the better BioSense can understand your unique
+            patterns and connections.
+          </p>
+          <div className="mt-4">
+            <div className="text-[13px] font-semibold text-ink mb-1">Building your first connections</div>
+            <p className="text-[12.5px] text-ink-2 mb-2">
+              BioSense is analysing your data from multiple sources. Your first connection will
+              appear when we find a pattern strong enough to be useful.
+            </p>
+            <div className="divide-y divide-[rgba(26,28,26,0.06)]">
+              <SourceRow icon={Watch} title="Wearable data" hint="Heart rate, HRV, sleep, activity, recovery" state={wearableConnected ? 'done' : 'missing'} />
+              <SourceRow icon={User} title="Your profile" hint="Age, goals, health profile" state={hasProfile ? 'done' : 'missing'} />
+              <SourceRow icon={Brain} title="Learning Mode" hint="Personalised understanding of you" state={learningStarted ? 'done' : 'building'} />
+              <SourceRow icon={FlaskConical} title="Biomarkers" hint="Blood test results and trends" state={hasBlood ? 'done' : 'missing'} />
+              <SourceRow icon={Sun} title="Today's Context" hint="Environmental and lifestyle factors" state="optional" />
+            </div>
+          </div>
+        </Card>
+        <Card padding="lg">
+          <div className="flex items-center gap-2 text-[13px] font-semibold text-ink mb-2">
+            <Sparkles className="w-4 h-4 text-sage-deep" strokeWidth={2} />
+            What we&apos;re looking for
+          </div>
+          <p className="text-[12.5px] text-ink-2 mb-3">
+            Repeatable relationships in your own data. First connections usually appear after about{' '}
+            {min} days of consistent information.
+          </p>
+          <div className="grid grid-cols-3 gap-2">
+            <LookFor icon={Moon} title="Sleep ↔ Recovery" body="How sleep influences your recovery" />
+            <LookFor icon={Footprints} title="Activity ↔ Readiness" body="How training impacts your readiness" />
+            <LookFor icon={Heart} title="Lifestyle ↔ Health" body="How daily habits relate to your health" />
+          </div>
+          <p className="text-[12px] text-ink-3 mt-3">
+            You currently have {checkinCount} context day{checkinCount === 1 ? '' : 's'} stored.
+          </p>
+        </Card>
+        <PrivacyStrip body="Your data stays private and secure. Connections are based on your data only, never compared to others." />
+      </div>
+    )
   }
 
   return (
-    <div className="space-y-5">
-      <HeroIntroCard
-        eyebrow="Patterns & connections"
-        lead="Your habits show clear"
-        accent="patterns and connections."
-        body="These are associations we found in your check-in history — educational, not causal."
-        decoration="circles"
+    <div className="space-y-3">
+      <Card padding="lg">
+        <h2 className="font-sans text-[20px] font-bold text-ink tracking-tight">
+          Your habits show clear{' '}
+          <span className="italic-accent text-sage-deep font-normal">patterns and connections.</span>
+        </h2>
+        <p className="text-[13px] text-ink-2 mt-1.5">
+          These are repeated relationships BioSense has observed in your own data over time.
+        </p>
+      </Card>
+      {patterns.map((p) => (
+        <Link key={p.id} href={`/insights/connection/${p.id}`} className="block">
+          <Card padding="md" className="tile-hover flex items-start gap-3">
+            <IconBadge
+              icon={p.confidence === 'HIGH' ? Moon : p.confidence === 'MEDIUM' ? Brain : TrendingUp}
+              tone={p.confidence === 'HIGH' ? 'sage' : p.confidence === 'MEDIUM' ? 'amber' : 'violet'}
+              variant="tint"
+              size="md"
+            />
+            <div className="flex-1 min-w-0">
+              <div className={cn('text-[10px] font-bold uppercase tracking-[0.12em]', confTone(p.confidence))}>
+                {patternKind(p.confidence)}
+              </div>
+              <div className="text-[15px] font-semibold text-ink mt-1 leading-snug">{p.description}</div>
+              <div className="text-[12px] text-ink-3 mt-1.5">
+                First noticed {monthsBetween(p.discoveredAt)} ago · Confidence: {confLabel(p.confidence)}
+              </div>
+            </div>
+            <div className="text-[12.5px] font-semibold text-sage-deep shrink-0 pt-1 inline-flex items-center gap-0.5">
+              Explore
+              <ChevronRight className="w-3.5 h-3.5" />
+            </div>
+          </Card>
+        </Link>
+      ))}
+      <SignalsStrip
+        items={[
+          { icon: Watch, label: 'Wearable data', hint: 'Heart rate, HRV, sleep, activity, recovery' },
+          { icon: FlaskConical, label: 'Biomarkers', hint: 'Blood test results and trends' },
+          { icon: Brain, label: 'Learning Mode', hint: 'Personalised understanding of you' },
+          { icon: Sun, label: "Today's Context", hint: 'Environmental and lifestyle factors' },
+        ]}
       />
-
-      {patterns.length === 0 ? (
-        <EmptyState
-          title={
-            checkinCount < patternMinCheckins
-              ? `Patterns unlock after ${patternMinCheckins} check-ins`
-              : 'No clear patterns yet'
-          }
-          body={
-            checkinCount < patternMinCheckins
-              ? `You’ve logged ${checkinCount} of ${patternMinCheckins} days. Keep checking in — we’ll surface sleep/stress ↔ energy/mood links when the signal is strong enough.`
-              : 'We looked at your recent check-ins but didn’t find associations above the confidence floor. Keep logging — patterns emerge with consistency.'
-          }
-          href="/checkin"
-          cta="Log a check-in"
-        />
-      ) : (
-        <Card variant="glass" padding="lg">
-          <div className="space-y-3">
-            {patterns.map((p) => {
-              const { icon, tone } = iconFor(p.type)
-              return (
-                <div
-                  key={p.id}
-                  className="flex items-start gap-3 sm:gap-4 p-3 sm:p-3.5 rounded-card tile"
-                >
-                  <IconBadge icon={icon} tone={tone} variant="tint" size="md" />
-                  <div className="flex-1 min-w-0">
-                    <div className="font-sans text-[13.5px] font-semibold text-ink leading-tight">
-                      {p.description}
-                    </div>
-                    <p className="text-[12px] text-ink-3 leading-snug mt-1">
-                      Confidence: {p.confidence.toLowerCase()}
-                      {p.scoreImpact != null ? ` · impact score ${p.scoreImpact}` : ''}
-                    </p>
-                  </div>
-                  <span
-                    className={cn(
-                      'inline-flex items-center px-2 py-0.5 rounded-pill text-[10.5px] font-semibold uppercase tracking-wide shrink-0',
-                      p.confidence === 'HIGH'
-                        ? 'bg-[rgba(111,143,107,0.14)] text-sage-deep'
-                        : p.confidence === 'MEDIUM'
-                          ? 'bg-[rgba(167,117,48,0.14)] text-[#A77530]'
-                          : 'bg-[rgba(26,28,26,0.06)] text-ink-2',
-                    )}
-                  >
-                    {p.confidence === 'HIGH' ? 'Strong' : p.confidence === 'MEDIUM' ? 'Moderate' : 'Weak'}
-                  </span>
-                </div>
-              )
-            })}
-          </div>
-        </Card>
-      )}
+      <PrivacyStrip body="Connections are based on your data only. BioSense surfaces repeated relationships, not fixed truths." />
     </div>
   )
 }
 
 function PredictionsTab({
-  patterns,
-  checkinCount,
+  cards,
+  wearableConnected,
+  hasBlood,
+  learningStarted,
 }: {
-  patterns: PatternRow[]
-  checkinCount: number
+  cards: InsightCard[]
+  wearableConnected: boolean
+  hasBlood: boolean
+  learningStarted: boolean
 }) {
-  const confidenceStyle: Record<string, string> = {
-    HIGH:   'bg-[rgba(111,143,107,0.14)] text-sage-deep ring-1 ring-inset ring-[rgba(111,143,107,0.24)]',
-    MEDIUM: 'bg-[rgba(167,117,48,0.14)] text-[#A77530] ring-1 ring-inset ring-[rgba(167,117,48,0.22)]',
-    LOW:    'bg-[rgba(26,28,26,0.06)] text-ink-2 ring-1 ring-inset ring-[rgba(26,28,26,0.10)]',
+  const preds = cards.filter((c) => c.type === 'PROJECTION' || c.type === 'LONG_TERM_TREND')
+  if (preds.length === 0) {
+    return (
+      <div className="space-y-3">
+        <Card padding="lg">
+          <h2 className="font-sans text-[20px] font-bold text-ink">Building your first predictions</h2>
+          <p className="text-[13px] text-ink-2 mt-2 leading-relaxed">
+            BioSense needs enough reliable history before it can say where a trend may be heading.
+          </p>
+          <div className="mt-4 divide-y divide-[rgba(26,28,26,0.06)]">
+            <SourceRow icon={TrendingUp} title="Health trajectory" hint="Analysing your current direction" state="building" />
+            <SourceRow icon={Watch} title="Wearable history" hint="Sleep, activity, recovery and more" state={wearableConnected ? 'done' : 'missing'} />
+            <SourceRow icon={Link2} title="Patterns & Connections" hint="Learning what affects you" state="building" />
+            <SourceRow icon={FlaskConical} title="Biomarkers" hint="Lab results and trends" state={hasBlood ? 'done' : 'missing'} />
+            <SourceRow icon={GraduationCap} title="Learning Mode" hint="Personalised understanding" state={learningStarted ? 'done' : 'building'} />
+          </div>
+        </Card>
+        <Card padding="lg">
+          <div className="text-[13px] font-semibold text-ink mb-3">What BioSense may predict</div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <LookFor icon={Heart} title="Recovery trajectory" body="Whether your recovery appears to be improving or declining" />
+            <LookFor icon={TrendingUp} title="Health Score direction" body="Whether your long-term score is likely to keep improving" />
+            <LookFor icon={Moon} title="Sleep trend" body="Whether your current sleep pattern is likely to persist" />
+            <LookFor icon={FlaskConical} title="Biomarker direction" body="Whether a biomarker may be trending up or down" />
+          </div>
+        </Card>
+        <PrivacyStrip body="Predictions are based on your data only, never compared to others." />
+      </div>
+    )
   }
-
-  // Honest framing: these are lag associations restated as forward-looking notes —
-  // not a forecasting engine (ENG-007). No invented charts or percentages.
-  const predictions = patterns.slice(0, 3).map((p) => ({
-    key: p.id,
-    icon: p.type.includes('sleep') ? Moon : p.type.includes('stress') ? Wind : TrendingUp,
-    tone: (p.type.includes('sleep') ? 'violet' : p.type.includes('stress') ? 'teal' : 'sage') as Tone,
-    title: p.description,
-    detail:
-      'Based on a past association in your check-ins — if the link continues, similar days may show a similar next-day effect. Not a forecast model.',
-    confidence: p.confidence,
-  }))
-
   return (
-    <div className="space-y-5">
-      <HeroIntroCard
-        eyebrow="Predictions"
-        lead="Early signals from"
-        accent="patterns we’ve already found."
-        body="These are educational restatements of detected associations — not clinical forecasts."
-        decoration="mountains"
+    <div className="space-y-3">
+      <Card padding="lg">
+        <h2 className="font-sans text-[20px] font-bold text-ink">
+          Your current data suggests several developing trajectories.
+        </h2>
+      </Card>
+      {preds.map((c) => (
+        <Link key={c.id} href={`/insights/item/${c.id}`} className="block">
+          <Card padding="md" className="tile-hover">
+            <div className="text-[10px] font-bold uppercase tracking-[0.12em] text-sage-deep">
+              {c.type === 'PROJECTION' ? 'Likely' : 'Developing'}
+            </div>
+            <div className="text-[15px] font-semibold text-ink mt-1">{c.title}</div>
+            <p className="text-[13px] text-ink-2 mt-1 leading-snug">{c.body}</p>
+            <div className="text-[12.5px] font-semibold text-sage-deep mt-2 inline-flex items-center gap-0.5">
+              Explore prediction <ChevronRight className="w-3.5 h-3.5" />
+            </div>
+          </Card>
+        </Link>
+      ))}
+      <SignalsStrip
+        items={[
+          { icon: Watch, label: 'Wearable data', hint: 'Continuous stream from your devices' },
+          { icon: Link2, label: 'Patterns & Connections', hint: 'Recurring trends and relationships' },
+          { icon: FlaskConical, label: 'Biomarkers', hint: 'Key lab results and biological signals' },
+          { icon: GraduationCap, label: 'Learning Mode', hint: 'Personalised insights that improve over time' },
+        ]}
       />
-
-      {predictions.length === 0 ? (
-        <EmptyState
-          title="No predictions yet"
-          body={
-            checkinCount < 7
-              ? 'Predictions appear once we have enough check-ins to detect a pattern.'
-              : 'We’ll surface likely next-day effects when a pattern clears the confidence floor.'
-          }
-          href="/checkin"
-          cta="Keep checking in"
-        />
-      ) : (
-        <Card variant="glass" padding="lg">
-          <div className="space-y-3">
-            {predictions.map((p) => (
-              <div
-                key={p.key}
-                className="flex items-start gap-3 sm:gap-4 p-3 sm:p-3.5 rounded-card tile"
-              >
-                <IconBadge icon={p.icon} tone={p.tone} variant="tint" size="md" />
-                <div className="flex-1 min-w-0">
-                  <div className="font-sans text-[13.5px] font-semibold text-ink leading-tight">
-                    {p.title}
-                  </div>
-                  <p className="text-[12px] text-ink-3 leading-snug mt-1">{p.detail}</p>
-                </div>
-                <div className="flex flex-col items-end gap-1 shrink-0">
-                  <span className="text-[9.5px] uppercase tracking-[0.10em] text-ink-3">
-                    Confidence
-                  </span>
-                  <span
-                    className={cn(
-                      'inline-flex items-center px-2 py-0.5 rounded-pill text-[10.5px] font-semibold uppercase tracking-wide',
-                      confidenceStyle[p.confidence],
-                    )}
-                  >
-                    {p.confidence === 'HIGH' ? 'High' : p.confidence === 'MEDIUM' ? 'Medium' : 'Low'}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </Card>
-      )}
+      <PrivacyStrip body="Predictions are based on your own data only and represent likely directions, not fixed outcomes." />
     </div>
   )
 }
 
-function KnowsTab({ facts }: { facts: LearnedFact[] }) {
-  const toneCycle: Tone[] = ['sky', 'violet', 'teal', 'amber', 'sage']
-  const iconCycle: LucideIcon[] = [CalendarDays, Moon, Wind, Heart, Activity]
-
-  return (
-    <div className="space-y-5">
-      <HeroIntroCard
-        eyebrow="Knows about you"
-        lead="A summary of what"
-        accent="BioSense has learned about you."
-        body="Facts from Learning Mode and registration — not invented demo traits."
-        decoration="brain"
-      />
-
-      {facts.length === 0 ? (
-        <EmptyState
-          title="Nothing learned yet"
-          body="Complete a few Learning Mode answers or keep chatting — durable facts you share will show up here."
-          href="/chat"
-          cta="Open Learning Mode"
-        />
-      ) : (
-        <Card variant="glass" padding="lg">
-          <div className="space-y-3">
-            {facts.map((f, i) => (
-              <Link
-                key={f.id}
-                href="/chat"
-                className="flex items-start gap-3 sm:gap-4 p-3 sm:p-3.5 rounded-card tile tile-hover group"
-              >
-                <IconBadge
-                  icon={iconCycle[i % iconCycle.length]}
-                  tone={toneCycle[i % toneCycle.length]}
-                  variant="tint"
-                  size="md"
-                />
-                <div className="flex-1 min-w-0">
-                  <div className="font-sans text-[13.5px] font-semibold text-ink leading-tight">
-                    {f.text}
-                  </div>
-                  <p className="text-[12px] text-ink-3 leading-snug mt-1 capitalize">
-                    From {f.section.replace(/_/g, ' ')}
-                  </p>
-                </div>
-                <ArrowRight
-                  className="w-4 h-4 text-ink-3 shrink-0 mt-1 transition-transform group-hover:translate-x-0.5"
-                  strokeWidth={2.25}
-                />
-              </Link>
-            ))}
-          </div>
-        </Card>
-      )}
-    </div>
-  )
-}
-
-function HeroIntroCard({
-  eyebrow,
-  lead,
-  accent,
-  body,
-  decoration,
+function LearnedTab({
+  facts,
+  saved,
+  patterns,
+  wearableConnected,
+  hasProfile,
+  hasBlood,
 }: {
-  eyebrow: string
-  lead: string
-  accent: string
-  body: string
-  decoration: 'leaves' | 'circles' | 'mountains' | 'brain'
+  facts: LearnedFact[]
+  saved: InsightCard[]
+  patterns: PatternRow[]
+  wearableConnected: boolean
+  hasProfile: boolean
+  hasBlood: boolean
+}) {
+  const [filter, setFilter] = useState('all')
+  const items = useMemo(() => {
+    const rows: {
+      id: string
+      href: string
+      title: string
+      body: string
+      chip: string
+      section: string
+    }[] = [
+      ...saved.map((c) => ({
+        id: `i-${c.id}`,
+        href: `/insights/item/${c.id}`,
+        title: c.title,
+        body: c.body,
+        chip: 'Saved by you',
+        section: 'all',
+      })),
+      ...patterns.map((p) => ({
+        id: `p-${p.id}`,
+        href: `/insights/connection/${p.id}`,
+        title: p.description,
+        body: `First noticed ${monthsBetween(p.discoveredAt)} ago · Confidence: ${confLabel(p.confidence)}`,
+        chip: 'Saved by BioSense',
+        section: p.type.toLowerCase(),
+      })),
+      ...facts.map((f) => ({
+        id: f.id,
+        href: `/insights/learned/${f.id}`,
+        title: f.text,
+        body: f.section.replace(/_/g, ' '),
+        chip: 'Learned',
+        section: f.section.toLowerCase(),
+      })),
+    ]
+    if (filter === 'all') return rows
+    return rows.filter(
+      (r) =>
+        r.section.includes(filter) ||
+        r.title.toLowerCase().includes(filter) ||
+        r.body.toLowerCase().includes(filter),
+    )
+  }, [facts, saved, patterns, filter])
+
+  const empty = items.length === 0
+  const filters: { id: string; label: string }[] = [
+    { id: 'all', label: 'All' },
+    { id: 'sleep', label: 'Sleep' },
+    { id: 'recovery', label: 'Recovery' },
+    { id: 'stress', label: 'Stress' },
+    { id: 'biomarker', label: 'Biomarkers' },
+  ]
+
+  return (
+    <div className="space-y-3">
+      {empty ? (
+        <>
+          <Card padding="lg">
+            <h2 className="font-sans text-[20px] font-bold text-ink">Your Learned Intelligence is being built</h2>
+            <p className="text-[13px] text-ink-2 mt-2 leading-relaxed">
+              BioSense is still learning from your data. As we discover meaningful insights about your
+              health, they will appear here.
+            </p>
+            <div className="mt-4 relative">
+              <div className="absolute top-5 left-[8%] right-[8%] h-px bg-[rgba(168,191,163,0.35)]" aria-hidden />
+              <div className="relative grid grid-cols-5 gap-1">
+                <Mini icon={Watch} source="Wearables" ok={wearableConnected} />
+                <Mini icon={User} source="Profile" ok={hasProfile} />
+                <Mini icon={Link2} source="Patterns" ok={patterns.length > 0} />
+                <Mini icon={FlaskConical} source="Biomarkers" ok={hasBlood} />
+                <Mini icon={Brain} source="Learning" ok={facts.length > 0} />
+              </div>
+            </div>
+          </Card>
+          <Card padding="lg">
+            <div className="flex items-center gap-2 text-[13px] font-semibold text-ink mb-3">
+              <Bookmark className="w-4 h-4 text-sage-deep" strokeWidth={2} />
+              What gets saved here
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <LookFor icon={Sparkles} title="High impact" body="Insights that strongly affect your health or results" />
+              <LookFor icon={Clock} title="Long term" body="Important discoveries stay here, even if newer insights appear" />
+              <LookFor icon={RefreshCw} title="Always up to date" body="We track whether each insight strengthens, changes or fades" />
+              <LookFor icon={User} title="Yours to reflect on" body="Look back today, next year, or years from now" />
+            </div>
+          </Card>
+          <Card padding="md" className="flex items-center justify-between gap-3">
+            <div>
+              <div className="text-[13px] font-semibold text-ink">Keep going. Every data point helps.</div>
+              <p className="text-[12px] text-ink-2 mt-0.5">
+                The more consistent data you share, the more personal your intelligence becomes.
+              </p>
+            </div>
+            <Link href="/context" className="shrink-0 h-9 px-3.5 rounded-pill btn-sage text-white text-[12.5px] font-semibold inline-flex items-center gap-0.5">
+              Add today&apos;s context
+              <ChevronRight className="w-3.5 h-3.5" />
+            </Link>
+          </Card>
+        </>
+      ) : (
+        <>
+          <div className="flex gap-1.5 overflow-x-auto no-scrollbar">
+            {filters.map((f) => (
+              <button
+                key={f.id}
+                type="button"
+                onClick={() => setFilter(f.id)}
+                className={cn(
+                  'h-8 px-3 rounded-pill text-[12px] font-medium',
+                  filter === f.id ? 'btn-sage text-white' : 'tile text-ink-2',
+                )}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+          {items.map((row) => (
+            <Link key={row.id} href={row.href} className="block">
+              <Card padding="md" className="tile-hover flex items-start gap-3">
+                <IconBadge icon={Sparkles} tone="sage" variant="tint" size="md" />
+                <div className="flex-1 min-w-0">
+                  <div className="text-[10px] font-bold uppercase tracking-[0.12em] text-sage-deep">{row.chip}</div>
+                  <div className="text-[15px] font-semibold text-ink mt-1">{row.title}</div>
+                  <p className="text-[12.5px] text-ink-2 mt-1">{row.body}</p>
+                </div>
+                <div className="text-[12.5px] font-semibold text-sage-deep shrink-0 pt-1 inline-flex items-center gap-0.5">
+                  View detail
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </div>
+              </Card>
+            </Link>
+          ))}
+          <Card padding="md">
+            <div className="text-[13px] font-semibold text-ink">Why this matters</div>
+            <p className="text-[12.5px] text-ink-2 mt-1 leading-relaxed">
+              These discoveries are preserved because they have long-term value for understanding
+              your health. BioSense keeps them here unless your data stops supporting them.
+            </p>
+          </Card>
+        </>
+      )}
+      <PrivacyStrip />
+    </div>
+  )
+}
+
+function LookFor({ icon: Icon, title, body }: { icon: LucideIcon; title: string; body: string }) {
+  return (
+    <div className="rounded-[16px] px-2 py-3 text-center">
+      <div className="w-9 h-9 rounded-full bg-[rgba(168,191,163,0.18)] flex items-center justify-center mx-auto mb-2">
+        <Icon className="w-4 h-4 text-sage-deep" strokeWidth={2} />
+      </div>
+      <div className="text-[12.5px] font-semibold text-ink">{title}</div>
+      <p className="text-[11.5px] text-ink-2 mt-0.5 leading-snug">{body}</p>
+    </div>
+  )
+}
+
+function SignalsStrip({
+  items,
+}: {
+  items: { icon: LucideIcon; label: string; hint: string }[]
 }) {
   return (
-    <Card variant="premium" padding="lg" className="relative overflow-hidden">
-      <div className="flex items-start gap-4">
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-1.5 text-eyebrow uppercase text-sage-deep mb-2">
-            <Leaf className="w-3 h-3" strokeWidth={2.25} />
-            {eyebrow}
+    <Card padding="lg">
+      <div className="text-[13px] font-semibold text-ink mb-3">Signals behind this</div>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+        {items.map((x) => (
+          <div key={x.label} className="text-center px-1">
+            <div className="w-9 h-9 rounded-full bg-[rgba(168,191,163,0.18)] flex items-center justify-center mx-auto mb-1.5">
+              <x.icon className="w-4 h-4 text-sage-deep" strokeWidth={2} />
+            </div>
+            <div className="text-[11.5px] font-semibold text-ink">{x.label}</div>
+            <div className="text-[10.5px] text-ink-3 leading-snug">{x.hint}</div>
           </div>
-          <div className="font-serif text-[22px] sm:text-[26px] text-ink leading-[1.12] tracking-tight">
-            {lead}{' '}
-            <span className="italic-accent text-[1em] text-sage-deep">{accent}</span>
-          </div>
-          <p className="text-caption text-ink-2 mt-2 leading-snug max-w-[42ch]">{body}</p>
-        </div>
-        <HeroDecoration kind={decoration} />
+        ))}
       </div>
     </Card>
   )
 }
 
-function HeroDecoration({ kind }: { kind: 'leaves' | 'circles' | 'mountains' | 'brain' }) {
-  if (kind === 'circles') {
-    return (
-      <div className="relative w-[88px] h-[88px] shrink-0">
-        <span className="absolute top-1 left-1 w-12 h-12 rounded-full bg-[rgba(111,143,107,0.20)] ring-1 ring-[rgba(111,143,107,0.30)]" />
-        <span className="absolute top-1 right-1 w-12 h-12 rounded-full bg-[rgba(168,191,163,0.20)] ring-1 ring-[rgba(168,191,163,0.30)]" />
-        <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-[rgba(200,214,197,0.22)] ring-1 ring-[rgba(168,191,163,0.30)]" />
-      </div>
-    )
-  }
-  if (kind === 'mountains') {
-    return (
-      <div className="relative w-[88px] h-[88px] shrink-0 rounded-full overflow-hidden ring-1 ring-[rgba(168,191,163,0.40)] shadow-[inset_0_2px_6px_rgba(26,28,26,0.10),0_6px_18px_-6px_rgba(111,143,107,0.30)]">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/insight-mountains.png" alt="" className="w-full h-full object-cover" />
-      </div>
-    )
-  }
-  if (kind === 'brain') {
-    return (
-      <div className="relative w-[88px] h-[88px] shrink-0 rounded-full bg-white/70 ring-1 ring-[rgba(168,191,163,0.40)] shadow-[inset_0_2px_6px_rgba(26,28,26,0.06),0_6px_18px_-6px_rgba(111,143,107,0.25)] flex items-center justify-center">
-        <Brain className="w-9 h-9 text-sage-deep" strokeWidth={1.5} />
-      </div>
-    )
-  }
+function Mini({ source, ok, icon: Icon }: { source: string; ok: boolean; icon: LucideIcon }) {
   return (
-    <div className="relative w-[88px] h-[88px] shrink-0">
-      <Leaf className="absolute top-2 right-6 w-7 h-7 text-sage-deep rotate-[18deg]" strokeWidth={1.5} />
-      <Leaf className="absolute top-8 right-2 w-9 h-9 text-sage rotate-[-12deg]" strokeWidth={1.5} />
-      <Leaf className="absolute bottom-2 right-8 w-5 h-5 text-sage-soft rotate-[35deg]" strokeWidth={1.5} />
+    <div className="text-center px-0.5 min-w-0">
+      <div className="relative inline-flex">
+        <IconBadge icon={Icon} tone={ok ? 'sage' : 'ink'} variant="tint" size="md" />
+        {ok && (
+          <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-sage-deep text-white flex items-center justify-center">
+            <Check className="w-2.5 h-2.5" strokeWidth={3} />
+          </span>
+        )}
+      </div>
+      <div className="text-[11px] font-semibold text-ink mt-1.5 leading-tight">{source}</div>
+      <div className={cn('text-[10px]', ok ? 'text-sage-deep' : 'text-ink-3')}>{ok ? 'Ready' : 'Building'}</div>
     </div>
   )
 }
 
-type TodayDriver = {
-  key: string
-  label: string
-  reason: string
-  impact: Impact
-  icon: LucideIcon
-  tone: Tone
-}
-
-function todayDrivers(checkins: Checkin[], wm: WearableMetrics): TodayDriver[] {
-  if (checkins.length < 2 && wm.hrv == null && wm.steps == null && wm.recovery == null) {
-    return []
-  }
-
-  const drivers: TodayDriver[] = []
-
-  if (checkins.length >= 2) {
-    const recent = checkins.slice(0, 3)
-    const older = checkins.slice(3, 7)
-    const avg = (arr: Checkin[], k: keyof Checkin) =>
-      arr.length ? arr.reduce((s, c) => s + (c[k] as number), 0) / arr.length : 0
-    const dSleep = avg(recent, 'sleep') - (older.length ? avg(older, 'sleep') : avg(recent, 'sleep'))
-    const dStress = avg(recent, 'stress') - (older.length ? avg(older, 'stress') : avg(recent, 'stress'))
-    const dEnergy = avg(recent, 'energy') - (older.length ? avg(older, 'energy') : avg(recent, 'energy'))
-
-    drivers.push({
-      key: 'sleep',
-      label: 'Sleep',
-      reason:
-        dSleep < -0.3
-          ? 'Recent sleep ratings are below your earlier average.'
-          : dSleep > 0.3
-            ? 'Sleep ratings have been trending up versus earlier this week.'
-            : 'Sleep ratings are roughly in line with your recent baseline.',
-      impact: Math.abs(dSleep) >= 1.2 ? 'high' : Math.abs(dSleep) >= 0.5 ? 'moderate' : 'low',
-      icon: Moon,
-      tone: 'violet',
-    })
-    drivers.push({
-      key: 'stress',
-      label: 'Stress',
-      reason:
-        dStress > 0.3
-          ? 'Stress check-ins have been elevated versus earlier days.'
-          : dStress < -0.3
-            ? 'Stress ratings have eased compared with earlier this week.'
-            : 'Stress is close to your recent baseline.',
-      impact: Math.abs(dStress) >= 1.2 ? 'high' : Math.abs(dStress) >= 0.5 ? 'moderate' : 'low',
-      icon: Wind,
-      tone: 'teal',
-    })
-    drivers.push({
-      key: 'energy',
-      label: 'Energy',
-      reason:
-        dEnergy < -0.3
-          ? 'Energy has dipped versus your earlier check-ins.'
-          : dEnergy > 0.3
-            ? 'Energy is trending higher than earlier this week.'
-            : 'Energy is holding near your recent average.',
-      impact: Math.abs(dEnergy) >= 1.2 ? 'high' : Math.abs(dEnergy) >= 0.5 ? 'moderate' : 'low',
-      icon: Activity,
-      tone: 'sky',
-    })
-  }
-
-  if (wm.hrv != null) {
-    drivers.push({
-      key: 'hrv',
-      label: 'HRV',
-      reason: `Latest wearable HRV ≈ ${Math.round(wm.hrv)} ms.`,
-      impact: wm.hrv < 40 ? 'high' : wm.hrv < 55 ? 'moderate' : 'low',
-      icon: Heart,
-      tone: 'rose',
-    })
-  }
-  if (wm.recovery != null) {
-    drivers.push({
-      key: 'recovery',
-      label: 'Recovery',
-      reason: `Latest recovery / readiness ≈ ${Math.round(wm.recovery)}.`,
-      impact: wm.recovery < 40 ? 'high' : wm.recovery < 60 ? 'moderate' : 'low',
-      icon: Activity,
-      tone: 'sage',
-    })
-  }
-  if (wm.steps != null) {
-    drivers.push({
-      key: 'steps',
-      label: 'Activity',
-      reason: `Latest step count ≈ ${Math.round(wm.steps).toLocaleString()}.`,
-      impact: wm.steps < 4000 ? 'moderate' : 'low',
-      icon: Activity,
-      tone: 'sky',
-    })
-  }
-
-  return drivers.slice(0, 5)
+function HeroArt({ kind }: { kind: 'nodes' | 'path' | 'tree' }) {
+  return (
+    <svg viewBox="0 0 120 88" className="w-[88px] sm:w-[108px] h-auto shrink-0 mt-1" aria-hidden>
+      {kind === 'nodes' && (
+        <>
+          <circle cx="60" cy="44" r="34" fill="none" stroke="rgba(168,191,163,0.28)" strokeWidth="1.2" />
+          <circle cx="60" cy="44" r="22" fill="none" stroke="rgba(168,191,163,0.18)" strokeWidth="1" />
+          <circle cx="88" cy="18" r="7" fill="#7DA379" />
+          <text x="88" y="21.5" textAnchor="middle" fill="white" fontSize="9" fontWeight="700">+</text>
+          <circle cx="96" cy="52" r="6" fill="#D9A05B" />
+          <circle cx="78" cy="72" r="6" fill="#8B7BB8" />
+        </>
+      )}
+      {kind === 'path' && (
+        <>
+          <circle cx="60" cy="44" r="38" fill="rgba(168,191,163,0.10)" />
+          <path d="M18 70 C38 62 44 50 60 52 S92 38 108 28" fill="none" stroke="#7DA379" strokeWidth="2.2" strokeLinecap="round" />
+          <circle cx="86" cy="18" r="7" fill="#C9D9C4" />
+        </>
+      )}
+      {kind === 'tree' && (
+        <>
+          <ellipse cx="60" cy="72" rx="28" ry="8" fill="rgba(168,191,163,0.18)" />
+          <path d="M60 72 L60 48" stroke="#5A7556" strokeWidth="2.4" />
+          <circle cx="60" cy="36" r="18" fill="#A8BFA3" />
+          <circle cx="48" cy="40" r="10" fill="#7DA379" />
+          <circle cx="74" cy="38" r="11" fill="#8FB089" />
+        </>
+      )}
+    </svg>
+  )
 }

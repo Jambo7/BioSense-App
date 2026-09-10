@@ -9,8 +9,6 @@ import {
   Moon,
   Wind,
   Heart,
-  Footprints,
-  UtensilsCrossed,
   Leaf,
   Sparkles,
   Trophy,
@@ -99,11 +97,20 @@ export function TrendsClient({ summaries, reportsCount, savedInsights }: TrendsC
       </header>
 
       {showDiscovery && (
-        <DiscoveryCard
-          headline="You recover better"
-          accent="when your sleep is consistent and earlier."
-          detail="Consistent, earlier sleep tends to have the biggest positive impact on your recovery."
-        />
+        savedInsights[0] ? (
+          <DiscoveryCard
+            headline={savedInsights[0].title}
+            accent=""
+            detail={savedInsights[0].body}
+          />
+        ) : (
+          <Card padding="lg">
+            <div className="text-[13px] font-semibold text-ink">Discoveries unlock over time</div>
+            <p className="text-[13px] text-ink-2 mt-1 leading-relaxed">
+              Save an insight from Home or Insights and it will appear here as a shareable card.
+            </p>
+          </Card>
+        )
       )}
 
       {/* Tab strip */}
@@ -204,7 +211,7 @@ function GoalsTab() {
           <p className="text-caption text-ink-3 text-center py-6">Loading goals…</p>
         ) : goals.length === 0 ? (
           <p className="text-caption text-ink-3 text-center py-6">
-            No goals yet — add one above to get started.
+            No goals yet. Add one above to get started.
           </p>
         ) : (
           <div className="space-y-3">
@@ -359,74 +366,50 @@ function TrajectoryTab({ summaries }: { summaries: MetricSummary[] }) {
 
 // ── Tab 3: LIFESTYLE TRENDS ──────────────────────────────────────────────
 function LifestyleTab({ summaries }: { summaries: MetricSummary[] }) {
-  // Real series where available; deterministic mock fallback for everything else
-  // (especially the metrics we don't yet have a wearable feed for).
-  const findSeries = (slug: MetricSlug, fallback: number[]) => {
-    const s = summaries.find((x) => x.slug === slug)
-    return s && s.values.length >= 4 ? s.values : fallback
-  }
+  const rows = summaries
+    .filter((s) => s.points >= 4 && s.latest != null)
+    .map((s) => {
+      const iconMap: Record<string, LucideIcon> = {
+        sleep: Moon,
+        stress: Wind,
+        mood: Heart,
+        energy: Heart,
+        score: TrendingUp,
+      }
+      return {
+        key: s.slug,
+        icon: iconMap[s.slug] ?? Heart,
+        title: s.label,
+        value: s.latest != null ? `${Math.round(s.latest)}${s.unit}` : 'Building',
+        delta: s.delta != null ? `${s.delta > 0 ? '+' : ''}${Math.round(s.delta)}` : 'Building',
+        deltaPositive: s.improving !== false,
+        tone: (s.improving === false ? 'amber' : 'sage') as 'sage' | 'amber',
+        series: s.values,
+      }
+    })
 
-  const lifestyle: {
-    key: string
-    icon: LucideIcon
-    title: string
-    value: string
-    delta: string
-    deltaPositive: boolean
-    tone: 'sage' | 'amber' | 'rose'
-    series: number[]
-  }[] = [
-    {
-      key: 'sleep_consistency',
-      icon: Moon,
-      title: 'Sleep consistency',
-      value: '78%',
-      delta: '+16%',
-      deltaPositive: true,
-      tone: 'sage',
-      series: findSeries('sleep', [6, 6.5, 7, 7.2, 7.4, 7.6, 7.5, 7.8]),
-    },
-    {
-      key: 'stress',
-      icon: Wind,
-      title: 'Stress levels',
-      value: 'Low-Mod',
-      delta: '-12%',
-      deltaPositive: true,
-      tone: 'sage',
-      series: findSeries('stress', [7, 6.5, 6, 5.5, 5.5, 5, 4.8, 4.5]).map((v) => 10 - v),
-    },
-    {
-      key: 'activity',
-      icon: Footprints,
-      title: 'Activity',
-      value: '7,842 steps',
-      delta: '-5%',
-      deltaPositive: false,
-      tone: 'amber',
-      series: [7200, 8400, 7800, 9100, 8200, 7500, 7800, 7842],
-    },
-    {
-      key: 'nutrition',
-      icon: UtensilsCrossed,
-      title: 'Nutrition',
-      value: 'Good',
-      delta: '+9%',
-      deltaPositive: true,
-      tone: 'sage',
-      series: [62, 65, 68, 70, 72, 74, 75, 76],
-    },
-    {
-      key: 'recovery',
-      icon: Heart,
-      title: 'Recovery',
-      value: '68 avg',
-      delta: '+11%',
-      deltaPositive: true,
-      tone: 'sage',
-      series: findSeries('mood', [55, 58, 60, 62, 64, 66, 67, 68]),
-    },
-  ]
+  if (rows.length === 0) {
+    return (
+      <div className="space-y-5">
+        <HeroIntroCard
+          eyebrow="Lifestyle trends"
+          lead="Your key habits"
+          accent="unlock with consistent days."
+          body="Sleep, stress, recovery and activity trends appear here once BioSense has enough of your own data. Nothing is filled in until then."
+          decoration="leaves"
+        />
+        <Card padding="lg">
+          <p className="text-[13px] text-ink-2 leading-relaxed">
+            Connect a wearable and add today&apos;s context. Lifestyle trends stay locked until there
+            is a real series to show.
+          </p>
+          <Link href="/context" className="inline-flex text-[13px] font-semibold text-sage-deep mt-3">
+            Add today&apos;s context →
+          </Link>
+        </Card>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-5">
@@ -440,7 +423,7 @@ function LifestyleTab({ summaries }: { summaries: MetricSummary[] }) {
 
       <Card variant="glass" padding="lg">
         <div className="space-y-3">
-          {lifestyle.map((l) => (
+          {rows.map((l) => (
             <div
               key={l.key}
               className="flex items-center gap-3 sm:gap-4 p-3 sm:p-3.5 rounded-card tile"

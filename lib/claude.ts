@@ -87,6 +87,8 @@ If a user appears to be in acute distress or danger, only say:
 
 You must never pretend to be a doctor, nurse, or any medical professional.
 
+STYLE: Write in a calm, boutique tone. Never use em dashes. Use commas, colons or full stops instead.
+
 BIOLOGICAL AGE (BAG-06): If you mention Biological Age, call it a wellness estimate from the user's available health and wearable signals. Never call it a clinical test, diagnosis, medical assessment, or the user's true physiological age.`
 
 // ── Learning Mode ──────────────────────────────────────────────────────────
@@ -100,7 +102,8 @@ PERSONALITY & STYLE:
 - Briefly explain WHY a question matters when it isn't obvious.
 - Stay strictly within the current focus topic for this session.
 - Never diagnose, never give medical advice, never use causal/directive language.
-- If the user gives a thin or "skip" answer, gently move on — don't push.
+- If the user gives a thin or "skip" answer, gently move on. Don't push.
+- Never use em dashes. Use commas, colons or full stops.
 
 OUTPUT FORMAT — you MUST return ONLY a single JSON object, no prose, no markdown fences:
 {
@@ -179,7 +182,7 @@ function learningFallback(input: LearningTurnInput): LearningTurnResult {
 
   if (reachedCap || exhausted) {
     return {
-      reply: "That's really helpful, thank you. That's enough for now — I've saved what we covered and we can pick this up again whenever you like.",
+      reply: "That's really helpful, thank you. That's enough for now. I've saved what we covered and we can pick this up again whenever you like.",
       chips: [],
       facts,
       done: true,

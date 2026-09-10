@@ -19,7 +19,7 @@ const dmSerif = DM_Serif_Display({
 })
 
 export const metadata: Metadata = {
-  title: 'BioSense — Understand your biology. Live your best.',
+  title: 'BioSense. Understand your biology. Live your best.',
   description:
     'Personalised health intelligence. Sleep better, recover faster, perform stronger.',
   appleWebApp: {

@@ -54,8 +54,8 @@ type NavItem = {
 // Per v7 spec: page concept renamed Today → Home; bottom-tab order
 // flipped so Trends sits last (Biomarkers shifts left of Trends).
 const navItems: NavItem[] = [
-  { href: '/dashboard', label: 'Home',       icon: Sun,           matchPaths: ['/dashboard', '/checkin'], tourId: 'home' },
-  { href: '/insights',  label: 'Insights',   icon: Lightbulb,     tourId: 'insights' },
+  { href: '/dashboard', label: 'Home',       icon: Sun,           matchPaths: ['/dashboard', '/checkin', '/context'], tourId: 'home' },
+  { href: '/insights',  label: 'Insights',   icon: Lightbulb,     matchPaths: ['/insights'], tourId: 'insights' },
   { href: '/chat',      label: 'AI',         icon: Sparkles,      center: true, tourId: 'ai' },
   { href: '/blood',     label: 'Biomarkers', icon: FlaskConical,  matchPaths: ['/blood', '/biomarkers'], tourId: 'biomarkers' },
   { href: '/reports',   label: 'Trends',     icon: TrendingUp,    tourId: 'trends' },

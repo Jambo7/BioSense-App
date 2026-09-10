@@ -128,10 +128,10 @@ export default function GoalDetailPage() {
       <Card padding="md" variant="soft">
         <CardLabel className="mb-2">Data helping this goal</CardLabel>
         <ul className="text-caption text-ink-2 space-y-1.5 leading-snug">
-          <li>Daily check-ins — energy, sleep, mood and stress</li>
-          <li>Wearable sync — recovery, activity and sleep patterns</li>
-          <li>Learning Mode — lifestyle context and priorities</li>
-          <li>Blood results — biomarker trends where relevant</li>
+          <li>Today&apos;s Context: energy, sleep, mood and stress</li>
+          <li>Wearable sync: recovery, activity and sleep patterns</li>
+          <li>Learning Mode: lifestyle context and priorities</li>
+          <li>Blood results: biomarker trends where relevant</li>
         </ul>
       </Card>
     </div>

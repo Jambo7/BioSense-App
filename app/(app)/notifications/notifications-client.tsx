@@ -57,7 +57,7 @@ export function NotificationsClient({ initial }: { initial: Notif[] }) {
           Your <span className="italic-accent">updates.</span>
         </h1>
         <p className="text-body-sm text-ink-2 mt-2">
-          In-app updates appear here. On iPhone you can also turn on a daily check-in reminder.
+          In-app updates appear here. On iPhone you can also turn on a daily context reminder.
         </p>
       </header>
 

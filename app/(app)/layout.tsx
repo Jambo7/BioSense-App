@@ -47,7 +47,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           <footer className="hidden lg:block fixed bottom-0 left-0 right-0 pointer-events-none z-10">
             <div className="max-w-5xl mx-auto px-4 pb-3 text-right">
               <span className="text-micro text-ink-3 glass px-2.5 py-1 rounded-pill">
-                Educational insights only — not medical advice
+                Educational insights only, not medical advice
               </span>
             </div>
           </footer>

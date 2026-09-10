@@ -124,7 +124,7 @@ export default function SignupPage() {
         <span className="italic-accent">health journey.</span>
       </h2>
       <p className="text-body-sm text-ink-2 mb-7 leading-relaxed">
-        Your data stays private. Educational insights only — never medical advice.
+        Your data stays private. Educational insights only, never medical advice.
       </p>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">

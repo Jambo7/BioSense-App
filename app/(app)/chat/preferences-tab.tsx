@@ -123,7 +123,7 @@ export function PreferencesTab() {
         <div className="mb-3 px-1">
           <h2 className="font-sans text-h3 text-ink tracking-tight">What BioSense knows about you</h2>
           <p className="text-caption text-ink-2 mt-0.5">
-            Built from Learning Mode and your registration — {facts.length} thing{facts.length === 1 ? '' : 's'} learned so far.
+            Built from Learning Mode and your registration. {facts.length} thing{facts.length === 1 ? '' : 's'} learned so far.
           </p>
         </div>
 
@@ -155,7 +155,7 @@ export function PreferencesTab() {
       <section>
         <div className="mb-3 px-1">
           <h2 className="font-sans text-h3 text-ink tracking-tight">Everything I&apos;ve learned</h2>
-          <p className="text-caption text-ink-2 mt-0.5">Edit or delete anything — you&apos;re always in control.</p>
+          <p className="text-caption text-ink-2 mt-0.5">Edit or delete anything. You&apos;re always in control.</p>
         </div>
 
         <Card padding="none" className="divide-y divide-line shadow-[0_1px_2px_rgba(26,28,26,0.04),0_8px_24px_-12px_rgba(111,143,107,0.20)]">

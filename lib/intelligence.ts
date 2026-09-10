@@ -257,7 +257,7 @@ function genWatchList(days: DayRow[]): InsightCandidate | null {
       return {
         type: 'WATCH_LIST',
         title: 'Resting heart rate drifting up',
-        body: `Your resting heart rate has been drifting upward over the last couple of weeks — a little higher than where it started. Not an alarm, but worth watching: extra sleep and easier training days usually bring it back down.`,
+        body: `Your resting heart rate has been drifting upward over the last couple of weeks, a little higher than where it started. Not an alarm, but worth watching: extra sleep and easier training days usually bring it back down.`,
         data: { series: rhr.map((p) => p.y), metric: 'rhr' },
         dedupeKey: `watch:rhr:${isoWeekKey()}`,
       }
@@ -274,7 +274,7 @@ function genWatchList(days: DayRow[]): InsightCandidate | null {
       return {
         type: 'WATCH_LIST',
         title: 'HRV trending down',
-        body: `Your HRV has been trending down over the last couple of weeks. That often tracks with accumulated stress or lighter sleep — worth keeping an eye on recovery this week.`,
+        body: `Your HRV has been trending down over the last couple of weeks. That often tracks with accumulated stress or lighter sleep. Worth keeping an eye on recovery this week.`,
         data: { series: hrv.map((p) => p.y), metric: 'hrv' },
         dedupeKey: `watch:hrv:${isoWeekKey()}`,
       }
@@ -301,7 +301,7 @@ function genNewDiscovery(patterns: PatternRow[]): InsightCandidate | null {
   return {
     type: 'NEW_DISCOVERY',
     title: 'A new pattern in your data',
-    body: `${newest.description}. Detected from your own check-ins (${newest.confidence.toLowerCase()} confidence) — it will sharpen as more data comes in.`,
+    body: `${newest.description}. Detected from your own context days (${newest.confidence.toLowerCase()} confidence). It will sharpen as more data comes in.`,
     data: { patternId: newest.id, confidence: newest.confidence },
     dedupeKey: `discovery:${newest.id}`,
   }
@@ -358,8 +358,8 @@ function genProjection(scores: ScoreRow[]): InsightCandidate | null {
     type: 'PROJECTION',
     title: rising ? 'Your trajectory is heading the right way' : 'Your trajectory is easing off',
     body: rising
-      ? 'If your recent habits hold, your Health Score looks set to keep building over the coming weeks. This is the direction your own data is pointing — not a fixed target — and it moves as your data does.'
-      : 'Your recent trend has your Health Score drifting gently downward. Nothing dramatic — a run of consistent days usually turns the direction back around.',
+      ? 'If your recent habits hold, your Health Score looks set to keep building over the coming weeks. This is the direction your own data is pointing, not a fixed target, and it moves as your data does.'
+      : 'Your recent trend has your Health Score drifting gently downward. Nothing dramatic. A run of consistent days usually turns the direction back around.',
     data: {
       series: sorted.slice(-14).map((s) => Math.round(s.score)),
     },
@@ -407,7 +407,7 @@ function genLongTermTrend(
       return {
         type: 'LONG_TERM_TREND',
         title: delta > 0 ? 'Your sleep is building' : 'Sleep has been sliding',
-        body: `Over the last couple of months your average night's sleep has gone from ${formatHours(from)} to ${formatHours(to)} — ${delta > 0 ? 'up' : 'down'} ${formatMinutesDelta(delta)} a night.`,
+        body: `Over the last couple of months your average night's sleep has gone from ${formatHours(from)} to ${formatHours(to)}, ${delta > 0 ? 'up' : 'down'} ${formatMinutesDelta(delta)} a night.`,
         data: { series: sleep.map((p) => p.y), metric: 'sleepHours' },
         dedupeKey: `trend:sleep:${monthKey()}`,
       }

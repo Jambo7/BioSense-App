@@ -2,7 +2,7 @@
 
 import { useRef } from 'react'
 import { Brain, Share2 } from 'lucide-react'
-import { IntelligenceMark } from '@/components/brand-mark'
+import { BrandMark } from '@/components/brand-mark'
 import { cn } from '@/lib/utils'
 
 interface DiscoveryCardProps {
@@ -17,7 +17,7 @@ export function DiscoveryCard({ headline, accent, detail, className }: Discovery
   const cardRef = useRef<HTMLDivElement>(null)
 
   async function handleShare() {
-    const text = `${headline} ${accent} — ${detail} #MyBioSense`
+    const text = `${headline} ${accent}. ${detail} #MyBioSense`
     if (navigator.share) {
       try {
         await navigator.share({ title: 'BioSense Discovered', text })
@@ -41,7 +41,7 @@ export function DiscoveryCard({ headline, accent, detail, className }: Discovery
       >
         <div className="absolute top-0 right-0 w-32 h-32 bg-[radial-gradient(circle,rgba(168,191,163,0.25)_0%,transparent_70%)]" aria-hidden />
         <div className="relative text-center">
-          <IntelligenceMark size="md" className="mx-auto mb-4" />
+          <BrandMark size={28} className="mx-auto mb-4" />
           <div className="flex items-center justify-center gap-1.5 text-eyebrow uppercase text-sage-deep mb-3">
             <Brain className="w-3.5 h-3.5" strokeWidth={2.25} />
             BioSense Discovered
@@ -55,9 +55,7 @@ export function DiscoveryCard({ headline, accent, detail, className }: Discovery
           </p>
           <div className="mt-6 pt-4 border-t border-line flex items-center justify-between gap-3">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-sage-deep flex items-center justify-center text-white text-[11px] font-bold">
-                B
-              </div>
+              <BrandMark size={28} />
               <span className="text-[11px] text-ink-2">Small consistent actions create powerful change.</span>
             </div>
             <span className="text-[11px] font-semibold text-sage-deep">#MyBioSense</span>

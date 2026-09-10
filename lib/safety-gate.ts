@@ -106,5 +106,5 @@ export function enforceOutputSafety(text: string): string {
 }
 
 export function degradedSafetyReply(): string {
-  return `BioSense AI is temporarily unavailable. Your data is still saved — try again in a moment.\n\n${DISCLAIMER}`
+  return `BioSense AI is temporarily unavailable. Your data is still saved. Try again in a moment.\n\n${DISCLAIMER}`
 }

@@ -27,7 +27,7 @@ export async function sendWelcomeEmail(userId: string, firstName: string) {
       body: 'Unlock deeper biomarker analysis, personalised trend tracking and clear explanations of what your biomarkers mean, why they matter and how they may relate to your health.',
     },
     {
-      title: 'Complete your Daily Check-ins',
+      title: "Add Today's Context",
       body: 'Help BioSense understand how you actually feel, not just what your wearable data says.',
     },
   ]
@@ -124,7 +124,7 @@ export async function sendPasswordResetEmail(userId: string, name: string, url: 
           <p style="font-size:14px;line-height:1.7;color:#3A3F37;margin:0 0 14px;">Hi ${firstName},</p>
           <p style="font-size:14px;line-height:1.7;color:#3A3F37;margin:0 0 18px;">We received a request to reset your BioSense password. Click the button below to choose a new one. This link expires in 1 hour.</p>
           <a href="${url}" style="display:inline-block;padding:12px 24px;background:linear-gradient(180deg,#7DA277 0%,#6F8F6B 100%);color:#ffffff;font-weight:700;font-size:14px;text-decoration:none;border-radius:999px;">Reset my password &rarr;</a>
-          <p style="font-size:12px;line-height:1.6;color:#8A8F84;margin:20px 0 0;">If you didn&rsquo;t request this, you can safely ignore this email — your password won&rsquo;t change.</p>
+          <p style="font-size:12px;line-height:1.6;color:#8A8F84;margin:20px 0 0;">If you didn&rsquo;t request this, you can safely ignore this email. Your password won&rsquo;t change.</p>
         </td>
       </tr>
       <tr>

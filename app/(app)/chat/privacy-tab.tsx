@@ -80,8 +80,8 @@ export function PrivacyTab() {
           <div className="flex-1 min-w-0">
             <div className="text-[13px] font-semibold text-ink leading-tight">How I use your data</div>
             <p className="text-caption text-ink-2 leading-snug mt-1">
-              Personalised insights and recommendations based on your wearables, blood results and check-ins.
-              Your data is used only to improve your experience — never sold to third parties.
+              Personalised insights and recommendations based on your wearables, blood results and context.
+              Your data is used only to improve your experience, never sold to third parties.
             </p>
           </div>
         </div>

@@ -45,8 +45,8 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
 
             <p className="text-body text-ink-2 max-w-[42ch]">
               Personalised insights that help you sleep better, recover faster
-              and perform at your best — built from your wearables, blood
-              results and daily check-ins.
+              and perform at your best, built from your wearables, blood
+              results and today&apos;s context.
             </p>
 
             {/* Stats row */}

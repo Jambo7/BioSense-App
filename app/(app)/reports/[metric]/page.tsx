@@ -279,18 +279,18 @@ function EmptyState({ slug }: { slug: MetricSlug }) {
   return (
     <Card padding="lg" className="text-center">
       <div className="font-sans text-h3 text-ink mb-2">
-        {isScore ? 'No score history yet' : 'Not enough check-ins yet'}
+        {isScore ? 'No score history yet' : 'Not enough context yet'}
       </div>
       <p className="text-caption text-ink-2 max-w-[40ch] mx-auto leading-relaxed">
         {isScore
-          ? 'Your composite health score builds after a few daily check-ins.'
-          : 'Log a few daily check-ins and your trend chart will appear here.'}
+          ? 'Your composite health score builds after a few days of context and wearable data.'
+          : 'Add a few days of context and your trend chart will appear here.'}
       </p>
       <Link
-        href="/checkin"
+        href="/context"
         className="btn-sage mt-5 inline-flex items-center gap-1.5 h-10 px-4 rounded-pill font-semibold text-caption"
       >
-        Start a check-in
+        Start today&apos;s context
       </Link>
     </Card>
   )

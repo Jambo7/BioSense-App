@@ -131,9 +131,9 @@ export async function POST(req: NextRequest) {
 
     const bioAgeSummary = bioUnlock.unlocked
       ? latestBioAge
-        ? `Unlocked — wellness estimate ${latestBioAge.bioAge} (calendar ${latestBioAge.calendarAge}, delta ${latestBioAge.delta >= 0 ? '+' : ''}${latestBioAge.delta}). Not a clinical or diagnostic age.`
+        ? `Unlocked. Wellness estimate ${latestBioAge.bioAge} (calendar ${latestBioAge.calendarAge}, delta ${latestBioAge.delta >= 0 ? '+' : ''}${latestBioAge.delta}). Not a clinical or diagnostic age.`
         : `Unlocked (day ${bioUnlock.trackingDays}/${bioUnlock.unlockDays}) but not enough signals yet (need ≥${MATURITY.BIO_AGE_MIN_SIGNALS} of HRV/RHR/sleep/energy)`
-      : `Locked — day ${bioUnlock.trackingDays} of ${bioUnlock.unlockDays} tracking`
+      : `Locked. Day ${bioUnlock.trackingDays} of ${bioUnlock.unlockDays} tracking`
 
     // Build context string
     const checkinSummary =

@@ -132,7 +132,7 @@ function WearablePreview({ state }: { state: PreviewState | undefined }) {
   if (state.status === 'error') {
     return (
       <div className="text-caption text-ink-3 py-2">
-        Couldn’t load a preview right now — please try again shortly.
+        Couldn’t load a preview right now. Please try again shortly.
       </div>
     )
   }
@@ -147,7 +147,7 @@ function WearablePreview({ state }: { state: PreviewState | undefined }) {
     return (
       <div className="flex items-center gap-2 text-caption text-ink-3 py-2">
         <RefreshCw className="w-3.5 h-3.5" />
-        Connected — syncing your first readings. Fresh data usually lands within a few hours.
+        Connected. Syncing your first readings. Fresh data usually lands within a few hours.
       </div>
     )
   }
@@ -255,8 +255,8 @@ export default function WearablesPage() {
       }
       toast.success(
         result.dayCount > 0
-          ? `Apple Health synced — ${result.dayCount} day${result.dayCount === 1 ? '' : 's'}`
-          : 'Apple Health connected. No readings in the last two weeks yet — wear your Watch and sync again tomorrow.',
+          ? `Apple Health synced, ${result.dayCount} day${result.dayCount === 1 ? '' : 's'}`
+          : 'Apple Health connected. No readings in the last two weeks yet. Wear your Watch and sync again tomorrow.',
       )
       const res2 = await fetch('/api/wearables', { cache: 'no-store' })
       setConnected(await res2.json())

@@ -261,13 +261,13 @@ function summariseMarkers(markers: VMarker[]): { accent: string; body: string } 
   if (t3.length > 0) {
     return {
       accent: 'worth some attention.',
-      body: `${nameList(t3)} ${t3.length === 1 ? 'is' : 'are'} outside the optimal range — open Recommendations for specific actions.`,
+      body: `${nameList(t3)} ${t3.length === 1 ? 'is' : 'are'} outside the optimal range. Open Recommendations for specific actions.`,
     }
   }
   if (t2.length > 0) {
     return {
       accent: 'balanced overall.',
-      body: `${nameList(t2)} could be optimised — see Recommendations for next steps.`,
+      body: `${nameList(t2)} could be optimised. See Recommendations for next steps.`,
     }
   }
   return {
@@ -372,7 +372,7 @@ function ListTab({
               return (
                 <div key={category.id}>
                   <div className="text-eyebrow uppercase text-ink-3 mb-1.5">{category.label}</div>
-                  <p className="text-[11.5px] text-ink-3 italic px-1">No biomarkers yet — upload a result to populate this section.</p>
+                  <p className="text-[11.5px] text-ink-3 italic px-1">No biomarkers yet. Upload a result to populate this section.</p>
                 </div>
               )
             }
@@ -505,7 +505,7 @@ function ComparisonsOverview({
         eyebrow="Comparisons overview"
         lead="See how your results compare"
         accent="to key reference points."
-        body="These comparisons help you understand your results in context — against your own baseline, the optimal range, and the population average."
+        body="These comparisons help you understand your results in context: against your own baseline, the optimal range, and the population average."
         decoration="leaves"
       />
 
@@ -867,7 +867,7 @@ function ExplanationsCatalogue({
         eyebrow="Understand your biomarkers"
         lead="Learn what your biomarkers mean"
         accent="and why they matter."
-        body="Browse every biomarker we track, by category — clear, science-backed explanations in plain language."
+        body="Browse every biomarker we track, by category. Clear, science-backed explanations in plain language."
         decoration="leaves"
       />
 

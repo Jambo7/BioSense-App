@@ -36,8 +36,8 @@ export function calcBiologicalAge(input: BioAgeInput): BioAgeResult {
     const diff = input.hrv - expectedHrv
     const adjustment = -(diff / expectedHrv) * 5 // ±5 years max
     ageAdjustment += adjustment * 0.30
-    if (diff > 5) positive.push(`HRV ${input.hrv.toFixed(0)}ms — above expected`)
-    else if (diff < -5) negative.push(`HRV ${input.hrv.toFixed(0)}ms — below expected`)
+    if (diff > 5) positive.push(`HRV ${input.hrv.toFixed(0)}ms, above expected`)
+    else if (diff < -5) negative.push(`HRV ${input.hrv.toFixed(0)}ms, below expected`)
   }
 
   // RHR contribution (weight: 25%)
@@ -46,8 +46,8 @@ export function calcBiologicalAge(input: BioAgeInput): BioAgeResult {
     const diff = input.rhr - idealRhr // positive = worse
     const adjustment = (diff / idealRhr) * 4 // ±4 years max
     ageAdjustment += adjustment * 0.25
-    if (diff < -5) positive.push(`Resting HR ${input.rhr}bpm — excellent`)
-    else if (diff > 15) negative.push(`Resting HR ${input.rhr}bpm — elevated`)
+    if (diff < -5) positive.push(`Resting HR ${input.rhr}bpm, excellent`)
+    else if (diff > 15) negative.push(`Resting HR ${input.rhr}bpm, elevated`)
   }
 
   // VO2max contribution (weight: 30%)
@@ -57,8 +57,8 @@ export function calcBiologicalAge(input: BioAgeInput): BioAgeResult {
     const diff = input.vo2max - expectedVo2
     const adjustment = -(diff / expectedVo2) * 6 // ±6 years max
     ageAdjustment += adjustment * 0.30
-    if (diff > 5) positive.push(`VO2max ${input.vo2max.toFixed(0)} ml/kg/min — above average`)
-    else if (diff < -5) negative.push(`VO2max ${input.vo2max.toFixed(0)} ml/kg/min — below average`)
+    if (diff > 5) positive.push(`VO2max ${input.vo2max.toFixed(0)} ml/kg/min, above average`)
+    else if (diff < -5) negative.push(`VO2max ${input.vo2max.toFixed(0)} ml/kg/min, below average`)
   }
 
   // Sleep quality contribution (weight: 15%)
@@ -66,8 +66,8 @@ export function calcBiologicalAge(input: BioAgeInput): BioAgeResult {
     const diff = input.sleepAvg - 7 // ideal 7/10
     const adjustment = -(diff / 7) * 2 // ±2 years
     ageAdjustment += adjustment * 0.15
-    if (diff > 1) positive.push(`Sleep quality ${input.sleepAvg.toFixed(1)}/10 — good`)
-    else if (diff < -2) negative.push(`Sleep quality ${input.sleepAvg.toFixed(1)}/10 — needs attention`)
+    if (diff > 1) positive.push(`Sleep quality ${input.sleepAvg.toFixed(1)}/10, good`)
+    else if (diff < -2) negative.push(`Sleep quality ${input.sleepAvg.toFixed(1)}/10, needs attention`)
   }
 
   const bioAge = Math.max(18, Math.round(calendarAge + ageAdjustment))

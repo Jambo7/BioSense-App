@@ -86,7 +86,7 @@ export default function BloodUploadPage() {
         return
       }
 
-      toast.success(`Analysis complete — ${data.markerCount} biomarkers extracted`)
+      toast.success(`Analysis complete. ${data.markerCount} biomarkers extracted`)
       router.push('/blood')
     } catch {
       toast.error('Upload failed. Please try again.')
@@ -251,7 +251,7 @@ export default function BloodUploadPage() {
             <p className="text-caption text-ink-2 leading-relaxed mb-4">
               By uploading blood test results, you confirm that the data is yours (or you have
               permission to use it), and you understand that BioSense provides educational
-              insights only — not medical diagnosis or treatment advice.
+              insights only, not medical diagnosis or treatment advice.
             </p>
             <label className="flex items-start gap-2.5 mb-5 cursor-pointer">
               <input

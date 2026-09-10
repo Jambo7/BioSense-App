@@ -61,7 +61,7 @@ export default function TutorialPage() {
       </h1>
       <p className="text-body text-ink-2 leading-relaxed mb-6">
         Rather than just reading about BioSense, let me walk you through it live. I&apos;ll
-        highlight each part of the app, explain what it does, and let you tap along as we go —
+        highlight each part of the app, explain what it does, and let you tap along as we go,
         so by the end you&apos;ll know exactly where everything lives.
       </p>
 

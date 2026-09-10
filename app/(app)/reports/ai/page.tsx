@@ -3,25 +3,15 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import {
-  FileText,
   CalendarDays,
   CalendarClock,
   Bell,
-  TrendingDown,
-  Sparkles,
-  Lightbulb,
-  Target,
-  Scale,
-  Eye,
-  CheckCircle2,
   ChevronRight,
   ChevronLeft,
 } from 'lucide-react'
 import { Card, CardLabel } from '@/components/ui/card'
 import { IconBadge } from '@/components/ui/icon-badge'
 import { Pill } from '@/components/ui/pill'
-import { ScoreRing } from '@/components/ui/score-ring'
-import { BarStrip } from '@/components/ui/spark-line'
 
 export default async function AiReportsPage() {
   const session = await getServerSession(authOptions)
@@ -52,7 +42,6 @@ export default async function AiReportsPage() {
         Back to Trends
       </Link>
 
-      {/* Page header */}
       <header className="flex items-start justify-between gap-4">
         <div>
           <div className="text-eyebrow uppercase text-sage-deep mb-1">
@@ -63,13 +52,12 @@ export default async function AiReportsPage() {
             <span className="italic-accent">health reports.</span>
           </h1>
           <p className="text-body text-ink-2 mt-2 max-w-[58ch] leading-relaxed">
-            Weekly and monthly AI-generated insights — automatically delivered Sunday 7am
+            Weekly and monthly AI-generated insights, automatically delivered Sunday 7am
             and on the final day of each month.
           </p>
         </div>
       </header>
 
-      {/* Push notification card (matches moodboard) */}
       <Card padding="md" className="flex items-center gap-3">
         <IconBadge icon={Bell} size="md" tone="sage" />
         <div className="flex-1 min-w-0">
@@ -77,7 +65,7 @@ export default async function AiReportsPage() {
             Notify me when reports drop
           </div>
           <div className="text-caption text-ink-2 leading-snug">
-            Push notification at 7am every Sunday & end of month
+            Push notification at 7am every Sunday and end of month
           </div>
         </div>
         <div className="w-10 h-6 rounded-pill bg-sage relative shrink-0">
@@ -85,10 +73,8 @@ export default async function AiReportsPage() {
         </div>
       </Card>
 
-      {/* Empty state — show a preview of what reports look like */}
-      {!hasAnyReports && <SampleWeeklyReport />}
+      {!hasAnyReports && <LockedReports />}
 
-      {/* Weekly reports list */}
       {weeklyReports.length > 0 && (
         <section>
           <div className="flex items-center gap-2 mb-3">
@@ -113,7 +99,7 @@ export default async function AiReportsPage() {
                       <div className="flex items-center gap-2 mb-1.5">
                         <CardLabel className="mb-0">Week {r.period}</CardLabel>
                         <Pill tone="soft-sage" size="sm">
-                          {r.checkinsCompleted ?? 0}/7 check-ins
+                          {r.checkinsCompleted ?? 0}/7 context days
                         </Pill>
                       </div>
                       <p className="text-body text-ink font-medium leading-snug truncate">
@@ -143,7 +129,6 @@ export default async function AiReportsPage() {
         </section>
       )}
 
-      {/* Monthly reports list */}
       {monthlyReports.length > 0 && (
         <section>
           <div className="flex items-center gap-2 mb-3">
@@ -187,7 +172,6 @@ export default async function AiReportsPage() {
         </section>
       )}
 
-      {/* Schedule reference */}
       <Card variant="soft" padding="md">
         <CardLabel>Report schedule</CardLabel>
         <div className="grid sm:grid-cols-2 gap-4 mt-2">
@@ -195,7 +179,7 @@ export default async function AiReportsPage() {
             <IconBadge icon={CalendarDays} tone="sage" size="sm" />
             <div className="text-caption text-ink-2 leading-relaxed">
               <div className="text-body-sm text-ink font-semibold">Weekly</div>
-              Sunday 7am · headline, what changed, why it happened, 3 actions, effort vs
+              Sunday 7am. Headline, what changed, why it happened, 3 actions, effort vs
               impact, best/worst day.
             </div>
           </div>
@@ -203,7 +187,7 @@ export default async function AiReportsPage() {
             <IconBadge icon={CalendarClock} tone="amber" size="sm" />
             <div className="text-caption text-ink-2 leading-relaxed">
               <div className="text-body-sm text-ink font-semibold">Monthly</div>
-              Last day of month · progress graphs, patterns, personal drivers, biological
+              Last day of month. Progress graphs, patterns, personal drivers, biological
               age trend.
             </div>
           </div>
@@ -213,191 +197,23 @@ export default async function AiReportsPage() {
   )
 }
 
-/**
- * Sample weekly report preview rendered when the user has none yet.
- */
-function SampleWeeklyReport() {
-  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-  const dayValues = [85, 78, 70, 45, 65, 80, 76]
-
+function LockedReports() {
   return (
     <section>
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <IconBadge icon={FileText} tone="sage" size="sm" />
-          <h2 className="text-h2 text-ink">Sample weekly report</h2>
-        </div>
-        <Pill tone="ink" size="sm">
-          Preview · not your data
-        </Pill>
-      </div>
-
-      <Card padding="lg" className="space-y-6">
-        {/* Hero callout */}
-        <div className="rounded-[12px] bg-rose-tint border border-[rgba(201,122,122,0.25)] p-5 flex items-center gap-5">
-          <ScoreRing value={42} size={108} thickness={8} tone="rose" label="Energy score" />
-          <div className="flex-1">
-            <div className="flex items-center gap-2 text-rose mb-1">
-              <TrendingDown className="w-4 h-4" />
-              <span className="text-caption font-semibold">↓ 21% vs last week</span>
-            </div>
-            <p className="text-body text-ink leading-snug">
-              Your energy dropped this week — mainly driven by{' '}
-              <span className="font-semibold">inconsistent sleep</span> and{' '}
-              <span className="font-semibold">rising stress mid-week</span>.
-            </p>
-          </div>
-        </div>
-
-        {/* What changed + why it happened */}
-        <div className="grid md:grid-cols-2 gap-4">
-          <Card variant="soft" padding="md">
-            <div className="flex items-center gap-2 mb-3">
-              <IconBadge icon={TrendingDown} tone="rose" size="sm" />
-              <span className="text-h3 text-ink">What changed</span>
-            </div>
-            <div className="space-y-2">
-              {[
-                { label: 'Energy', delta: '↓ 21%' },
-                { label: 'Sleep consistency', delta: '↓ 26%' },
-                { label: 'Stress', delta: '↑ 18%' },
-                { label: 'Resting heart rate', delta: '↑ 3 bpm' },
-              ].map((r) => (
-                <div key={r.label} className="flex items-center justify-between text-body-sm">
-                  <span className="text-ink-2">{r.label}</span>
-                  <span className="text-rose font-semibold">{r.delta}</span>
-                </div>
-              ))}
-            </div>
-          </Card>
-
-          <Card variant="soft" padding="md">
-            <div className="flex items-center gap-2 mb-3">
-              <IconBadge icon={Lightbulb} tone="amber" size="sm" />
-              <span className="text-h3 text-ink">Why it happened</span>
-            </div>
-            <p className="text-body-sm text-ink-2 leading-[1.65]">
-              Your sleep window shifted later in the week (Tue–Thu), with bedtimes moving
-              60–90 minutes later than usual. This compounded mid-week stress and likely
-              drove the dip in recovery.
-            </p>
-          </Card>
-        </div>
-
-        {/* Actions + effort vs impact */}
-        <div className="grid md:grid-cols-2 gap-4">
-          <Card variant="soft" padding="md">
-            <div className="flex items-center gap-2 mb-3">
-              <IconBadge icon={Target} tone="sage" size="sm" />
-              <span className="text-h3 text-ink">Your 3 actions</span>
-            </div>
-            <ol className="space-y-2.5">
-              {[
-                'Lock your sleep window — in bed by 11pm, ≥4 nights',
-                'No caffeine after 2pm',
-                'Add 2 light recovery sessions (walk, mobility)',
-              ].map((a, i) => (
-                <li key={a} className="flex items-start gap-2.5 text-body-sm text-ink-2">
-                  <span className="w-5 h-5 rounded-full bg-sage text-white text-[11px] font-semibold flex items-center justify-center shrink-0 mt-0.5">
-                    {i + 1}
-                  </span>
-                  <span className="leading-snug">{a}</span>
-                </li>
-              ))}
-            </ol>
-          </Card>
-
-          <Card variant="soft" padding="md">
-            <div className="flex items-center gap-2 mb-3">
-              <IconBadge icon={Scale} tone="ink" size="sm" />
-              <span className="text-h3 text-ink">Effort vs impact</span>
-            </div>
-            <div className="space-y-2">
-              {[
-                { label: 'Sleep timing', impact: 'High',   tone: 'sage' as const },
-                { label: 'Caffeine',     impact: 'Medium', tone: 'amber' as const },
-                { label: 'Recovery',     impact: 'Medium', tone: 'amber' as const },
-              ].map((r) => (
-                <div key={r.label} className="flex items-center justify-between">
-                  <span className="text-body-sm text-ink-2">{r.label}</span>
-                  <Pill tone={r.tone === 'sage' ? 'soft-sage' : 'amber'} size="sm">
-                    {r.impact} impact
-                  </Pill>
-                </div>
-              ))}
-            </div>
-          </Card>
-        </div>
-
-        {/* Insight + pattern */}
-        <div className="grid md:grid-cols-2 gap-4">
-          <Card variant="sage" padding="md">
-            <div className="flex items-center gap-2 mb-3">
-              <IconBadge icon={Eye} tone="sage" size="sm" />
-              <span className="text-h3 text-ink">Insight you didn&apos;t know</span>
-            </div>
-            <p className="text-body-sm text-ink leading-[1.65]">
-              Your energy tends to drop <strong>2 days after</strong> disrupted sleep — not
-              immediately. The impact of poor sleep often shows up later, not the next day.
-            </p>
-          </Card>
-
-          <Card variant="soft" padding="md">
-            <div className="flex items-center gap-2 mb-3">
-              <IconBadge icon={Sparkles} tone="amber" size="sm" />
-              <span className="text-h3 text-ink">Pattern snapshot</span>
-            </div>
-            <div className="text-caption text-ink-2 mb-3">
-              Best: <span className="text-sage-deep font-semibold">Monday</span> · Worst:{' '}
-              <span className="text-rose font-semibold">Thursday</span>
-            </div>
-            <BarStrip values={dayValues} labels={days} highlightIndex={3} highlightTone="rose" />
-          </Card>
-        </div>
-
-        {/* Consistency check */}
-        <div className="rounded-[12px] tile p-4 flex items-center gap-3">
-          <IconBadge icon={CheckCircle2} tone="sage" size="md" />
-          <div className="flex-1">
-            <div className="text-body-sm font-semibold text-ink">
-              Consistency check · 5/7 days
-            </div>
-            <div className="text-caption text-ink-2">
-              You&apos;re building a strong data baseline — keep going.
-            </div>
-          </div>
-          <div className="hidden sm:flex gap-1">
-            {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d, i) => {
-              const checked = i < 5
-              return (
-                <div
-                  key={i}
-                  className={`w-7 h-7 rounded-full text-[10px] font-semibold flex items-center justify-center ${checked ? 'bg-sage text-white' : 'bg-sand-deep text-ink-3'}`}
-                >
-                  {d}
-                </div>
-              )
-            })}
-          </div>
-        </div>
-
-        {/* Final note */}
-        <div className="rounded-[12px] tile p-4 flex items-start gap-3">
-          <IconBadge icon={Sparkles} tone="amber" size="md" />
-          <div>
-            <div className="text-body-sm font-semibold text-ink mb-1">Final note</div>
-            <p className="text-caption text-ink-2 leading-relaxed">
-              This wasn&apos;t your strongest week, but the pattern is clear — and very
-              fixable. Small improvements in sleep timing alone could reverse most of this
-              in the next 7 days.
-            </p>
-          </div>
-        </div>
+      <Card padding="lg" className="space-y-3">
+        <h2 className="font-sans text-[20px] font-bold text-ink tracking-tight">
+          Your first report is still{' '}
+          <span className="italic-accent text-sage-deep font-normal">being built.</span>
+        </h2>
+        <p className="text-[13px] text-ink-2 leading-relaxed">
+          Weekly and monthly reports unlock once BioSense has enough of your own days to
+          summarise honestly. Nothing here is filled with sample numbers.
+        </p>
+        <p className="text-[12px] text-ink-3">
+          Keep adding today&apos;s context and keep your wearable connected. The first weekly
+          report usually lands after a consistent week.
+        </p>
       </Card>
-
-      <p className="text-caption text-ink-3 mt-3 text-center">
-        Your real reports start after 3 check-ins · monthly after your first full month.
-      </p>
     </section>
   )
 }

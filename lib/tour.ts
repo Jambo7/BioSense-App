@@ -38,7 +38,7 @@ export const TOUR_STEPS: TourStep[] = [
     icon: Heart,
     title: 'Welcome to BioSense',
     body:
-      "Let's take a quick walk around the app. I'll highlight each part and explain what it does — tap Next to move along, or tap a highlighted button to try it yourself.",
+      "Let's take a quick walk around the app. I'll highlight each part and explain what it does. Tap Next to move along, or tap a highlighted button to try it yourself.",
   },
   {
     id: 'home',
@@ -46,7 +46,7 @@ export const TOUR_STEPS: TourStep[] = [
     icon: Sun,
     title: 'Home',
     body:
-      'Your daily snapshot lives here — health score, readiness and your daily check-in, all in one place.',
+      "Your daily snapshot lives here: health score, readiness and today's context, all in one place.",
     placement: 'top',
   },
   {
@@ -64,7 +64,7 @@ export const TOUR_STEPS: TourStep[] = [
     icon: Sparkles,
     title: 'BioSense AI',
     body:
-      'Tap here anytime to chat or start Learning Mode — a guided conversation where BioSense gets to know your lifestyle, habits and goals.',
+      'Tap here anytime to chat or start Learning Mode, a guided conversation where BioSense gets to know your lifestyle, habits and goals.',
     hint: 'Give it a tap to open it.',
     placement: 'top',
   },
@@ -83,7 +83,7 @@ export const TOUR_STEPS: TourStep[] = [
     icon: TrendingUp,
     title: 'Trends',
     body:
-      'Set your goals, read your weekly & monthly reports, and share your BioSense Discovery — your progress over time, all here.',
+      'Set your goals, read your weekly and monthly reports, and share your BioSense Discovery. Your progress over time, all here.',
     placement: 'top',
   },
   {
@@ -110,7 +110,7 @@ export const TOUR_STEPS: TourStep[] = [
     icon: UserIcon,
     title: 'Your account',
     body:
-      'Manage your profile, privacy and settings here — and you can replay this walkthrough anytime.',
+      'Manage your profile, privacy and settings here, and you can replay this walkthrough anytime.',
     placement: 'bottom',
   },
   {
@@ -118,7 +118,7 @@ export const TOUR_STEPS: TourStep[] = [
     icon: Heart,
     title: 'Your journey starts here',
     body:
-      'Every health journey is unique. Connect your devices, set your goals and keep exploring — your next discovery could be the one that changes everything.',
+      'Every health journey is unique. Connect your devices, set your goals and keep exploring. Your next discovery could be the one that changes everything.',
   },
 ]
 

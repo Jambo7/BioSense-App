@@ -83,7 +83,7 @@ const ENERGY_CHOICES: Choice<Energy>[] = [
 
 const FEATURE_CARDS: { Icon: LucideIcon; tone: IconBadgeTone; title: string; body: string }[] = [
   { Icon: Sparkles,   tone: 'violet', title: 'Learning Mode',        body: 'Help BioSense understand your lifestyle, routines and goals so your insights become more personalised over time.' },
-  { Icon: CheckCircle2,tone: 'sky',   title: 'Daily Check-ins',      body: 'Quickly log how you feel each day to help BioSense understand what your wearable data can’t always see.' },
+  { Icon: CheckCircle2,tone: 'sky',   title: "Today's Context",      body: 'Add a little context each day so BioSense can understand what your wearable data cannot always see.' },
   { Icon: Watch,      tone: 'sage',   title: 'Connect your wearables', body: 'Sync your wearable data to unlock automatic insights around sleep, recovery, stress and activity.' },
   { Icon: FlaskConical,tone: 'amber', title: 'Upload blood results', body: 'Add blood test results anytime to unlock deeper biomarker analysis and long-term health tracking.' },
   { Icon: BarChart3,  tone: 'rose',   title: 'Reports & insights',   body: 'Receive personalised insights, trends and reports based on your data, habits and goals.' },
@@ -356,7 +356,7 @@ export default function OnboardingPage() {
           <StepHead
             eyebrow="Almost there"
             title={<>Anything else you&apos;d like <span className="italic-accent">us to know?</span></>}
-            sub="Optional — you can update this anytime."
+            sub="Optional. You can update this anytime."
           />
           <div className="tile rounded-card p-5 sm:p-6 mt-7">
             <textarea
@@ -383,7 +383,7 @@ export default function OnboardingPage() {
           />
           <div className="space-y-3 mt-7">
             {[
-              { Icon: Sparkles, tone: 'violet' as const, title: 'Personalised insights', body: 'We tailor everything — your Health Score, insights and guidance — to you.' },
+              { Icon: Sparkles, tone: 'violet' as const, title: 'Personalised insights', body: 'We tailor everything, your Health Score, insights and guidance, to you.' },
               { Icon: TrendingUp, tone: 'sage' as const, title: 'Smarter over time', body: 'The better we learn, the more helpful BioSense becomes for you.' },
               { Icon: Lock, tone: 'teal' as const, title: 'Your privacy matters', body: 'Your data is private, secure and never sold or shared.' },
             ].map((r) => (

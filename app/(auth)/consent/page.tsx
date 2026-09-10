@@ -45,7 +45,7 @@ export default function ConsentPage() {
         Before you continue
       </div>
       <h2 className="font-sans text-[28px] font-bold text-ink mb-6 leading-[1.1] tracking-tight">
-        Important — please read.
+        Important, please read.
       </h2>
 
       <div className="rounded-card p-5 mb-6 bg-sage-wash border border-accent-ring space-y-4">
@@ -115,7 +115,7 @@ export default function ConsentPage() {
           {marketing && <Check className="w-3 h-3 text-white" strokeWidth={3.5} />}
         </button>
         <span className="text-body-sm text-ink leading-relaxed">
-          Optional — send me marketing emails. You can turn this off anytime in Profile.
+          Optional. Send me marketing emails. You can turn this off anytime in Profile.
         </span>
       </label>
 
@@ -127,7 +127,7 @@ export default function ConsentPage() {
         fullWidth
         onClick={handleAccept}
       >
-        I understand — continue
+        I understand, continue
         <ArrowRight className="w-4 h-4" />
       </Button>
     </div>
