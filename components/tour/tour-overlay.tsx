@@ -191,7 +191,7 @@ export function TourOverlay() {
         )}
 
         <Button variant="primary" size="sm" onClick={isLast ? finish : next}>
-          {isLast ? 'Go to dashboard' : index === 0 ? 'Start' : 'Next'}
+          {isLast ? 'Go to Home' : 'Next'}
           <ArrowRight className="w-3.5 h-3.5" />
         </Button>
       </div>

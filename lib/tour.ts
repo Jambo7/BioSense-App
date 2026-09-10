@@ -18,7 +18,7 @@ import {
  * (see `components/app-nav.tsx`). When omitted, the step renders as a
  * centred card (used for the intro + finale) rather than a spotlight.
  *
- * `placement` is a hint only — the overlay flips it automatically when the
+ * `placement` is a hint only. The overlay flips it automatically when the
  * target sits too close to a screen edge.
  */
 export type TourStep = {
@@ -38,7 +38,7 @@ export const TOUR_STEPS: TourStep[] = [
     icon: Heart,
     title: 'Welcome to BioSense',
     body:
-      "Let's take a quick walk around the app. I'll highlight each part and explain what it does. Tap Next to move along, or tap a highlighted button to try it yourself.",
+      'BioSense gets more useful as it learns from your data over time. This quick tour will show you where your scores, intelligence, AI, biomarkers and connected data live. Tap Next to move along.',
   },
   {
     id: 'home',
@@ -46,7 +46,7 @@ export const TOUR_STEPS: TourStep[] = [
     icon: Sun,
     title: 'Home',
     body:
-      "Your daily snapshot lives here: health score, readiness and today's context, all in one place.",
+      "Your most important summarised health intelligence lives here. Your long-term Health Score, Latest Intelligence, today's readiness and your daily snapshot.",
     placement: 'top',
   },
   {
@@ -55,7 +55,7 @@ export const TOUR_STEPS: TourStep[] = [
     icon: Lightbulb,
     title: 'Insights',
     body:
-      "The 'why' behind your score. Insights breaks down what's driving how you feel today.",
+      "This is where BioSense turns your data into intelligence. From what's changed recently, to patterns, predictions and discoveries learned across months and years.",
     placement: 'top',
   },
   {
@@ -64,7 +64,7 @@ export const TOUR_STEPS: TourStep[] = [
     icon: Sparkles,
     title: 'BioSense AI',
     body:
-      'Tap here anytime to chat or start Learning Mode, a guided conversation where BioSense gets to know your lifestyle, habits and goals.',
+      'Dive into Learning Mode, an intuitive feature that will ask you questions to help understand your lifestyle and habits. When there are gaps in knowledge, BioSense will ask you the questions.',
     hint: 'Give it a tap to open it.',
     placement: 'top',
   },
@@ -74,7 +74,7 @@ export const TOUR_STEPS: TourStep[] = [
     icon: FlaskConical,
     title: 'Biomarkers',
     body:
-      'Upload blood test results from any provider, then explore the Biomarker Guide to understand what each marker means for you.',
+      'Upload blood test results from almost any provider. BioSense organises your biomarkers, explains what they mean and tracks how they change over time.',
     placement: 'top',
   },
   {
@@ -83,16 +83,16 @@ export const TOUR_STEPS: TourStep[] = [
     icon: TrendingUp,
     title: 'Trends',
     body:
-      'Set your goals, read your weekly and monthly reports, and share your BioSense Discovery. Your progress over time, all here.',
+      'Follow how your health changes over time. Track goals, review reports and see your longer-term progress.',
     placement: 'top',
   },
   {
     id: 'wearables',
     target: 'wearables',
     icon: Watch,
-    title: 'Wearables',
+    title: 'Connections',
     body:
-      'Connect Oura, Whoop, Garmin, Apple Health and more to sync your health data into BioSense automatically.',
+      'Connect your wearable and BioSense will continuously analyse its history and incoming data, using it across your scores, readiness, patterns and predictions.',
     placement: 'bottom',
   },
   {
@@ -101,7 +101,7 @@ export const TOUR_STEPS: TourStep[] = [
     icon: Bell,
     title: 'Notifications',
     body:
-      'Nudges and alerts from BioSense land here. Tap one to jump straight to whatever it relates to.',
+      'Important changes, discoveries and prompts from BioSense appear here. Tap one to go straight to the intelligence behind it.',
     placement: 'bottom',
   },
   {
@@ -109,8 +109,7 @@ export const TOUR_STEPS: TourStep[] = [
     target: 'profile',
     icon: UserIcon,
     title: 'Your account',
-    body:
-      'Manage your profile, privacy and settings here, and you can replay this walkthrough anytime.',
+    body: 'Manage your profile, privacy and settings here.',
     placement: 'bottom',
   },
   {
@@ -118,7 +117,7 @@ export const TOUR_STEPS: TourStep[] = [
     icon: Heart,
     title: 'Your journey starts here',
     body:
-      'Every health journey is unique. Connect your devices, set your goals and keep exploring. Your next discovery could be the one that changes everything.',
+      'Every health journey is unique. Connect your wearables, set your goals and keep exploring. The more BioSense learns over time, the more useful your health intelligence becomes.',
   },
 ]
 

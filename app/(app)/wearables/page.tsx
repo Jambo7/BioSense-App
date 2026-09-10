@@ -16,6 +16,9 @@ import {
   Flame,
   Moon,
   RefreshCw,
+  TrendingUp,
+  Link2,
+  Gauge,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -132,7 +135,7 @@ function WearablePreview({ state }: { state: PreviewState | undefined }) {
   if (state.status === 'error') {
     return (
       <div className="text-caption text-ink-3 py-2">
-        Couldn’t load a preview right now. Please try again shortly.
+        Couldn&apos;t load a preview right now. Please try again shortly.
       </div>
     )
   }
@@ -284,21 +287,17 @@ export default function WearablesPage() {
 
   return (
     <div className="max-w-2xl mx-auto fade-up space-y-6">
-      <header className="flex items-start justify-between gap-4">
-        <div className="flex items-start gap-4">
-          <IconBadge icon={Activity} size="xl" tone="amber" />
-          <div>
-            <div className="text-eyebrow uppercase text-sage-deep mb-1">Data sources</div>
-            <h1 className="font-sans text-h1 text-ink tracking-tight">
-              Connect{' '}
-              <span className="italic-accent">your wearables.</span>
-            </h1>
-            <p className="text-body text-ink-2 mt-2 leading-relaxed max-w-[58ch]">
-              Connect a wearable to pull HRV, sleep, recovery and activity into your score.
-              Apple Health reads from the Health app on this iPhone.
-            </p>
-          </div>
-        </div>
+      <header>
+        <div className="text-eyebrow uppercase text-sage-deep mb-2">Connections</div>
+        <h1 className="font-sans text-[28px] sm:text-[34px] font-bold text-ink tracking-tight leading-[1.06]">
+          Link wearables and{' '}
+          <span className="italic-accent text-sage-deep font-normal">health data.</span>
+        </h1>
+        <p className="text-[14px] text-ink-2 mt-2 leading-relaxed max-w-[52ch]">
+          Connect a wearable and BioSense will continuously analyse its history and incoming data,
+          using it across your scores, readiness, patterns and predictions. Apple Health reads from
+          the Health app on this iPhone.
+        </p>
       </header>
 
       <div className="flex items-center gap-2">
@@ -424,6 +423,25 @@ export default function WearablesPage() {
           )
         })}
       </div>
+
+      <Card padding="lg">
+        <div className="text-[13px] font-semibold text-ink mb-3">What BioSense uses this for</div>
+        <div className="grid grid-cols-3 gap-2">
+          {[
+            { icon: Gauge, label: 'Scores & readiness', hint: 'Long-term Health Score and today\'s readiness' },
+            { icon: Link2, label: 'Patterns', hint: 'Relationships across sleep, recovery and activity' },
+            { icon: TrendingUp, label: 'Predictions', hint: 'Where your health appears to be heading' },
+          ].map((x) => (
+            <div key={x.label} className="text-center px-1">
+              <div className="w-9 h-9 rounded-full bg-[rgba(168,191,163,0.18)] flex items-center justify-center mx-auto mb-1.5">
+                <x.icon className="w-4 h-4 text-sage-deep" strokeWidth={2} />
+              </div>
+              <div className="text-[12px] font-semibold text-ink">{x.label}</div>
+              <div className="text-[11px] text-ink-3 leading-snug">{x.hint}</div>
+            </div>
+          ))}
+        </div>
+      </Card>
     </div>
   )
 }
