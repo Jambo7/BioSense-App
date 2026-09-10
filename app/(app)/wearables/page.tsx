@@ -11,18 +11,19 @@ import {
   Activity,
   Plug,
   ChevronDown,
+  Heart,
   HeartPulse,
-  Footprints,
-  Flame,
   Moon,
+  Footprints,
   RefreshCw,
   TrendingUp,
   Link2,
-  Gauge,
+  Star,
+  Leaf,
+  Shield,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { IconBadge } from '@/components/ui/icon-badge'
 import { Pill } from '@/components/ui/pill'
 import { cn } from '@/lib/utils'
 import { syncAppleHealthKit } from '@/lib/native/apple-sync'
@@ -31,12 +32,23 @@ const WEARABLES = [
   { id: 'oura',    name: 'Oura Ring',      Icon: Watch,      image: '/wearables/oura.png',    desc: 'Sleep, HRV, readiness, temperature',  type: 'oauth' },
   { id: 'whoop',   name: 'Whoop',          Icon: Watch,      image: '/wearables/whoop.png',   desc: 'Recovery, strain, sleep performance', type: 'oauth' },
   { id: 'garmin',  name: 'Garmin',         Icon: Watch,      image: '/wearables/garmin.png',  desc: 'Activity, HRV, steps, VO₂ max',       type: 'oauth' },
-  { id: 'fitbit',  name: 'Fitbit',         Icon: Watch,      image: '/wearables/fitbit.png',  desc: 'Sleep, heart rate, steps, activity',  type: 'oauth' },
+  { id: 'fitbit',  name: 'Fitbit',         Icon: Watch,      image: undefined,                  desc: 'Sleep, heart rate, steps, activity',  type: 'oauth' },
   { id: 'strava',  name: 'Strava',         Icon: Activity,   image: '/wearables/strava.png',  desc: 'Running, cycling, workouts, activities', type: 'oauth' },
   { id: 'samsung', name: 'Samsung Health', Icon: Smartphone, image: '/wearables/samsung.png', desc: 'Steps, heart rate, sleep (Android)',  type: 'oauth' },
   { id: 'google',  name: 'Google Health',  Icon: Activity,   image: '/wearables/google.png',  desc: 'Steps, heart rate, sleep (Google Health / Fit)', type: 'oauth' },
   { id: 'apple',   name: 'Apple Health',   Icon: Smartphone, image: '/wearables/apple.png',   desc: 'Apple Watch and iPhone Health data',  type: 'healthkit' },
 ]
+
+const PRIMARY_ROLE: Record<string, string> = {
+  whoop: 'Recovery source',
+  oura: 'Sleep source',
+  garmin: 'Activity source',
+  fitbit: 'Activity source',
+  apple: 'Sleep and activity source',
+  strava: 'Activity source',
+  samsung: 'Activity source',
+  google: 'Activity source',
+}
 
 function WearableThumb({
   src,
@@ -52,25 +64,26 @@ function WearableThumb({
   const [errored, setErrored] = useState(false)
 
   if (!src || errored) {
-    return <IconBadge icon={Icon} size="lg" tone={connected ? 'sage' : 'sand'} />
+    return (
+      <div className="w-14 h-14 rounded-full bg-[#E8E2D6] flex items-center justify-center shrink-0">
+        <Icon className="w-6 h-6 text-ink-3" strokeWidth={1.6} />
+      </div>
+    )
   }
 
   return (
     <div
       className={cn(
-        'relative w-12 h-12 rounded-2xl overflow-hidden bg-white shrink-0',
-        'ring-1 ring-inset',
-        connected
-          ? 'ring-[rgba(111,143,107,0.35)] shadow-[0_2px_6px_-2px_rgba(111,143,107,0.30)]'
-          : 'ring-[rgba(26,28,26,0.06)]',
+        'relative w-14 h-14 rounded-full overflow-hidden bg-[#E8E2D6] shrink-0',
+        connected ? 'ring-1 ring-inset ring-[rgba(111,143,107,0.28)]' : '',
       )}
     >
       <Image
         src={src}
         alt={alt}
         fill
-        sizes="48px"
-        className="object-contain p-1"
+        sizes="56px"
+        className="object-contain p-1.5"
         onError={() => setErrored(true)}
       />
     </div>
@@ -95,34 +108,32 @@ interface PreviewData {
   connectedAt: string
   lastSync: string | null
   metrics: PreviewMetrics
+  historyDays: number
+  coverage: {
+    sleep: string
+    hrv: string
+    recovery: string
+    activity: string
+  }
 }
 
 type PreviewState = { status: 'loading' } | { status: 'error' } | { status: 'ready'; data: PreviewData }
 
-const METRIC_TILES: Array<{
-  key: keyof PreviewMetrics
-  label: string
-  Icon: typeof Activity
-  unit?: string
-}> = [
-  { key: 'hrv', label: 'HRV', Icon: Activity, unit: 'ms' },
-  { key: 'rhr', label: 'Resting HR', Icon: HeartPulse, unit: 'bpm' },
-  { key: 'sleepScore', label: 'Sleep', Icon: Moon },
-  { key: 'steps', label: 'Steps', Icon: Footprints },
-  { key: 'activeMinutes', label: 'Active', Icon: Flame, unit: 'min' },
-]
-
 function formatSync(iso: string | null) {
   if (!iso) return null
-  return new Date(iso).toLocaleDateString('en-GB', {
-    day: 'numeric',
-    month: 'short',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
+  const d = new Date(iso)
+  const date = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
+  const time = d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false })
+  return `${date} at ${time}`
 }
 
-function WearablePreview({ state }: { state: PreviewState | undefined }) {
+function WearablePreview({
+  state,
+  provider,
+}: {
+  state: PreviewState | undefined
+  provider: string
+}) {
   if (!state || state.status === 'loading') {
     return (
       <div className="flex items-center gap-2 text-caption text-ink-3 py-2">
@@ -140,43 +151,67 @@ function WearablePreview({ state }: { state: PreviewState | undefined }) {
     )
   }
 
-  const { metrics, lastSync } = state.data
-  const tiles = METRIC_TILES.filter((t) => {
-    const v = metrics[t.key]
-    return typeof v === 'number' && Number.isFinite(v)
-  })
-
-  if (tiles.length === 0) {
-    return (
-      <div className="flex items-center gap-2 text-caption text-ink-3 py-2">
-        <RefreshCw className="w-3.5 h-3.5" />
-        Connected. Syncing your first readings. Fresh data usually lands within a few hours.
-      </div>
-    )
-  }
+  const { historyDays, coverage } = state.data
+  const coverageTiles = [
+    { icon: Moon, label: 'Sleep', value: coverage.sleep },
+    { icon: HeartPulse, label: 'HRV', value: coverage.hrv },
+    { icon: Heart, label: 'Recovery', value: coverage.recovery },
+    { icon: Footprints, label: 'Activity', value: coverage.activity },
+  ]
 
   return (
-    <div className="space-y-3">
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-        {tiles.map((t) => (
-          <div
-            key={t.key}
-            className="rounded-xl bg-[rgba(111,143,107,0.07)] ring-1 ring-inset ring-[rgba(111,143,107,0.16)] px-3 py-2.5"
-          >
-            <div className="flex items-center gap-1.5 text-micro text-sage-deep mb-1">
-              <t.Icon className="w-3 h-3" />
-              {t.label}
-            </div>
-            <div className="text-body-sm font-semibold text-ink tabular-nums">
-              {Math.round(metrics[t.key] as number).toLocaleString('en-GB')}
-              {t.unit && <span className="text-micro text-ink-3 font-normal ml-0.5">{t.unit}</span>}
-            </div>
-          </div>
-        ))}
+    <div className="space-y-4">
+      <div>
+        <div className="text-[12px] text-ink-2">BioSense has analysed</div>
+        <div className="italic-accent text-[28px] sm:text-[32px] text-sage-deep leading-tight mt-0.5">
+          {historyDays > 0
+            ? `${historyDays} day${historyDays === 1 ? '' : 's'} of history`
+            : 'history still landing'}
+        </div>
       </div>
-      {lastSync && (
-        <div className="text-micro text-ink-3">Latest reading · {formatSync(lastSync)}</div>
-      )}
+
+      <div>
+        <div className="text-[12px] text-ink-3 mb-2">Coverage quality</div>
+        <div className="grid grid-cols-4 gap-2">
+          {coverageTiles.map((t) => (
+            <div
+              key={t.label}
+              className="rounded-[16px] bg-[rgba(255,255,255,0.72)] ring-1 ring-inset ring-[rgba(111,143,107,0.16)] px-2 py-2 flex items-start gap-1.5"
+            >
+              <t.icon className="w-3.5 h-3.5 text-sage-deep mt-0.5 shrink-0" strokeWidth={2} />
+              <div className="min-w-0">
+                <div className="text-[11px] text-ink-2 leading-tight">{t.label}</div>
+                <div className="text-[11px] font-semibold text-sage-deep leading-tight">{t.value}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <div className="text-[12px] text-ink-3 mb-2">Used by BioSense</div>
+        <div className="flex flex-wrap gap-1.5">
+          {[
+            { icon: Star, label: 'Health Score' },
+            { icon: Leaf, label: 'Readiness' },
+            { icon: Link2, label: 'Connections' },
+            { icon: TrendingUp, label: 'Predictions' },
+          ].map((x) => (
+            <span
+              key={x.label}
+              className="inline-flex items-center gap-1 h-7 px-2.5 rounded-pill bg-white/70 ring-1 ring-inset ring-[rgba(111,143,107,0.22)] text-[11.5px] text-sage-deep"
+            >
+              <x.icon className="w-3 h-3 text-sage-deep" strokeWidth={2.2} />
+              {x.label}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex items-center gap-2 text-[12.5px] text-sage-deep">
+        <Shield className="w-3.5 h-3.5 text-sage-deep" strokeWidth={2.2} />
+        <span>Primary role: {PRIMARY_ROLE[provider] ?? 'Health data source'}</span>
+      </div>
     </div>
   )
 }
@@ -191,13 +226,26 @@ export default function WearablesPage() {
     const load = () =>
       fetch('/api/wearables', { cache: 'no-store' })
         .then((r) => r.json())
-        .then(setConnected)
+        .then((rows: WearableSync[]) => {
+          setConnected(rows)
+          setExpanded((cur) => {
+            if (cur) return cur
+            return rows[0]?.provider ?? null
+          })
+        })
         .catch(() => {})
 
     load()
     const t = setTimeout(load, 6000)
     return () => clearTimeout(t)
   }, [])
+
+  useEffect(() => {
+    if (!expanded) return
+    if (previews[expanded]) return
+    void loadPreview(expanded)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [expanded])
 
   async function loadPreview(id: string) {
     setPreviews((prev) => ({ ...prev, [id]: { status: 'loading' } }))
@@ -212,11 +260,7 @@ export default function WearablesPage() {
   }
 
   function togglePreview(id: string) {
-    setExpanded((cur) => {
-      const next = cur === id ? null : id
-      if (next && previews[id]?.status !== 'ready') void loadPreview(id)
-      return next
-    })
+    setExpanded((cur) => (cur === id ? null : id))
   }
 
   function isConnected(id: string) {
@@ -225,13 +269,7 @@ export default function WearablesPage() {
 
   function lastSync(id: string) {
     const sync = connected.find((c) => c.provider === id)
-    if (!sync?.lastSync) return null
-    return new Date(sync.lastSync).toLocaleDateString('en-GB', {
-      day: 'numeric',
-      month: 'short',
-      hour: '2-digit',
-      minute: '2-digit',
-    })
+    return formatSync(sync?.lastSync ?? null)
   }
 
   async function handleConnect(id: string) {
@@ -276,6 +314,7 @@ export default function WearablesPage() {
       await fetch(`/api/wearables/${id}`, { method: 'DELETE' })
       toast.success(`${id} disconnected`)
       setConnected((prev) => prev.filter((c) => c.provider !== id))
+      setExpanded((cur) => (cur === id ? null : cur))
     } catch {
       toast.error('Failed to disconnect')
     } finally {
@@ -286,40 +325,36 @@ export default function WearablesPage() {
   const connectedCount = connected.length
 
   return (
-    <div className="max-w-2xl mx-auto fade-up space-y-6">
-      <header>
-        <div className="text-eyebrow uppercase text-sage-deep mb-2">Connections</div>
-        <h1 className="font-sans text-[28px] sm:text-[34px] font-bold text-ink tracking-tight leading-[1.06]">
-          Link wearables and{' '}
-          <span className="italic-accent text-sage-deep font-normal">health data.</span>
+    <div className="max-w-xl mx-auto fade-up space-y-5">
+      <header className="text-center pt-1">
+        <h1 className="italic-accent text-[32px] sm:text-[38px] text-sage-deep leading-none">
+          wearables.
         </h1>
-        <p className="text-[14px] text-ink-2 mt-2 leading-relaxed max-w-[52ch]">
-          Connect a wearable and BioSense will continuously analyse its history and incoming data,
-          using it across your scores, readiness, patterns and predictions. Apple Health reads from
-          the Health app on this iPhone.
+        <p className="text-[14px] text-ink-2 mt-3 leading-relaxed max-w-[40ch] mx-auto">
+          Auto-enrich your health score with real-time HRV, sleep, recovery and activity.
         </p>
       </header>
 
-      <div className="flex items-center gap-2">
-        <Pill tone={connectedCount > 0 ? 'soft-sage' : 'ink'} size="md">
+      <div className="flex items-center justify-center gap-2">
+        <Pill tone="soft-sage" size="md">
           <Plug className="w-3.5 h-3.5" />
           {connectedCount} connected
         </Pill>
         {connectedCount > 0 && (
-          <Pill tone="ink" size="sm">syncing automatically</Pill>
+          <Pill tone="ink" size="md">syncing automatically</Pill>
         )}
       </div>
 
-      <div className="space-y-2.5">
+      <div className="space-y-3">
         {WEARABLES.map((w) => {
           const conn = isConnected(w.id)
           const sync = lastSync(w.id)
           const isOpen = expanded === w.id
 
           return (
-            <Card key={w.id} padding="md">
+            <Card key={w.id} variant="plain" padding="sm">
               <div
-                className={cn('flex items-center gap-4', conn && 'cursor-pointer')}
+                className={cn('flex items-center gap-3', conn && 'cursor-pointer')}
                 onClick={conn ? () => togglePreview(w.id) : undefined}
                 role={conn ? 'button' : undefined}
                 tabIndex={conn ? 0 : undefined}
@@ -342,23 +377,18 @@ export default function WearablesPage() {
                 />
 
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-                    <span className="text-body-sm font-semibold text-ink">{w.name}</span>
-                    {conn && (
-                      <Pill tone="soft-sage" size="sm">
-                        <CheckCircle2 className="w-3 h-3" /> Connected
-                      </Pill>
-                    )}
+                  <div className="text-[15px] font-semibold text-ink">{w.name}</div>
+                  <div className="text-[12.5px] text-ink-2 mt-0.5 leading-snug">
+                    {conn ? (sync ? `Last sync · ${sync}` : 'Waiting for the first sync') : w.desc}
                   </div>
-                  <div className="text-caption text-ink-2">
-                    {conn ? 'Tap to view your latest readings' : w.desc}
-                  </div>
-                  {sync && <div className="text-micro text-ink-3 mt-0.5">Last sync · {sync}</div>}
                 </div>
 
                 <div className="shrink-0 flex items-center gap-1.5">
                   {conn ? (
                     <>
+                      <Pill tone="soft-sage" size="sm">
+                        <CheckCircle2 className="w-3 h-3" /> Connected
+                      </Pill>
                       {w.id === 'apple' && (
                         <Button
                           variant="ghost"
@@ -374,7 +404,7 @@ export default function WearablesPage() {
                         </Button>
                       )}
                       <Button
-                        variant="subtle"
+                        variant="ghost"
                         size="sm"
                         loading={loading === w.id}
                         onClick={(e) => {
@@ -401,47 +431,28 @@ export default function WearablesPage() {
                       Connect
                     </Button>
                   ) : (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    loading={loading === w.id}
-                    onClick={() => handleConnect(w.id)}
-                  >
-                    <ExternalLink className="w-3.5 h-3.5" />
-                    Connect
-                  </Button>
-                )}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      loading={loading === w.id}
+                      onClick={() => handleConnect(w.id)}
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                      Connect
+                    </Button>
+                  )}
                 </div>
               </div>
 
               {conn && isOpen && (
-                <div className="mt-3 pt-3 border-t border-[rgba(26,28,26,0.06)] fade-up">
-                  <WearablePreview state={previews[w.id]} />
+                <div className="mt-4 pt-3 border-t border-[rgba(26,28,26,0.06)] fade-up">
+                  <WearablePreview state={previews[w.id]} provider={w.id} />
                 </div>
               )}
             </Card>
           )
         })}
       </div>
-
-      <Card padding="lg">
-        <div className="text-[13px] font-semibold text-ink mb-3">What BioSense uses this for</div>
-        <div className="grid grid-cols-3 gap-2">
-          {[
-            { icon: Gauge, label: 'Scores & readiness', hint: 'Long-term Health Score and today\'s readiness' },
-            { icon: Link2, label: 'Patterns', hint: 'Relationships across sleep, recovery and activity' },
-            { icon: TrendingUp, label: 'Predictions', hint: 'Where your health appears to be heading' },
-          ].map((x) => (
-            <div key={x.label} className="text-center px-1">
-              <div className="w-9 h-9 rounded-full bg-[rgba(168,191,163,0.18)] flex items-center justify-center mx-auto mb-1.5">
-                <x.icon className="w-4 h-4 text-sage-deep" strokeWidth={2} />
-              </div>
-              <div className="text-[12px] font-semibold text-ink">{x.label}</div>
-              <div className="text-[11px] text-ink-3 leading-snug">{x.hint}</div>
-            </div>
-          ))}
-        </div>
-      </Card>
     </div>
   )
 }

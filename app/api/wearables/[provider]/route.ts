@@ -1,10 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getRequestUser } from '@/lib/api-auth'
-import { metricsFromSyncData } from '@/lib/wearable-metrics'
+import { dailyBreakdownFromSyncData, metricsFromSyncData } from '@/lib/wearable-metrics'
 import { deauthenticateTerraUser } from '@/lib/terra'
 
 export const dynamic = 'force-dynamic'
+
+function quality(daysWith: number, total: number, complete = false): string {
+  if (daysWith <= 0) return 'Building'
+  if (complete && total >= 7 && daysWith / total >= 0.75) return 'Complete'
+  if (daysWith >= 5 || (total >= 7 && daysWith / total >= 0.5)) return 'Strong'
+  return 'Building'
+}
 
 /**
  * Preview a single connected wearable — returns the latest normalised metrics
@@ -29,11 +36,31 @@ export async function GET(
     return NextResponse.json({ error: 'Not connected' }, { status: 404 })
   }
 
+  const days = dailyBreakdownFromSyncData(sync.data)
+  const total = days.size
+  let sleep = 0
+  let hrv = 0
+  let recovery = 0
+  let activity = 0
+  for (const m of days.values()) {
+    if (m.sleepHours != null || m.sleepScore != null) sleep += 1
+    if (m.hrv != null) hrv += 1
+    if (m.recovery != null) recovery += 1
+    if (m.steps != null || m.activeMinutes != null) activity += 1
+  }
+
   return NextResponse.json({
     provider: sync.provider,
     connectedAt: sync.createdAt.toISOString(),
     lastSync: sync.lastSync ? sync.lastSync.toISOString() : null,
     metrics: metricsFromSyncData(sync.data),
+    historyDays: total,
+    coverage: {
+      sleep: quality(sleep, total),
+      hrv: quality(hrv, total),
+      recovery: quality(recovery, total),
+      activity: quality(activity, total, true),
+    },
   })
 }
 
