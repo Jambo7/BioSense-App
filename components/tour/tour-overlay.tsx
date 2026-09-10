@@ -147,7 +147,7 @@ export function TourOverlay() {
       )}
     >
       <div className="flex items-start gap-3.5">
-        <IconBadge icon={Icon} tone="sage" variant="gradient" size="md" />
+        <IconBadge icon={Icon} tone={step.tone ?? 'sage'} variant="gradient" size="md" />
         <div className="min-w-0 flex-1">
           <div className="flex items-center justify-between gap-2">
             <span className="text-eyebrow uppercase text-sage-deep">

@@ -1,32 +1,37 @@
 'use client'
 
 import { useState } from 'react'
+import type { ComponentType } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   Sun,
   Watch,
   Target,
-  Sparkles,
   FlaskConical,
   Lightbulb,
   TrendingUp,
   User,
   ArrowRight,
-  type LucideIcon,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { IconBadge } from '@/components/ui/icon-badge'
+import { IconBadge, type IconBadgeTone } from '@/components/ui/icon-badge'
+import { BiosenseS } from '@/components/brand-mark'
 import { useTour } from '@/components/tour/tour-context'
 
-const HIGHLIGHTS: { icon: LucideIcon; title: string; body: string }[] = [
-  { icon: Sun, title: 'Home', body: 'Your health intelligence at a glance' },
-  { icon: Watch, title: 'Connections', body: 'Link wearables and health data to sync automatically' },
-  { icon: Target, title: 'Goals', body: 'Give BioSense a destination to work towards' },
-  { icon: Sparkles, title: 'BioSense AI', body: 'Answer questions and help BioSense learn' },
-  { icon: FlaskConical, title: 'Biomarkers', body: 'Upload, understand and track your blood results' },
-  { icon: Lightbulb, title: 'Insights', body: 'Patterns, predictions and new discoveries' },
-  { icon: TrendingUp, title: 'Trends & Reports', body: 'Track progress over time with tailored reports' },
-  { icon: User, title: 'Your account', body: 'Privacy, profile and settings' },
+const HIGHLIGHTS: {
+  icon: ComponentType<{ className?: string; strokeWidth?: number }>
+  tone: IconBadgeTone
+  title: string
+  body: string
+}[] = [
+  { icon: Sun,          tone: 'amber',  title: 'Home',            body: 'Your health intelligence at a glance' },
+  { icon: Watch,        tone: 'sage',   title: 'Connections',      body: 'Link wearables and health data to sync automatically' },
+  { icon: Target,      tone: 'sky',    title: 'Goals',           body: 'Give BioSense a destination to work towards' },
+  { icon: BiosenseS,   tone: 'violet', title: 'BioSense AI',     body: 'Answer questions and help BioSense learn' },
+  { icon: FlaskConical, tone: 'amber',  title: 'Biomarkers',      body: 'Upload, understand and track your blood results' },
+  { icon: Lightbulb,    tone: 'teal',   title: 'Insights',         body: 'Patterns, predictions and new discoveries' },
+  { icon: TrendingUp,   tone: 'rose',   title: 'Trends & Reports', body: 'Track progress over time with tailored reports' },
+  { icon: User,         tone: 'ink',    title: 'Your account',    body: 'Privacy, profile and settings' },
 ]
 
 export default function TutorialPage() {
@@ -64,7 +69,7 @@ export default function TutorialPage() {
       <div className="grid grid-cols-2 gap-2.5 mb-8">
         {HIGHLIGHTS.map((h) => (
           <div key={h.title} className="flex items-start gap-2.5 rounded-[18px] tile p-3">
-            <IconBadge icon={h.icon} tone="sage" variant="tint" size="sm" />
+            <IconBadge icon={h.icon} tone={h.tone} variant="tint" size="sm" />
             <div className="min-w-0">
               <div className="text-[13px] font-semibold text-ink leading-tight">{h.title}</div>
               <div className="text-[11.5px] text-ink-2 leading-snug mt-0.5">{h.body}</div>

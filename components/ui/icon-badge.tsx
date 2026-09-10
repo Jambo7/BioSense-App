@@ -1,5 +1,10 @@
-import { LucideIcon } from 'lucide-react'
+import type { ComponentType } from 'react'
 import { cn } from '@/lib/utils'
+
+type IconComponent = ComponentType<{
+  className?: string
+  strokeWidth?: number
+}>
 
 export type IconBadgeTone =
   | 'sage'
@@ -12,7 +17,7 @@ export type IconBadgeTone =
   | 'sand'
 
 interface IconBadgeProps {
-  icon: LucideIcon
+  icon: IconComponent
   size?: 'sm' | 'md' | 'lg' | 'xl'
   tone?: IconBadgeTone
   variant?: 'tint' | 'solid' | 'gradient'

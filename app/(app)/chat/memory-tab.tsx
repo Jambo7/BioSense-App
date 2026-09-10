@@ -14,12 +14,12 @@ import {
   Edit3,
   Check,
   X,
-  Sparkles,
   type LucideIcon,
 } from 'lucide-react'
 import { Card, CardLabel } from '@/components/ui/card'
 import { ScoreRing } from '@/components/ui/score-ring'
 import { IconBadge, type IconBadgeTone } from '@/components/ui/icon-badge'
+import { BiosenseS } from '@/components/brand-mark'
 import { SECTIONS } from '@/lib/learning'
 import { cn } from '@/lib/utils'
 
@@ -27,7 +27,7 @@ type Confidence = 'High' | 'Medium' | 'Low'
 type Fact = { id: string; section: string; text: string; confidence: string; source: string }
 type ProgressSection = { id: string; label: string; phase: string; percent: number; status: string }
 
-const SECTION_DISPLAY: Record<string, { icon: LucideIcon; tone: IconBadgeTone }> = {
+const SECTION_DISPLAY: Record<string, { icon: LucideIcon | typeof BiosenseS; tone: IconBadgeTone }> = {
   energy:            { icon: Zap,          tone: 'amber'  },
   sleep:             { icon: Moon,         tone: 'violet' },
   stress:            { icon: Wind,         tone: 'teal'   },
@@ -151,7 +151,7 @@ export function MemoryTab() {
 
       {facts.length === 0 ? (
         <Card padding="lg" variant="soft" className="text-center">
-          <IconBadge icon={Sparkles} tone="sage" variant="gradient" size="lg" className="mx-auto mb-3" />
+          <IconBadge icon={BiosenseS} tone="sage" variant="gradient" size="lg" className="mx-auto mb-3" />
           <div className="text-body-sm font-semibold text-ink">Nothing learned yet</div>
           <p className="text-caption text-ink-2 leading-snug mt-1 max-w-[40ch] mx-auto">
             Start a conversation in <span className="text-sage-deep font-medium">Learning Mode</span> and
@@ -161,7 +161,7 @@ export function MemoryTab() {
       ) : (
         <>
           {grouped.filter((g) => g.items.length > 0).map(({ meta, items }) => {
-            const disp = SECTION_DISPLAY[meta.id] ?? { icon: Sparkles, tone: 'sage' as IconBadgeTone }
+            const disp = SECTION_DISPLAY[meta.id] ?? { icon: BiosenseS, tone: 'sage' as IconBadgeTone }
             return (
               <section key={meta.id}>
                 <div className="flex items-center gap-2 mb-2.5 px-1">

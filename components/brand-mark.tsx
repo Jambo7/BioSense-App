@@ -1,5 +1,51 @@
+import { forwardRef } from 'react'
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
+
+/** Lucide-shaped icon props so the S mark can drop into IconBadge and nav. */
+export type BrandIconProps = {
+  className?: string
+  size?: number | string
+  strokeWidth?: number
+  color?: string
+  absoluteStrokeWidth?: boolean
+}
+
+/**
+ * Official BioSense S, as a currentColor icon.
+ * Uses the brand-sheet mark (tight crop) so it matches the wordmark, not a redraw.
+ */
+export const BiosenseS = forwardRef<SVGSVGElement, BrandIconProps>(function BiosenseS(
+  { className, size, color, strokeWidth: _strokeWidth, absoluteStrokeWidth: _abs },
+  ref,
+) {
+  return (
+    <svg
+      ref={ref}
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      aria-hidden
+      focusable="false"
+      className={cn('block', className)}
+      width={size}
+      height={size}
+      color={color}
+      style={{
+        WebkitMaskImage: 'url(/biosense-s-icon.png)',
+        maskImage: 'url(/biosense-s-icon.png)',
+        WebkitMaskSize: 'contain',
+        maskSize: 'contain',
+        WebkitMaskRepeat: 'no-repeat',
+        maskRepeat: 'no-repeat',
+        WebkitMaskPosition: 'center',
+        maskPosition: 'center',
+      }}
+    >
+      <rect width="24" height="24" fill="currentColor" />
+    </svg>
+  )
+})
+BiosenseS.displayName = 'BiosenseS'
 
 const LOGO_SRC = '/biosense-wordmark-v2.png'
 const MARK_SRC = '/biosense-mark.png'

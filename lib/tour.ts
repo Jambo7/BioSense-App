@@ -1,8 +1,7 @@
-import type { LucideIcon } from 'lucide-react'
+import type { ComponentType } from 'react'
 import {
   Sun,
   Lightbulb,
-  Sparkles,
   FlaskConical,
   TrendingUp,
   Watch,
@@ -10,6 +9,8 @@ import {
   User as UserIcon,
   Heart,
 } from 'lucide-react'
+import { BiosenseS } from '@/components/brand-mark'
+import type { IconBadgeTone } from '@/components/ui/icon-badge'
 
 /**
  * Interactive walkthrough step.
@@ -24,7 +25,8 @@ import {
 export type TourStep = {
   id: string
   target?: string
-  icon: LucideIcon
+  icon: ComponentType<{ className?: string; strokeWidth?: number }>
+  tone?: IconBadgeTone
   title: string
   body: string
   /** Optional nudge shown under the body, e.g. "Tap it to try". */
@@ -36,6 +38,7 @@ export const TOUR_STEPS: TourStep[] = [
   {
     id: 'welcome',
     icon: Heart,
+    tone: 'sage',
     title: 'Welcome to BioSense',
     body:
       'BioSense gets more useful as it learns from your data over time. This quick tour will show you where your scores, intelligence, AI, biomarkers and connected data live. Tap Next to move along.',
@@ -44,6 +47,7 @@ export const TOUR_STEPS: TourStep[] = [
     id: 'home',
     target: 'home',
     icon: Sun,
+    tone: 'amber',
     title: 'Home',
     body:
       "Your most important summarised health intelligence lives here. Your long-term Health Score, Latest Intelligence, today's readiness and your daily snapshot.",
@@ -53,6 +57,7 @@ export const TOUR_STEPS: TourStep[] = [
     id: 'insights',
     target: 'insights',
     icon: Lightbulb,
+    tone: 'teal',
     title: 'Insights',
     body:
       "This is where BioSense turns your data into intelligence. From what's changed recently, to patterns, predictions and discoveries learned across months and years.",
@@ -61,7 +66,8 @@ export const TOUR_STEPS: TourStep[] = [
   {
     id: 'ai',
     target: 'ai',
-    icon: Sparkles,
+    icon: BiosenseS,
+    tone: 'violet',
     title: 'BioSense AI',
     body:
       'Dive into Learning Mode, an intuitive feature that will ask you questions to help understand your lifestyle and habits. When there are gaps in knowledge, BioSense will ask you the questions.',
@@ -72,6 +78,7 @@ export const TOUR_STEPS: TourStep[] = [
     id: 'biomarkers',
     target: 'biomarkers',
     icon: FlaskConical,
+    tone: 'amber',
     title: 'Biomarkers',
     body:
       'Upload blood test results from almost any provider. BioSense organises your biomarkers, explains what they mean and tracks how they change over time.',
@@ -81,6 +88,7 @@ export const TOUR_STEPS: TourStep[] = [
     id: 'trends',
     target: 'trends',
     icon: TrendingUp,
+    tone: 'rose',
     title: 'Trends',
     body:
       'Follow how your health changes over time. Track goals, review reports and see your longer-term progress.',
@@ -90,6 +98,7 @@ export const TOUR_STEPS: TourStep[] = [
     id: 'wearables',
     target: 'wearables',
     icon: Watch,
+    tone: 'sage',
     title: 'Connections',
     body:
       'Connect your wearable and BioSense will continuously analyse its history and incoming data, using it across your scores, readiness, patterns and predictions.',
@@ -99,6 +108,7 @@ export const TOUR_STEPS: TourStep[] = [
     id: 'notifications',
     target: 'notifications',
     icon: Bell,
+    tone: 'sky',
     title: 'Notifications',
     body:
       'Important changes, discoveries and prompts from BioSense appear here. Tap one to go straight to the intelligence behind it.',
@@ -108,6 +118,7 @@ export const TOUR_STEPS: TourStep[] = [
     id: 'profile',
     target: 'profile',
     icon: UserIcon,
+    tone: 'ink',
     title: 'Your account',
     body: 'Manage your profile, privacy and settings here.',
     placement: 'bottom',
@@ -115,6 +126,7 @@ export const TOUR_STEPS: TourStep[] = [
   {
     id: 'finish',
     icon: Heart,
+    tone: 'sage',
     title: 'Your journey starts here',
     body:
       'Every health journey is unique. Connect your wearables, set your goals and keep exploring. The more BioSense learns over time, the more useful your health intelligence becomes.',

@@ -2,15 +2,13 @@
 
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import Image from 'next/image'
-import { useEffect, useState, useEffectEvent } from 'react'
+import { useEffect, useState, useEffectEvent, type ComponentType } from 'react'
 import { createPortal } from 'react-dom'
 import { cn } from '@/lib/utils'
-import { BrandWordmark } from '@/components/brand-mark'
+import { BrandWordmark, BiosenseS } from '@/components/brand-mark'
 import {
   Sun,
   Lightbulb,
-  Sparkles,
   TrendingUp,
   FlaskConical,
   Bell,
@@ -43,7 +41,7 @@ function UserMark() {
 type NavItem = {
   href: string
   label: string
-  icon: typeof Sun
+  icon: ComponentType<{ className?: string; strokeWidth?: number }>
   matchPaths?: string[]
   /** Marks this item as the central floating CTA in the mobile tab bar. */
   center?: boolean
@@ -56,7 +54,7 @@ type NavItem = {
 const navItems: NavItem[] = [
   { href: '/dashboard', label: 'Home',       icon: Sun,           matchPaths: ['/dashboard', '/checkin', '/context'], tourId: 'home' },
   { href: '/insights',  label: 'Insights',   icon: Lightbulb,     matchPaths: ['/insights'], tourId: 'insights' },
-  { href: '/chat',      label: 'AI',         icon: Sparkles,      center: true, tourId: 'ai' },
+  { href: '/chat',      label: 'AI',         icon: BiosenseS,     center: true, tourId: 'ai' },
   { href: '/blood',     label: 'Biomarkers', icon: FlaskConical,  matchPaths: ['/blood', '/biomarkers'], tourId: 'biomarkers' },
   { href: '/reports',   label: 'Trends',     icon: TrendingUp,    tourId: 'trends' },
 ]
@@ -145,13 +143,8 @@ export function AppNav() {
                           'inset 0 1px 0 rgba(255,255,255,0.30), 0 2px 4px rgba(40,56,38,0.18), 0 10px 24px -4px rgba(111,143,107,0.55)',
                       }}
                     >
-                      <Image
-                        src="/biosense-mark-white.png"
-                        alt=""
-                        width={26}
-                        height={26}
-                        priority
-                        className="relative block select-none [filter:drop-shadow(0_1px_1px_rgba(0,0,0,0.18))]"
+                      <BiosenseS
+                        className="relative w-[22px] h-[22px] text-white [filter:drop-shadow(0_1px_1px_rgba(0,0,0,0.18))]"
                       />
                     </div>
                   </div>

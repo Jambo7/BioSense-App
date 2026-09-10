@@ -34,6 +34,7 @@ import { Button } from '@/components/ui/button'
 import { IconBadge, type IconBadgeTone } from '@/components/ui/icon-badge'
 import { cn } from '@/lib/utils'
 import { GOAL_OPTIONS } from '@/lib/registration'
+import { BiosenseS } from '@/components/brand-mark'
 
 type Sex = 'MALE' | 'FEMALE' | 'UNDISCLOSED'
 type Activity = 'LOW' | 'MODERATE' | 'HIGH' | 'VERY_HIGH'
@@ -81,8 +82,8 @@ const ENERGY_CHOICES: Choice<Energy>[] = [
   { value: 'LOW',      title: 'Low',      desc: 'I often feel tired or drained',            Icon: Moon         },
 ]
 
-const FEATURE_CARDS: { Icon: LucideIcon; tone: IconBadgeTone; title: string; body: string }[] = [
-  { Icon: Sparkles,   tone: 'violet', title: 'Learning Mode',        body: 'Help BioSense understand your lifestyle, routines and goals so your insights become more personalised over time.' },
+const FEATURE_CARDS: { Icon: typeof BiosenseS | LucideIcon; tone: IconBadgeTone; title: string; body: string }[] = [
+  { Icon: BiosenseS,   tone: 'violet', title: 'Learning Mode',        body: 'Help BioSense understand your lifestyle, routines and goals so your insights become more personalised over time.' },
   { Icon: CheckCircle2,tone: 'sky',   title: "Today's Context",      body: 'Add a little context each day so BioSense can understand what your wearable data cannot always see.' },
   { Icon: Watch,      tone: 'sage',   title: 'Connect your wearables', body: 'Sync your wearable data to unlock automatic insights around sleep, recovery, stress and activity.' },
   { Icon: FlaskConical,tone: 'amber', title: 'Upload blood results', body: 'Add blood test results anytime to unlock deeper biomarker analysis and long-term health tracking.' },
@@ -383,7 +384,7 @@ export default function OnboardingPage() {
           />
           <div className="space-y-3 mt-7">
             {[
-              { Icon: Sparkles, tone: 'violet' as const, title: 'Personalised insights', body: 'We tailor everything, your Health Score, insights and guidance, to you.' },
+              { Icon: BiosenseS, tone: 'violet' as const, title: 'Personalised insights', body: 'We tailor everything, your Health Score, insights and guidance, to you.' },
               { Icon: TrendingUp, tone: 'sage' as const, title: 'Smarter over time', body: 'The better we learn, the more helpful BioSense becomes for you.' },
               { Icon: Lock, tone: 'teal' as const, title: 'Your privacy matters', body: 'Your data is private, secure and never sold or shared.' },
             ].map((r) => (

@@ -14,18 +14,18 @@ import {
   Edit3,
   Check,
   X,
-  Sparkles,
   type LucideIcon,
 } from 'lucide-react'
 import { Card, CardLabel } from '@/components/ui/card'
 import { IconBadge, type IconBadgeTone } from '@/components/ui/icon-badge'
+import { BiosenseS } from '@/components/brand-mark'
 import { SECTIONS } from '@/lib/learning'
 import { cn } from '@/lib/utils'
 
 type Confidence = 'High' | 'Medium' | 'Low'
 type Fact = { id: string; section: string; text: string; confidence: string; source: string }
 
-const SECTION_DISPLAY: Record<string, { icon: LucideIcon; tone: IconBadgeTone }> = {
+const SECTION_DISPLAY: Record<string, { icon: LucideIcon | typeof BiosenseS; tone: IconBadgeTone }> = {
   energy:            { icon: Zap,          tone: 'amber'  },
   sleep:             { icon: Moon,         tone: 'violet' },
   stress:            { icon: Wind,         tone: 'teal'   },
@@ -106,7 +106,7 @@ export function PreferencesTab() {
   if (facts.length === 0) {
     return (
       <Card padding="lg" variant="soft" className="text-center">
-        <IconBadge icon={Sparkles} tone="sage" variant="gradient" size="lg" className="mx-auto mb-3" />
+        <IconBadge icon={BiosenseS} tone="sage" variant="gradient" size="lg" className="mx-auto mb-3" />
         <div className="text-body-sm font-semibold text-ink">Nothing learned yet</div>
         <p className="text-caption text-ink-2 leading-snug mt-1 max-w-[40ch] mx-auto">
           Start a short conversation in <span className="text-sage-deep font-medium">Learning Mode</span> and
@@ -129,7 +129,7 @@ export function PreferencesTab() {
 
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
           {grouped.map(({ meta, items }) => {
-            const disp = SECTION_DISPLAY[meta.id] ?? { icon: Sparkles, tone: 'sage' as IconBadgeTone }
+            const disp = SECTION_DISPLAY[meta.id] ?? { icon: BiosenseS, tone: 'sage' as IconBadgeTone }
             const topConf = items
               .map((i) => i.confidence)
               .sort((a, b) => (CONF_RANK[b] ?? 0) - (CONF_RANK[a] ?? 0))[0] as Confidence
@@ -160,7 +160,7 @@ export function PreferencesTab() {
 
         <Card padding="none" className="divide-y divide-line shadow-[0_1px_2px_rgba(26,28,26,0.04),0_8px_24px_-12px_rgba(111,143,107,0.20)]">
           {facts.map((f) => {
-            const disp = SECTION_DISPLAY[f.section] ?? { icon: Sparkles, tone: 'sage' as IconBadgeTone }
+            const disp = SECTION_DISPLAY[f.section] ?? { icon: BiosenseS, tone: 'sage' as IconBadgeTone }
             const isEditing = editingId === f.id
             return (
               <div key={f.id} className={cn('flex items-start gap-3 p-3.5 transition-colors', !isEditing && 'hover:bg-[rgba(168,191,163,0.04)]')}>

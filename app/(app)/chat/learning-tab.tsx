@@ -6,7 +6,6 @@ import {
   ArrowUp,
   Check,
   Pause,
-  Sparkles,
   ShieldCheck,
   MessagesSquare,
   Pencil,
@@ -16,7 +15,7 @@ import {
 import { cn } from '@/lib/utils'
 import { Card, CardLabel } from '@/components/ui/card'
 import { ScoreRing } from '@/components/ui/score-ring'
-import { IntelligenceMark } from '@/components/brand-mark'
+import { IntelligenceMark, BiosenseS } from '@/components/brand-mark'
 import { RichText } from '@/components/ui/rich-text'
 import { SECTION_BY_ID } from '@/lib/learning'
 
@@ -438,7 +437,7 @@ function EnterScreen({
           {[
             { Icon: MessagesSquare, title: 'Conversational & easy', body: 'A few questions at a time.' },
             { Icon: ShieldCheck, title: 'Your data, your control', body: 'Edit or delete anything we learn.' },
-            { Icon: Sparkles, title: 'Smarter over time', body: 'Every session builds on the last.' },
+            { Icon: BiosenseS, title: 'Smarter over time', body: 'Every session builds on the last.' },
           ].map((p) => (
             <div key={p.title} className="rounded-card bg-white/70 ring-1 ring-inset ring-[rgba(168,191,163,0.30)] p-3">
               <p.Icon className="w-4 h-4 text-sage-deep mb-1.5" strokeWidth={2.1} />

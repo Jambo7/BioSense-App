@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Sparkles } from 'lucide-react'
+import { BiosenseS } from '@/components/brand-mark'
 import { cn } from '@/lib/utils'
 import { LearningTab } from './learning-tab'
 import { MemoryTab } from './memory-tab'
@@ -29,7 +29,7 @@ export default function AIPage() {
       <header className="relative pt-2 pb-1">
         <div>
           <div className="flex items-center gap-2 text-eyebrow uppercase text-sage-deep mb-2">
-            <Sparkles className="w-3.5 h-3.5" strokeWidth={2.25} />
+            <BiosenseS className="w-3.5 h-3.5" />
             <span>AI</span>
           </div>
           <h1 className="font-sans text-[28px] sm:text-[34px] text-ink tracking-tight leading-[1.04] max-w-[18ch] font-bold">
