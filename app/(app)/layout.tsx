@@ -5,6 +5,7 @@ import { authOptions } from '@/lib/auth'
 import { AppNav } from '@/components/app-nav'
 import { TourProvider } from '@/components/tour/tour-context'
 import { TourOverlay } from '@/components/tour/tour-overlay'
+import { IosNavLock } from '@/components/ios-nav-lock'
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const session = await getServerSession(authOptions)
@@ -38,6 +39,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       </div>
 
       <TourProvider>
+        <IosNavLock />
         <div className="relative z-10">
           <AppNav />
           <main className="max-w-5xl mx-auto px-4 sm:px-6 pb-36 lg:pb-16 pt-5 sm:pt-8 max-w-full overflow-x-clip">

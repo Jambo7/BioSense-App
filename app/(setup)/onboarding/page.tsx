@@ -384,7 +384,7 @@ export default function OnboardingPage() {
           />
           <div className="space-y-3 mt-7">
             {[
-              { Icon: BiosenseS, tone: 'violet' as const, title: 'Personalised insights', body: 'We tailor everything, your Health Score, insights and guidance, to you.' },
+              { Icon: BiosenseS, tone: 'violet' as const, title: 'Personalised insights', body: 'We tailor everything, your biological age estimate, insights and guidance, to you.' },
               { Icon: TrendingUp, tone: 'sage' as const, title: 'Smarter over time', body: 'The better we learn, the more helpful BioSense becomes for you.' },
               { Icon: Lock, tone: 'teal' as const, title: 'Your privacy matters', body: 'Your data is private, secure and never sold or shared.' },
             ].map((r) => (

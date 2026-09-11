@@ -73,5 +73,8 @@ class BiosenseBridgeViewController: CAPBridgeViewController {
         };
         """
         ucc?.addUserScript(WKUserScript(source: js, injectionTime: .atDocumentStart, forMainFrameOnly: false))
+        // Tab switches should not slide like Safari history.
+        webView?.allowsBackForwardNavigationGestures = false
+        webView?.allowsLinkPreview = false
     }
 }

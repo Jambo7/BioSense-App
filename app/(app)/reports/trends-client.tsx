@@ -43,15 +43,16 @@ interface MetricSummary {
   points: number
 }
 
+type Tab = 'goals' | 'trajectory' | 'lifestyle' | 'reports'
+
 interface TrendsClientProps {
   summaries: MetricSummary[]
   windowDays: number
   reportsCount: number
   savedInsights: InsightCard[]
+  initialTab?: Tab
 }
 
-// ── Tab definitions per v7 spec ───────────────────────────────────────────
-type Tab = 'goals' | 'trajectory' | 'lifestyle' | 'reports'
 const TABS: { id: Tab; label: string }[] = [
   { id: 'goals',      label: 'Goals'             },
   { id: 'trajectory', label: 'Health trajectory' },
@@ -59,8 +60,8 @@ const TABS: { id: Tab; label: string }[] = [
   { id: 'reports',    label: 'Reports'           },
 ]
 
-export function TrendsClient({ summaries, reportsCount, savedInsights }: TrendsClientProps) {
-  const [tab, setTab] = useState<Tab>('goals')
+export function TrendsClient({ summaries, reportsCount, savedInsights, initialTab }: TrendsClientProps) {
+  const [tab, setTab] = useState<Tab>(initialTab && TABS.some((t) => t.id === initialTab) ? initialTab : 'goals')
   const [showDiscovery, setShowDiscovery] = useState(false)
 
   return (

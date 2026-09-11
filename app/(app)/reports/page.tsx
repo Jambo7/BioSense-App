@@ -7,9 +7,14 @@ import { TrendsClient } from './trends-client'
 
 const WINDOW_DAYS = 30
 
-export default async function TrendsPage() {
+export default async function TrendsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ tab?: string }>
+}) {
   const session = await getServerSession(authOptions)
   if (!session) return null
+  const { tab } = await searchParams
 
   const since = new Date()
   since.setDate(since.getDate() - WINDOW_DAYS)
@@ -61,6 +66,7 @@ export default async function TrendsPage() {
       windowDays={WINDOW_DAYS}
       reportsCount={weeklyCount + monthlyCount}
       savedInsights={savedInsights}
+      initialTab={tab === 'trajectory' || tab === 'lifestyle' || tab === 'reports' || tab === 'goals' ? tab : undefined}
     />
   )
 }

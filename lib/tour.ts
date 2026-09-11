@@ -50,7 +50,7 @@ export const TOUR_STEPS: TourStep[] = [
     tone: 'amber',
     title: 'Home',
     body:
-      "Your most important summarised health intelligence lives here. Your long-term Health Score, Latest Intelligence, today's readiness and your daily snapshot.",
+      "Your most important summarised health intelligence lives here. Your biological age estimate, Latest Intelligence, today's readiness and your daily snapshot.",
     placement: 'top',
   },
   {

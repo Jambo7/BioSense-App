@@ -19,12 +19,10 @@ import {
   Activity,
   type LucideIcon,
 } from 'lucide-react'
-import { scoreLabel } from '@/lib/score'
 import type { WearableMetrics } from '@/lib/wearable-metrics'
 import type { InsightCard, InsightType } from '@/lib/intelligence'
 import { Card } from '@/components/ui/card'
 import { ScoreRing } from '@/components/ui/score-ring'
-import { SparkLine } from '@/components/ui/spark-line'
 import { IconBadge, type IconBadgeTone } from '@/components/ui/icon-badge'
 import { SourceRow } from '@/components/source-status'
 import { computeReadiness, formatSleep, readinessCaption } from '@/lib/readiness'
@@ -44,43 +42,42 @@ const INSIGHT_ICONS: Record<InsightType, { icon: LucideIcon; tone: Tone; chip: s
 
 interface DashboardClientProps {
   user: { name: string; age: number | null; goalType: string | null; goalText: string | null }
-  healthScore: number | null
-  scoreBreakdown: Record<string, number> | null
   hasContextToday: boolean
   checkinCount: number
   hasBlood: boolean
   connectedWearables: string[]
   wearableMetrics: WearableMetrics
-  scoreSeries: number[]
-  scoreSeriesDays: number
   intelligence: InsightCard[]
   learningStarted: boolean
   hasProfile: boolean
+  bioAge: {
+    unlocked: boolean
+    trackingDays: number
+    unlockDays: number
+    value: number | null
+    calendarAge: number | null
+    delta: number | null
+  }
 }
 
 export function DashboardClient(props: DashboardClientProps) {
   const {
     user,
-    healthScore,
     hasContextToday,
     connectedWearables,
     wearableMetrics: wm,
-    scoreSeries,
-    scoreSeriesDays,
     intelligence,
     hasProfile,
     learningStarted,
     hasBlood,
+    bioAge,
   } = props
 
-  const hasScore = healthScore != null
-  const isNew = !hasScore
+  const hasEstimate = bioAge.unlocked && bioAge.value != null
+  const isNew = !hasEstimate
   const firstName = user.name.split(' ')[0] || 'there'
   const readiness = computeReadiness(wm)
-  const sl = healthScore != null ? scoreLabel(healthScore) : null
   const homeCards = intelligence.slice(0, 3)
-  const delta =
-    scoreSeries.length >= 2 ? Math.round(scoreSeries[scoreSeries.length - 1] - scoreSeries[0]) : 0
 
   return (
     <div className="max-w-3xl mx-auto fade-up space-y-4">
@@ -116,13 +113,9 @@ export function DashboardClient(props: DashboardClientProps) {
         </header>
       )}
 
-      <HealthScoreCard
+      <BioAgeCard
         isNew={isNew}
-        score={healthScore}
-        label={sl?.label}
-        series={scoreSeries}
-        seriesDays={scoreSeriesDays}
-        delta={delta}
+        bioAge={bioAge}
         wearableConnected={connectedWearables.length > 0}
         hasProfile={hasProfile}
       />
@@ -146,44 +139,47 @@ export function DashboardClient(props: DashboardClientProps) {
   )
 }
 
-function HealthScoreCard({
+function BioAgeCard({
   isNew,
-  score,
-  label,
-  series,
-  seriesDays,
-  delta,
+  bioAge,
   wearableConnected,
   hasProfile,
 }: {
   isNew: boolean
-  score: number | null
-  label?: string
-  series: number[]
-  seriesDays: number
-  delta: number
+  bioAge: DashboardClientProps['bioAge']
   wearableConnected: boolean
   hasProfile: boolean
 }) {
+  const daysLeft = Math.max(0, bioAge.unlockDays - bioAge.trackingDays)
+  const younger =
+    bioAge.delta != null && bioAge.delta >= 2
+      ? 'younger'
+      : bioAge.delta != null && bioAge.delta <= -2
+        ? 'older'
+        : 'in line'
+
   return (
     <Card variant="glass" padding="lg">
       <div className="flex items-center gap-2 text-eyebrow uppercase text-ink-3 mb-2">
-        <span>Health score</span>
+        <span>Biological age</span>
         <span className="text-[10px] px-2 py-0.5 rounded-pill bg-[rgba(168,191,163,0.2)] text-sage-deep">
-          Long-term
+          Wellness estimate
         </span>
       </div>
 
-      {isNew || score == null ? (
+      {isNew || bioAge.value == null ? (
         <>
           <div className="flex items-start gap-4">
             <div className="flex-1 min-w-0">
               <h2 className="font-sans text-[22px] font-bold text-ink tracking-tight">
-                Building your baseline
+                Building your estimate
               </h2>
               <p className="text-[13px] text-ink-2 mt-1.5 leading-relaxed max-w-[48ch]">
-                BioSense needs enough information to understand your normal patterns before it can
-                calculate your long-term Health Score.
+                {bioAge.unlocked
+                  ? 'BioSense has enough days of tracking, and is waiting on a little more wearable or lifestyle signal before it can show an estimate.'
+                  : daysLeft > 0
+                    ? `BioSense needs about ${daysLeft} more day${daysLeft === 1 ? '' : 's'} of your own data before it can show a biological age estimate.`
+                    : 'BioSense needs enough of your own data before it can show a biological age estimate.'}
               </p>
             </div>
             <EmptyRing icon={User} />
@@ -207,12 +203,12 @@ function HealthScoreCard({
             <SourceRow
               compact
               icon={TrendingUp}
-              title="Long-term baseline"
-              hint="Your trajectory will appear here as BioSense learns your baseline."
-              state="building"
+              title="Enough history"
+              hint="Your estimate appears after BioSense has a personal baseline."
+              state={bioAge.unlocked ? 'done' : 'building'}
+              doneLabel="Ready"
             />
           </div>
-          <GhostSparkline />
           <Link
             href="/wearables"
             className="inline-flex items-center gap-1 text-[13px] font-semibold text-sage-deep mt-3"
@@ -221,48 +217,52 @@ function HealthScoreCard({
           </Link>
         </>
       ) : (
-        <div className="flex items-start gap-4">
+        <Link href="/reports?tab=trajectory" className="flex items-start gap-4 group">
           <div className="flex-1 min-w-0">
             <h2 className="font-sans text-[20px] sm:text-[24px] font-bold text-ink tracking-tight leading-[1.12]">
-              {delta <= -3 ? (
+              {younger === 'younger' ? (
                 <>
-                  Your long-term health{' '}
-                  <span className="italic-accent text-sage-deep font-normal">needs attention.</span>
+                  Tracking{' '}
+                  <span className="italic-accent text-sage-deep font-normal">younger</span>
+                  {' '}than calendar age.
+                </>
+              ) : younger === 'older' ? (
+                <>
+                  Tracking a little{' '}
+                  <span className="italic-accent text-sage-deep font-normal">older</span>
+                  {' '}than calendar age.
                 </>
               ) : (
                 <>
-                  Your long-term health is{' '}
-                  <span className="italic-accent text-sage-deep font-normal">
-                    {delta >= 3 ? 'improving.' : 'holding.'}
-                  </span>
+                  Tracking{' '}
+                  <span className="italic-accent text-sage-deep font-normal">in line</span>
+                  {' '}with calendar age.
                 </>
               )}
             </h2>
             <p className="text-[13px] text-ink-2 mt-1.5 leading-relaxed">
-              {seriesDays > 0
-                ? `Your score has trended ${delta >= 0 ? 'up' : 'down'} ${Math.abs(delta)} points over the past ${seriesDays} days.`
-                : 'Your score will show a clearer trend as more days land.'}
+              {bioAge.delta != null && bioAge.calendarAge != null
+                ? younger === 'in line'
+                  ? `About the same as your calendar age of ${bioAge.calendarAge}.`
+                  : `${Math.abs(Math.round(bioAge.delta))} year${Math.abs(Math.round(bioAge.delta)) === 1 ? '' : 's'} ${younger} than your calendar age of ${bioAge.calendarAge}.`
+                : 'A wellness estimate from your available health and wearable signals.'}
             </p>
-            {series.length >= 4 && (
-              <div className="mt-3">
-                <SparkLine values={series} width={240} height={56} tone="sage" showFill className="w-full h-auto" />
-                <div className="flex justify-between text-[10px] uppercase tracking-[0.1em] text-ink-3 mt-1">
-                  <span>{seriesDays}d ago</span>
-                  <span>Today</span>
-                </div>
-              </div>
-            )}
+            <p className="text-[11.5px] text-ink-3 mt-2 leading-snug">
+              A wellness estimate from your available signals. Not a clinical or medical age.
+            </p>
+            <span className="inline-flex items-center gap-1 text-[12.5px] font-semibold text-sage-deep mt-3">
+              See what this is based on <ArrowRight className="w-3.5 h-3.5" />
+            </span>
           </div>
           <div className="flex flex-col items-center shrink-0">
-            <ScoreRing value={Math.round(score)} size={108} thickness={8} label={label ?? 'Score'} sublabel="/100" />
-            <Link
-              href="/reports"
-              className="inline-flex items-center gap-1 text-[12.5px] font-semibold text-sage-deep mt-2"
-            >
-              View score factors <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
+            <div className="w-[108px] h-[108px] rounded-full bg-[rgba(255,255,255,0.72)] ring-1 ring-inset ring-[rgba(168,191,163,0.28)] flex flex-col items-center justify-center">
+              <div className="font-sans font-bold text-[34px] leading-none tabular-nums tracking-tight text-ink">
+                {Math.round(bioAge.value)}
+              </div>
+              <div className="italic-accent text-[12px] text-sage-deep mt-1">years</div>
+            </div>
           </div>
-        </div>
+        </Link>
       )}
     </Card>
   )
@@ -587,25 +587,6 @@ function EmptyRing({
       <div className="absolute inset-0 flex items-center justify-center">
         <Icon className={cn('w-6 h-6', iconClass)} strokeWidth={1.8} />
       </div>
-    </div>
-  )
-}
-
-function GhostSparkline() {
-  return (
-    <div className="relative mt-4 h-14">
-      <svg viewBox="0 0 240 56" className="w-full h-full" aria-hidden>
-        <path
-          d="M0 42 C28 42 48 28 72 32 S120 18 152 24 S200 40 240 22"
-          fill="none"
-          stroke="rgba(111,143,107,0.22)"
-          strokeWidth="2"
-          strokeLinecap="round"
-        />
-      </svg>
-      <p className="absolute inset-0 flex items-center justify-center text-[12px] text-ink-3 text-center px-6 leading-snug">
-        Your trajectory will appear here as BioSense learns your baseline.
-      </p>
     </div>
   )
 }

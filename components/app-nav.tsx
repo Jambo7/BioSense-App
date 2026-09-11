@@ -114,6 +114,7 @@ export function AppNav() {
                 <Link
                   key={item.href}
                   href={item.href}
+                  replace
                   prefetch
                   aria-label={item.label}
                   data-tour={item.tourId}
@@ -164,6 +165,7 @@ export function AppNav() {
               <Link
                 key={item.href}
                 href={item.href}
+                replace
                 prefetch
                 data-tour={item.tourId}
                 onClick={onTabClick}
@@ -212,7 +214,7 @@ export function AppNav() {
           legible when content scrolls under the bar. */}
       <header className="glass-nav sticky top-0 z-40 flex items-center justify-between px-4 sm:px-6 gap-3 w-full max-w-full box-border">
         {/* Wordmark */}
-        <Link href="/dashboard" className="flex items-center group shrink-0">
+        <Link href="/dashboard" replace className="flex items-center group shrink-0">
           <BrandWordmark height={28} priority />
         </Link>
 
@@ -225,6 +227,7 @@ export function AppNav() {
               <Link
                 key={item.href}
                 href={item.href}
+                replace
                 data-tour={item.tourId}
                 className={cn(
                   'flex items-center gap-1.5 px-3.5 h-9 rounded-pill text-caption font-medium transition-all relative',
