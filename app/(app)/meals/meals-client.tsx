@@ -8,6 +8,7 @@ import {
   Camera,
   Check,
   Image as ImageIcon,
+  Plus,
   Trash2,
   Utensils,
 } from 'lucide-react'
@@ -26,6 +27,8 @@ import {
   type MealEstimate,
   type MealSlot,
 } from '@/lib/meals'
+
+type Mode = 'plate' | 'ingredients'
 
 type MealRow = {
   id: string
@@ -53,6 +56,13 @@ type Draft = MealEstimate & {
   sourceFat: number
 }
 
+type Ingredient = {
+  id: string
+  file: File
+  previewUrl: string
+  note: string
+}
+
 function asItems(value: unknown): { name: string; portion: string }[] {
   if (!Array.isArray(value)) return []
   return value
@@ -61,16 +71,40 @@ function asItems(value: unknown): { name: string; portion: string }[] {
     .map((item) => ({ name: item.name ?? '', portion: item.portion ?? '' }))
 }
 
+function fileProblem(file: File): string | null {
+  const type = file.type || ''
+  const name = file.name || ''
+  if (/heic|heif/i.test(type) || /\.hei[cf]$/i.test(name)) {
+    return 'That library format will not read. Take a new photo, or pick a JPG or PNG.'
+  }
+  if (file.size < 12 * 1024) {
+    return 'That photo looks too small or empty. Take another shot.'
+  }
+  if (file.size > 8 * 1024 * 1024) {
+    return 'That photo is too large. Try another shot, a bit closer.'
+  }
+  if (type && !type.startsWith('image/') && !/\.(jpe?g|png|webp)$/i.test(name)) {
+    return 'Please take a photo, or choose a JPG or PNG.'
+  }
+  return null
+}
+
 export function MealsClient() {
   const router = useRouter()
-  const cameraRef = useRef<HTMLInputElement>(null)
-  const libraryRef = useRef<HTMLInputElement>(null)
+  const plateCameraRef = useRef<HTMLInputElement>(null)
+  const plateLibraryRef = useRef<HTMLInputElement>(null)
+  const ingredientCameraRef = useRef<HTMLInputElement>(null)
+  const ingredientLibraryRef = useRef<HTMLInputElement>(null)
   const date = todayDateParam()
   const [meals, setMeals] = useState<MealRow[]>([])
-  const [note, setNote] = useState('')
+  const [mode, setMode] = useState<Mode>('plate')
+  const [plateNote, setPlateNote] = useState('')
+  const [ingredientNote, setIngredientNote] = useState('')
+  const [ingredients, setIngredients] = useState<Ingredient[]>([])
   const [reading, setReading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [draft, setDraft] = useState<Draft | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -92,101 +126,130 @@ export function MealsClient() {
   }, [date])
 
   const totals = useMemo(() => totalsFor(meals), [meals])
-  const isToday = true
 
-  function tryAgain() {
-    cameraRef.current?.click()
-  }
-
-  function failPhoto(message: string) {
+  function showError(message: string, retry?: () => void) {
+    setError(message)
     toast.error(message, {
-      duration: 6500,
-      action: {
-        label: 'Try again',
-        onClick: () => tryAgain(),
-      },
+      duration: 7000,
+      action: retry
+        ? {
+            label: 'Try again',
+            onClick: () => retry(),
+          }
+        : undefined,
     })
   }
 
-  async function onFile(file: File | undefined) {
-    if (!file) return
+  function openPlateCamera() {
+    plateCameraRef.current?.click()
+  }
 
-    const type = file.type || ''
-    const name = file.name || ''
-    if (/heic|heif/i.test(type) || /\.hei[cf]$/i.test(name)) {
-      failPhoto('That library format will not read. Take a new photo, or pick a JPG or PNG.')
-      return
+  function applyEstimate(estimate: MealEstimate, previewUrl: string, userNote: string) {
+    setError(null)
+    setDraft({
+      ...estimate,
+      slot: defaultMealSlot(),
+      userNote,
+      previewUrl,
+      sourceCalories: estimate.calories,
+      sourceProtein: estimate.proteinG,
+      sourceCarbs: estimate.carbsG,
+      sourceFat: estimate.fatG,
+    })
+    if (estimate.confidence === 'low') {
+      setError('This estimate is a guess. Retake in better light, or adjust the numbers.')
     }
-    if (file.size < 12 * 1024) {
-      failPhoto('That photo looks too small or empty. Take another shot of the plate.')
-      return
-    }
-    if (file.size > 8 * 1024 * 1024) {
-      failPhoto('That photo is too large. Try another shot, a bit closer to the plate.')
-      return
-    }
-    if (
-      type &&
-      !type.startsWith('image/') &&
-      !/\.(jpe?g|png|webp)$/i.test(name)
-    ) {
-      failPhoto('Please take a photo of the meal, or choose a JPG or PNG.')
-      return
-    }
+  }
 
+  async function analyse(files: File[], notes: string[], analyseMode: Mode) {
     setReading(true)
-    const previewUrl = URL.createObjectURL(file)
+    setError(null)
     try {
       const fd = new FormData()
-      fd.append('file', file)
-      if (note.trim()) fd.append('note', note.trim())
+      fd.append('mode', analyseMode)
+      files.forEach((file) => fd.append('files', file))
+      notes.forEach((note) => fd.append('notes', note))
       const res = await fetch('/api/meals/analyse', { method: 'POST', body: fd })
       let json: { error?: string; isMeal?: boolean; reason?: string } = {}
       try {
         json = await res.json()
       } catch {
-        throw new Error('Could not read that photo. Please try again.')
+        throw new Error('Could not read those photos. Please try again.')
       }
-      if (!res.ok) {
-        throw new Error(json.error || 'Could not read that photo. Please try again.')
-      }
+      if (!res.ok) throw new Error(json.error || 'Could not read those photos. Please try again.')
       if (json.isMeal === false) {
-        URL.revokeObjectURL(previewUrl)
-        failPhoto(json.reason || 'That photo does not look like a meal. Take another shot of the plate.')
-        return
+        throw new Error(json.reason || 'Those photos do not look like food. Try again.')
       }
-      const estimate = json as MealEstimate
-      setDraft({
-        ...estimate,
-        slot: defaultMealSlot(),
-        userNote: note.trim(),
-        previewUrl,
-        sourceCalories: estimate.calories,
-        sourceProtein: estimate.proteinG,
-        sourceCarbs: estimate.carbsG,
-        sourceFat: estimate.fatG,
-      })
-      if (estimate.confidence === 'low') {
-        toast('This estimate is a guess. You can retake the photo or adjust the numbers.', {
-          duration: 5000,
-          action: {
-            label: 'Retake',
-            onClick: () => {
-              URL.revokeObjectURL(previewUrl)
-              setDraft(null)
-              tryAgain()
-            },
-          },
-        })
-      }
+      const previewUrl = URL.createObjectURL(files[0])
+      applyEstimate(json as MealEstimate, previewUrl, notes.filter(Boolean).join(' · '))
     } catch (err) {
-      URL.revokeObjectURL(previewUrl)
-      failPhoto(err instanceof Error ? err.message : 'Could not read that photo. Please try again.')
+      showError(
+        err instanceof Error ? err.message : 'Could not read those photos. Please try again.',
+        analyseMode === 'plate' ? openPlateCamera : undefined,
+      )
     } finally {
       setReading(false)
-      if (cameraRef.current) cameraRef.current.value = ''
-      if (libraryRef.current) libraryRef.current.value = ''
+      if (plateCameraRef.current) plateCameraRef.current.value = ''
+      if (plateLibraryRef.current) plateLibraryRef.current.value = ''
+      if (ingredientCameraRef.current) ingredientCameraRef.current.value = ''
+      if (ingredientLibraryRef.current) ingredientLibraryRef.current.value = ''
     }
+  }
+
+  async function onPlateFile(file: File | undefined) {
+    if (!file) return
+    const problem = fileProblem(file)
+    if (problem) {
+      showError(problem, openPlateCamera)
+      return
+    }
+    await analyse([file], [plateNote], 'plate')
+  }
+
+  function addIngredient(file: File | undefined) {
+    if (!file) return
+    const problem = fileProblem(file)
+    if (problem) {
+      showError(problem, () => ingredientCameraRef.current?.click())
+      return
+    }
+    if (ingredients.length >= 6) {
+      showError('You can add up to 6 ingredient photos.')
+      return
+    }
+    setError(null)
+    setIngredients((prev) => [
+      ...prev,
+      {
+        id: `${Date.now()}-${file.name}`,
+        file,
+        previewUrl: URL.createObjectURL(file),
+        note: ingredientNote.trim(),
+      },
+    ])
+    setIngredientNote('')
+    if (ingredientCameraRef.current) ingredientCameraRef.current.value = ''
+    if (ingredientLibraryRef.current) ingredientLibraryRef.current.value = ''
+  }
+
+  function removeIngredient(id: string) {
+    setIngredients((prev) => {
+      const row = prev.find((item) => item.id === id)
+      if (row) URL.revokeObjectURL(row.previewUrl)
+      return prev.filter((item) => item.id !== id)
+    })
+  }
+
+  async function createFromIngredients() {
+    if (ingredients.length === 0) {
+      showError('Add at least one ingredient photo first.')
+      return
+    }
+    await analyse(
+      ingredients.map((item) => item.file),
+      ingredients.map((item) => item.note),
+      'ingredients',
+    )
   }
 
   async function saveDraft() {
@@ -219,20 +282,17 @@ export function MealsClient() {
       const json = await res.json()
       if (!res.ok) throw new Error(json.error || 'Could not save meal')
       const saved = json.meal as MealRow
-      setMeals((prev) => [
-        ...prev,
-        {
-          ...saved,
-          items: asItems(saved.items),
-        },
-      ])
+      setMeals((prev) => [...prev, { ...saved, items: asItems(saved.items) }])
       URL.revokeObjectURL(draft.previewUrl)
+      ingredients.forEach((item) => URL.revokeObjectURL(item.previewUrl))
       setDraft(null)
-      setNote('')
+      setIngredients([])
+      setPlateNote('')
+      setError(null)
       toast.success('Meal logged')
       router.refresh()
-    } catch (err) {
-      toast.error('Could not save meal. Please try again.')
+    } catch {
+      showError('Could not save that meal. Please try again.')
     } finally {
       setSaving(false)
     }
@@ -241,7 +301,7 @@ export function MealsClient() {
   async function removeMeal(id: string) {
     const res = await fetch(`/api/meals/${id}`, { method: 'DELETE' })
     if (!res.ok) {
-      toast.error('Could not remove that meal. Please try again.')
+      showError('Could not remove that meal. Please try again.')
       return
     }
     setMeals((prev) => prev.filter((m) => m.id !== id))
@@ -266,17 +326,34 @@ export function MealsClient() {
             Log today&apos;s <span className="italic-accent">plate.</span>
           </h1>
           <p className="text-body-sm text-ink-2 mt-2 leading-relaxed max-w-[54ch]">
-            Photograph a meal. BioSense estimates calories and macros. You can
-            adjust the numbers before you save. Estimates only, not a weighed
-            portion or medical nutrition advice.
+            Photograph a finished meal, or add ingredient and pack photos with notes
+            such as &quot;half this pack&quot;. Estimates only, not a weighed portion.
           </p>
         </div>
       </header>
 
-      <Card padding="md">
-        <div className="text-eyebrow uppercase text-ink-3 mb-3">
-          {isToday ? 'Today' : date}
+      {error && (
+        <div
+          role="alert"
+          className="rounded-card p-4 bg-rose-tint border border-[rgba(201,122,122,0.28)] space-y-3"
+        >
+          <p className="text-body-sm text-ink leading-relaxed">{error}</p>
+          <Button
+            variant="subtle"
+            size="sm"
+            onClick={() => {
+              setError(null)
+              if (mode === 'plate') openPlateCamera()
+              else ingredientCameraRef.current?.click()
+            }}
+          >
+            Try again
+          </Button>
         </div>
+      )}
+
+      <Card padding="md">
+        <div className="text-eyebrow uppercase text-ink-3 mb-3">Today</div>
         <div className="grid grid-cols-4 gap-2">
           <MacroStat label="kcal" value={Math.round(totals.calories)} />
           <MacroStat label="Protein" value={`${Math.round(totals.proteinG)}g`} />
@@ -285,55 +362,178 @@ export function MealsClient() {
         </div>
       </Card>
 
-      <Card>
-        <label className="block text-eyebrow uppercase text-ink-3 mb-2">
-          Anything the photo might miss?
-        </label>
-        <Input
-          placeholder="e.g. olive oil on the side, extra rice"
-          value={note}
-          onChange={(e) => setNote(e.target.value)}
-          maxLength={280}
-        />
-        <div className="grid grid-cols-2 gap-2 mt-4">
+      <div className="grid grid-cols-2 gap-2">
+        <button
+          type="button"
+          onClick={() => setMode('plate')}
+          className={cn(
+            'h-11 rounded-pill text-[13px] font-semibold border',
+            mode === 'plate'
+              ? 'bg-sage-wash border-accent-ring text-sage-deep'
+              : 'bg-white border-line text-ink-2',
+          )}
+        >
+          Whole plate
+        </button>
+        <button
+          type="button"
+          onClick={() => setMode('ingredients')}
+          className={cn(
+            'h-11 rounded-pill text-[13px] font-semibold border',
+            mode === 'ingredients'
+              ? 'bg-sage-wash border-accent-ring text-sage-deep'
+              : 'bg-white border-line text-ink-2',
+          )}
+        >
+          Ingredients
+        </button>
+      </div>
+
+      {mode === 'plate' ? (
+        <Card>
+          <div className="text-eyebrow uppercase text-ink-3 mb-2">Whole plate</div>
+          <p className="text-caption text-ink-2 mb-3 leading-relaxed">
+            One photo of the meal you are eating. Add a note if the photo will miss
+            oil, sauces or a leftover.
+          </p>
+          <Input
+            placeholder="e.g. extra rice, or I left half"
+            value={plateNote}
+            onChange={(e) => setPlateNote(e.target.value)}
+            maxLength={280}
+          />
+          <div className="grid grid-cols-2 gap-2 mt-4">
             <Button
+              variant="primary"
+              size="lg"
+              loading={reading}
+              onClick={openPlateCamera}
+            >
+              <Camera className="w-4 h-4" />
+              {reading ? 'Reading the plate' : 'Take photo'}
+            </Button>
+            <Button
+              variant="ghost"
+              size="lg"
+              disabled={reading}
+              onClick={() => plateLibraryRef.current?.click()}
+            >
+              <ImageIcon className="w-4 h-4" />
+              Library
+            </Button>
+          </div>
+          <input
+            ref={plateCameraRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            capture="environment"
+            className="hidden"
+            onChange={(e) => void onPlateFile(e.target.files?.[0])}
+          />
+          <input
+            ref={plateLibraryRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            className="hidden"
+            onChange={(e) => void onPlateFile(e.target.files?.[0])}
+          />
+          <p className="text-caption text-ink-3 mt-3 leading-relaxed">
+            Photos are read once and not stored.
+          </p>
+        </Card>
+      ) : (
+        <Card>
+          <div className="text-eyebrow uppercase text-ink-3 mb-2">Build from ingredients</div>
+          <p className="text-caption text-ink-2 mb-3 leading-relaxed">
+            Photo each pack or ingredient, with a note such as &quot;having half this
+            pack&quot;. Then create the meal. Brand names on packs are looked up for a
+            closer estimate.
+          </p>
+          <Input
+            placeholder='Note for the next photo, e.g. "half this pack"'
+            value={ingredientNote}
+            onChange={(e) => setIngredientNote(e.target.value)}
+            maxLength={280}
+          />
+          <div className="grid grid-cols-2 gap-2 mt-4">
+            <Button
+              variant="ghost"
+              size="lg"
+              disabled={reading}
+              onClick={() => ingredientCameraRef.current?.click()}
+            >
+              <Camera className="w-4 h-4" />
+              Add photo
+            </Button>
+            <Button
+              variant="ghost"
+              size="lg"
+              disabled={reading}
+              onClick={() => ingredientLibraryRef.current?.click()}
+            >
+              <ImageIcon className="w-4 h-4" />
+              Library
+            </Button>
+          </div>
+          <input
+            ref={ingredientCameraRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            capture="environment"
+            className="hidden"
+            onChange={(e) => addIngredient(e.target.files?.[0])}
+          />
+          <input
+            ref={ingredientLibraryRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            className="hidden"
+            onChange={(e) => addIngredient(e.target.files?.[0])}
+          />
+
+          {ingredients.length > 0 && (
+            <ul className="mt-4 space-y-2">
+              {ingredients.map((item, index) => (
+                <li key={item.id} className="flex items-start gap-3">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={item.previewUrl}
+                    alt=""
+                    className="w-12 h-12 rounded-[10px] object-cover shrink-0"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <div className="text-caption text-ink-3">Photo {index + 1}</div>
+                    <p className="text-body-sm text-ink leading-snug">
+                      {item.note || 'No note'}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => removeIngredient(item.id)}
+                    className="text-ink-3 hover:text-rose p-1"
+                    aria-label="Remove ingredient"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          <Button
             variant="primary"
             size="lg"
+            fullWidth
+            className="mt-4"
             loading={reading}
-            onClick={() => cameraRef.current?.click()}
+            disabled={ingredients.length === 0}
+            onClick={() => void createFromIngredients()}
           >
-            <Camera className="w-4 h-4" />
-            {reading ? 'Reading the plate' : 'Take photo'}
+            <Plus className="w-4 h-4" />
+            {reading ? 'Creating meal' : 'Create meal'}
           </Button>
-          <Button
-            variant="ghost"
-            size="lg"
-            disabled={reading}
-            onClick={() => libraryRef.current?.click()}
-          >
-            <ImageIcon className="w-4 h-4" />
-            Library
-          </Button>
-        </div>
-        <input
-          ref={cameraRef}
-          type="file"
-          accept="image/jpeg,image/png,image/webp"
-          capture="environment"
-          className="hidden"
-          onChange={(e) => void onFile(e.target.files?.[0])}
-        />
-        <input
-          ref={libraryRef}
-          type="file"
-          accept="image/jpeg,image/png,image/webp"
-          className="hidden"
-          onChange={(e) => void onFile(e.target.files?.[0])}
-        />
-        <p className="text-caption text-ink-3 mt-3 leading-relaxed">
-          Photos are read once and not stored.
-        </p>
-      </Card>
+        </Card>
+      )}
 
       {draft && (
         <Card padding="lg" className="space-y-4">
@@ -347,6 +547,7 @@ export function MealsClient() {
             <div className="flex-1 min-w-0">
               <div className="text-eyebrow uppercase text-ink-3 mb-1">
                 {draft.confidence} confidence
+                {draft.usedWebLookup ? ' · pack lookup' : ''}
               </div>
               <Input
                 value={draft.title}
@@ -421,7 +622,8 @@ export function MealsClient() {
               onClick={() => {
                 URL.revokeObjectURL(draft.previewUrl)
                 setDraft(null)
-                tryAgain()
+                setError(null)
+                if (mode === 'plate') openPlateCamera()
               }}
             >
               Retake
@@ -436,9 +638,7 @@ export function MealsClient() {
 
       <div className="space-y-3">
         {meals.length === 0 && !draft && (
-          <p className="text-body-sm text-ink-3 leading-relaxed">
-            No meals logged {isToday ? 'today' : 'on this day'} yet.
-          </p>
+          <p className="text-body-sm text-ink-3 leading-relaxed">No meals logged today yet.</p>
         )}
         {meals.map((meal) => (
           <Card key={meal.id} className="flex items-start gap-3">

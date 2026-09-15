@@ -27,6 +27,7 @@ export interface MealEstimate {
   fibreG: number | null
   confidence: 'high' | 'medium' | 'low'
   assumptions: string
+  usedWebLookup: boolean
 }
 
 export interface MealReject {
@@ -129,8 +130,9 @@ export function parseMealAnalysis(raw: string): MealAnalysis | null {
     confidence,
     assumptions:
       typeof parsed.assumptions === 'string' && parsed.assumptions.trim()
-        ? enforceOutputSafety(parsed.assumptions.trim().slice(0, 280))
+        ? enforceOutputSafety(parsed.assumptions.trim().slice(0, 400))
         : 'Portion size was estimated from the photo.',
+    usedWebLookup: parsed.usedWebLookup === true,
   }
 }
 
@@ -139,19 +141,94 @@ export async function analyseMealPhoto(params: {
   mime: string
   note?: string
 }): Promise<MealAnalysis> {
+  return analyseMealPhotos({
+    mode: 'plate',
+    images: [{ buffer: params.buffer, mime: params.mime }],
+    notes: [params.note ?? ''],
+  })
+}
+
+export async function analyseMealPhotos(params: {
+  mode: 'plate' | 'ingredients'
+  images: { buffer: Buffer; mime: string }[]
+  notes: string[]
+}): Promise<MealAnalysis> {
   if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY === 'placeholder') {
     throw new Error('AI is not configured')
   }
+  if (params.images.length === 0) {
+    return { isMeal: false, reason: 'Please add at least one photo.' }
+  }
 
   const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
-  const b64 = params.buffer.toString('base64')
-  const hint = params.note?.trim()
-    ? `The member added this note about the meal: ${params.note.trim().slice(0, 280)}`
-    : 'The member did not add a note.'
+  const noteLines = params.images
+    .map((_, i) => {
+      const note = params.notes[i]?.trim()
+      return note
+        ? `Photo ${i + 1} note: ${note.slice(0, 280)}`
+        : `Photo ${i + 1}: no extra note.`
+    })
+    .join('\n')
 
+  const task =
+    params.mode === 'ingredients'
+      ? 'These photos are ingredients or packs that make one meal. Combine them. Apply each note to that photo only (for example "half this pack"). Search the web for readable brand names.'
+      : 'This is one plated meal or a single pack. Apply the member note to the portion. If a brand is readable, search the web for that product.'
+
+  const userText = `${task}\n${noteLines}\nReturn JSON only.`
+
+  const parsed =
+    (await analyseWithSearch(client, params.images, userText)) ??
+    (await analyseWithVisionOnly(client, params.images, userText))
+
+  if (!parsed) {
+    return {
+      isMeal: false,
+      reason: 'Could not read those photos clearly. Try a brighter, closer shot.',
+    }
+  }
+  return parsed
+}
+
+async function analyseWithSearch(
+  client: OpenAI,
+  images: { buffer: Buffer; mime: string }[],
+  userText: string,
+): Promise<MealAnalysis | null> {
+  try {
+    const res = await client.responses.create({
+      model: process.env.OPENAI_MODEL ?? 'gpt-4o',
+      instructions: MEAL_ANALYSIS_PROMPT,
+      tools: [{ type: 'web_search' }],
+      input: [
+        {
+          role: 'user',
+          content: [
+            { type: 'input_text', text: userText },
+            ...images.map((image) => ({
+              type: 'input_image' as const,
+              image_url: `data:${image.mime};base64,${image.buffer.toString('base64')}`,
+              detail: 'auto' as const,
+            })),
+          ],
+        },
+      ],
+    })
+    return parseMealAnalysis(res.output_text ?? '')
+  } catch (err) {
+    console.error('Meal web lookup failed, using photo only:', err)
+    return null
+  }
+}
+
+async function analyseWithVisionOnly(
+  client: OpenAI,
+  images: { buffer: Buffer; mime: string }[],
+  userText: string,
+): Promise<MealAnalysis | null> {
   const res = await client.chat.completions.create({
     model: process.env.OPENAI_MODEL ?? 'gpt-4o',
-    max_tokens: 800,
+    max_tokens: 1000,
     store: false,
     response_format: { type: 'json_object' },
     messages: [
@@ -159,27 +236,18 @@ export async function analyseMealPhoto(params: {
       {
         role: 'user',
         content: [
-          {
-            type: 'text',
-            text: `${hint}\nEstimate the meal in the photo. Return JSON only.`,
-          },
-          {
-            type: 'image_url',
-            image_url: { url: `data:${params.mime};base64,${b64}` },
-          },
+          { type: 'text', text: userText },
+          ...images.map((image) => ({
+            type: 'image_url' as const,
+            image_url: {
+              url: `data:${image.mime};base64,${image.buffer.toString('base64')}`,
+            },
+          })),
         ],
       },
     ],
   })
-
-  const parsed = parseMealAnalysis(res.choices[0]?.message?.content ?? '')
-  if (!parsed) {
-    return {
-      isMeal: false,
-      reason: 'Could not read that photo clearly. Try a brighter, closer shot of the plate.',
-    }
-  }
-  return parsed
+  return parseMealAnalysis(res.choices[0]?.message?.content ?? '')
 }
 
 export function totalsFor(meals: Array<{ calories: number; proteinG: number; carbsG: number; fatG: number }>) {
