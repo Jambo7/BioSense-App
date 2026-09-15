@@ -6,12 +6,16 @@ import { AppNav } from '@/components/app-nav'
 import { TourProvider } from '@/components/tour/tour-context'
 import { TourOverlay } from '@/components/tour/tour-overlay'
 import { IosNavLock } from '@/components/ios-nav-lock'
+import { billingEnabled, hasMembership } from '@/lib/stripe'
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const session = await getServerSession(authOptions)
 
   if (!session) redirect('/login')
   if (!session.user.hasConsented) redirect('/consent')
+  if (billingEnabled() && !hasMembership(session.user.subscriptionStatus)) {
+    redirect('/upgrade')
+  }
   // Trust the JWT flag — a Prisma round-trip here made every tab switch wait
   // on Neon. Incomplete profiles are still caught at /onboarding write-time
   // and when session is refreshed after onboarding.

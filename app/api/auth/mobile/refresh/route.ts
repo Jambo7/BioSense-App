@@ -25,7 +25,7 @@ export async function POST(req: Request) {
 
   const user = await prisma.user.findUnique({
     where: { id: authed.id },
-    select: { id: true, email: true, name: true, hasConsented: true, onboardingDone: true },
+    select: { id: true, email: true, name: true, hasConsented: true, onboardingDone: true, subscriptionStatus: true },
   })
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -38,6 +38,7 @@ export async function POST(req: Request) {
       name: user.name,
       hasConsented: user.hasConsented,
       onboardingDone: user.onboardingDone,
+      subscriptionStatus: user.subscriptionStatus,
     },
     secret,
     maxAge: MAX_AGE,

@@ -37,6 +37,7 @@ export async function GET(req: Request) {
     monthlyReports,
     wearableSyncs,
     preferenceChanges,
+    mealLogs,
   ] = await Promise.all([
     prisma.user.findUnique({
       where: { id: authed.id },
@@ -115,6 +116,25 @@ export async function GET(req: Request) {
       where: { userId: authed.id },
       select: { field: true, previous: true, next: true, source: true, createdAt: true },
     }),
+    prisma.mealLog.findMany({
+      where: { userId: authed.id },
+      select: {
+        date: true,
+        slot: true,
+        title: true,
+        items: true,
+        calories: true,
+        proteinG: true,
+        carbsG: true,
+        fatG: true,
+        fibreG: true,
+        confidence: true,
+        assumptions: true,
+        userNote: true,
+        adjusted: true,
+        createdAt: true,
+      },
+    }),
   ])
 
   const exportData = {
@@ -124,6 +144,7 @@ export async function GET(req: Request) {
       'Machine-readable export of personal data BioSense holds for this account.',
       'Wearable OAuth/HealthKit tokens and processor credentials are not included.',
       'Stripe customer identifiers are not included.',
+      'Photos of meals are not stored. Macro values are estimates.',
     ],
     user,
     consents,
@@ -145,6 +166,7 @@ export async function GET(req: Request) {
     weeklyReports,
     monthlyReports,
     preferenceChanges,
+    mealLogs,
   }
 
   return new NextResponse(JSON.stringify(exportData, null, 2), {

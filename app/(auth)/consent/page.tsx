@@ -30,7 +30,7 @@ export default function ConsentPage() {
       })
       if (!res.ok) throw new Error()
       await update({ refresh: true })
-      router.push('/onboarding')
+      router.push('/')
     } catch {
       toast.error('Something went wrong. Please try again.')
       setLoading(false)

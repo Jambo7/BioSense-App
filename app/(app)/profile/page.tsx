@@ -2,6 +2,7 @@ import { getServerSession } from 'next-auth'
 import { redirect } from 'next/navigation'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { billingEnabled } from '@/lib/stripe'
 import { ProfileClient } from './profile-client'
 
 export default async function ProfilePage() {
@@ -17,6 +18,7 @@ export default async function ProfilePage() {
       age: true,
       subscriptionStatus: true,
       createdAt: true,
+      stripeCustomerId: true,
       notifyProductEmail: true,
       notifyMarketingEmail: true,
     },
@@ -24,11 +26,15 @@ export default async function ProfilePage() {
 
   if (!user) redirect('/login')
 
+  const { stripeCustomerId, createdAt, ...rest } = user
+
   return (
     <ProfileClient
+      billingEnabled={billingEnabled()}
       user={{
-        ...user,
-        createdAt: user.createdAt.toISOString(),
+        ...rest,
+        hasBillingAccount: Boolean(stripeCustomerId),
+        createdAt: createdAt.toISOString(),
       }}
     />
   )

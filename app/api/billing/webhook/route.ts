@@ -1,11 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { stripe } from '@/lib/stripe'
+import { getStripe } from '@/lib/stripe'
 import { prisma } from '@/lib/prisma'
+import { activateMembership, checkoutEmail } from '@/lib/billing'
 import Stripe from 'stripe'
+
+export async function GET() {
+  return NextResponse.json({
+    ok: true,
+    message:
+      'This is the Stripe webhook endpoint. Stripe sends POST events here. It is not a page, and billing for members happens on https://bio-sense.ai/pricing',
+  })
+}
 
 export async function POST(req: NextRequest) {
   const body = await req.text()
   const sig = req.headers.get('stripe-signature') ?? ''
+  const stripe = getStripe()
 
   let event: Stripe.Event
 
@@ -27,24 +37,29 @@ export async function POST(req: NextRequest) {
 
   switch (event.type) {
     case 'checkout.session.completed': {
-      const session = event.data.object as Stripe.Checkout.Session
-      const userId = session.metadata?.userId
-      if (userId) {
-        await prisma.user.update({
-          where: { id: userId },
-          data: {
-            subscriptionId: session.subscription as string,
-            subscriptionStatus: 'ACTIVE',
-            cancelAtPeriodEnd: false,
-          },
-        })
-      }
+      const checkout = event.data.object as Stripe.Checkout.Session
+      const customerId =
+        typeof checkout.customer === 'string'
+          ? checkout.customer
+          : checkout.customer?.id
+      const subscriptionId =
+        typeof checkout.subscription === 'string'
+          ? checkout.subscription
+          : checkout.subscription?.id
+      await activateMembership({
+        userId: checkout.metadata?.userId || null,
+        email: checkoutEmail(checkout),
+        customerId: customerId ?? null,
+        subscriptionId: subscriptionId ?? null,
+      })
       break
     }
 
     case 'customer.subscription.updated': {
       const sub = event.data.object as Stripe.Subscription
-      const userId = await getUserIdFromCustomer(sub.customer as string)
+      const userId =
+        sub.metadata?.userId ||
+        (await getUserIdFromCustomer(sub.customer as string))
       if (userId) {
         await prisma.user.update({
           where: { id: userId },
@@ -81,7 +96,9 @@ export async function POST(req: NextRequest) {
 
     case 'customer.subscription.deleted': {
       const sub = event.data.object as Stripe.Subscription
-      const userId = await getUserIdFromCustomer(sub.customer as string)
+      const userId =
+        sub.metadata?.userId ||
+        (await getUserIdFromCustomer(sub.customer as string))
       if (userId) {
         await prisma.user.update({
           where: { id: userId },

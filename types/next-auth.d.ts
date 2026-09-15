@@ -6,6 +6,7 @@ declare module 'next-auth' {
     id: string
     hasConsented: boolean
     onboardingDone: boolean
+    subscriptionStatus: string
   }
   interface Session {
     user: {
@@ -15,6 +16,7 @@ declare module 'next-auth' {
       image?: string | null
       hasConsented: boolean
       onboardingDone: boolean
+      subscriptionStatus: string
     }
   }
 }
@@ -24,5 +26,6 @@ declare module 'next-auth/jwt' {
     id: string
     hasConsented: boolean
     onboardingDone: boolean
+    subscriptionStatus: string
   }
 }

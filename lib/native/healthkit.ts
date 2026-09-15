@@ -52,6 +52,12 @@ export function isNativeIos(): boolean {
   return Boolean(cap?.isNativePlatform?.() && cap.getPlatform?.() === 'ios')
 }
 
+export function isNativeApp(): boolean {
+  if (typeof window === 'undefined') return false
+  if ((window as unknown as { __biosenseNative?: boolean }).__biosenseNative) return true
+  return isNativeIos()
+}
+
 export interface HealthKitDay {
   date: string
   steps?: number

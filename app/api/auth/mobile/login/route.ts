@@ -72,6 +72,7 @@ export async function POST(req: Request) {
       name: user.name,
       hasConsented: user.hasConsented,
       onboardingDone: user.onboardingDone,
+      subscriptionStatus: user.subscriptionStatus,
     },
     secret,
     maxAge: MAX_AGE,
@@ -87,6 +88,7 @@ export async function POST(req: Request) {
       name: user.name,
       hasConsented: user.hasConsented,
       onboardingDone: user.onboardingDone,
+      subscriptionStatus: user.subscriptionStatus,
     },
   })
 }

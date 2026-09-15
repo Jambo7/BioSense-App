@@ -25,6 +25,7 @@ export default async function DashboardPage() {
     learningCount,
     bioUnlock,
     latestBioAge,
+    mealsTodayRows,
   ] = await Promise.all([
     prisma.user.findUnique({ where: { id: userId } }),
     prisma.dailyCheckin.count({ where: { userId } }),
@@ -46,6 +47,10 @@ export default async function DashboardPage() {
     prisma.learnedFact.count({ where: { userId } }),
     getBioAgeUnlockStatus(userId),
     getLatestBiologicalAge(userId),
+    prisma.mealLog.findMany({
+      where: { userId, date: today },
+      select: { calories: true },
+    }),
   ])
 
   return (
@@ -71,6 +76,10 @@ export default async function DashboardPage() {
         value: latestBioAge?.bioAge ?? null,
         calendarAge: latestBioAge?.calendarAge ?? user?.age ?? null,
         delta: latestBioAge?.delta ?? null,
+      }}
+      mealsToday={{
+        count: mealsTodayRows.length,
+        calories: mealsTodayRows.reduce((sum, row) => sum + row.calories, 0),
       }}
     />
   )

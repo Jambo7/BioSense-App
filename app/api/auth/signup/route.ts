@@ -63,6 +63,9 @@ export async function POST(req: NextRequest) {
       },
     })
 
+    const { attachExistingStripeMembership } = await import('@/lib/billing')
+    await attachExistingStripeMembership(user.id, user.email)
+
     // Fire the welcome email at account creation so every registrant receives
     // it even if they drop off mid-onboarding. Fail soft — never block signup.
     try {

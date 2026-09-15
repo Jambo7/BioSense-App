@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
+import { afterAuthPath } from '@/lib/stripe'
 
 export default async function RootPage() {
   const session = await getServerSession(authOptions)
@@ -9,13 +10,5 @@ export default async function RootPage() {
     redirect('/login')
   }
 
-  if (!session.user.hasConsented) {
-    redirect('/consent')
-  }
-
-  if (!session.user.onboardingDone) {
-    redirect('/onboarding')
-  }
-
-  redirect('/dashboard')
+  redirect(afterAuthPath(session.user))
 }

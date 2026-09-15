@@ -12,6 +12,7 @@ import {
   Check,
   X,
   LogOut,
+  CreditCard,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -36,17 +37,25 @@ interface ProfileData {
   age: number | null
   subscriptionStatus: string
   createdAt: string
+  hasBillingAccount: boolean
   notifyProductEmail: boolean
   notifyMarketingEmail: boolean
 }
 
-export function ProfileClient({ user }: { user: ProfileData }) {
+export function ProfileClient({
+  user,
+  billingEnabled,
+}: {
+  user: ProfileData
+  billingEnabled: boolean
+}) {
   const [editing, setEditing] = useState(false)
   const [saving, setSaving] = useState(false)
 
   const [notifyProductEmail, setNotifyProductEmail] = useState(user.notifyProductEmail)
   const [notifyMarketingEmail, setNotifyMarketingEmail] = useState(user.notifyMarketingEmail)
   const [prefBusy, setPrefBusy] = useState(false)
+  const [billingBusy, setBillingBusy] = useState(false)
 
   const [form, setForm] = useState({
     name: user.name ?? '',
@@ -122,6 +131,19 @@ export function ProfileClient({ user }: { user: ProfileData }) {
     }
   }
 
+  async function handleManageBilling() {
+    setBillingBusy(true)
+    try {
+      const res = await fetch('/api/billing/portal', { method: 'POST' })
+      const json = (await res.json()) as { url?: string; error?: string }
+      if (!res.ok || !json.url) throw new Error(json.error || 'Could not open billing')
+      window.location.href = json.url
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Could not open billing')
+      setBillingBusy(false)
+    }
+  }
+
   const initials = (user.name ?? user.email)
     .split(' ')
     .map((s) => s[0])
@@ -144,7 +166,11 @@ export function ProfileClient({ user }: { user: ProfileData }) {
           <div className="text-body-sm text-ink-2 mt-0.5">{user.email}</div>
           <div className="flex flex-wrap gap-2 justify-center sm:justify-start mt-3">
             <Pill tone={isActive ? 'soft-sage' : 'ink'} size="md">
-              {isActive ? 'Active' : user.subscriptionStatus}
+              {user.subscriptionStatus === 'PAST_DUE'
+                ? 'Payment due'
+                : isActive
+                  ? 'Active'
+                  : user.subscriptionStatus}
             </Pill>
             <Pill tone="ink" size="md">
               Member since{' '}
@@ -153,6 +179,44 @@ export function ProfileClient({ user }: { user: ProfileData }) {
           </div>
         </div>
       </Card>
+
+      {billingEnabled && (
+        <Card>
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-start gap-2">
+              <IconBadge icon={CreditCard} tone="sage" size="sm" />
+              <div>
+                <CardLabel className="mb-0.5">Membership</CardLabel>
+                <p className="text-caption text-ink-3 leading-relaxed max-w-[42ch]">
+                  {user.subscriptionStatus === 'PAST_DUE'
+                    ? 'A payment did not go through. Update your card on the website to keep access.'
+                    : 'Manage plan, payment method and cancellation on the BioSense website.'}
+                </p>
+              </div>
+            </div>
+            {user.hasBillingAccount ? (
+              <Button
+                variant="subtle"
+                size="sm"
+                loading={billingBusy}
+                onClick={() => void handleManageBilling()}
+              >
+                Manage
+              </Button>
+            ) : (
+              <Button
+                variant="subtle"
+                size="sm"
+                onClick={() => {
+                  window.open('https://bio-sense.ai/pricing', '_blank', 'noopener,noreferrer')
+                }}
+              >
+                Join
+              </Button>
+            )}
+          </div>
+        </Card>
+      )}
 
       {/* Personal details */}
       <Card>

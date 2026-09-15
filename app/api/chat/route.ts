@@ -17,6 +17,7 @@ import { degradedChatReply, sanitizeChatReply } from '@/lib/chat-safety'
 import { classifyUserMessage, safetyTemplate } from '@/lib/safety-gate'
 import { hitRateLimit } from '@/lib/rate-limit'
 import { TSB } from '@/lib/security-baseline'
+import { mealChatSummary } from '@/lib/meals'
 import { z } from 'zod'
 
 const schema = z.object({
@@ -71,6 +72,7 @@ export async function POST(req: NextRequest) {
       wearables,
       bioUnlock,
       latestBioAge,
+      recentMeals,
     ] = await Promise.all([
       prisma.user.findUnique({ where: { id: authed.id } }),
       prisma.dailyCheckin.findMany({
@@ -108,6 +110,20 @@ export async function POST(req: NextRequest) {
       }),
       getBioAgeUnlockStatus(authed.id),
       getLatestBiologicalAge(authed.id),
+      prisma.mealLog.findMany({
+        where: { userId: authed.id },
+        orderBy: { date: 'desc' },
+        take: 12,
+        select: {
+          date: true,
+          slot: true,
+          title: true,
+          calories: true,
+          proteinG: true,
+          carbsG: true,
+          fatG: true,
+        },
+      }),
     ])
 
     const wearableMetrics = aggregateWearableMetrics(wearables)
@@ -197,6 +213,9 @@ ${bloodSummary}
 
 PATTERNS:
 ${patternSummary}
+
+RECENT MEAL LOGS (photo estimates the member may have adjusted, not weighed portions):
+${mealChatSummary(recentMeals)}
 ${previousQuestions ? `\nPREVIOUS QUESTIONS: ${previousQuestions}` : ''}
 `.trim()
 
