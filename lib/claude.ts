@@ -337,6 +337,6 @@ RULES:
 - Do not diagnose, do not comment on body weight, do not tell the person what they should eat.
 - Never use em dashes.
 - Never invent a branded product unless the packaging is clearly readable.
-- If several dishes are visible, estimate the whole plate as one meal.
+- If the image is dark, blurry, mostly a table, or the food is cropped away, set "isMeal": false and ask for a closer, brighter photo.
 - calories, proteinG, carbsG, fatG must be numbers (integers preferred). fibreG may be null if you cannot tell.
 `

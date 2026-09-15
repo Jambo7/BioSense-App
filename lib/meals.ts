@@ -176,7 +176,7 @@ export async function analyseMealPhoto(params: {
   if (!parsed) {
     return {
       isMeal: false,
-      reason: 'Could not read that photo clearly. Try a brighter shot of the plate.',
+      reason: 'Could not read that photo clearly. Try a brighter, closer shot of the plate.',
     }
   }
   return parsed

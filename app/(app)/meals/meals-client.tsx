@@ -94,8 +94,46 @@ export function MealsClient() {
   const totals = useMemo(() => totalsFor(meals), [meals])
   const isToday = true
 
+  function tryAgain() {
+    cameraRef.current?.click()
+  }
+
+  function failPhoto(message: string) {
+    toast.error(message, {
+      duration: 6500,
+      action: {
+        label: 'Try again',
+        onClick: () => tryAgain(),
+      },
+    })
+  }
+
   async function onFile(file: File | undefined) {
     if (!file) return
+
+    const type = file.type || ''
+    const name = file.name || ''
+    if (/heic|heif/i.test(type) || /\.hei[cf]$/i.test(name)) {
+      failPhoto('That library format will not read. Take a new photo, or pick a JPG or PNG.')
+      return
+    }
+    if (file.size < 12 * 1024) {
+      failPhoto('That photo looks too small or empty. Take another shot of the plate.')
+      return
+    }
+    if (file.size > 8 * 1024 * 1024) {
+      failPhoto('That photo is too large. Try another shot, a bit closer to the plate.')
+      return
+    }
+    if (
+      type &&
+      !type.startsWith('image/') &&
+      !/\.(jpe?g|png|webp)$/i.test(name)
+    ) {
+      failPhoto('Please take a photo of the meal, or choose a JPG or PNG.')
+      return
+    }
+
     setReading(true)
     const previewUrl = URL.createObjectURL(file)
     try {
@@ -103,11 +141,18 @@ export function MealsClient() {
       fd.append('file', file)
       if (note.trim()) fd.append('note', note.trim())
       const res = await fetch('/api/meals/analyse', { method: 'POST', body: fd })
-      const json = await res.json()
-      if (!res.ok) throw new Error(json.error || 'Could not read that photo')
+      let json: { error?: string; isMeal?: boolean; reason?: string } = {}
+      try {
+        json = await res.json()
+      } catch {
+        throw new Error('Could not read that photo. Please try again.')
+      }
+      if (!res.ok) {
+        throw new Error(json.error || 'Could not read that photo. Please try again.')
+      }
       if (json.isMeal === false) {
-        toast.error(json.reason || 'That photo does not look like a meal.')
         URL.revokeObjectURL(previewUrl)
+        failPhoto(json.reason || 'That photo does not look like a meal. Take another shot of the plate.')
         return
       }
       const estimate = json as MealEstimate
@@ -121,9 +166,22 @@ export function MealsClient() {
         sourceCarbs: estimate.carbsG,
         sourceFat: estimate.fatG,
       })
+      if (estimate.confidence === 'low') {
+        toast('This estimate is a guess. You can retake the photo or adjust the numbers.', {
+          duration: 5000,
+          action: {
+            label: 'Retake',
+            onClick: () => {
+              URL.revokeObjectURL(previewUrl)
+              setDraft(null)
+              tryAgain()
+            },
+          },
+        })
+      }
     } catch (err) {
       URL.revokeObjectURL(previewUrl)
-      toast.error(err instanceof Error ? err.message : 'Could not read that photo')
+      failPhoto(err instanceof Error ? err.message : 'Could not read that photo. Please try again.')
     } finally {
       setReading(false)
       if (cameraRef.current) cameraRef.current.value = ''
@@ -174,7 +232,7 @@ export function MealsClient() {
       toast.success('Meal logged')
       router.refresh()
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Could not save meal')
+      toast.error('Could not save meal. Please try again.')
     } finally {
       setSaving(false)
     }
@@ -183,7 +241,7 @@ export function MealsClient() {
   async function removeMeal(id: string) {
     const res = await fetch(`/api/meals/${id}`, { method: 'DELETE' })
     if (!res.ok) {
-      toast.error('Could not remove meal')
+      toast.error('Could not remove that meal. Please try again.')
       return
     }
     setMeals((prev) => prev.filter((m) => m.id !== id))
@@ -238,14 +296,14 @@ export function MealsClient() {
           maxLength={280}
         />
         <div className="grid grid-cols-2 gap-2 mt-4">
-          <Button
+            <Button
             variant="primary"
             size="lg"
             loading={reading}
             onClick={() => cameraRef.current?.click()}
           >
             <Camera className="w-4 h-4" />
-            Take photo
+            {reading ? 'Reading the plate' : 'Take photo'}
           </Button>
           <Button
             variant="ghost"
@@ -327,6 +385,11 @@ export function MealsClient() {
           )}
 
           <p className="text-caption text-ink-3 leading-relaxed">{draft.assumptions}</p>
+          {draft.confidence === 'low' && (
+            <p className="text-caption text-ink-2 leading-relaxed">
+              The photo was hard to read. Retake it in better light, or adjust the numbers below.
+            </p>
+          )}
 
           <div className="grid grid-cols-2 gap-3">
             <MacroField
@@ -358,9 +421,10 @@ export function MealsClient() {
               onClick={() => {
                 URL.revokeObjectURL(draft.previewUrl)
                 setDraft(null)
+                tryAgain()
               }}
             >
-              Discard
+              Retake
             </Button>
             <Button variant="primary" fullWidth loading={saving} onClick={() => void saveDraft()}>
               <Check className="w-4 h-4" />
