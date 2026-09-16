@@ -6,24 +6,34 @@ import { toast } from 'sonner'
 import {
   ArrowLeft,
   Camera,
-  Check,
+  ChevronLeft,
+  ChevronRight,
   Image as ImageIcon,
+  Info,
   Plus,
   Trash2,
   Utensils,
 } from 'lucide-react'
-import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { IconBadge } from '@/components/ui/icon-badge'
 import { Input } from '@/components/ui/input'
+import { Pill } from '@/components/ui/pill'
 import { cn } from '@/lib/utils'
 import {
+  EATEN_AMOUNTS,
   MEAL_SLOTS,
+  aboutCalories,
+  dayHeading,
   defaultMealSlot,
+  eatenFactor,
+  estimatedGrams,
+  isTodayParam,
+  shiftDateParam,
   slotLabel,
   todayDateParam,
   totalsFor,
+  type EatenAmount,
   type MealEstimate,
   type MealSlot,
 } from '@/lib/meals'
@@ -44,6 +54,7 @@ type MealRow = {
   assumptions: string | null
   userNote: string | null
   adjusted: boolean
+  eatenAmount?: string
 }
 
 type Draft = MealEstimate & {
@@ -54,6 +65,11 @@ type Draft = MealEstimate & {
   sourceProtein: number
   sourceCarbs: number
   sourceFat: number
+  capturedAt: string
+  includedWhole: boolean
+  eatenAmount: EatenAmount
+  missingNote: string
+  editingItems: boolean
 }
 
 type Ingredient = {
@@ -89,13 +105,21 @@ function fileProblem(file: File): string | null {
   return null
 }
 
+function roundMacro(value: number): number {
+  return Math.max(0, Math.round(value * 10) / 10)
+}
+
+function clockLabel(now = new Date()): string {
+  return now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false })
+}
+
 export function MealsClient() {
   const router = useRouter()
   const plateCameraRef = useRef<HTMLInputElement>(null)
   const plateLibraryRef = useRef<HTMLInputElement>(null)
   const ingredientCameraRef = useRef<HTMLInputElement>(null)
   const ingredientLibraryRef = useRef<HTMLInputElement>(null)
-  const date = todayDateParam()
+  const [date, setDate] = useState(todayDateParam)
   const [meals, setMeals] = useState<MealRow[]>([])
   const [mode, setMode] = useState<Mode>('plate')
   const [plateNote, setPlateNote] = useState('')
@@ -105,6 +129,9 @@ export function MealsClient() {
   const [saving, setSaving] = useState(false)
   const [draft, setDraft] = useState<Draft | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [photoPolicyOpen, setPhotoPolicyOpen] = useState(false)
+
+  const viewingToday = isTodayParam(date)
 
   useEffect(() => {
     let cancelled = false
@@ -126,6 +153,7 @@ export function MealsClient() {
   }, [date])
 
   const totals = useMemo(() => totalsFor(meals), [meals])
+  const mealWord = meals.length === 1 ? 'meal' : 'meals'
 
   function showError(message: string, retry?: () => void) {
     setError(message)
@@ -155,10 +183,25 @@ export function MealsClient() {
       sourceProtein: estimate.proteinG,
       sourceCarbs: estimate.carbsG,
       sourceFat: estimate.fatG,
+      capturedAt: clockLabel(),
+      includedWhole: true,
+      eatenAmount: 'all',
+      missingNote: '',
+      editingItems: false,
     })
-    if (estimate.confidence === 'low') {
-      setError('This estimate is a guess. Retake in better light, or adjust the numbers.')
-    }
+  }
+
+  function setEatenAmount(amount: EatenAmount) {
+    if (!draft) return
+    const factor = eatenFactor(amount)
+    setDraft({
+      ...draft,
+      eatenAmount: amount,
+      calories: Math.round(draft.sourceCalories * factor),
+      proteinG: roundMacro(draft.sourceProtein * factor),
+      carbsG: roundMacro(draft.sourceCarbs * factor),
+      fatG: roundMacro(draft.sourceFat * factor),
+    })
   }
 
   async function analyse(files: File[], notes: string[], analyseMode: Mode) {
@@ -252,10 +295,20 @@ export function MealsClient() {
     )
   }
 
+  function discardDraft() {
+    if (!draft) return
+    URL.revokeObjectURL(draft.previewUrl)
+    setDraft(null)
+    setError(null)
+  }
+
   async function saveDraft() {
     if (!draft) return
     setSaving(true)
     try {
+      const noteParts = [draft.userNote.trim(), !draft.includedWhole ? draft.missingNote.trim() : '']
+        .filter(Boolean)
+        .join(' · ')
       const res = await fetch('/api/meals', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -271,12 +324,15 @@ export function MealsClient() {
           fibreG: draft.fibreG,
           confidence: draft.confidence,
           assumptions: draft.assumptions,
-          userNote: draft.userNote || undefined,
+          userNote: noteParts || undefined,
           adjusted:
             draft.calories !== draft.sourceCalories ||
             draft.proteinG !== draft.sourceProtein ||
             draft.carbsG !== draft.sourceCarbs ||
-            draft.fatG !== draft.sourceFat,
+            draft.fatG !== draft.sourceFat ||
+            draft.eatenAmount !== 'all',
+          includedWhole: draft.includedWhole,
+          eatenAmount: draft.eatenAmount,
         }),
       })
       const json = await res.json()
@@ -289,7 +345,7 @@ export function MealsClient() {
       setIngredients([])
       setPlateNote('')
       setError(null)
-      toast.success('Meal logged')
+      toast.success('Meal observation saved')
       router.refresh()
     } catch {
       showError('Could not save that meal. Please try again.')
@@ -308,29 +364,276 @@ export function MealsClient() {
     router.refresh()
   }
 
+  if (draft) {
+    return (
+      <div className="max-w-2xl mx-auto fade-up space-y-5">
+        <button
+          type="button"
+          onClick={discardDraft}
+          className="inline-flex items-center gap-1 text-caption text-ink-3 hover:text-ink-2 transition-colors"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+          Meal scanner
+        </button>
+
+        <header className="flex items-start gap-4">
+          <IconBadge icon={Utensils} size="xl" tone="amber" />
+          <div className="flex-1">
+            <div className="text-eyebrow uppercase text-sage-deep mb-1">Meal review</div>
+            <h1 className="font-sans text-h1 text-ink tracking-tight leading-[1.1]">
+              Review this <span className="italic-accent">meal.</span>
+            </h1>
+            <p className="text-body-sm text-ink-2 mt-2 leading-relaxed max-w-[54ch]">
+              BioSense has estimated what it can see. Check the details before saving.
+            </p>
+          </div>
+        </header>
+
+        <Card padding="lg" className="space-y-5">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-start gap-3 min-w-0">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={draft.previewUrl}
+                alt=""
+                className="w-16 h-16 rounded-[12px] object-cover shrink-0"
+              />
+              <div className="min-w-0">
+                <Input
+                  value={draft.title}
+                  onChange={(e) => setDraft({ ...draft, title: e.target.value })}
+                />
+                <p className="text-caption text-ink-3 mt-1.5">
+                  {slotLabel(draft.slot)} · {draft.capturedAt}
+                </p>
+              </div>
+            </div>
+            <Pill tone="soft-sage">AI estimate</Pill>
+          </div>
+
+          <div>
+            <div className="text-eyebrow uppercase text-ink-3 mb-2">Meal type</div>
+            <div className="flex flex-wrap gap-2">
+              {MEAL_SLOTS.map((slot) => (
+                <button
+                  key={slot.id}
+                  type="button"
+                  onClick={() => setDraft({ ...draft, slot: slot.id })}
+                  className={cn(
+                    'h-8 px-3 rounded-pill text-[12.5px] font-medium border',
+                    draft.slot === slot.id
+                      ? 'bg-sage-wash border-accent-ring text-sage-deep'
+                      : 'bg-white border-line text-ink-2',
+                  )}
+                >
+                  {slot.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-eyebrow uppercase text-ink-3">What we found</div>
+              <button
+                type="button"
+                className="text-[13px] font-medium text-sage-deep"
+                onClick={() => setDraft({ ...draft, editingItems: !draft.editingItems })}
+              >
+                {draft.editingItems ? 'Done' : 'Edit ingredients'}
+              </button>
+            </div>
+            {draft.editingItems ? (
+              <div className="space-y-2">
+                {draft.items.map((item, idx) => (
+                  <div key={`${item.name}-${idx}`} className="flex gap-2">
+                    <Input
+                      value={item.name}
+                      onChange={(e) => {
+                        const items = [...draft.items]
+                        items[idx] = { ...item, name: e.target.value }
+                        setDraft({ ...draft, items })
+                      }}
+                    />
+                    <button
+                      type="button"
+                      className="text-ink-3 hover:text-rose p-1"
+                      aria-label="Remove ingredient"
+                      onClick={() =>
+                        setDraft({
+                          ...draft,
+                          items: draft.items.filter((_, i) => i !== idx),
+                        })
+                      }
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() =>
+                    setDraft({
+                      ...draft,
+                      items: [...draft.items, { name: '', portion: '' }],
+                    })
+                  }
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  Add item
+                </Button>
+              </div>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                {draft.items.length === 0 && (
+                  <span className="text-caption text-ink-3">Nothing labelled yet.</span>
+                )}
+                {draft.items.map((item, idx) => (
+                  <span
+                    key={`${item.name}-${idx}`}
+                    className="h-8 px-3 rounded-pill text-[12.5px] bg-white border border-line text-ink-2 inline-flex items-center"
+                  >
+                    {item.name}
+                    {item.portion ? ` · ${item.portion}` : ''}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div>
+            <div className="text-eyebrow uppercase text-ink-3 mb-2">Estimated nutrients</div>
+            <div className="grid grid-cols-4 gap-2">
+              <MacroStat label="kcal" value={aboutCalories(draft.calories, draft.confidence)} />
+              <MacroStat label="protein" value={estimatedGrams(draft.proteinG)} />
+              <MacroStat label="carbs" value={estimatedGrams(draft.carbsG)} />
+              <MacroStat label="fat" value={estimatedGrams(draft.fatG)} />
+            </div>
+            <p className="text-caption text-ink-3 mt-2 leading-relaxed">
+              Estimates only. Ingredients and portion size can change these values.
+            </p>
+          </div>
+
+          <div>
+            <div className="text-[13.5px] font-semibold text-ink mb-2">
+              Did the photo include the whole meal?
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Choice
+                label="Yes"
+                active={draft.includedWhole}
+                onClick={() => setDraft({ ...draft, includedWhole: true, missingNote: '' })}
+              />
+              <Choice
+                label="No, add something"
+                active={!draft.includedWhole}
+                onClick={() => setDraft({ ...draft, includedWhole: false })}
+              />
+            </div>
+            {!draft.includedWhole && (
+              <div className="mt-3">
+                <Input
+                  placeholder="What was missing, e.g. a drink or extra rice"
+                  value={draft.missingNote}
+                  onChange={(e) => setDraft({ ...draft, missingNote: e.target.value })}
+                  maxLength={280}
+                />
+              </div>
+            )}
+          </div>
+
+          <div>
+            <div className="text-[13.5px] font-semibold text-ink mb-2">How much did you eat?</div>
+            <div className="flex flex-wrap gap-2">
+              {EATEN_AMOUNTS.map((amount) => (
+                <Choice
+                  key={amount.id}
+                  label={amount.label}
+                  active={draft.eatenAmount === amount.id}
+                  onClick={() => setEatenAmount(amount.id)}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-[16px] bg-sage-wash px-4 py-3 flex items-start gap-2.5">
+            <Info className="w-4 h-4 text-sage-deep mt-0.5 shrink-0" strokeWidth={2} />
+            <p className="text-caption text-ink-2 leading-relaxed">
+              Saving records this meal only. It does not tell BioSense what you ate for the rest of the day.
+            </p>
+          </div>
+
+          <Button variant="primary" size="lg" fullWidth loading={saving} onClick={() => void saveDraft()}>
+            Save meal observation
+          </Button>
+          <button
+            type="button"
+            onClick={discardDraft}
+            className="w-full text-center text-[13.5px] font-medium text-ink-3 hover:text-ink-2"
+          >
+            Discard
+          </button>
+        </Card>
+      </div>
+    )
+  }
+
   return (
     <div className="max-w-2xl mx-auto fade-up space-y-5">
-      <Link
-        href="/dashboard"
+      <button
+        type="button"
+        onClick={() => router.push('/dashboard')}
         className="inline-flex items-center gap-1 text-caption text-ink-3 hover:text-ink-2 transition-colors"
       >
         <ArrowLeft className="w-3.5 h-3.5" />
         Home
-      </Link>
+      </button>
 
       <header className="flex items-start gap-4">
         <IconBadge icon={Utensils} size="xl" tone="amber" />
         <div className="flex-1">
           <div className="text-eyebrow uppercase text-sage-deep mb-1">Meals</div>
           <h1 className="font-sans text-h1 text-ink tracking-tight leading-[1.1]">
-            Log today&apos;s <span className="italic-accent">plate.</span>
+            Log a <span className="italic-accent">meal.</span>
           </h1>
           <p className="text-body-sm text-ink-2 mt-2 leading-relaxed max-w-[54ch]">
-            Photograph a finished meal, or add ingredient and pack photos with notes
-            such as &quot;half this pack&quot;. Estimates only, not a weighed portion.
+            Photograph the portion you plan to eat. BioSense will estimate what it can see, then ask you to review it.
           </p>
         </div>
       </header>
+
+      <div className="flex items-center justify-between">
+        <button
+          type="button"
+          aria-label="Previous day"
+          onClick={() => setDate((current) => shiftDateParam(current, -1))}
+          className="w-9 h-9 rounded-full inline-flex items-center justify-center text-ink-2 hover:bg-[rgba(26,28,26,0.04)]"
+        >
+          <ChevronLeft className="w-5 h-5" />
+        </button>
+        <div className="text-center">
+          <div className="text-[15px] font-semibold text-ink">{dayHeading(date)}</div>
+          {!viewingToday && (
+            <button
+              type="button"
+              className="text-caption text-sage-deep font-medium"
+              onClick={() => setDate(todayDateParam())}
+            >
+              Back to today
+            </button>
+          )}
+        </div>
+        <button
+          type="button"
+          aria-label="Next day"
+          disabled={viewingToday}
+          onClick={() => setDate((current) => shiftDateParam(current, 1))}
+          className="w-9 h-9 rounded-full inline-flex items-center justify-center text-ink-2 hover:bg-[rgba(26,28,26,0.04)] disabled:opacity-30"
+        >
+          <ChevronRight className="w-5 h-5" />
+        </button>
+      </div>
 
       {error && (
         <div
@@ -353,13 +656,28 @@ export function MealsClient() {
       )}
 
       <Card padding="md">
-        <div className="text-eyebrow uppercase text-ink-3 mb-3">Today</div>
-        <div className="grid grid-cols-4 gap-2">
-          <MacroStat label="kcal" value={Math.round(totals.calories)} />
-          <MacroStat label="Protein" value={`${Math.round(totals.proteinG)}g`} />
-          <MacroStat label="Carbs" value={`${Math.round(totals.carbsG)}g`} />
-          <MacroStat label="Fat" value={`${Math.round(totals.fatG)}g`} />
+        <div className="text-eyebrow uppercase text-ink-3 mb-1">Meals logged {viewingToday ? 'today' : dayHeading(date).toLowerCase()}</div>
+        <div className="text-[28px] font-semibold tracking-tight text-ink leading-none">
+          {meals.length} {mealWord}
         </div>
+        <p className="text-caption text-ink-2 mt-2">
+          {meals.length === 0
+            ? 'No meal observations for this day. That does not mean meals were skipped.'
+            : `Estimated from ${meals.length} logged ${mealWord}`}
+        </p>
+        {meals.length > 0 && (
+          <>
+            <div className="grid grid-cols-4 gap-2 mt-4">
+              <MacroStat label="kcal" value={`~${Math.round(totals.calories / 10) * 10}`} />
+              <MacroStat label="protein" value={`~${Math.round(totals.proteinG)}g`} />
+              <MacroStat label="carbs" value={`~${Math.round(totals.carbsG)}g`} />
+              <MacroStat label="fat" value={`~${Math.round(totals.fatG)}g`} />
+            </div>
+            <p className="text-caption text-ink-3 mt-3 leading-relaxed">
+              This may not represent everything you ate or drank {viewingToday ? 'today' : 'that day'}.
+            </p>
+          </>
+        )}
       </Card>
 
       <div className="grid grid-cols-2 gap-2">
@@ -393,11 +711,10 @@ export function MealsClient() {
         <Card>
           <div className="text-eyebrow uppercase text-ink-3 mb-2">Whole plate</div>
           <p className="text-caption text-ink-2 mb-3 leading-relaxed">
-            One photo of the meal you are eating. Add a note if the photo will miss
-            oil, sauces or a leftover.
+            Photograph the portion you plan to eat. Add a note for oils, sauces, drinks or anything outside the photo.
           </p>
           <Input
-            placeholder="e.g. extra rice, or I left half"
+            placeholder="e.g. extra rice, dressing, or half the portion"
             value={plateNote}
             onChange={(e) => setPlateNote(e.target.value)}
             maxLength={280}
@@ -437,17 +754,24 @@ export function MealsClient() {
             className="hidden"
             onChange={(e) => void onPlateFile(e.target.files?.[0])}
           />
-          <p className="text-caption text-ink-3 mt-3 leading-relaxed">
-            Photos are read once and not stored.
-          </p>
+          <button
+            type="button"
+            onClick={() => setPhotoPolicyOpen((open) => !open)}
+            className="text-caption text-sage-deep underline-offset-2 hover:underline mt-3"
+          >
+            How your photo is used
+          </button>
+          {photoPolicyOpen && (
+            <p className="text-caption text-ink-3 mt-2 leading-relaxed">
+              Photos are read once to estimate what is on the plate. They are not stored. An estimate is never saved until you review and confirm it.
+            </p>
+          )}
         </Card>
       ) : (
         <Card>
           <div className="text-eyebrow uppercase text-ink-3 mb-2">Build from ingredients</div>
           <p className="text-caption text-ink-2 mb-3 leading-relaxed">
-            Photo each pack or ingredient, with a note such as &quot;having half this
-            pack&quot;. Then create the meal. Brand names on packs are looked up for a
-            closer estimate.
+            Photo each pack or ingredient, with a note such as &quot;having half this pack&quot;. Then create the meal. Brand names on packs are looked up for a closer estimate.
           </p>
           <Input
             placeholder='Note for the next photo, e.g. "half this pack"'
@@ -535,110 +859,12 @@ export function MealsClient() {
         </Card>
       )}
 
-      {draft && (
-        <Card padding="lg" className="space-y-4">
-          <div className="flex items-start gap-3">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={draft.previewUrl}
-              alt=""
-              className="w-16 h-16 rounded-[12px] object-cover shrink-0"
-            />
-            <div className="flex-1 min-w-0">
-              <div className="text-eyebrow uppercase text-ink-3 mb-1">
-                {draft.confidence} confidence
-                {draft.usedWebLookup ? ' · pack lookup' : ''}
-              </div>
-              <Input
-                value={draft.title}
-                onChange={(e) => setDraft({ ...draft, title: e.target.value })}
-              />
-            </div>
-          </div>
-
-          <div className="flex flex-wrap gap-2">
-            {MEAL_SLOTS.map((slot) => (
-              <button
-                key={slot.id}
-                type="button"
-                onClick={() => setDraft({ ...draft, slot: slot.id })}
-                className={cn(
-                  'h-8 px-3 rounded-pill text-[12.5px] font-medium border',
-                  draft.slot === slot.id
-                    ? 'bg-sage-wash border-accent-ring text-sage-deep'
-                    : 'bg-white border-line text-ink-2',
-                )}
-              >
-                {slot.label}
-              </button>
-            ))}
-          </div>
-
-          {draft.items.length > 0 && (
-            <ul className="text-body-sm text-ink-2 space-y-1">
-              {draft.items.map((item, idx) => (
-                <li key={`${item.name}-${idx}`}>
-                  {item.name}
-                  {item.portion ? ` · ${item.portion}` : ''}
-                </li>
-              ))}
-            </ul>
-          )}
-
-          <p className="text-caption text-ink-3 leading-relaxed">{draft.assumptions}</p>
-          {draft.confidence === 'low' && (
-            <p className="text-caption text-ink-2 leading-relaxed">
-              The photo was hard to read. Retake it in better light, or adjust the numbers below.
-            </p>
-          )}
-
-          <div className="grid grid-cols-2 gap-3">
-            <MacroField
-              label="Calories"
-              value={draft.calories}
-              onChange={(n) => setDraft({ ...draft, calories: n })}
-            />
-            <MacroField
-              label="Protein (g)"
-              value={draft.proteinG}
-              onChange={(n) => setDraft({ ...draft, proteinG: n })}
-            />
-            <MacroField
-              label="Carbs (g)"
-              value={draft.carbsG}
-              onChange={(n) => setDraft({ ...draft, carbsG: n })}
-            />
-            <MacroField
-              label="Fat (g)"
-              value={draft.fatG}
-              onChange={(n) => setDraft({ ...draft, fatG: n })}
-            />
-          </div>
-
-          <div className="flex gap-2">
-            <Button
-              variant="ghost"
-              fullWidth
-              onClick={() => {
-                URL.revokeObjectURL(draft.previewUrl)
-                setDraft(null)
-                setError(null)
-                if (mode === 'plate') openPlateCamera()
-              }}
-            >
-              Retake
-            </Button>
-            <Button variant="primary" fullWidth loading={saving} onClick={() => void saveDraft()}>
-              <Check className="w-4 h-4" />
-              Log meal
-            </Button>
-          </div>
-        </Card>
-      )}
-
       <div className="space-y-3">
-        {meals.length === 0 && !draft && (
-          <p className="text-body-sm text-ink-3 leading-relaxed">No meals logged today yet.</p>
+        <div className="text-eyebrow uppercase text-ink-3">Logged meals</div>
+        {meals.length === 0 && (
+          <p className="text-body-sm text-ink-3 leading-relaxed">
+            Add as many meals as you like. Totals only cover what you photograph.
+          </p>
         )}
         {meals.map((meal) => (
           <Card key={meal.id} className="flex items-start gap-3">
@@ -650,8 +876,7 @@ export function MealsClient() {
               </div>
               <div className="font-semibold text-ink">{meal.title}</div>
               <div className="text-caption text-ink-2 mt-0.5">
-                {meal.calories} kcal · P {Math.round(meal.proteinG)}g · C {Math.round(meal.carbsG)}g · F{' '}
-                {Math.round(meal.fatG)}g
+                {aboutCalories(meal.calories, meal.confidence)} kcal · {estimatedGrams(meal.proteinG)} protein
               </div>
               {meal.userNote && (
                 <p className="text-caption text-ink-3 mt-1">{meal.userNote}</p>
@@ -672,31 +897,36 @@ export function MealsClient() {
   )
 }
 
+function Choice({
+  label,
+  active,
+  onClick,
+}: {
+  label: string
+  active: boolean
+  onClick: () => void
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        'h-10 px-4 rounded-pill text-[13px] font-semibold border',
+        active
+          ? 'bg-sage-deep text-white border-sage-deep'
+          : 'bg-white border-line text-ink-2',
+      )}
+    >
+      {label}
+    </button>
+  )
+}
+
 function MacroStat({ label, value }: { label: string; value: string | number }) {
   return (
     <div>
       <div className="text-[10px] uppercase tracking-[0.1em] text-ink-3">{label}</div>
-      <div className="text-[15px] font-semibold text-ink tabular-nums">{value}</div>
+      <div className="text-[13px] font-semibold text-ink tabular-nums leading-snug">{value}</div>
     </div>
-  )
-}
-
-function MacroField({
-  label,
-  value,
-  onChange,
-}: {
-  label: string
-  value: number
-  onChange: (n: number) => void
-}) {
-  return (
-    <Input
-      label={label}
-      type="number"
-      min={0}
-      value={Number.isFinite(value) ? String(value) : ''}
-      onChange={(e) => onChange(Math.max(0, Number(e.target.value) || 0))}
-    />
   )
 }

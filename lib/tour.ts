@@ -111,7 +111,7 @@ export const TOUR_STEPS: TourStep[] = [
     tone: 'amber',
     title: 'Meal Scanner',
     body:
-      'Photograph a meal for a calorie and macro estimate. It sits here so you can log food without hunting through Home.',
+      'Photograph the portion you plan to eat. Review the estimate, then add as many meals as you like. Totals reset each day, and you can look back at previous days.',
     placement: 'bottom',
   },
   {

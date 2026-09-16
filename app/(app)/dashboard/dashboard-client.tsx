@@ -549,8 +549,8 @@ function MealsCard({ count, calories }: { count: number; calories: number }) {
         </div>
         <p className="text-[12px] text-ink-2 leading-snug mt-0.5">
           {count === 0
-            ? 'Photograph a meal for a calorie and macro estimate you can adjust.'
-            : `${count} logged today · about ${Math.round(calories)} kcal (estimate)`}
+            ? 'Photograph meals you want to log. Totals only cover what you add.'
+            : `${count} logged today · about ${Math.round(calories)} kcal from those meals`}
         </p>
       </div>
       <Link

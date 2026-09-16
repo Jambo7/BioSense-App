@@ -23,6 +23,8 @@ const createSchema = z.object({
   assumptions: z.string().max(280).optional(),
   userNote: z.string().max(280).optional(),
   adjusted: z.boolean().optional(),
+  includedWhole: z.boolean().optional(),
+  eatenAmount: z.enum(['all', 'most', 'half', 'little']).optional(),
 })
 
 export async function GET(req: NextRequest) {
@@ -76,6 +78,8 @@ export async function POST(req: NextRequest) {
       assumptions: parsed.data.assumptions,
       userNote: parsed.data.userNote,
       adjusted: Boolean(parsed.data.adjusted),
+      includedWhole: parsed.data.includedWhole ?? true,
+      eatenAmount: parsed.data.eatenAmount ?? 'all',
     },
   })
 

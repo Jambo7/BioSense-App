@@ -62,6 +62,57 @@ export function todayDateParam(now = new Date()): string {
   return `${y}-${m}-${d}`
 }
 
+export function shiftDateParam(dateParam: string, days: number): string {
+  const [year, month, day] = dateParam.split('-').map(Number)
+  if (!year || !month || !day) return todayDateParam()
+  const date = new Date(year, month - 1, day)
+  date.setDate(date.getDate() + days)
+  return todayDateParam(date)
+}
+
+export function isTodayParam(dateParam: string, now = new Date()): boolean {
+  return dateParam === todayDateParam(now)
+}
+
+export function dayHeading(dateParam: string, now = new Date()): string {
+  if (isTodayParam(dateParam, now)) return 'Today'
+  const yesterday = shiftDateParam(todayDateParam(now), -1)
+  if (dateParam === yesterday) return 'Yesterday'
+  const [year, month, day] = dateParam.split('-').map(Number)
+  const date = new Date(year, month - 1, day)
+  return date.toLocaleDateString('en-GB', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+  })
+}
+
+export const EATEN_AMOUNTS = [
+  { id: 'all', label: 'All', factor: 1 },
+  { id: 'most', label: 'Most', factor: 0.75 },
+  { id: 'half', label: 'About half', factor: 0.5 },
+  { id: 'little', label: 'A little', factor: 0.25 },
+] as const
+
+export type EatenAmount = (typeof EATEN_AMOUNTS)[number]['id']
+
+export function eatenFactor(amount: EatenAmount): number {
+  return EATEN_AMOUNTS.find((row) => row.id === amount)?.factor ?? 1
+}
+
+export function aboutCalories(value: number, confidence: string): string {
+  if (confidence === 'low') {
+    const lo = Math.max(0, Math.round((value * 0.85) / 10) * 10)
+    const hi = Math.round((value * 1.15) / 10) * 10
+    return `About ${lo}–${hi}`
+  }
+  return `About ${Math.round(value / 10) * 10}`
+}
+
+export function estimatedGrams(value: number): string {
+  return `Estimated ${Math.round(value)}g`
+}
+
 function asNumber(value: unknown): number | null {
   if (typeof value === 'number' && Number.isFinite(value)) return value
   if (typeof value === 'string' && value.trim()) {
@@ -273,11 +324,13 @@ export function mealChatSummary(
     fatG: number
   }>,
 ): string {
-  if (rows.length === 0) return 'No meals logged recently.'
+  if (rows.length === 0) {
+    return 'No meal observations in this period. That does not mean meals were skipped, the person was fasting, or intake was low. BioSense simply has no meal photos for those days.'
+  }
   return rows
     .map((row) => {
       const day = row.date.toISOString().split('T')[0]
-      return `${day} ${row.slot}: ${row.title} (~${row.calories} kcal, P${Math.round(row.proteinG)} C${Math.round(row.carbsG)} F${Math.round(row.fatG)}). Estimates only.`
+      return `${day} ${row.slot}: ${row.title} (about ${row.calories} kcal estimated, P${Math.round(row.proteinG)} C${Math.round(row.carbsG)} F${Math.round(row.fatG)}). Observation only, not a weighed portion or a full-day diet record.`
     })
     .join('\n')
 }

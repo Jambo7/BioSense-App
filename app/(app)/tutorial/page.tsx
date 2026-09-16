@@ -27,7 +27,7 @@ const HIGHLIGHTS: {
 }[] = [
   { icon: Sun,          tone: 'amber',  title: 'Home',            body: 'Your health intelligence at a glance' },
   { icon: Watch,        tone: 'sage',   title: 'Connections',      body: 'Link wearables and health data to sync automatically' },
-  { icon: Camera,      tone: 'amber',  title: 'Meal Scanner',     body: 'Photograph a meal for a calorie and macro estimate' },
+  { icon: Camera,      tone: 'amber',  title: 'Meal Scanner',     body: 'Photograph meals, review the estimate, and keep a running total for the day' },
   { icon: Target,      tone: 'sky',    title: 'Goals',           body: 'Give BioSense a destination to work towards' },
   { icon: BiosenseS,   tone: 'violet', title: 'BioSense AI',     body: 'Answer questions and help BioSense learn' },
   { icon: FlaskConical, tone: 'amber',  title: 'Biomarkers',      body: 'Upload, understand and track your blood results' },
