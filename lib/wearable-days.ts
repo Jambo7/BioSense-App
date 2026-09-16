@@ -30,6 +30,7 @@ export async function upsertWearableDays(
       sleepScore: m.sleepScore ?? undefined,
       recovery: m.recovery ?? undefined,
       stress: m.stress ?? undefined,
+      glucoseMgdl: m.glucoseMgdl ?? undefined,
     }
     await prisma.wearableDay.upsert({
       where: { userId_date: { userId, date: new Date(date) } },

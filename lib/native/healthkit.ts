@@ -65,6 +65,7 @@ export interface HealthKitDay {
   hrv?: number
   activeMinutes?: number
   sleepHours?: number
+  glucoseMgdl?: number
 }
 
 export interface BiosenseHealthPlugin {

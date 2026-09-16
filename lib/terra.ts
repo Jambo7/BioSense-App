@@ -113,7 +113,7 @@ export async function generateWidgetSession(params: {
 }
 
 /** Default Terra data types we request on a recurring sync. */
-export const TERRA_SYNC_TYPES = ['daily', 'sleep', 'activity', 'body'] as const
+export const TERRA_SYNC_TYPES = ['daily', 'sleep', 'activity', 'body', 'nutrition'] as const
 
 export interface TerraDataRequestResult {
   type: string

@@ -1,34 +1,9 @@
-/**
- * Terra connect — starts a hosted "widget session" so the logged-in user can
- * link a wearable. We pass our User.id as the reference_id so every webhook
- * Terra later sends is attributable back to this user.
- *
- * Returns { url } — the frontend opens it (new tab / redirect). On completion
- * Terra redirects back to /wearables and (separately) pushes auth + data
- * events to our webhook.
- */
 import { NextRequest, NextResponse } from 'next/server'
 import { getRequestUser } from '@/lib/api-auth'
+import { TERRA_PROVIDER_SLUGS } from '@/lib/connectables'
 import { generateWidgetSession } from '@/lib/terra'
 
 export const runtime = 'nodejs'
-
-// Map our internal wearable ids → Terra provider slugs (used to scope the
-// widget to a single provider when the user clicks a specific brand).
-const PROVIDER_SLUGS: Record<string, string> = {
-  oura: 'OURA',
-  whoop: 'WHOOP',
-  garmin: 'GARMIN',
-  samsung: 'SAMSUNG',
-  fitbit: 'FITBIT',
-  strava: 'STRAVA',
-  // Google: offer both the new web-based Google Health API (the Fitbit Web API
-  // replacement, where most current Android/Pixel data lives) and legacy Google
-  // Fit, so the widget lets the user pick whichever their account is under.
-  // NB: Health Connect is SDK-only and needs a native app, so it's excluded.
-  google: 'GOOGLE_HEALTH,GOOGLE',
-  peloton: 'PELOTON',
-}
 
 export async function GET(req: NextRequest) {
   const authed = await getRequestUser(req)
@@ -37,8 +12,8 @@ export async function GET(req: NextRequest) {
   }
 
   const providerParam = req.nextUrl.searchParams.get('provider')?.toLowerCase()
-  const providers =
-    providerParam && PROVIDER_SLUGS[providerParam] ? [PROVIDER_SLUGS[providerParam]] : undefined
+  const slug = providerParam ? TERRA_PROVIDER_SLUGS[providerParam] : undefined
+  const providers = slug ? [slug] : undefined
 
   const base = process.env.NEXTAUTH_URL ?? req.nextUrl.origin
 

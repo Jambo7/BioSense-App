@@ -10,6 +10,7 @@ import {
   FlaskConical,
   Lightbulb,
   TrendingUp,
+  Camera,
   User,
   ArrowRight,
 } from 'lucide-react'
@@ -26,12 +27,13 @@ const HIGHLIGHTS: {
 }[] = [
   { icon: Sun,          tone: 'amber',  title: 'Home',            body: 'Your health intelligence at a glance' },
   { icon: Watch,        tone: 'sage',   title: 'Connections',      body: 'Link wearables and health data to sync automatically' },
+  { icon: Camera,      tone: 'amber',  title: 'Meal Scanner',     body: 'Photograph a meal for a calorie and macro estimate' },
   { icon: Target,      tone: 'sky',    title: 'Goals',           body: 'Give BioSense a destination to work towards' },
   { icon: BiosenseS,   tone: 'violet', title: 'BioSense AI',     body: 'Answer questions and help BioSense learn' },
   { icon: FlaskConical, tone: 'amber',  title: 'Biomarkers',      body: 'Upload, understand and track your blood results' },
   { icon: Lightbulb,    tone: 'teal',   title: 'Insights',         body: 'Patterns, predictions and new discoveries' },
   { icon: TrendingUp,   tone: 'rose',   title: 'Trends & Reports', body: 'Track progress over time with tailored reports' },
-  { icon: User,         tone: 'ink',    title: 'Your account',    body: 'Privacy, profile and settings' },
+  { icon: User,         tone: 'ink',    title: 'Your account',    body: 'Privacy, profile and settings, under Updates' },
 ]
 
 export default function TutorialPage() {

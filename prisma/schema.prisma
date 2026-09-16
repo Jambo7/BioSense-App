@@ -51,6 +51,13 @@ enum EnergyLevel {
   LOW
 }
 
+enum GlucoseTracking {
+  NONE
+  CGM
+  OTHER
+  PREFER_NOT
+}
+
 enum LearningPhase {
   FOUNDATIONS
   LIFESTYLE
@@ -79,6 +86,7 @@ model User {
   activityLevel      ActivityLevel?
   sleepQuality       SleepQuality?
   energyLevel        EnergyLevel?
+  glucoseTracking    GlucoseTracking   @default(NONE)
   baselineStress     Int?
   goals              String[]
   registrationNotes  String?
@@ -449,6 +457,7 @@ model WearableDay {
   sleepScore    Float?
   recovery      Float?
   stress        Float?
+  glucoseMgdl   Float?
   updatedAt     DateTime @updatedAt
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 

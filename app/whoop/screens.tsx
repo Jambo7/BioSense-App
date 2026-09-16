@@ -9,7 +9,7 @@ import {
   CheckCircle2,
   ExternalLink,
   FlaskConical,
-  GraduationCap,
+  Camera,
   Heart,
   Leaf,
   Lightbulb,
@@ -67,9 +67,9 @@ function TopBar({ connectionsActive }: { connectionsActive?: boolean }) {
     <header className="h-[52px] flex items-center justify-between px-4 gap-2 shrink-0">
       <BrandWordmark height={22} />
       <div className="flex items-center gap-1.5">
-        <span className="hidden xs:inline-flex h-8 px-2.5 rounded-pill text-[11px] font-medium text-ink-2 bg-white/70 ring-1 ring-inset ring-line items-center gap-1">
-          <GraduationCap className="w-3.5 h-3.5" />
-          Tutorial
+        <span className="hidden xs:inline-flex h-8 px-2.5 rounded-pill text-[11px] font-medium text-white bg-grad-sage items-center gap-1">
+          <Camera className="w-3.5 h-3.5" />
+          Meal Scanner
         </span>
         <span
           className={cn(

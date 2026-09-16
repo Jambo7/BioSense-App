@@ -18,6 +18,7 @@ import {
   Footprints,
   Activity,
   Utensils,
+  Droplets,
   type LucideIcon,
 } from 'lucide-react'
 import type { WearableMetrics } from '@/lib/wearable-metrics'
@@ -27,6 +28,7 @@ import { ScoreRing } from '@/components/ui/score-ring'
 import { IconBadge, type IconBadgeTone } from '@/components/ui/icon-badge'
 import { SourceRow } from '@/components/source-status'
 import { computeReadiness, formatSleep, readinessCaption } from '@/lib/readiness'
+import { formatGlucose } from '@/lib/glucose'
 import { cn } from '@/lib/utils'
 
 type Tone = IconBadgeTone
@@ -52,6 +54,7 @@ interface DashboardClientProps {
   learningStarted: boolean
   hasProfile: boolean
   mealsToday: { count: number; calories: number }
+  glucose: { show: boolean; todayMgdl: number | null; connected: boolean }
   bioAge: {
     unlocked: boolean
     trackingDays: number
@@ -74,6 +77,7 @@ export function DashboardClient(props: DashboardClientProps) {
     hasBlood,
     bioAge,
     mealsToday,
+    glucose,
   } = props
 
   const hasEstimate = bioAge.unlocked && bioAge.value != null
@@ -138,6 +142,10 @@ export function DashboardClient(props: DashboardClientProps) {
       <ContextCard done={hasContextToday} name={firstName} />
 
       <MealsCard count={mealsToday.count} calories={mealsToday.calories} />
+
+      {glucose.show && (
+        <GlucoseCard todayMgdl={glucose.todayMgdl} connected={glucose.connected} />
+      )}
 
       <DailySnapshot wm={wm} />
     </div>
@@ -550,6 +558,40 @@ function MealsCard({ count, calories }: { count: number; calories: number }) {
         className="shrink-0 h-9 px-3.5 rounded-pill btn-sage-outline text-[12.5px] font-semibold inline-flex items-center gap-1"
       >
         {count === 0 ? 'Log a meal' : 'Add meal'}
+        <ArrowRight className="w-3.5 h-3.5" />
+      </Link>
+    </Card>
+  )
+}
+
+function GlucoseCard({
+  todayMgdl,
+  connected,
+}: {
+  todayMgdl: number | null
+  connected: boolean
+}) {
+  const body =
+    todayMgdl != null
+      ? `Today's average ${formatGlucose(todayMgdl)}. One signal next to sleep, meals and activity.`
+      : connected
+        ? 'Waiting for the first glucose sync. Wear your sensor and check back later today.'
+        : 'Connect Apple Health. If Dexcom already shares with Health, glucose comes with it.'
+
+  return (
+    <Card padding="md" className="flex items-start sm:items-center gap-3">
+      <IconBadge icon={Droplets} tone="teal" variant="tint" size="md" />
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2">
+          <span className="text-[13.5px] font-semibold text-ink">Glucose</span>
+        </div>
+        <p className="text-[12px] text-ink-2 leading-snug mt-0.5">{body}</p>
+      </div>
+      <Link
+        href="/glucose"
+        className="shrink-0 h-9 px-3.5 rounded-pill btn-sage-outline text-[12.5px] font-semibold inline-flex items-center gap-1"
+      >
+        {todayMgdl != null ? 'View' : 'Set up'}
         <ArrowRight className="w-3.5 h-3.5" />
       </Link>
     </Card>

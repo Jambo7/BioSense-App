@@ -24,6 +24,8 @@ export interface WearableMetrics {
   recovery?: number
   /** Average daily stress level 0-100 (Garmin/Samsung); absent for Whoop. */
   stress?: number
+  /** Daily mean blood glucose, mg/dL (Dexcom, Ultrahuman, Apple Health). */
+  glucoseMgdl?: number
 }
 
 function getPath(obj: unknown, path: string): unknown {
@@ -97,6 +99,27 @@ function activityHasSignal(rec: unknown): boolean {
   return (steps != null && steps > 0) || (aSec != null && aSec > 0)
 }
 
+function glucoseFromBody(rec: unknown): number | undefined {
+  const dayAvg =
+    num(getPath(rec, 'glucose_data.day_avg_blood_glucose_mg_per_dL')) ??
+    num(getPath(rec, 'glucose_data.blood_glucose_avg_mg_per_dL'))
+  if (dayAvg != null && dayAvg > 0) return Math.round(dayAvg)
+
+  const samples =
+    getPath(rec, 'glucose_data.blood_glucose_samples') ??
+    getPath(rec, 'glucose_data.detailed.blood_glucose_samples')
+  if (!Array.isArray(samples) || samples.length === 0) return undefined
+  const values = samples
+    .map(
+      (s) =>
+        num(getPath(s, 'blood_glucose_mg_per_dL')) ??
+        num(getPath(s, 'glucose_mg_per_dL')),
+    )
+    .filter((v): v is number => v != null && v > 0)
+  if (values.length === 0) return undefined
+  return Math.round(values.reduce((a, b) => a + b, 0) / values.length)
+}
+
 /** Extract metrics from one WearableSync.data JSON blob. */
 export function metricsFromSyncData(data: unknown): WearableMetrics {
   const m: WearableMetrics = {}
@@ -112,6 +135,7 @@ export function metricsFromSyncData(data: unknown): WearableMetrics {
       if (typeof l.steps === 'number') m.steps = l.steps
       if (typeof l.activeMinutes === 'number') m.activeMinutes = l.activeMinutes
       if (typeof l.sleepHours === 'number') m.sleepHours = l.sleepHours
+      if (typeof l.glucoseMgdl === 'number') m.glucoseMgdl = l.glucoseMgdl
     }
     if (m.steps === 0) delete m.steps
     if (m.activeMinutes === 0) delete m.activeMinutes
@@ -188,12 +212,18 @@ export function metricsFromSyncData(data: unknown): WearableMetrics {
 
   // --- Body: occasional RHR / composition-adjacent resting measures ---
   const body = latestMeaningful(getPath(data, 'payloads.body.data'), (rec) => {
-    return num(getPath(rec, 'heart_data.heart_rate_data.summary.resting_hr_bpm')) != null
+    return (
+      num(getPath(rec, 'heart_data.heart_rate_data.summary.resting_hr_bpm')) != null ||
+      glucoseFromBody(rec) != null
+    )
   })
-  if (body && m.rhr == null) {
-    m.rhr =
-      num(getPath(body, 'heart_data.heart_rate_data.summary.resting_hr_bpm')) ??
-      num(getPath(body, 'heart_rate_data.summary.resting_hr_bpm'))
+  if (body) {
+    if (m.rhr == null) {
+      m.rhr =
+        num(getPath(body, 'heart_data.heart_rate_data.summary.resting_hr_bpm')) ??
+        num(getPath(body, 'heart_rate_data.summary.resting_hr_bpm'))
+    }
+    m.glucoseMgdl = glucoseFromBody(body) ?? m.glucoseMgdl
   }
 
   // Drop pure-zero steps (empty Fitbit stub) so aggregation can keep an older day.
@@ -270,6 +300,7 @@ export function dailyBreakdownFromSyncData(
         hrv: typeof d.hrv === 'number' ? d.hrv : undefined,
         activeMinutes: typeof d.activeMinutes === 'number' ? d.activeMinutes : undefined,
         sleepHours: typeof d.sleepHours === 'number' ? d.sleepHours : undefined,
+        glucoseMgdl: typeof d.glucoseMgdl === 'number' ? d.glucoseMgdl : undefined,
       })
     }
     return days
@@ -353,6 +384,16 @@ export function dailyBreakdownFromSyncData(
     }
   }
 
+  const bodyArr = getPath(data, 'payloads.body.data')
+  if (Array.isArray(bodyArr)) {
+    for (const rec of bodyArr) {
+      const date = recordDate(rec)
+      if (!date) continue
+      const glucoseMgdl = glucoseFromBody(rec)
+      if (glucoseMgdl != null) mergeDay(days, date, { glucoseMgdl })
+    }
+  }
+
   // Drop days that carry nothing.
   for (const [date, m] of days) {
     if (Object.values(m).every((v) => v == null)) days.delete(date)
@@ -370,5 +411,6 @@ export function formatWearableMetricsSummary(m: WearableMetrics): string {
   if (m.sleepHours != null) parts.push(`sleep≈${m.sleepHours}h`)
   if (m.recovery != null) parts.push(`recovery≈${Math.round(m.recovery)}`)
   if (m.activeMinutes != null) parts.push(`active≈${m.activeMinutes}m`)
+  if (m.glucoseMgdl != null) parts.push(`glucose≈${Math.round(m.glucoseMgdl)}mg/dL`)
   return parts.length > 0 ? parts.join(', ') : 'no wearable metrics extracted'
 }

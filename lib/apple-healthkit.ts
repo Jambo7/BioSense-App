@@ -11,6 +11,7 @@ export interface AppleHealthKitDayInput {
   hrv?: number
   activeMinutes?: number
   sleepHours?: number
+  glucoseMgdl?: number
 }
 
 function isYmd(value: string): boolean {
@@ -33,6 +34,7 @@ export function parseAppleHealthKitDays(raw: unknown): AppleHealthKitDayInput[] 
       hrv: num(rec.hrv),
       activeMinutes: num(rec.activeMinutes),
       sleepHours: num(rec.sleepHours),
+      glucoseMgdl: num(rec.glucoseMgdl),
     })
   }
   return out
@@ -50,6 +52,7 @@ export async function persistAppleHealthKit(
       hrv: d.hrv,
       activeMinutes: d.activeMinutes,
       sleepHours: d.sleepHours,
+      glucoseMgdl: d.glucoseMgdl,
     })
   }
 
@@ -67,6 +70,7 @@ export async function persistAppleHealthKit(
             hrv: latest.hrv,
             activeMinutes: latest.activeMinutes,
             sleepHours: latest.sleepHours,
+            glucoseMgdl: latest.glucoseMgdl,
           }
         : {},
       days,

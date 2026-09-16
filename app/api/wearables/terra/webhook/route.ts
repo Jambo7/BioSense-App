@@ -19,6 +19,7 @@
 import { NextRequest, NextResponse, after } from 'next/server'
 import type { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
+import { canonicalProvider } from '@/lib/connectables'
 import { getReferenceId, verifyTerraSignature, type TerraWebhookPayload } from '@/lib/terra'
 import { storeTerraDataPayloads } from '@/lib/terra-store'
 
@@ -62,7 +63,7 @@ async function processTerraEvent(initial: IncomingPayload): Promise<void> {
   if (!payload) return
 
   const { type } = payload
-  const provider = (payload.user?.provider ?? 'terra').toLowerCase()
+  const provider = canonicalProvider(payload.user?.provider ?? 'terra')
   const terraUserId = payload.user?.user_id ?? null
   const referenceId = getReferenceId(payload)
 

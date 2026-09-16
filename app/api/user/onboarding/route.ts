@@ -6,6 +6,7 @@ import {
   ACTIVITY_LABEL,
   SLEEP_LABEL,
   ENERGY_LABEL,
+  GLUCOSE_TRACKING_LABEL,
 } from '@/lib/registration'
 import { z } from 'zod'
 
@@ -16,6 +17,7 @@ const schema = z.object({
   activityLevel: z.enum(['LOW', 'MODERATE', 'HIGH', 'VERY_HIGH']).nullable().optional(),
   sleepQuality: z.enum(['GREAT', 'OKAY', 'POOR']).nullable().optional(),
   energyLevel: z.enum(['HIGH', 'VARIABLE', 'LOW']).nullable().optional(),
+  glucoseTracking: z.enum(['NONE', 'CGM', 'OTHER', 'PREFER_NOT']).optional(),
   baselineStress: z.number().int().min(1).max(10).nullable().optional(),
   registrationNotes: z.string().max(250).nullable().optional(),
 })
@@ -55,6 +57,7 @@ export async function POST(req: NextRequest) {
         activityLevel: data.activityLevel ?? null,
         sleepQuality: data.sleepQuality ?? null,
         energyLevel: data.energyLevel ?? null,
+        glucoseTracking: data.glucoseTracking ?? 'NONE',
         baselineStress: data.baselineStress ?? null,
         registrationNotes: data.registrationNotes ?? null,
         onboardingDone: true,
@@ -80,6 +83,16 @@ export async function POST(req: NextRequest) {
     }
     if (data.energyLevel) {
       seeds.push({ section: 'energy', text: ENERGY_LABEL[data.energyLevel], confidence: 'High' })
+    }
+    if (data.glucoseTracking && data.glucoseTracking !== 'NONE' && data.glucoseTracking !== 'PREFER_NOT') {
+      seeds.push({
+        section: 'nutrition',
+        text:
+          data.glucoseTracking === 'CGM'
+            ? 'Uses a continuous glucose monitor via Apple Health. Relate meals, sleep and activity to glucose when that data is connected. Educational only, not a diabetes management tool.'
+            : GLUCOSE_TRACKING_LABEL[data.glucoseTracking],
+        confidence: 'High',
+      })
     }
     if (data.baselineStress != null) {
       seeds.push({

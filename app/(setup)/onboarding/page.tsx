@@ -28,18 +28,20 @@ import {
   Heart,
   Lock,
   TrendingUp,
+  Droplets,
   type LucideIcon,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { IconBadge, type IconBadgeTone } from '@/components/ui/icon-badge'
 import { cn } from '@/lib/utils'
-import { GOAL_OPTIONS } from '@/lib/registration'
+import { GOAL_OPTIONS, GLUCOSE_TRACKING_OPTIONS } from '@/lib/registration'
 import { BiosenseS } from '@/components/brand-mark'
 
 type Sex = 'MALE' | 'FEMALE' | 'UNDISCLOSED'
 type Activity = 'LOW' | 'MODERATE' | 'HIGH' | 'VERY_HIGH'
 type Sleep = 'GREAT' | 'OKAY' | 'POOR'
 type Energy = 'HIGH' | 'VARIABLE' | 'LOW'
+type GlucoseTracking = 'NONE' | 'CGM' | 'OTHER' | 'PREFER_NOT'
 
 const GOAL_META: Record<string, { Icon: LucideIcon; tone: IconBadgeTone }> = {
   more_energy:      { Icon: Zap,        tone: 'amber'  },
@@ -105,6 +107,7 @@ export default function OnboardingPage() {
   const [activity, setActivity] = useState<Activity | null>(null)
   const [sleep, setSleep] = useState<Sleep | null>(null)
   const [energy, setEnergy] = useState<Energy | null>(null)
+  const [glucose, setGlucose] = useState<GlucoseTracking | null>(null)
   const [stress, setStress] = useState<number | null>(null)
   const [notes, setNotes] = useState('')
 
@@ -132,6 +135,7 @@ export default function OnboardingPage() {
           activityLevel: activity,
           sleepQuality: sleep,
           energyLevel: energy,
+          glucoseTracking: glucose ?? 'NONE',
           baselineStress: stress,
           registrationNotes: notes.trim() || null,
         }),
@@ -351,22 +355,53 @@ export default function OnboardingPage() {
         </div>
       )}
 
-      {/* STEP 7 — Optional notes */}
+      {/* STEP 7 — Glucose (optional) + notes */}
       {step === 7 && (
         <div className="fade-up">
           <StepHead
             eyebrow="Almost there"
             title={<>Anything else you&apos;d like <span className="italic-accent">us to know?</span></>}
-            sub="Optional. You can update this anytime."
+            sub="Optional. Glucose is just one more signal, next to sleep, meals and activity. You can skip this."
           />
-          <div className="tile rounded-card p-5 sm:p-6 mt-7">
+          <div className="mt-7 space-y-2.5">
+            <div className="text-eyebrow uppercase text-ink-3 px-0.5">Glucose</div>
+            {GLUCOSE_TRACKING_OPTIONS.map((o) => {
+              const active = glucose === o.id
+              return (
+                <button
+                  key={o.id}
+                  type="button"
+                  onClick={() => setGlucose(o.id)}
+                  className={cn(
+                    'w-full flex items-center gap-3.5 p-4 rounded-card text-left transition-all duration-150',
+                    active ? 'tile-sage ring-2 ring-[rgba(111,143,107,0.55)] -translate-y-px' : 'tile tile-hover',
+                  )}
+                >
+                  <IconBadge icon={Droplets} tone={active ? 'sage' : 'sand'} variant="gradient" size="md" />
+                  <div className="flex-1 min-w-0">
+                    <div className="text-body-sm font-semibold text-ink">{o.label}</div>
+                    <div className="text-caption text-ink-2 leading-snug">{o.desc}</div>
+                  </div>
+                  <span
+                    className={cn(
+                      'w-5 h-5 rounded-full border flex items-center justify-center shrink-0 transition-colors',
+                      active ? 'bg-grad-sage border-transparent' : 'border-line-2 bg-white',
+                    )}
+                  >
+                    {active && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
+                  </span>
+                </button>
+              )
+            })}
+          </div>
+          <div className="tile rounded-card p-5 sm:p-6 mt-4">
             <textarea
-              rows={5}
+              rows={4}
               maxLength={250}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Share anything that feels important about your health, lifestyle or current challenges."
-              className="w-full px-4 py-3 bg-white border border-line rounded-[10px] text-ink text-[14px] placeholder:text-ink-4 outline-none transition-all resize-y min-h-[120px] hover:border-line-2 focus:border-[var(--a-ring)] focus:ring-2 focus:ring-[rgba(111,143,107,0.10)]"
+              className="w-full px-4 py-3 bg-white border border-line rounded-[10px] text-ink text-[14px] placeholder:text-ink-4 outline-none transition-all resize-y min-h-[100px] hover:border-line-2 focus:border-[var(--a-ring)] focus:ring-2 focus:ring-[rgba(111,143,107,0.10)]"
             />
             <div className="text-right text-caption text-ink-3 mt-1.5">{notes.length} / 250</div>
           </div>
@@ -414,7 +449,22 @@ export default function OnboardingPage() {
           </p>
 
           <div className="space-y-2.5 text-left max-w-[460px] mx-auto">
-            {FEATURE_CARDS.map((c) => (
+            {(glucose === 'CGM'
+              ? [
+                  FEATURE_CARDS[0],
+                  FEATURE_CARDS[1],
+                  FEATURE_CARDS[2],
+                  {
+                    Icon: Droplets,
+                    tone: 'teal' as const,
+                    title: 'Connect continuous glucose',
+                    body: 'Share Dexcom with Apple Health, then connect Apple Health so BioSense can relate glucose to sleep, meals and activity.',
+                  },
+                  FEATURE_CARDS[3],
+                  FEATURE_CARDS[4],
+                ]
+              : FEATURE_CARDS
+            ).map((c) => (
               <div key={c.title} className="tile tile-hover rounded-card p-4 flex items-start gap-3.5">
                 <IconBadge icon={c.Icon} tone={c.tone} variant="gradient" size="md" />
                 <div>

@@ -6,7 +6,7 @@ import {
   TrendingUp,
   Watch,
   Bell,
-  User as UserIcon,
+  Camera,
   Heart,
 } from 'lucide-react'
 import { BiosenseS } from '@/components/brand-mark'
@@ -105,22 +105,23 @@ export const TOUR_STEPS: TourStep[] = [
     placement: 'bottom',
   },
   {
+    id: 'meals',
+    target: 'meals',
+    icon: Camera,
+    tone: 'amber',
+    title: 'Meal Scanner',
+    body:
+      'Photograph a meal for a calorie and macro estimate. It sits here so you can log food without hunting through Home.',
+    placement: 'bottom',
+  },
+  {
     id: 'notifications',
     target: 'notifications',
     icon: Bell,
     tone: 'sky',
-    title: 'Notifications',
+    title: 'Updates and account',
     body:
-      'Important changes, discoveries and prompts from BioSense appear here. Tap one to go straight to the intelligence behind it.',
-    placement: 'bottom',
-  },
-  {
-    id: 'profile',
-    target: 'profile',
-    icon: UserIcon,
-    tone: 'ink',
-    title: 'Your account',
-    body: 'Manage your profile, privacy and settings here.',
+      'Important changes appear here. This is also where you take the tutorial, open your account, and sign out.',
     placement: 'bottom',
   },
   {

@@ -21,34 +21,28 @@ import {
   Star,
   Leaf,
   Shield,
+  Droplets,
+  Utensils,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Pill } from '@/components/ui/pill'
 import { cn } from '@/lib/utils'
 import { syncAppleHealthKit } from '@/lib/native/apple-sync'
+import { CONNECT_GROUPS, CONNECTABLES, connectionIdFor, type Connectable } from '@/lib/connectables'
 
-const WEARABLES = [
-  { id: 'oura',    name: 'Oura Ring',      Icon: Watch,      image: '/wearables/oura.png',    desc: 'Sleep, HRV, readiness, temperature',  type: 'oauth' },
-  { id: 'whoop',   name: 'Whoop',          Icon: Watch,      image: '/wearables/whoop.png',   desc: 'Recovery, strain, sleep performance', type: 'oauth' },
-  { id: 'garmin',  name: 'Garmin',         Icon: Watch,      image: '/wearables/garmin.png',  desc: 'Activity, HRV, steps, VO₂ max',       type: 'oauth' },
-  { id: 'fitbit',  name: 'Fitbit',         Icon: Watch,      image: undefined,                  desc: 'Sleep, heart rate, steps, activity',  type: 'oauth' },
-  { id: 'strava',  name: 'Strava',         Icon: Activity,   image: '/wearables/strava.png',  desc: 'Running, cycling, workouts, activities', type: 'oauth' },
-  { id: 'samsung', name: 'Samsung Health', Icon: Smartphone, image: '/wearables/samsung.png', desc: 'Steps, heart rate, sleep (Android)',  type: 'oauth' },
-  { id: 'google',  name: 'Google Health',  Icon: Activity,   image: '/wearables/google.png',  desc: 'Steps, heart rate, sleep (Google Health / Fit)', type: 'oauth' },
-  { id: 'apple',   name: 'Apple Health',   Icon: Smartphone, image: '/wearables/apple.png',   desc: 'Apple Watch and iPhone Health data',  type: 'healthkit' },
-]
-
-const PRIMARY_ROLE: Record<string, string> = {
-  whoop: 'Recovery source',
-  oura: 'Sleep source',
-  garmin: 'Activity source',
-  fitbit: 'Activity source',
-  apple: 'Sleep and activity source',
-  strava: 'Activity source',
-  samsung: 'Activity source',
-  google: 'Activity source',
+function iconFor(id: string): typeof Watch {
+  if (id === 'dexcom') return Droplets
+  if (id === 'myfitnesspal' || id === 'cronometer') return Utensils
+  if (id === 'flo') return Heart
+  if (id === 'strava' || id === 'peloton' || id === 'wahoo') return Activity
+  if (id === 'apple' || id === 'samsung') return Smartphone
+  return Watch
 }
+
+const PRIMARY_ROLE: Record<string, string> = Object.fromEntries(
+  CONNECTABLES.map((c) => [c.id, c.role]),
+)
 
 function WearableThumb({
   src,
@@ -210,7 +204,11 @@ function WearablePreview({
 
       <div className="flex items-center gap-2 text-[12.5px] text-sage-deep">
         <Shield className="w-3.5 h-3.5 text-sage-deep" strokeWidth={2.2} />
-        <span>Primary role: {PRIMARY_ROLE[provider] ?? 'Health data source'}</span>
+        <span>
+          {provider === 'dexcom'
+            ? 'Comes through Apple Health. Share Dexcom with Health, then Sync.'
+            : `Primary role: ${PRIMARY_ROLE[provider] ?? 'Health data source'}`}
+        </span>
       </div>
     </div>
   )
@@ -250,7 +248,7 @@ export default function WearablesPage() {
   async function loadPreview(id: string) {
     setPreviews((prev) => ({ ...prev, [id]: { status: 'loading' } }))
     try {
-      const res = await fetch(`/api/wearables/${id}`, { cache: 'no-store' })
+      const res = await fetch(`/api/wearables/${connectionIdFor(id)}`, { cache: 'no-store' })
       if (!res.ok) throw new Error('failed')
       const data: PreviewData = await res.json()
       setPreviews((prev) => ({ ...prev, [id]: { status: 'ready', data } }))
@@ -264,11 +262,11 @@ export default function WearablesPage() {
   }
 
   function isConnected(id: string) {
-    return connected.some((c) => c.provider === id)
+    return connected.some((c) => c.provider === connectionIdFor(id))
   }
 
   function lastSync(id: string) {
-    const sync = connected.find((c) => c.provider === id)
+    const sync = connected.find((c) => c.provider === connectionIdFor(id))
     return formatSync(sync?.lastSync ?? null)
   }
 
@@ -286,8 +284,8 @@ export default function WearablesPage() {
     }
   }
 
-  async function handleAppleHealthKit() {
-    setLoading('apple')
+  async function handleAppleHealthKit(sourceId = 'apple') {
+    setLoading(sourceId)
     try {
       const result = await syncAppleHealthKit(14)
       if (result.error) {
@@ -297,7 +295,7 @@ export default function WearablesPage() {
       toast.success(
         result.dayCount > 0
           ? `Apple Health synced, ${result.dayCount} day${result.dayCount === 1 ? '' : 's'}`
-          : 'Apple Health connected. No readings in the last two weeks yet. Wear your Watch and sync again tomorrow.',
+          : 'Apple Health connected. If you use Dexcom, share it with Health and sync again after a few readings.',
       )
       const res2 = await fetch('/api/wearables', { cache: 'no-store' })
       setConnected(await res2.json())
@@ -312,7 +310,7 @@ export default function WearablesPage() {
     setLoading(id)
     try {
       await fetch(`/api/wearables/${id}`, { method: 'DELETE' })
-      toast.success(`${id} disconnected`)
+      toast.success(`${CONNECTABLES.find((c) => c.id === id)?.name ?? id} disconnected`)
       setConnected((prev) => prev.filter((c) => c.provider !== id))
       setExpanded((cur) => (cur === id ? null : cur))
     } catch {
@@ -345,114 +343,159 @@ export default function WearablesPage() {
         )}
       </div>
 
-      <div className="space-y-3">
-        {WEARABLES.map((w) => {
-          const conn = isConnected(w.id)
-          const sync = lastSync(w.id)
-          const isOpen = expanded === w.id
+      {CONNECT_GROUPS.map((group) => (
+        <section key={group.id} className="space-y-3">
+          <div className="text-eyebrow uppercase text-sage-deep px-0.5">{group.label}</div>
+          {group.items.map((w) => {
+            const conn = isConnected(w.id)
+            const sync = lastSync(w.id)
+            const isOpen = expanded === w.id
 
-          return (
-            <Card key={w.id} variant="plain" padding="sm">
-              <div
-                className={cn('flex items-center gap-3', conn && 'cursor-pointer')}
-                onClick={conn ? () => togglePreview(w.id) : undefined}
-                role={conn ? 'button' : undefined}
-                tabIndex={conn ? 0 : undefined}
-                onKeyDown={
-                  conn
-                    ? (e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault()
-                          togglePreview(w.id)
-                        }
-                      }
-                    : undefined
-                }
-              >
-                <WearableThumb
-                  src={w.image}
-                  alt={w.name}
-                  fallbackIcon={w.Icon}
-                  connected={conn}
-                />
-
-                <div className="flex-1 min-w-0">
-                  <div className="text-[15px] font-semibold text-ink">{w.name}</div>
-                  <div className="text-[12.5px] text-ink-2 mt-0.5 leading-snug">
-                    {conn ? (sync ? `Last sync · ${sync}` : 'Waiting for the first sync') : w.desc}
-                  </div>
-                </div>
-
-                <div className="shrink-0 flex items-center gap-1.5">
-                  {conn ? (
-                    <>
-                      <Pill tone="soft-sage" size="sm">
-                        <CheckCircle2 className="w-3 h-3" /> Connected
-                      </Pill>
-                      {w.id === 'apple' && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          loading={loading === 'apple'}
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            void handleAppleHealthKit()
-                          }}
-                        >
-                          <RefreshCw className="w-3.5 h-3.5" />
-                          Sync
-                        </Button>
-                      )}
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        loading={loading === w.id}
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleDisconnect(w.id)
-                        }}
-                      >
-                        Disconnect
-                      </Button>
-                      <ChevronDown
-                        className={cn(
-                          'w-4 h-4 text-ink-3 transition-transform',
-                          isOpen && 'rotate-180',
-                        )}
-                      />
-                    </>
-                  ) : w.id === 'apple' ? (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      loading={loading === 'apple'}
-                      onClick={() => void handleAppleHealthKit()}
-                    >
-                      Connect
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      loading={loading === w.id}
-                      onClick={() => handleConnect(w.id)}
-                    >
-                      <ExternalLink className="w-3.5 h-3.5" />
-                      Connect
-                    </Button>
-                  )}
-                </div>
-              </div>
-
-              {conn && isOpen && (
-                <div className="mt-4 pt-3 border-t border-[rgba(26,28,26,0.06)] fade-up">
-                  <WearablePreview state={previews[w.id]} provider={w.id} />
-                </div>
-              )}
-            </Card>
-          )
-        })}
-      </div>
+            return (
+              <ConnectableRow
+                key={w.id}
+                item={w}
+                connected={conn}
+                syncLabel={sync}
+                isOpen={isOpen}
+                loading={loading}
+                preview={previews[w.id]}
+                onToggle={() => togglePreview(w.id)}
+                onConnect={() => handleConnect(w.id)}
+                onApple={() => void handleAppleHealthKit(w.id)}
+                onDisconnect={() => handleDisconnect(w.id)}
+              />
+            )
+          })}
+        </section>
+      ))}
     </div>
+  )
+}
+
+function ConnectableRow({
+  item,
+  connected,
+  syncLabel,
+  isOpen,
+  loading,
+  preview,
+  onToggle,
+  onConnect,
+  onApple,
+  onDisconnect,
+}: {
+  item: Connectable
+  connected: boolean
+  syncLabel: string | null
+  isOpen: boolean
+  loading: string | null
+  preview: PreviewState | undefined
+  onToggle: () => void
+  onConnect: () => void
+  onApple: () => void
+  onDisconnect: () => void
+}) {
+  return (
+    <Card variant="plain" padding="sm">
+      <div
+        className={cn('flex items-center gap-3', connected && 'cursor-pointer')}
+        onClick={connected ? onToggle : undefined}
+        role={connected ? 'button' : undefined}
+        tabIndex={connected ? 0 : undefined}
+        onKeyDown={
+          connected
+            ? (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault()
+                  onToggle()
+                }
+              }
+            : undefined
+        }
+      >
+        <WearableThumb
+          src={item.image}
+          alt={item.name}
+          fallbackIcon={iconFor(item.id)}
+          connected={connected}
+        />
+
+        <div className="flex-1 min-w-0">
+          <div className="text-[15px] font-semibold text-ink">{item.name}</div>
+          <div className="text-[12.5px] text-ink-2 mt-0.5 leading-snug">
+            {connected ? (syncLabel ? `Last sync · ${syncLabel}` : 'Waiting for the first sync') : item.desc}
+          </div>
+        </div>
+
+        <div className="shrink-0 flex items-center gap-1.5">
+          {connected ? (
+            <>
+              <Pill tone="soft-sage" size="sm">
+                <CheckCircle2 className="w-3 h-3" /> Connected
+              </Pill>
+              {item.kind === 'healthkit' && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  loading={loading === item.id}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onApple()
+                  }}
+                >
+                  <RefreshCw className="w-3.5 h-3.5" />
+                  Sync
+                </Button>
+              )}
+              {!item.viaApple && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  loading={loading === item.id}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onDisconnect()
+                  }}
+                >
+                  Disconnect
+                </Button>
+              )}
+              <ChevronDown
+                className={cn(
+                  'w-4 h-4 text-ink-3 transition-transform',
+                  isOpen && 'rotate-180',
+                )}
+              />
+            </>
+          ) : item.kind === 'healthkit' ? (
+            <Button
+              variant="ghost"
+              size="sm"
+              loading={loading === item.id}
+              onClick={onApple}
+            >
+              {item.connectLabel ?? 'Connect'}
+            </Button>
+          ) : (
+            <Button
+              variant="ghost"
+              size="sm"
+              loading={loading === item.id}
+              onClick={onConnect}
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              Connect
+            </Button>
+          )}
+        </div>
+      </div>
+
+      {connected && isOpen && (
+        <div className="mt-4 pt-3 border-t border-[rgba(26,28,26,0.06)] fade-up">
+          <WearablePreview state={preview} provider={item.id} />
+        </div>
+      )}
+    </Card>
   )
 }

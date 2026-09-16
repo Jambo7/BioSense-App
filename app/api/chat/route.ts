@@ -18,6 +18,7 @@ import { classifyUserMessage, safetyTemplate } from '@/lib/safety-gate'
 import { hitRateLimit } from '@/lib/rate-limit'
 import { TSB } from '@/lib/security-baseline'
 import { mealChatSummary } from '@/lib/meals'
+import { formatGlucose } from '@/lib/glucose'
 import { z } from 'zod'
 
 const schema = z.object({
@@ -140,6 +141,9 @@ export async function POST(req: NextRequest) {
             wearableMetrics.recovery != null
               ? `Recovery≈${Math.round(wearableMetrics.recovery)}`
               : null,
+            wearableMetrics.glucoseMgdl != null
+              ? `Glucose≈${formatGlucose(wearableMetrics.glucoseMgdl)} (educational, not diabetes management)`
+              : null,
           ]
             .filter(Boolean)
             .join(' | ')
@@ -216,6 +220,7 @@ ${patternSummary}
 
 RECENT MEAL LOGS (photo estimates the member may have adjusted, not weighed portions):
 ${mealChatSummary(recentMeals)}
+${wearableMetrics.glucoseMgdl != null ? `\nGLUCOSE:\nDaily average ${formatGlucose(wearableMetrics.glucoseMgdl)}. Treat as one wellness signal alongside sleep, meals and activity. Never give insulin, hypo treatment or clinical advice.\n` : ''}
 ${previousQuestions ? `\nPREVIOUS QUESTIONS: ${previousQuestions}` : ''}
 `.trim()
 

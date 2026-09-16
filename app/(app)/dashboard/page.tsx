@@ -5,6 +5,7 @@ import { aggregateWearableMetrics } from '@/lib/wearable-metrics'
 import { getIntelligenceFeed } from '@/lib/intelligence'
 import { getBioAgeUnlockStatus, getLatestBiologicalAge } from '@/lib/maturity'
 import { DashboardClient } from './dashboard-client'
+import { shouldShowGlucoseSurface } from '@/lib/glucose'
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions)
@@ -26,6 +27,8 @@ export default async function DashboardPage() {
     bioUnlock,
     latestBioAge,
     mealsTodayRows,
+    todayGlucose,
+    anyGlucose,
   ] = await Promise.all([
     prisma.user.findUnique({ where: { id: userId } }),
     prisma.dailyCheckin.count({ where: { userId } }),
@@ -51,7 +54,27 @@ export default async function DashboardPage() {
       where: { userId, date: today },
       select: { calories: true },
     }),
+    prisma.wearableDay.findUnique({
+      where: { userId_date: { userId, date: today } },
+      select: { glucoseMgdl: true },
+    }),
+    prisma.wearableDay.findFirst({
+      where: { userId, glucoseMgdl: { not: null } },
+      select: { id: true },
+    }),
   ])
+
+  const connectedProviders = wearables.map((w) => w.provider)
+  const glucose = {
+    show: shouldShowGlucoseSurface({
+      glucoseTracking: user?.glucoseTracking,
+      connectedProviders,
+      hasGlucoseReading: Boolean(anyGlucose || todayGlucose?.glucoseMgdl),
+    }),
+    todayMgdl: todayGlucose?.glucoseMgdl ?? null,
+    connected:
+      connectedProviders.includes('apple') || connectedProviders.includes('dexcom'),
+  }
 
   return (
     <DashboardClient
@@ -64,7 +87,7 @@ export default async function DashboardPage() {
       hasContextToday={Boolean(todayContext || todayCheckin)}
       checkinCount={checkinCount}
       hasBlood={Boolean(latestBlood)}
-      connectedWearables={wearables.map((w) => w.provider)}
+      connectedWearables={connectedProviders}
       wearableMetrics={aggregateWearableMetrics(wearables)}
       intelligence={intelligence}
       learningStarted={learningCount > 0}
@@ -81,6 +104,7 @@ export default async function DashboardPage() {
         count: mealsTodayRows.length,
         calories: mealsTodayRows.reduce((sum, row) => sum + row.calories, 0),
       }}
+      glucose={glucose}
     />
   )
 }

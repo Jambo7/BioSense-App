@@ -13,15 +13,8 @@ import {
   FlaskConical,
   Bell,
   Watch,
-  GraduationCap,
-  User as UserIcon,
+  Camera,
 } from 'lucide-react'
-
-/** Small inline avatar placeholder. Replace with `<Image src={user.image} />`
- *  once we wire real avatars in via NextAuth session. */
-function UserMark() {
-  return <UserIcon className="w-4 h-4" strokeWidth={2.25} />
-}
 
 /**
  * Bottom (mobile) / top centre (desktop) navigation.
@@ -32,8 +25,8 @@ function UserMark() {
  *  Trends     → /reports   (the "Am I improving?" view — progression over time)
  *  Biomarkers → /blood     (blood-panel biomarker results + history)
  *
- * Account / sign-out live behind the avatar button in the top-right, NOT in
- * the primary tab bar (per the v6 spec).
+ * Account / sign-out live on Updates (bell), together with the tutorial.
+ * Meal Scanner sits in the old Tutorial slot in the top bar.
  *
  * Wearables shortcut remains as the sage pill in the top bar — it's a setup
  * action, not a primary destination.
@@ -52,7 +45,7 @@ type NavItem = {
 // Per v7 spec: page concept renamed Today → Home; bottom-tab order
 // flipped so Trends sits last (Biomarkers shifts left of Trends).
 const navItems: NavItem[] = [
-  { href: '/dashboard', label: 'Home',       icon: Sun,           matchPaths: ['/dashboard', '/checkin', '/context', '/meals'], tourId: 'home' },
+  { href: '/dashboard', label: 'Home',       icon: Sun,           matchPaths: ['/dashboard', '/checkin', '/context', '/meals', '/glucose'], tourId: 'home' },
   { href: '/insights',  label: 'Insights',   icon: Lightbulb,     matchPaths: ['/insights'], tourId: 'insights' },
   { href: '/chat',      label: 'AI',         icon: BiosenseS,     center: true, tourId: 'ai' },
   { href: '/blood',     label: 'Biomarkers', icon: FlaskConical,  matchPaths: ['/blood', '/biomarkers'], tourId: 'biomarkers' },
@@ -250,17 +243,18 @@ export function AppNav() {
         {/* Right actions */}
         <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
           <Link
-            href="/tutorial"
+            href="/meals"
             className={cn(
               'inline-flex items-center gap-1 h-8 px-2.5 sm:px-3.5 rounded-pill',
               'text-[11px] sm:text-[12px] font-medium text-white',
               'bg-grad-sage shadow-button',
               'transition-all hover:scale-[1.02] active:scale-[0.98]',
             )}
-            aria-label="Tutorial"
+            aria-label="Meal Scanner"
+            data-tour="meals"
           >
-            <GraduationCap className="w-[14px] h-[14px]" strokeWidth={2} />
-            <span>Tutorial</span>
+            <Camera className="w-[14px] h-[14px]" strokeWidth={2} />
+            <span>Meal Scanner</span>
           </Link>
 
           <Link
@@ -285,31 +279,13 @@ export function AppNav() {
             href="/notifications"
             data-tour="notifications"
             className="relative w-8 h-8 sm:w-9 sm:h-9 inline-flex items-center justify-center rounded-full text-ink-2 hover:text-ink hover:bg-[rgba(26,28,26,0.04)] transition-colors"
-            aria-label="Notifications"
+            aria-label="Updates and account"
           >
             <Bell className="w-4 h-4 sm:w-[18px] sm:h-[18px]" strokeWidth={1.85} />
             <span
               aria-hidden
               className="absolute top-1.5 right-2 w-1.5 h-1.5 rounded-full bg-sage ring-1 ring-white"
             />
-          </Link>
-
-          {/* Profile avatar — replaces the old sign-out button. Sign-out
-              now lives inside the Profile / Account page. */}
-          <Link
-            href="/profile"
-            aria-label="Account"
-            data-tour="profile"
-            className={cn(
-              'w-8 h-8 sm:w-9 sm:h-9 inline-flex items-center justify-center rounded-full overflow-hidden',
-              'bg-[linear-gradient(180deg,rgba(168,191,163,0.35)_0%,rgba(111,143,107,0.25)_100%)]',
-              'ring-1 ring-inset ring-[rgba(168,191,163,0.45)]',
-              'text-sage-deep text-[12px] font-semibold',
-              'hover:ring-[rgba(168,191,163,0.65)] transition-all',
-              isActive(pathname, { href: '/profile', label: '', icon: Sun }) && 'ring-sage-deep',
-            )}
-          >
-            <UserMark />
           </Link>
         </div>
       </header>

@@ -13,6 +13,7 @@ final class BiosenseHealthKit {
             .heartRateVariabilitySDNN,
             .appleExerciseTime,
             .activeEnergyBurned,
+            .bloodGlucose,
         ]
         for id in ids {
             if let t = HKObjectType.quantityType(forIdentifier: id) {
@@ -113,10 +114,12 @@ final class BiosenseHealthKit {
         }
 
         let bpm = HKUnit.count().unitDivided(by: HKUnit.minute())
+        let mgdl = HKUnit.gramUnit(with: .milli).unitDivided(by: HKUnit.literUnit(with: .deci))
         stats(id: .stepCount, options: .cumulativeSum, unit: .count(), field: "steps", mode: "sum")
         stats(id: .appleExerciseTime, options: .cumulativeSum, unit: .minute(), field: "activeMinutes", mode: "sum")
         stats(id: .restingHeartRate, options: .discreteAverage, unit: bpm, field: "rhr", mode: "avg")
         stats(id: .heartRateVariabilitySDNN, options: .discreteAverage, unit: .secondUnit(with: .milli), field: "hrv", mode: "avg")
+        stats(id: .bloodGlucose, options: .discreteAverage, unit: mgdl, field: "glucoseMgdl", mode: "avg")
 
         group.enter()
         if let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis) {
@@ -162,7 +165,8 @@ final class BiosenseHealthKit {
                 }
                 if let rhr = row["rhr"] { row["rhr"] = rhr.rounded() }
                 if let hrv = row["hrv"] { row["hrv"] = (hrv * 10).rounded() / 10 }
-                let meaningful = ["steps", "rhr", "hrv", "activeMinutes", "sleepHours"].contains { field in
+                if let glucose = row["glucoseMgdl"] { row["glucoseMgdl"] = glucose.rounded() }
+                let meaningful = ["steps", "rhr", "hrv", "activeMinutes", "sleepHours", "glucoseMgdl"].contains { field in
                     (row[field] ?? 0) > 0
                 }
                 guard meaningful else { return nil }

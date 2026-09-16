@@ -39,3 +39,17 @@ export const ENERGY_LABEL: Record<string, string> = {
   VARIABLE: 'Energy fluctuates throughout the day',
   LOW: 'Often feels tired or drained',
 }
+
+export const GLUCOSE_TRACKING_OPTIONS: { id: 'NONE' | 'CGM' | 'OTHER' | 'PREFER_NOT'; label: string; desc: string }[] = [
+  { id: 'NONE', label: 'I do not track glucose', desc: 'Skip this for now. You can connect a sensor later.' },
+  { id: 'CGM', label: 'I use a continuous glucose monitor', desc: 'Dexcom or similar. Share it with Apple Health, then connect Apple Health in BioSense.' },
+  { id: 'OTHER', label: 'I check glucose another way', desc: 'Finger-prick readings or occasional lab results.' },
+  { id: 'PREFER_NOT', label: 'Prefer not to say', desc: 'We will not assume anything about glucose for you.' },
+]
+
+export const GLUCOSE_TRACKING_LABEL: Record<string, string> = {
+  NONE: 'Does not track glucose',
+  CGM: 'Uses a continuous glucose monitor',
+  OTHER: 'Checks glucose another way',
+  PREFER_NOT: 'Preferred not to share glucose tracking',
+}

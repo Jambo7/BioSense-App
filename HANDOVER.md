@@ -117,6 +117,11 @@ pushed to Neon — only run `npx prisma db push` after editing `prisma/schema.pr
 - [ ] **Validate Fitbit data mapping** against a real stored payload once data syncs
       (check `lib/wearable-metrics.ts` paths match what Fitbit actually sends).
 - [ ] **Confirm Vercel ⇄ Terra environment alignment** (Testing vs Production keys).
+- [ ] **Terra brand credentials still needed** before Connect will complete for
+      WHOOP, Huawei, Samsung Health and Strava (Terra dashboard → that source →
+      Add Credentials). Sources are enabled. Dexcom does **not** need this for
+      launch: BioSense reads Dexcom from Apple Health when the member shares it
+      there. Direct Terra Dexcom (US + EU) can wait.
 - [ ] **Whoop integration** — needs the client's own Whoop developer app credentials
       ("Add Credentials" in Terra) + a DNS CNAME; gated on company incorporation +
       finalised privacy policy.

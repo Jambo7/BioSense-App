@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Bell, ChevronRight } from 'lucide-react'
+import { Bell, ChevronRight, GraduationCap, User } from 'lucide-react'
 import { toast } from 'sonner'
 import { Card, CardLabel } from '@/components/ui/card'
 import { IconBadge } from '@/components/ui/icon-badge'
@@ -57,7 +57,7 @@ export function NotificationsClient({ initial }: { initial: Notif[] }) {
           Your <span className="italic-accent">updates.</span>
         </h1>
         <p className="text-body-sm text-ink-2 mt-2">
-          In-app updates appear here. On iPhone you can also turn on a daily context reminder.
+          In-app updates appear here. Tutorial and account live here too. On iPhone you can also turn on a daily context reminder.
         </p>
       </header>
 
@@ -139,6 +139,35 @@ export function NotificationsClient({ initial }: { initial: Notif[] }) {
           })}
         </Card>
       )}
+
+      <Card padding="none" className="divide-y divide-line">
+        <Link
+          href="/tutorial"
+          className="flex items-center gap-3 p-4 transition-colors hover:bg-[rgba(168,191,163,0.06)]"
+        >
+          <IconBadge icon={GraduationCap} tone="sage" variant="tint" size="sm" />
+          <div className="flex-1 min-w-0">
+            <div className="text-[13px] font-semibold text-ink">Tutorial</div>
+            <p className="text-[12px] text-ink-2 leading-snug mt-0.5">
+              Take the interactive tour of BioSense.
+            </p>
+          </div>
+          <ChevronRight className="w-4 h-4 text-ink-3 shrink-0" strokeWidth={2.25} />
+        </Link>
+        <Link
+          href="/profile"
+          className="flex items-center gap-3 p-4 transition-colors hover:bg-[rgba(168,191,163,0.06)]"
+        >
+          <IconBadge icon={User} tone="ink" variant="tint" size="sm" />
+          <div className="flex-1 min-w-0">
+            <div className="text-[13px] font-semibold text-ink">Account</div>
+            <p className="text-[12px] text-ink-2 leading-snug mt-0.5">
+              Profile, privacy, billing and sign out.
+            </p>
+          </div>
+          <ChevronRight className="w-4 h-4 text-ink-3 shrink-0" strokeWidth={2.25} />
+        </Link>
+      </Card>
     </div>
   )
 }
