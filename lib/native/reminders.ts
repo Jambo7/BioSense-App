@@ -1,5 +1,5 @@
 import { LocalNotifications } from '@capacitor/local-notifications'
-import { isNativeIos } from '@/lib/native/healthkit'
+import { isNativeApp } from '@/lib/native/healthkit'
 
 const CHECKIN_ID = 1001
 const STORAGE_KEY = 'biosense.localReminders'
@@ -10,8 +10,8 @@ export function localRemindersEnabled(): boolean {
 }
 
 export async function setLocalReminders(enabled: boolean): Promise<void> {
-  if (!isNativeIos()) {
-    throw new Error('Reminders are available in the BioSense iPhone app')
+  if (!isNativeApp()) {
+    throw new Error('Reminders are available in the BioSense iPhone or Android app')
   }
 
   if (!enabled) {
@@ -22,7 +22,7 @@ export async function setLocalReminders(enabled: boolean): Promise<void> {
 
   const perm = await LocalNotifications.requestPermissions()
   if (perm.display !== 'granted') {
-    throw new Error('Notifications were not allowed. You can enable them in iPhone Settings → BioSense.')
+    throw new Error('Notifications were not allowed. You can enable them in system settings for BioSense.')
   }
 
   await LocalNotifications.cancel({ notifications: [{ id: CHECKIN_ID }] })

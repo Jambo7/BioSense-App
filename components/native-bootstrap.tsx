@@ -3,13 +3,14 @@
 import { useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { startAppleHealthForegroundSync } from '@/lib/native/apple-sync'
-import { isIosDevice, isNativeIos } from '@/lib/native/healthkit'
+import { isIosDevice, isNativeAndroid, isNativeIos } from '@/lib/native/healthkit'
 
 export function NativeBootstrap() {
   const { update, status } = useSession()
 
   useEffect(() => {
     if (isIosDevice()) document.documentElement.classList.add('is-ios')
+    if (isNativeAndroid()) document.documentElement.classList.add('is-android')
     if (!isNativeIos()) return
     return startAppleHealthForegroundSync()
   }, [])

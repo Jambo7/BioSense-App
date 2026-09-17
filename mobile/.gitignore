@@ -8,3 +8,14 @@ ios/App/build/
 ios/DerivedData/
 ios/**/xcuserdata/
 *.xcworkspace/xcuserdata/
+
+# Android Studio local (keep android/ in git; do not commit SDK paths or build output)
+android/.gradle/
+android/build/
+android/app/build/
+android/app/release/
+android/local.properties
+android/.idea/
+android/*.iml
+android/captures/
+android/.cxx/

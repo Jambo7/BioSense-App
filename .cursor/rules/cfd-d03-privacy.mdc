@@ -1,0 +1,14 @@
+---
+description: CFD D03 Privacy Notice is blocked on engineering facts, not a document Neil can write alone
+alwaysApply: true
+---
+
+# CFD D03 / privacy packs
+
+- Canonical map: `docs/governance/LIBRARY.md`. Working answers: `docs/governance/CFD-D03-CLOSURE-STATUS.md`.
+- TSB-001 and BAG-06 are approved and closed. Do not reopen them.
+- **Do not tell Neil CFD-D03 is “his remaining document” with no work on our side.** He said he cannot draft English/Arabic until the missing production facts are filled. He sent `CFD-D03_BioSense_Privacy_Notice_Closure_Request_v1_0.docx` as that list (D03-01 to D03-08).
+- Fill from live production. Distinguish current vs launch. If a control is not implemented, say so. Do not invent Neon PITR days, OpenAI org toggles, Stripe legal entity, Resend tracking, or store Privacy URLs.
+- Do not publish or swap live Privacy Notices until Eagle issues CFD D03. Controlling public destination is `bio-sense.ai/privacy`. App `/privacy` must not stay a second conflicting notice.
+- Do not add processors or tracking that contradict the accepted set (Neon, Vercel, Terra, OpenAI, Resend, Stripe, Zoho, Apple/Google). FormSubmit and Google Fonts on the marketing site currently conflict; do not add more of the same.
+- Do not send credentials, tokens, or identifiable health information in Eagle packs.

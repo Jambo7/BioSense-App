@@ -29,6 +29,7 @@ import { Card } from '@/components/ui/card'
 import { Pill } from '@/components/ui/pill'
 import { cn } from '@/lib/utils'
 import { syncAppleHealthKit } from '@/lib/native/apple-sync'
+import { isNativeAndroid } from '@/lib/native/healthkit'
 import { CONNECT_GROUPS, CONNECTABLES, connectionIdFor, type Connectable } from '@/lib/connectables'
 
 function iconFor(id: string): typeof Watch {
@@ -285,6 +286,12 @@ export default function WearablesPage() {
   }
 
   async function handleAppleHealthKit(sourceId = 'apple') {
+    if (isNativeAndroid()) {
+      toast.error(
+        'Apple Health is iPhone only. On Android, Dexcom will use a Dexcom login once that is set up.',
+      )
+      return
+    }
     setLoading(sourceId)
     try {
       const result = await syncAppleHealthKit(14)

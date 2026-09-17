@@ -308,6 +308,10 @@ html.is-ios .glass-nav {
   padding-top: max(calc(env(safe-area-inset-top, 0px) + 10px), 54px);
 }
 
+html.is-android .glass-nav {
+  padding-top: calc(env(safe-area-inset-top, 0px) + 10px);
+}
+
 .tabbar-pill {
   background: #FFFFFF;
   border-top: 1px solid rgba(184, 168, 144, 0.18);

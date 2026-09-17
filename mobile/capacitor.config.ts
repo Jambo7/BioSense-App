@@ -1,11 +1,11 @@
 import type { CapacitorConfig } from '@capacitor/cli'
 
 /**
- * Thin native shell for TestFlight / App Store.
+ * Thin native shell for TestFlight / App Store / Play.
  *
  * Loads the live Next.js app so NextAuth cookies, SSR pages, Terra OAuth and
- * Stripe all keep working. HealthKit and local notifications are native plugins
- * called from the web UI via Capacitor.
+ * Stripe all keep working. HealthKit is iOS only. Local notifications work on
+ * both shells via Capacitor.
  *
  * Change `server.url` only if the production host moves.
  */
@@ -26,6 +26,10 @@ const config: CapacitorConfig = {
     preferredContentMode: 'mobile',
     scheme: 'BioSense',
     backgroundColor: '#F7F5F0',
+  },
+  android: {
+    backgroundColor: '#F7F5F0',
+    allowMixedContent: false,
   },
   plugins: {
     SplashScreen: {

@@ -52,10 +52,21 @@ export function isNativeIos(): boolean {
   return Boolean(cap?.isNativePlatform?.() && cap.getPlatform?.() === 'ios')
 }
 
+export function isNativeAndroid(): boolean {
+  if (typeof window === 'undefined') return false
+  try {
+    if (Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'android') return true
+  } catch {
+    /* ignore */
+  }
+  const cap = windowCap()
+  return Boolean(cap?.isNativePlatform?.() && cap.getPlatform?.() === 'android')
+}
+
 export function isNativeApp(): boolean {
   if (typeof window === 'undefined') return false
   if ((window as unknown as { __biosenseNative?: boolean }).__biosenseNative) return true
-  return isNativeIos()
+  return isNativeIos() || isNativeAndroid()
 }
 
 export interface HealthKitDay {

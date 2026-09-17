@@ -8,7 +8,7 @@ import { Card, CardLabel } from '@/components/ui/card'
 import { IconBadge } from '@/components/ui/icon-badge'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import { isNativeIos } from '@/lib/native/healthkit'
+import { isNativeApp } from '@/lib/native/healthkit'
 import { localRemindersEnabled, setLocalReminders } from '@/lib/native/reminders'
 
 type Notif = {
@@ -22,12 +22,12 @@ type Notif = {
 
 export function NotificationsClient({ initial }: { initial: Notif[] }) {
   const [items, setItems] = useState(initial)
-  const [nativeIos, setNativeIos] = useState(false)
+  const [nativeApp, setNativeApp] = useState(false)
   const [remindersOn, setRemindersOn] = useState(false)
   const [reminderBusy, setReminderBusy] = useState(false)
 
   useEffect(() => {
-    setNativeIos(isNativeIos())
+    setNativeApp(isNativeApp())
     setRemindersOn(localRemindersEnabled())
   }, [])
 
@@ -57,15 +57,15 @@ export function NotificationsClient({ initial }: { initial: Notif[] }) {
           Your <span className="italic-accent">updates.</span>
         </h1>
         <p className="text-body-sm text-ink-2 mt-2">
-          In-app updates appear here. Tutorial and account live here too. On iPhone you can also turn on a daily context reminder.
+          In-app updates appear here. Tutorial and account live here too. On the iPhone or Android app you can also turn on a daily context reminder.
         </p>
       </header>
 
-      {nativeIos && (
+      {nativeApp && (
         <Card padding="md" variant="soft">
           <CardLabel className="mb-1">Daily reminder</CardLabel>
           <p className="text-caption text-ink-2 mb-3 leading-relaxed">
-            A local 9:00 reminder on this iPhone. It does not go through our servers.
+            A local 9:00 reminder on this phone. It does not go through our servers.
           </p>
           <Button
             variant={remindersOn ? 'subtle' : 'ghost'}

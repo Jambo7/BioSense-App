@@ -2,7 +2,7 @@
 
 > Living context doc for collaborators (human or AI agents) working across multiple
 > machines. Read this first to get up to speed, and update the **Recent changes** and
-> **Open items** sections as work progresses. **Last updated: 2026-07-30.**
+> **Open items** sections as work progresses. **Last updated: 2026-09-16.**
 
 ---
 
@@ -125,8 +125,15 @@ pushed to Neon — only run `npx prisma db push` after editing `prisma/schema.pr
 - [ ] **Whoop integration** — needs the client's own Whoop developer app credentials
       ("Add Credentials" in Terra) + a DNS CNAME; gated on company incorporation +
       finalised privacy policy.
-- [ ] **Company incorporation** before finalising the privacy policy for provider submission.
+- [ ] **CFD D03 Privacy Notice** — Neil cannot draft English/Arabic until we return one
+      completed copy of `docs/governance/source/CFD-D03_BioSense_Privacy_Notice_Closure_Request_v1_0.docx`.
+      Working answers: `docs/governance/CFD-D03-CLOSURE-STATUS.md`. Do not tell him this is
+      “his remaining document” with no work on our side. Do not publish notices until Eagle
+      issues CFD D03. Controlling URL: `bio-sense.ai/privacy`.
 - [ ] **Custom-domain email** (e.g. hello@bio-sense.ai) — Google Workspace recommended.
+- [ ] **Android / Play shell** — Capacitor `mobile/android` is in the repo (`ai.biosense.app`).
+      `npm run sync` stays iOS-only. Use `npm run sync:android` then Android Studio.
+      Waiting on Neil’s Play Console account. HealthKit is not on Android.
 - [ ] **TestFlight upload** — iOS Capacitor shell is in `mobile/`; Neil creates the App Store
       Connect app + signs in Xcode on a Mac, then Archive → TestFlight (see `mobile/README.md`).
       **Build 2** adds HealthKit + local reminders — must re-Archive.
@@ -149,6 +156,9 @@ keys are optional locally — those features skip gracefully when blank.
 
 ## 8. Recent changes (most recent first)
 
+- 2026-09-16 — Ingested Neil’s CFD D03 closure request into `docs/governance/`. This is the
+  missing-facts pack so he can draft the notice. TSB-001 and BAG-06 stay closed. Do not
+  treat CFD-D03 as already on Neil with no engineering return.
 - 2026-08-25 — Wrote docs/data-flow.md: current hosting / subprocessors statement for
   partner questionnaires (Neon us-east-1, Vercel, Terra, OpenAI, Resend; R2 unused).
 - 2026-08-07 — Ingested GSC-000/001/002 (architecture + Health Score + Biological Age
