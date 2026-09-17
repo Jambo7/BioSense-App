@@ -70,6 +70,7 @@ type Draft = MealEstimate & {
   eatenAmount: EatenAmount
   missingNote: string
   editingItems: boolean
+  macrosEdited: boolean
 }
 
 type Ingredient = {
@@ -188,7 +189,36 @@ export function MealsClient() {
       eatenAmount: 'all',
       missingNote: '',
       editingItems: false,
+      macrosEdited: false,
     })
+  }
+
+  function editMacro(kind: 'calories' | 'protein' | 'carbs' | 'fat', next: number) {
+    if (!draft) return
+    const factor = eatenFactor(draft.eatenAmount) || 1
+    if (kind === 'calories') {
+      const calories = Math.min(6000, Math.max(0, Math.round(next)))
+      setDraft({
+        ...draft,
+        calories,
+        sourceCalories: Math.round(calories / factor),
+        macrosEdited: true,
+      })
+      return
+    }
+    const value = roundMacro(Math.max(0, next))
+    if (kind === 'protein') {
+      const proteinG = Math.min(400, value)
+      setDraft({ ...draft, proteinG, sourceProtein: roundMacro(proteinG / factor), macrosEdited: true })
+      return
+    }
+    if (kind === 'carbs') {
+      const carbsG = Math.min(600, value)
+      setDraft({ ...draft, carbsG, sourceCarbs: roundMacro(carbsG / factor), macrosEdited: true })
+      return
+    }
+    const fatG = Math.min(300, value)
+    setDraft({ ...draft, fatG, sourceFat: roundMacro(fatG / factor), macrosEdited: true })
   }
 
   function setEatenAmount(amount: EatenAmount) {
@@ -326,6 +356,7 @@ export function MealsClient() {
           assumptions: draft.assumptions,
           userNote: noteParts || undefined,
           adjusted:
+            draft.macrosEdited ||
             draft.calories !== draft.sourceCalories ||
             draft.proteinG !== draft.sourceProtein ||
             draft.carbsG !== draft.sourceCarbs ||
@@ -505,10 +536,36 @@ export function MealsClient() {
           <div>
             <div className="text-eyebrow uppercase text-ink-3 mb-2">Estimated nutrients</div>
             <div className="grid grid-cols-4 gap-2">
-              <MacroStat label="kcal" value={aboutCalories(draft.calories, draft.confidence)} />
-              <MacroStat label="protein" value={estimatedGrams(draft.proteinG)} />
-              <MacroStat label="carbs" value={estimatedGrams(draft.carbsG)} />
-              <MacroStat label="fat" value={estimatedGrams(draft.fatG)} />
+              <MacroField
+                label="kcal"
+                value={draft.calories}
+                max={6000}
+                onChange={(n) => editMacro('calories', n)}
+              />
+              <MacroField
+                label="protein"
+                value={draft.proteinG}
+                suffix="g"
+                max={400}
+                step={0.1}
+                onChange={(n) => editMacro('protein', n)}
+              />
+              <MacroField
+                label="carbs"
+                value={draft.carbsG}
+                suffix="g"
+                max={600}
+                step={0.1}
+                onChange={(n) => editMacro('carbs', n)}
+              />
+              <MacroField
+                label="fat"
+                value={draft.fatG}
+                suffix="g"
+                max={300}
+                step={0.1}
+                onChange={(n) => editMacro('fat', n)}
+              />
             </div>
             <p className="text-caption text-ink-3 mt-2 leading-relaxed">
               Estimates only. Ingredients and portion size can change these values.
@@ -928,5 +985,41 @@ function MacroStat({ label, value }: { label: string; value: string | number }) 
       <div className="text-[10px] uppercase tracking-[0.1em] text-ink-3">{label}</div>
       <div className="text-[13px] font-semibold text-ink tabular-nums leading-snug">{value}</div>
     </div>
+  )
+}
+
+function MacroField({
+  label,
+  value,
+  suffix,
+  max,
+  step = 1,
+  onChange,
+}: {
+  label: string
+  value: number
+  suffix?: string
+  max: number
+  step?: number
+  onChange: (n: number) => void
+}) {
+  return (
+    <label className="block min-w-0 rounded-[12px] border border-line bg-white px-2 py-2 focus-within:border-[var(--a-ring)] focus-within:ring-2 focus-within:ring-[rgba(111,143,107,0.10)]">
+      <span className="text-[10px] uppercase tracking-[0.1em] text-ink-3">{label}</span>
+      <span className="flex items-baseline gap-0.5">
+        <input
+          type="number"
+          inputMode={step < 1 ? 'decimal' : 'numeric'}
+          min={0}
+          max={max}
+          step={step}
+          value={Number.isFinite(value) ? String(value) : ''}
+          onChange={(e) => onChange(Math.max(0, Math.min(max, Number(e.target.value) || 0)))}
+          className="w-full min-w-0 bg-transparent p-0 text-[13px] font-semibold text-ink tabular-nums leading-snug outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+          aria-label={label}
+        />
+        {suffix ? <span className="text-[11px] text-ink-3 shrink-0">{suffix}</span> : null}
+      </span>
+    </label>
   )
 }
