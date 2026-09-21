@@ -2,6 +2,7 @@ import { NextResponse, after } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getRequestUser } from '@/lib/api-auth'
 import { nudgeStaleWearableSyncs } from '@/lib/wearable-sync-nudge'
+import { backfillTerraHistoryIfThin } from '@/lib/terra-history'
 
 // Allow the post-response refresh (via after()) time to hit Terra + write back.
 export const maxDuration = 60
@@ -21,6 +22,7 @@ export async function GET(req: Request) {
   // an un-awaited promise resolves). Fresh data lands by the next page load.
   after(async () => {
     try {
+      await backfillTerraHistoryIfThin(authed.id)
       await nudgeStaleWearableSyncs(authed.id)
     } catch (err) {
       console.error('[wearables] stale sync nudge failed:', err)

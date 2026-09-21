@@ -119,7 +119,7 @@ function formatSync(iso: string | null) {
   const d = new Date(iso)
   const date = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
   const time = d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false })
-  return `${date} at ${time}`
+  return `${date}, ${time}`
 }
 
 function WearablePreview({
@@ -333,7 +333,7 @@ export default function WearablesPage() {
     <div className="max-w-xl mx-auto fade-up space-y-5">
       <header className="text-center pt-1">
         <h1 className="italic-accent text-[32px] sm:text-[38px] text-sage-deep leading-none">
-          wearables.
+          connections.
         </h1>
         <p className="text-[14px] text-ink-2 mt-3 leading-relaxed max-w-[40ch] mx-auto">
           Auto-enrich your health score with real-time HRV, sleep, recovery and activity.
@@ -406,7 +406,7 @@ function ConnectableRow({
   return (
     <Card variant="plain" padding="sm">
       <div
-        className={cn('flex items-center gap-3', connected && 'cursor-pointer')}
+        className={cn('flex flex-col gap-2.5', connected && 'cursor-pointer')}
         onClick={connected ? onToggle : undefined}
         role={connected ? 'button' : undefined}
         tabIndex={connected ? 0 : undefined}
@@ -421,21 +421,34 @@ function ConnectableRow({
             : undefined
         }
       >
-        <WearableThumb
-          src={item.image}
-          alt={item.name}
-          fallbackIcon={iconFor(item.id)}
-          connected={connected}
-        />
-
-        <div className="flex-1 min-w-0">
-          <div className="text-[15px] font-semibold text-ink">{item.name}</div>
-          <div className="text-[12.5px] text-ink-2 mt-0.5 leading-snug">
-            {connected ? (syncLabel ? `Last sync · ${syncLabel}` : 'Waiting for the first sync') : item.desc}
+        <div className="flex items-center gap-3 min-w-0">
+          <WearableThumb
+            src={item.image}
+            alt={item.name}
+            fallbackIcon={iconFor(item.id)}
+            connected={connected}
+          />
+          <div className="flex-1 min-w-0">
+            <div className="text-[15px] font-semibold text-ink truncate">{item.name}</div>
+            <div className="text-[12.5px] text-ink-2 mt-0.5 leading-snug truncate">
+              {connected
+                ? syncLabel
+                  ? `Synced ${syncLabel}`
+                  : 'Waiting for the first sync'
+                : item.desc}
+            </div>
           </div>
+          {connected && (
+            <ChevronDown
+              className={cn(
+                'w-4 h-4 text-ink-3 shrink-0 transition-transform',
+                isOpen && 'rotate-180',
+              )}
+            />
+          )}
         </div>
 
-        <div className="shrink-0 flex items-center gap-1.5">
+        <div className="flex flex-wrap items-center gap-1.5">
           {connected ? (
             <>
               <Pill tone="soft-sage" size="sm">
@@ -468,12 +481,6 @@ function ConnectableRow({
                   Disconnect
                 </Button>
               )}
-              <ChevronDown
-                className={cn(
-                  'w-4 h-4 text-ink-3 transition-transform',
-                  isOpen && 'rotate-180',
-                )}
-              />
             </>
           ) : item.kind === 'healthkit' ? (
             <Button

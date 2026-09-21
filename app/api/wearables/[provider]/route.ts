@@ -37,7 +37,10 @@ export async function GET(
   }
 
   const days = dailyBreakdownFromSyncData(sync.data)
-  const total = days.size
+  const payloadDays = days.size
+  const persistedDays = await prisma.wearableDay.count({ where: { userId: authed.id } })
+  const total = Math.max(payloadDays, persistedDays)
+  const coverageBase = payloadDays > 0 ? payloadDays : total
   let sleep = 0
   let hrv = 0
   let recovery = 0
@@ -56,10 +59,10 @@ export async function GET(
     metrics: metricsFromSyncData(sync.data),
     historyDays: total,
     coverage: {
-      sleep: quality(sleep, total),
-      hrv: quality(hrv, total),
-      recovery: quality(recovery, total),
-      activity: quality(activity, total, true),
+      sleep: quality(sleep, coverageBase),
+      hrv: quality(hrv, coverageBase),
+      recovery: quality(recovery, coverageBase),
+      activity: quality(activity, coverageBase, true),
     },
   })
 }

@@ -7,6 +7,7 @@ import { z } from 'zod'
 
 const schema = z.object({
   plan: z.enum(['monthly', 'annual']),
+  returnTo: z.enum(['account', 'upgrade']).optional(),
 })
 
 export async function POST(req: NextRequest) {
@@ -17,7 +18,7 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json()
-  const { plan } = schema.parse(body)
+  const { plan, returnTo } = schema.parse(body)
   const priceId = PLANS[plan].priceId
 
   if (!priceId) {
@@ -49,14 +50,17 @@ export async function POST(req: NextRequest) {
   }
 
   const origin = (process.env.NEXTAUTH_URL ?? '').replace(/\/$/, '')
+  const fromAccount = returnTo === 'account'
   const checkoutSession = await stripe.checkout.sessions.create({
     customer: customerId,
     client_reference_id: session.user.id,
     line_items: [{ price: priceId, quantity: 1 }],
     mode: 'subscription',
-    success_url: `${origin}/upgrade/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${origin}/upgrade`,
-    metadata: { userId: session.user.id },
+    success_url: fromAccount
+      ? `${origin}/account?session_id={CHECKOUT_SESSION_ID}`
+      : `${origin}/upgrade/success?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: fromAccount ? `${origin}/account` : `${origin}/upgrade`,
+    metadata: { userId: session.user.id, source: fromAccount ? 'account' : 'app' },
     subscription_data: {
       metadata: { userId: session.user.id },
     },

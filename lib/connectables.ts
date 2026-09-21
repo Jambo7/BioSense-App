@@ -235,11 +235,16 @@ export const CONNECT_GROUPS: ConnectableGroup[] = [
     ),
   },
   {
-    id: 'wearables',
-    label: 'More wearables',
+    id: 'devices',
+    label: 'Devices',
     items: CONNECTABLES.filter((c) =>
       ['huawei', 'amazfit', 'ultrahuman', 'polar', 'suunto', 'coros', 'withings'].includes(c.id),
     ),
+  },
+  {
+    id: 'female',
+    label: 'Female health',
+    items: CONNECTABLES.filter((c) => ['flo'].includes(c.id)),
   },
   {
     id: 'metabolic',
@@ -252,7 +257,7 @@ export const CONNECT_GROUPS: ConnectableGroup[] = [
     id: 'lifestyle',
     label: 'Fitness & lifestyle',
     items: CONNECTABLES.filter((c) =>
-      ['strava', 'peloton', 'wahoo', 'flo'].includes(c.id),
+      ['strava', 'peloton', 'wahoo'].includes(c.id),
     ),
   },
 ]

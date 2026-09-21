@@ -22,6 +22,7 @@ import { prisma } from '@/lib/prisma'
 import { canonicalProvider } from '@/lib/connectables'
 import { getReferenceId, verifyTerraSignature, type TerraWebhookPayload } from '@/lib/terra'
 import { storeTerraDataPayloads } from '@/lib/terra-store'
+import { pullTerraHistory } from '@/lib/terra-history'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -129,6 +130,20 @@ async function processTerraEvent(initial: IncomingPayload): Promise<void> {
         data: nextData as Prisma.InputJsonValue,
       },
     })
+
+    // Terra's default connect window is a few days. Pull the longest inline
+    // history so Connections can show more than the latest webhook snapshot.
+    if (terraUserId) {
+      try {
+        await pullTerraHistory({
+          userId: referenceId,
+          provider,
+          terraUserId,
+        })
+      } catch (err) {
+        console.error(`[terra] connect history pull failed ${referenceId}/${provider}:`, err)
+      }
+    }
     return
   }
 
