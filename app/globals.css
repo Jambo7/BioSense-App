@@ -270,6 +270,7 @@ body {
   border-bottom: none;
   padding-top: calc(env(safe-area-inset-top, 0px) + 8px);
   padding-bottom: 8px;
+  transition: background-color 160ms ease, box-shadow 160ms ease;
 }
 
 /* iPhone / Capacitor often report 0 for env(safe-area) until layout settles.
@@ -297,6 +298,15 @@ body {
   );
   -webkit-mask: linear-gradient(180deg, #000 0%, #000 60%, transparent 100%);
           mask: linear-gradient(180deg, #000 0%, #000 60%, transparent 100%);
+}
+
+/* Once the page moves, cover the logo so card text cannot show through it. */
+.glass-nav--solid {
+  background: #ffffff;
+  box-shadow: 0 1px 0 rgba(26, 28, 26, 0.06);
+}
+.glass-nav--solid::before {
+  opacity: 0;
 }
 
 /* ─── Bottom tab bar ────────────────────────────────────────────────────

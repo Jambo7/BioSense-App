@@ -62,6 +62,7 @@ export function AppNav() {
   const router = useRouter()
   const [pendingHref, setPendingHref] = useState<string | null>(null)
   const [portalEl, setPortalEl] = useState<HTMLElement | null>(null)
+  const [scrolled, setScrolled] = useState(false)
 
   const clearPending = useEffectEvent(() => {
     setPendingHref(null)
@@ -82,6 +83,16 @@ export function AppNav() {
   // containers cannot drag it off the physical bottom of the screen.
   useEffect(() => {
     setPortalEl(document.body)
+  }, [])
+
+  useEffect(() => {
+    const onScroll = () => {
+      const y = window.scrollY || document.documentElement.scrollTop || 0
+      setScrolled(y > 8)
+    }
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
   const tabActive = (item: NavItem) =>
@@ -199,13 +210,15 @@ export function AppNav() {
 
   return (
     <>
-      {/* ── Top bar ──
-          Per v7-polish: header is now fully transparent — logo, Wearables
-          pill, bell, and avatar sit naturally over the page texture (no
-          defined header rectangle, no border, no blur). A very soft
-          top-down scrim drawn from inside `.glass-nav::before` keeps text
-          legible when content scrolls under the bar. */}
-      <header className="glass-nav sticky top-0 z-40 flex items-center justify-between px-4 sm:px-6 gap-3 w-full max-w-full box-border">
+      {/* Top bar stays open on the page texture. Once the page moves,
+          a solid white sheet sits behind the logo so card text cannot
+          show through it. */}
+      <header
+        className={cn(
+          'glass-nav sticky top-0 z-40 flex items-center justify-between px-4 sm:px-6 gap-3 w-full max-w-full box-border',
+          scrolled && 'glass-nav--solid',
+        )}
+      >
         {/* Wordmark */}
         <Link href="/dashboard" replace className="flex items-center group shrink-0">
           <BrandWordmark height={28} priority />
