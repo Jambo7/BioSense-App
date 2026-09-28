@@ -17,7 +17,6 @@ import {
   Heart,
   Footprints,
   Activity,
-  Utensils,
   Droplets,
   type LucideIcon,
 } from 'lucide-react'
@@ -53,7 +52,6 @@ interface DashboardClientProps {
   intelligence: InsightCard[]
   learningStarted: boolean
   hasProfile: boolean
-  mealsToday: { count: number; calories: number }
   glucose: { show: boolean; todayMgdl: number | null; connected: boolean }
   bioAge: {
     unlocked: boolean
@@ -76,7 +74,6 @@ export function DashboardClient(props: DashboardClientProps) {
     learningStarted,
     hasBlood,
     bioAge,
-    mealsToday,
     glucose,
   } = props
 
@@ -140,8 +137,6 @@ export function DashboardClient(props: DashboardClientProps) {
       />
 
       <ContextCard done={hasContextToday} name={firstName} />
-
-      <MealsCard count={mealsToday.count} calories={mealsToday.calories} />
 
       {glucose.show && (
         <GlucoseCard todayMgdl={glucose.todayMgdl} connected={glucose.connected} />
@@ -528,36 +523,6 @@ function ContextCard({ done }: { done: boolean; name: string }) {
         className="shrink-0 h-9 px-3.5 rounded-pill btn-sage-outline text-[12.5px] font-semibold inline-flex items-center gap-1"
       >
         {done ? 'Update' : 'Context check-in'}
-        <ArrowRight className="w-3.5 h-3.5" />
-      </Link>
-    </Card>
-  )
-}
-
-function MealsCard({ count, calories }: { count: number; calories: number }) {
-  return (
-    <Card padding="md" className="flex items-start sm:items-center gap-3">
-      <IconBadge icon={Utensils} tone="amber" variant="tint" size="md" />
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2">
-          <span className="text-[13.5px] font-semibold text-ink">Meals</span>
-          {count === 0 && (
-            <span className="text-[9px] font-bold uppercase tracking-[0.1em] px-2 py-[1px] rounded-pill text-white bg-grad-sage">
-              New
-            </span>
-          )}
-        </div>
-        <p className="text-[12px] text-ink-2 leading-snug mt-0.5">
-          {count === 0
-            ? 'Photograph meals you want to log. Totals only cover what you add.'
-            : `${count} logged today · about ${Math.round(calories)} kcal from those meals`}
-        </p>
-      </div>
-      <Link
-        href="/meals"
-        className="shrink-0 h-9 px-3.5 rounded-pill btn-sage-outline text-[12.5px] font-semibold inline-flex items-center gap-1"
-      >
-        {count === 0 ? 'Log a meal' : 'Add meal'}
         <ArrowRight className="w-3.5 h-3.5" />
       </Link>
     </Card>
