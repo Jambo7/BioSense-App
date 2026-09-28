@@ -3,16 +3,70 @@ import { prisma } from '@/lib/prisma'
 import { getRequestUser } from '@/lib/api-auth'
 import { callClaude, BLOOD_ANALYSIS_PROMPT } from '@/lib/claude'
 import { categoryForMarker } from '@/lib/biomarkers'
-import { recountTiers, sanitizeBloodMarkers } from '@/lib/blood-sanity'
+import { recountTiers, sanitizeBloodMarkers, type SanitizedBloodMarker } from '@/lib/blood-sanity'
 import { recalculateHealthScore } from '@/lib/health-score'
 import { enforceOutputSafety } from '@/lib/safety-gate'
 import OpenAI from 'openai'
 
-async function parsePdf(buffer: Buffer): Promise<string> {
+export const maxDuration = 60
+
+const MAX_PDF_PAGES = 4
+
+type PdfParser = {
+  getText: (params?: { pageJoiner?: string }) => Promise<{ text?: string }>
+  getScreenshot: (params?: {
+    first?: number
+    imageBuffer?: boolean
+    imageDataUrl?: boolean
+    desiredWidth?: number
+  }) => Promise<{ pages: Array<{ data?: Uint8Array }> }>
+  destroy: () => Promise<void>
+}
+
+function openPdf(buffer: Buffer): PdfParser {
+  // pdf-parse v2 exports a class. The old function call throws before any reading starts.
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const pdfParse = require('pdf-parse')
-  const result = await pdfParse(buffer)
-  return result.text
+  const { PDFParse } = require('pdf-parse') as {
+    PDFParse: new (opts: { data: Uint8Array }) => PdfParser
+  }
+  return new PDFParse({ data: new Uint8Array(buffer) })
+}
+
+async function parsePdf(buffer: Buffer): Promise<string> {
+  const parser = openPdf(buffer)
+  try {
+    const result = await parser.getText({ pageJoiner: '\n' })
+    return result.text ?? ''
+  } finally {
+    await parser.destroy().catch(() => {})
+  }
+}
+
+async function pdfPageImages(buffer: Buffer): Promise<Buffer[]> {
+  const parser = openPdf(buffer)
+  try {
+    const shot = await parser.getScreenshot({
+      first: MAX_PDF_PAGES,
+      imageBuffer: true,
+      imageDataUrl: false,
+      desiredWidth: 1400,
+    })
+    const images: Buffer[] = []
+    for (const page of shot.pages) {
+      if (page.data && page.data.byteLength > 0) images.push(Buffer.from(page.data))
+    }
+    return images
+  } finally {
+    await parser.destroy().catch(() => {})
+  }
+}
+
+function isPdf(file: File, buffer: Buffer): boolean {
+  return (
+    file.type === 'application/pdf' ||
+    file.name.toLowerCase().endsWith('.pdf') ||
+    buffer.subarray(0, 5).toString('utf8') === '%PDF-'
+  )
 }
 
 function isImageFile(file: File): boolean {
@@ -86,65 +140,87 @@ export async function POST(req: NextRequest) {
 
       const buffer = Buffer.from(await file.arrayBuffer())
 
-      if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
-        const pdfText = await parsePdf(buffer)
-        if (pdfText?.trim()) combinedText += `\n${pdfText}`
+      if (isPdf(file, buffer)) {
+        let pdfText = ''
+        try {
+          pdfText = await parsePdf(buffer)
+        } catch (err) {
+          const name = err instanceof Error ? err.name : ''
+          if (name === 'PasswordException') {
+            return NextResponse.json(
+              { error: `${file.name} is password protected. Upload an unlocked PDF or a photo of the pages.` },
+              { status: 422 },
+            )
+          }
+          console.error('[blood] pdf text failed:', err)
+        }
+        if (pdfText.trim().length >= 40) {
+          combinedText += `\n${pdfText}`
+        } else {
+          const pages = await pdfPageImages(buffer).catch((err) => {
+            console.error('[blood] pdf screenshot failed:', err)
+            return [] as Buffer[]
+          })
+          for (const page of pages) {
+            imageResponses.push(await analyseImage(page, 'image/png'))
+          }
+        }
       } else if (isImageFile(file)) {
         const mime = file.type || 'image/jpeg'
-        const resp = await analyseImage(buffer, mime)
-        imageResponses.push(resp)
+        imageResponses.push(await analyseImage(buffer, mime))
       } else {
         return NextResponse.json({ error: `${file.name}: must be PDF or JPG/PNG` }, { status: 400 })
       }
     }
 
-    let aiResponse = ''
-    if (combinedText.trim().length >= 50) {
-      aiResponse = await callClaude(
-        BLOOD_ANALYSIS_PROMPT,
-        `Analyse this blood test result and extract all biomarkers:\n\n${combinedText.slice(0, 8000)}`,
-        2000,
+    const aiChunks: string[] = []
+    if (combinedText.trim().length >= 40) {
+      aiChunks.push(
+        await callClaude(
+          BLOOD_ANALYSIS_PROMPT,
+          `Analyse this blood test result and extract all biomarkers:\n\n${combinedText.slice(0, 12000)}`,
+          2500,
+        ),
       )
-    } else if (imageResponses.length > 0) {
-      aiResponse = imageResponses.join('\n')
-    } else {
+    }
+    aiChunks.push(...imageResponses.filter((chunk) => chunk.trim().length > 0))
+
+    if (aiChunks.length === 0) {
       return NextResponse.json(
-        { error: 'Could not extract text from files. Ensure PDFs are text-based or images are clear.' },
+        { error: 'Could not read these files. Use a text PDF, or a clear photo of each page.' },
         { status: 422 },
       )
     }
 
-    let markers: object[] = []
-    let aiSummary = ''
-    let t1Count = 0
-    let t2Count = 0
-    let t3Count = 0
+    const markers: SanitizedBloodMarker[] = []
+    const summaries: string[] = []
     let rejectedMarkers = 0
 
-    try {
-      const jsonMatch = aiResponse.match(/\{[\s\S]*\}/)
-      if (jsonMatch) {
-        const parsed = JSON.parse(jsonMatch[0])
-        const enriched = enrichMarkers(parsed.markers ?? [])
-        const sanitized = sanitizeBloodMarkers(enriched)
-        markers = sanitized.markers
-        rejectedMarkers = sanitized.rejected
-        aiSummary = enforceOutputSafety(parsed.summary ?? '')
-        const tiers = recountTiers(sanitized.markers)
-        // Prefer recount from kept markers; fall back to model counts only if tiers absent.
-        t1Count = tiers.t1Count || parsed.t1Count || 0
-        t2Count = tiers.t2Count || parsed.t2Count || 0
-        t3Count = tiers.t3Count || parsed.t3Count || 0
+    for (const chunk of aiChunks) {
+      const jsonMatch = chunk.match(/\{[\s\S]*\}/)
+      if (!jsonMatch) continue
+      try {
+        const parsed = JSON.parse(jsonMatch[0]) as {
+          markers?: object[]
+          summary?: string
+        }
+        const sanitized = sanitizeBloodMarkers(enrichMarkers(parsed.markers ?? []))
+        markers.push(...sanitized.markers)
+        rejectedMarkers += sanitized.rejected
+        if (parsed.summary) summaries.push(enforceOutputSafety(parsed.summary))
+      } catch {
+        // One bad page should not drop the rest of the panel.
       }
-    } catch {
-      aiSummary = enforceOutputSafety(aiResponse)
     }
 
-    if (markers.length === 0 && rejectedMarkers > 0) {
+    const tiers = recountTiers(markers)
+    const aiSummary = summaries.join(' ')
+
+    if (markers.length === 0) {
       return NextResponse.json(
         {
           error:
-            'Could not extract any plausible biomarker values from this upload. Try a clearer PDF/image.',
+            'Could not extract any plausible biomarker values from this upload. Try a clearer PDF or photo.',
           rejectedMarkers,
         },
         { status: 422 },
@@ -155,7 +231,7 @@ export async function POST(req: NextRequest) {
       data: {
         userId: authed.id,
         drawDate: drawDate ? new Date(drawDate) : new Date(),
-        markers,
+        markers: JSON.parse(JSON.stringify(markers)),
         pdfUrl: null,
         aiSummary,
       },
@@ -174,9 +250,9 @@ export async function POST(req: NextRequest) {
       bloodId: blood.id,
       markerCount: markers.length,
       rejectedMarkers,
-      t1Count,
-      t2Count,
-      t3Count,
+      t1Count: tiers.t1Count,
+      t2Count: tiers.t2Count,
+      t3Count: tiers.t3Count,
       aiSummary,
     })
   } catch (err) {

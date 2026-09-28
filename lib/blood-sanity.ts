@@ -10,6 +10,8 @@ export interface RawBloodMarker {
   unit?: unknown
   refLow?: unknown
   refHigh?: unknown
+  refMin?: unknown
+  refMax?: unknown
   tier?: unknown
   [key: string]: unknown
 }
@@ -20,9 +22,22 @@ export interface SanitizedBloodMarker {
   unit?: string
   refLow?: number
   refHigh?: number
+  refMin?: number
+  refMax?: number
   tier?: string
   category?: string
   [key: string]: unknown
+}
+
+const KNOWN_TIER = /^(t1|t2|t3|1|2|3|normal|optimal|borderline|moderate|high|low|abnormal)$/i
+
+/** T1 inside the lab range, T2 up to 20% outside it, T3 beyond that. */
+function tierFromRange(value: number, refMin: number | null, refMax: number | null): string | null {
+  if (refMin == null || refMax == null || refMax <= refMin) return null
+  if (value >= refMin && value <= refMax) return 'T1'
+  const span = refMax - refMin
+  const outside = value < refMin ? refMin - value : value - refMax
+  return outside / span > 0.2 ? 'T3' : 'T2'
 }
 
 function asFiniteNumber(v: unknown): number | null {
@@ -64,11 +79,19 @@ export function sanitizeBloodMarkers(markers: unknown[]): {
     const cleaned: SanitizedBloodMarker = { name, value }
     const unit = typeof m.unit === 'string' ? m.unit.trim() : ''
     if (unit) cleaned.unit = unit
-    const refLow = asFiniteNumber(m.refLow)
-    const refHigh = asFiniteNumber(m.refHigh)
-    if (refLow != null) cleaned.refLow = refLow
-    if (refHigh != null) cleaned.refHigh = refHigh
-    if (typeof m.tier === 'string') cleaned.tier = m.tier
+    const refMin = asFiniteNumber(m.refMin ?? m.refLow)
+    const refMax = asFiniteNumber(m.refMax ?? m.refHigh)
+    if (refMin != null) {
+      cleaned.refMin = refMin
+      cleaned.refLow = refMin
+    }
+    if (refMax != null) {
+      cleaned.refMax = refMax
+      cleaned.refHigh = refMax
+    }
+    const givenTier = typeof m.tier === 'string' ? m.tier.trim() : ''
+    const tier = KNOWN_TIER.test(givenTier) ? givenTier : tierFromRange(value, refMin, refMax)
+    if (tier) cleaned.tier = tier
     if (typeof m.category === 'string') cleaned.category = m.category
 
     // Copy through any extra display fields that are plain strings/numbers.
@@ -100,4 +123,23 @@ export function recountTiers(markers: SanitizedBloodMarker[]): {
     else if (t === 't3' || t === '3' || t === 'high' || t === 'low' || t === 'abnormal') t3Count++
   }
   return { t1Count, t2Count, t3Count }
+}
+
+/** Compact list for prompts. Names, values and tiers only. */
+export function formatMarkerList(markers: unknown, limit = 40): string {
+  if (!Array.isArray(markers)) return ''
+  return markers
+    .slice(0, limit)
+    .map((raw) => {
+      if (!raw || typeof raw !== 'object') return ''
+      const m = raw as { name?: unknown; value?: unknown; unit?: unknown; tier?: unknown }
+      const name = typeof m.name === 'string' ? m.name.trim() : ''
+      if (!name) return ''
+      const value = asFiniteNumber(m.value)
+      const unit = typeof m.unit === 'string' ? m.unit.trim() : ''
+      const tier = typeof m.tier === 'string' ? m.tier.trim() : ''
+      return `${name} ${value ?? ''}${unit ? ` ${unit}` : ''}${tier ? ` (${tier})` : ''}`.trim()
+    })
+    .filter(Boolean)
+    .join('; ')
 }

@@ -10,6 +10,7 @@ import {
   aggregateWearableMetrics,
   formatWearableMetricsSummary,
 } from './wearable-metrics'
+import { formatMarkerList } from './blood-sanity'
 
 function sanitizeReportContent(content: object): object {
   try {
@@ -74,7 +75,7 @@ export async function generateWeeklyReport(userId: string, period: string) {
     prisma.bloodResult.findFirst({
       where: { userId },
       orderBy: { drawDate: 'desc' },
-      select: { drawDate: true, aiSummary: true },
+      select: { drawDate: true, aiSummary: true, markers: true },
     }),
   ])
 
@@ -108,7 +109,7 @@ Connected wearables: ${providers}
 Latest wearable metrics: ${wearableLine}
 Latest blood: ${
     blood
-      ? `${blood.drawDate.toISOString().split('T')[0]} — ${(blood.aiSummary ?? '').slice(0, 240)}`
+      ? `${blood.drawDate.toISOString().split('T')[0]} — ${(blood.aiSummary ?? '').slice(0, 240)}${formatMarkerList(blood.markers) ? ` Markers: ${formatMarkerList(blood.markers)}` : ''}`
       : 'none'
   }
 Top patterns: ${patterns.map((p) => p.description).join(' | ') || 'none yet'}`
@@ -186,7 +187,7 @@ Total check-ins: ${checkins.length}
 ${stats ? `Average scores — energy: ${stats.avgEnergy.toFixed(1)}, sleep: ${stats.avgSleep.toFixed(1)}, mood: ${stats.avgMood.toFixed(1)}, stress: ${stats.avgStress.toFixed(1)}` : ''}
 Health score: ${score?.score ?? 'N/A'}
 Wearables: ${wearables.map((w) => w.provider).join(', ') || 'none'} (${wearableLine})
-Blood uploads (recent): ${bloodResults.length}
+Blood uploads (recent): ${bloodResults.length}${bloodResults[0] ? `. Latest markers: ${formatMarkerList(bloodResults[0].markers) || 'none extracted'}` : ''}
 Biological age (wellness estimate) vs calendar: ${bioAge ? `${bioAge.delta > 0 ? '+' : ''}${bioAge.delta.toFixed(1)} years` : 'Not unlocked / not calculated'}
 Key patterns: ${patterns.map((p) => `${p.description} (${p.confidence})`).join(' | ') || 'none yet'}`
 

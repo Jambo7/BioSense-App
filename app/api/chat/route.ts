@@ -18,6 +18,7 @@ import { classifyUserMessage, safetyTemplate } from '@/lib/safety-gate'
 import { hitRateLimit } from '@/lib/rate-limit'
 import { TSB } from '@/lib/security-baseline'
 import { mealChatSummary } from '@/lib/meals'
+import { formatMarkerList } from '@/lib/blood-sanity'
 import { formatGlucose } from '@/lib/glucose'
 import { z } from 'zod'
 
@@ -168,7 +169,7 @@ export async function POST(req: NextRequest) {
         : 'No check-ins yet'
 
     const bloodSummary = latestBlood
-      ? `Latest blood (${new Date(latestBlood.drawDate).toISOString().split('T')[0]}): ${latestBlood.aiSummary ?? 'No summary available'}`
+      ? `Latest blood (${new Date(latestBlood.drawDate).toISOString().split('T')[0]}): ${latestBlood.aiSummary ?? 'No summary available'}${formatMarkerList(latestBlood.markers) ? `\nMarkers: ${formatMarkerList(latestBlood.markers)}` : ''}`
       : 'No blood results uploaded'
 
     const patternSummary =
