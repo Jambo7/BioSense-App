@@ -1,8 +1,30 @@
 import type { NextConfig } from 'next'
 
+const LEGAL_SITE = 'https://bio-sense.ai'
+
 const nextConfig: NextConfig = {
   // Standalone output required for Cloud Run Docker deployment
   output: 'standalone',
+  async redirects() {
+    const paths = [
+      '/privacy',
+      '/terms',
+      '/terms-of-use',
+      '/subscription-terms',
+      '/wellness-disclaimer',
+      '/ai-transparency',
+      '/acceptable-use',
+      '/privacy-choices',
+      '/cookies',
+      '/complaints',
+      '/health-ai',
+    ]
+    return paths.map((source) => ({
+      source,
+      destination: `${LEGAL_SITE}${source}`,
+      permanent: false,
+    }))
+  },
   experimental: {
     serverActions: {
       allowedOrigins: [

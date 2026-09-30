@@ -4,8 +4,22 @@
 **Prepared for:** Eagle AI Labs  
 **Company:** Origin BioSense Technologies FZCO  
 **Launch scope:** UAE, iOS and Android  
-**Date of this working copy:** 16 September 2026  
-**Completion rule:** Eagle can draft after D03-01 to D03-06. Publication needs D03-07 and D03-08 evidenced.
+**Date of this working copy:** 30 September 2026  
+**Completion rule:** Eagle can draft after D03-01 to D03-06. Publication of a new Privacy Notice needs D03-07 and D03-08 evidenced. CFD-D03 itself is still not written. Do not invent it.
+
+## Engineering close, 30 September 2026
+
+Done in the product, from code, not from account screenshots:
+
+1. Marketing pages no longer request Google Fonts. The site uses the system font stack.
+2. The contact form no longer posts to FormSubmit. It opens the visitor's own email app, addressed to support@bio-sense.ai.
+3. The app routes `/privacy` and `/terms` (and the other legal paths) to `https://bio-sense.ai/...`. The old in-app privacy page is not a second notice.
+4. Footer on the marketing site is Privacy, Terms, Health & AI, Data & Privacy Choices.
+5. Consumer text from CFD-D01, D02, D04, D05, D06, D07, D08 and D09 is on its own URL. Internal control pages were removed. The Privacy Notice URL is still the 26 June 2026 policy, updated only where it claimed analytics cookies that the product does not use.
+6. Cookie notice section 6 now includes the verified inventory: NextAuth session, CSRF and callback cookies, `biosense.localReminders` (local storage), `biosense.tour` (session storage), and no marketing-site cookies.
+7. Data rights page includes what delete and export actually do. There is no per-user encryption key. Neon backup days are still unknown.
+
+Still not ours to invent, so still open for Neil or the account holder: Neon plan and PITR days, OpenAI org screenshots, Stripe contracting entity, Resend tracking and retention, Zoho retention, App Store and Play Console privacy URLs, a named reviewer, and the Privacy Notice text (CFD-D03).
 
 This is a **working engineering copy**. Dashboard screenshots, restore tests, and store-listing URLs are still missing. It is not a publication pack.
 
@@ -17,13 +31,11 @@ Do not revisit: TSB-001, BAG-06, UAE-only launch, controller identity, consent s
 
 **Taking them in:** yes for this file and the approved closed items (TSB, BAG, launch processors). The 29 Aug facts pack and the customer operating model are **not** a safe current source without this document.
 
-**Using them properly:** not yet. Three product facts contradict the approved launch position:
+**Using them properly:** the three product mismatches below were closed on 30 September 2026. CFD-D03 is still not drafted, and the console facts in the list at the bottom are still missing, so a replacement Privacy Notice is not ready to publish.
 
-1. Marketing site still loads **Google Fonts** from Google. Approved position is self-hosted fonts.
-2. Contact form posts to **FormSubmit.co**. That is an extra processor, not on the accepted list.
-3. Two Privacy Notices are still live (app 17 June 2026, generic “BioSense”; website 26 June 2026, Origin BioSense Technologies FZCO). D03-08 requires one controlling notice at `bio-sense.ai/privacy` and matching in-app / store links.
-
-Until those are fixed, and until Neil supplies the remaining console facts, CFD D03 must not be treated as ready to publish. One further document is still expected.
+1. Marketing site no longer loads Google Fonts. It uses the system font stack.
+2. Contact form no longer posts to FormSubmit. It opens the visitor's email app to support@bio-sense.ai.
+3. The app no longer hosts a second privacy page. `/privacy` on the app redirects to `https://bio-sense.ai/privacy`.
 
 ---
 
@@ -44,8 +56,8 @@ Until those are fixed, and until Neil supplies the remaining console facts, CFD 
 | Zoho Mail | privacy@ / support / hello inboxes | Correspondence | Zoho | Possible if a person pastes health into mail | Mailbox retention unknown | Zoho (account) |
 | Apple HealthKit | On-device ingest (including Dexcom via Apple Health) | Health samples on device; selected metrics synced into BioSense days | On device + then Neon if synced | Yes | Disconnect Apple Health in app; account delete removes Neon copies. Apple-side Health data remains on the phone | Apple Health / App Store rules |
 | Capacitor / iOS WKWebView | Native shell loading production URL | Same as web app in the WebView | Device | Same as app | Uninstall + account delete | Apple |
-| Google Fonts | Marketing site webfonts | Visitor IP to Google when loading `bio-sense.ai` pages | Google | No | N/A | **Not accepted.** Launch position is self-hosted |
-| FormSubmit.co | Website contact form | Name, email, topic, message → forwards to support@bio-sense.ai | FormSubmit | Possible if user types health | FormSubmit account / inbox | **Not accepted.** Extra processor |
+| Google Fonts | Removed 30 Sep 2026 | Was a visitor IP to Google | n/a | No | Removed | Not a live processor |
+| FormSubmit.co | Removed 30 Sep 2026 | Contact now opens a mailto to support@ | n/a | No | Removed | Not a live processor |
 
 Explicitly **not** live: Sentry, PostHog, Mixpanel, Meta/Google Ads pixels, Intercom/Zendesk, APNs/FCM, Vercel Analytics/Speed Insights on shipped pages, Cloudflare R2 for lab files (client exists, upload path does not use it), Anthropic API (SDK in `package.json`, live AI is OpenAI), `web-push` (dependency only, no VAPID path).
 
@@ -137,8 +149,8 @@ Policy is fixed in BPriv2. Do not propose replacement periods.
 - Zoho: MX for bio-sense.ai. Mailbox retention unknown.
 - Push: Capacitor **local** notifications only. No APNs/FCM. `web-push` unused.
 - Email/lock-screen: weekly report mail is a link, not a health dump (operating model). Re-check templates before publication.
-- App cookies: NextAuth `__Host-` / `__Secure-` session cookies only. No consent banner (essential-only position).
-- Marketing site: **Google Fonts** still requested. Contact form posts to FormSubmit.
+- App cookies: `__Secure-next-auth.session-token` (30 days), `__Host-next-auth.csrf-token`, `__Secure-next-auth.callback-url`. Local storage `biosense.localReminders`. Session storage `biosense.tour`. No consent banner.
+- Marketing site: no Google Fonts request. Contact opens mailto:support@bio-sense.ai. No first-party cookies in site scripts.
 - No analytics, pixels, or crash reporting on shipped pages.
 
 **Launch position:** disable Resend open/click tracking; keep messages generic; self-host fonts; no FormSubmit (or replace with a processor already accepted, e.g. Resend/Zoho only); no remote push unless newly accepted.
@@ -174,9 +186,9 @@ Policy is fixed in BPriv2. Do not propose replacement periods.
 
 **Current production:**
 
-- Website notice: `https://bio-sense.ai/privacy` (Origin BioSense Technologies FZCO, last updated 26 June 2026).
-- App notice: `https://bio-sense-app-navy.vercel.app/privacy` (Last updated 17 June 2026, legal name still generic “BioSense”). Signup and WHOOP page link here. Profile does not.
-- These are **two different documents**. D03-08 requires CFD D03 as the **sole** controlling notice at `bio-sense.ai/privacy`, with website, app, and store listings changing together.
+- Controlling notice URL: `https://bio-sense.ai/privacy` (Origin BioSense Technologies FZCO). Last updated 30 September 2026 for the cookie and provider wording. This is still the June 2026 notice, not CFD-D03.
+- App `/privacy` redirects to that URL. Signup and the in-app privacy link follow it.
+- D03-08 still wants CFD-D03 as the text at that URL, plus matching App Store and Play Console URLs. The URL is single. The replacement text does not exist yet.
 - Apple in-app account deletion: exists in the logged-in app (password confirm). Store-listing Privacy URL **not confirmed**.
 - Android / Play path: not evidenced as a separate native listing.
 - Named Eagle reviewer for frozen-build comparison: **not assigned in this repo**.
