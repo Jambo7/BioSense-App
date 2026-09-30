@@ -5,6 +5,7 @@ import { getRequestUser } from '@/lib/api-auth'
 import { recordPreferenceChange } from '@/lib/comms'
 import { CONSENT } from '@/lib/consent'
 import { clientIp } from '@/lib/rate-limit'
+import { queueGhlSync } from '@/lib/ghl'
 
 const schema = z.object({
   name: z.string().min(1).optional(),
@@ -73,6 +74,7 @@ export async function PATCH(req: NextRequest) {
       })
     }
 
+    queueGhlSync(authed.id)
     return NextResponse.json({ success: true, name: updated.name })
   } catch (err) {
     if (err instanceof z.ZodError) {

@@ -79,6 +79,9 @@ export async function POST(req: NextRequest) {
       console.error('Welcome email failed (non-blocking):', emailErr)
     }
 
+    const { queueGhlSync } = await import('@/lib/ghl')
+    queueGhlSync(user.id)
+
     return NextResponse.json({ success: true }, { status: 201 })
   } catch (err) {
     if (err instanceof z.ZodError) {

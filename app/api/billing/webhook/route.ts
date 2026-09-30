@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getStripe } from '@/lib/stripe'
 import { prisma } from '@/lib/prisma'
 import { activateMembership, checkoutEmail } from '@/lib/billing'
+import { queueGhlSync } from '@/lib/ghl'
 import Stripe from 'stripe'
 
 export async function GET() {
@@ -46,12 +47,23 @@ export async function POST(req: NextRequest) {
         typeof checkout.subscription === 'string'
           ? checkout.subscription
           : checkout.subscription?.id
+      const checkoutUserId = checkout.metadata?.userId || null
+      const checkoutMail = checkoutEmail(checkout)
       await activateMembership({
-        userId: checkout.metadata?.userId || null,
-        email: checkoutEmail(checkout),
+        userId: checkoutUserId,
+        email: checkoutMail,
         customerId: customerId ?? null,
         subscriptionId: subscriptionId ?? null,
       })
+      if (checkoutUserId) {
+        queueGhlSync(checkoutUserId)
+      } else if (checkoutMail) {
+        const payer = await prisma.user.findUnique({
+          where: { email: checkoutMail },
+          select: { id: true },
+        })
+        if (payer) queueGhlSync(payer.id)
+      }
       break
     }
 
@@ -74,6 +86,7 @@ export async function POST(req: NextRequest) {
                   : 'CANCELLED',
           },
         })
+        queueGhlSync(userId)
       }
       break
     }
@@ -89,6 +102,7 @@ export async function POST(req: NextRequest) {
             where: { id: userId },
             data: { subscriptionStatus: 'PAST_DUE' },
           })
+          queueGhlSync(userId)
         }
       }
       break
@@ -108,6 +122,7 @@ export async function POST(req: NextRequest) {
             cancelAtPeriodEnd: false,
           },
         })
+        queueGhlSync(userId)
       }
       break
     }

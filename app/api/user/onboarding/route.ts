@@ -120,6 +120,9 @@ export async function POST(req: NextRequest) {
       })
     }
 
+    const { queueGhlSync } = await import('@/lib/ghl')
+    queueGhlSync(authed.id)
+
     return NextResponse.json({ success: true })
   } catch (err) {
     if (err instanceof z.ZodError) {

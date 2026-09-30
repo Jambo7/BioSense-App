@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { getRequestUser } from '@/lib/api-auth'
 import { CONSENT } from '@/lib/consent'
 import { clientIp } from '@/lib/rate-limit'
+import { queueGhlSync } from '@/lib/ghl'
 
 export async function POST(req: NextRequest) {
   const authed = await getRequestUser(req)
@@ -54,5 +55,6 @@ export async function POST(req: NextRequest) {
     }),
   ])
 
+  queueGhlSync(authed.id)
   return NextResponse.json({ success: true })
 }

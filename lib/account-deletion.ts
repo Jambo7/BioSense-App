@@ -3,6 +3,7 @@ import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import { deauthenticateTerraUser } from '@/lib/terra'
 import { getStripe } from '@/lib/stripe'
+import { removeGhlContact } from '@/lib/ghl'
 
 function emailHash(email: string): string {
   return createHash('sha256').update(email.toLowerCase().trim()).digest('hex')
@@ -51,6 +52,7 @@ export async function deleteUserAccount(userId: string): Promise<void> {
     terra: 'skipped',
     stripe: user.stripeCustomerId ? 'pending' : 'skipped',
     openai: 'not_controllable',
+    ghl: 'pending',
   }
 
   const terraIds = new Set<string>()
@@ -67,6 +69,8 @@ export async function deleteUserAccount(userId: string): Promise<void> {
     processors.stripe = await cancelStripe(user.stripeCustomerId)
     // Customer record retained for accounting — not destroyed.
   }
+
+  processors.ghl = await removeGhlContact(user.email)
 
   await prisma.verificationToken.deleteMany({ where: { identifier: user.email.toLowerCase() } })
   await prisma.user.delete({ where: { id: userId } })

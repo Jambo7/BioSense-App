@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getRequestUser } from '@/lib/api-auth'
+import { queueGhlSync } from '@/lib/ghl'
 
 export async function POST(req: Request) {
   const authed = await getRequestUser(req)
@@ -11,5 +12,6 @@ export async function POST(req: Request) {
     data: { tutorialDone: true },
   })
 
+  queueGhlSync(authed.id)
   return NextResponse.json({ success: true })
 }
