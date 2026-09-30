@@ -173,7 +173,7 @@ export function InsightsClient({ hasResult, drawDate, markers }: InsightsClientP
             </h1>
             {drawDate && (
               <p className="text-caption text-ink-3 mt-2">
-                Last upload:{' '}
+                Blood test:{' '}
                 <Link href="/blood/history" className="text-sage-deep font-medium hover:underline">
                   {new Date(drawDate).toLocaleDateString('en-GB', {
                     day: 'numeric',

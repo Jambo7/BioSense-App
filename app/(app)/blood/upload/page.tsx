@@ -87,6 +87,7 @@ export default function BloodUploadPage() {
       }
 
       toast.success(`Analysis complete. ${data.markerCount} biomarkers extracted`)
+      router.refresh()
       router.push('/blood')
     } catch {
       toast.error('Upload failed. Please try again.')

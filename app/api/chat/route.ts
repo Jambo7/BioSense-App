@@ -19,6 +19,7 @@ import { hitRateLimit } from '@/lib/rate-limit'
 import { TSB } from '@/lib/security-baseline'
 import { mealChatSummary } from '@/lib/meals'
 import { formatMarkerList } from '@/lib/blood-sanity'
+import { latestBloodWithMarkers } from '@/lib/latest-blood'
 import { formatGlucose } from '@/lib/glucose'
 import { z } from 'zod'
 
@@ -86,10 +87,7 @@ export async function POST(req: NextRequest) {
         where: { userId: authed.id },
         orderBy: { date: 'desc' },
       }),
-      prisma.bloodResult.findFirst({
-        where: { userId: authed.id },
-        orderBy: { drawDate: 'desc' },
-      }),
+      latestBloodWithMarkers(authed.id),
       prisma.pattern.findMany({
         where: { userId: authed.id },
         orderBy: { discoveredAt: 'desc' },

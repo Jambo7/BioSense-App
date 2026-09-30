@@ -11,6 +11,7 @@ import {
   formatWearableMetricsSummary,
 } from './wearable-metrics'
 import { formatMarkerList } from './blood-sanity'
+import { latestBloodWithMarkers, markerArrayLength } from './latest-blood'
 
 function sanitizeReportContent(content: object): object {
   try {
@@ -72,11 +73,7 @@ export async function generateWeeklyReport(userId: string, period: string) {
       where: { userId },
       select: { provider: true, lastSync: true, data: true },
     }),
-    prisma.bloodResult.findFirst({
-      where: { userId },
-      orderBy: { drawDate: 'desc' },
-      select: { drawDate: true, aiSummary: true, markers: true },
-    }),
+    latestBloodWithMarkers(userId),
   ])
 
   const stats = getWeeklyStats(
@@ -156,8 +153,8 @@ export async function generateMonthlyReport(userId: string, period: string) {
     }),
     prisma.bloodResult.findMany({
       where: { userId },
-      orderBy: { drawDate: 'desc' },
-      take: 2,
+      orderBy: { createdAt: 'desc' },
+      take: 8,
     }),
     prisma.pattern.findMany({ where: { userId }, orderBy: { discoveredAt: 'desc' }, take: 5 }),
     prisma.biologicalAge.findFirst({ where: { userId }, orderBy: { date: 'desc' } }),
@@ -167,6 +164,8 @@ export async function generateMonthlyReport(userId: string, period: string) {
     }),
     prisma.healthScore.findFirst({ where: { userId }, orderBy: { date: 'desc' } }),
   ])
+
+  const panels = bloodResults.filter((row) => markerArrayLength(row.markers) > 0).slice(0, 2)
 
   const stats = getWeeklyStats(
     checkins.map((c) => ({
@@ -187,7 +186,7 @@ Total check-ins: ${checkins.length}
 ${stats ? `Average scores — energy: ${stats.avgEnergy.toFixed(1)}, sleep: ${stats.avgSleep.toFixed(1)}, mood: ${stats.avgMood.toFixed(1)}, stress: ${stats.avgStress.toFixed(1)}` : ''}
 Health score: ${score?.score ?? 'N/A'}
 Wearables: ${wearables.map((w) => w.provider).join(', ') || 'none'} (${wearableLine})
-Blood uploads (recent): ${bloodResults.length}${bloodResults[0] ? `. Latest markers: ${formatMarkerList(bloodResults[0].markers) || 'none extracted'}` : ''}
+Blood uploads (recent): ${panels.length}${panels[0] ? `. Latest markers: ${formatMarkerList(panels[0].markers) || 'none extracted'}` : ''}
 Biological age (wellness estimate) vs calendar: ${bioAge ? `${bioAge.delta > 0 ? '+' : ''}${bioAge.delta.toFixed(1)} years` : 'Not unlocked / not calculated'}
 Key patterns: ${patterns.map((p) => `${p.description} (${p.confidence})`).join(' | ') || 'none yet'}`
 

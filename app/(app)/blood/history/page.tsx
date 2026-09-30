@@ -43,18 +43,20 @@ export default async function HistoryPage() {
     orderBy: { drawDate: 'desc' },
   })
 
-  const enriched = results.map((r) => {
-    const m = (r.markers as unknown as BloodMarkerRecord[] | null) ?? []
-    const c = tierCounts(m)
-    const total = m.length
-    return {
-      id: r.id,
-      drawDate: r.drawDate,
-      total,
-      ...c,
-      inRangePct: total > 0 ? Math.round((c.t1 / total) * 100) : 0,
-    }
-  })
+  const enriched = results
+    .map((r) => {
+      const m = (r.markers as unknown as BloodMarkerRecord[] | null) ?? []
+      const c = tierCounts(m)
+      const total = m.length
+      return {
+        id: r.id,
+        drawDate: r.drawDate,
+        total,
+        ...c,
+        inRangePct: total > 0 ? Math.round((c.t1 / total) * 100) : 0,
+      }
+    })
+    .filter((row) => row.total > 0)
 
   // Build the "in-range over time" series, in chronological order, for
   // the headline trend chart.
@@ -78,12 +80,12 @@ export default async function HistoryPage() {
             Past <span className="italic-accent">results.</span>
           </h1>
           <p className="text-body-sm text-ink-2 mt-1.5">
-            {results.length} test{results.length === 1 ? '' : 's'} on file
+            {enriched.length} test{enriched.length === 1 ? '' : 's'} on file
           </p>
         </div>
       </header>
 
-      {results.length === 0 ? (
+      {enriched.length === 0 ? (
         <Card padding="lg" className="text-center">
           <IconBadge icon={History} tone="ink" size="xl" className="mx-auto mb-3" />
           <h2 className="font-sans text-h3 text-ink">No history yet</h2>

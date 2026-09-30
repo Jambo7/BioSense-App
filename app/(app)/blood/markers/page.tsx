@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
+import { latestBloodWithMarkers } from '@/lib/latest-blood'
 import { Card, CardLabel } from '@/components/ui/card'
 import { IconBadge } from '@/components/ui/icon-badge'
 import { Pill } from '@/components/ui/pill'
@@ -26,10 +26,7 @@ export default async function MarkersPage() {
   const session = await getServerSession(authOptions)
   if (!session) return null
 
-  const latest = await prisma.bloodResult.findFirst({
-    where: { userId: session.user.id },
-    orderBy: { drawDate: 'desc' },
-  })
+  const latest = await latestBloodWithMarkers(session.user.id)
 
   const markers = (latest?.markers as unknown as BloodMarkerRecord[] | null) ?? []
 

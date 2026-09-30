@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/prisma'
 import { getRequestUser } from '@/lib/api-auth'
 import { callClaude, BLOOD_ANALYSIS_PROMPT } from '@/lib/claude'
@@ -71,6 +72,43 @@ function isPdf(file: File, buffer: Buffer): boolean {
 
 function isImageFile(file: File): boolean {
   return file.type.startsWith('image/') || /\.(jpe?g|png)$/i.test(file.name)
+}
+
+function parseDrawDate(drawDate: string | null): Date {
+  if (drawDate && /^\d{4}-\d{2}-\d{2}$/.test(drawDate)) {
+    return new Date(`${drawDate}T12:00:00.000Z`)
+  }
+  return new Date()
+}
+
+async function analysePdfDocument(buffer: Buffer): Promise<string> {
+  const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY ?? 'placeholder' })
+  const b64 = buffer.toString('base64')
+  const res = await client.chat.completions.create({
+    model: process.env.OPENAI_MODEL ?? 'gpt-4o',
+    max_tokens: 2500,
+    store: false,
+    messages: [
+      { role: 'system', content: BLOOD_ANALYSIS_PROMPT },
+      {
+        role: 'user',
+        content: [
+          {
+            type: 'text',
+            text: 'Extract all biomarker names, values, units and reference ranges from this blood test PDF. Return JSON with a markers array and a summary.',
+          },
+          {
+            type: 'file',
+            file: {
+              filename: 'lab.pdf',
+              file_data: `data:application/pdf;base64,${b64}`,
+            },
+          },
+        ],
+      },
+    ],
+  })
+  return res.choices[0]?.message?.content ?? ''
 }
 
 async function analyseImage(buffer: Buffer, mime: string): Promise<string> {
@@ -161,8 +199,12 @@ export async function POST(req: NextRequest) {
             console.error('[blood] pdf screenshot failed:', err)
             return [] as Buffer[]
           })
-          for (const page of pages) {
-            imageResponses.push(await analyseImage(page, 'image/png'))
+          if (pages.length > 0) {
+            for (const page of pages) {
+              imageResponses.push(await analyseImage(page, 'image/png'))
+            }
+          } else {
+            imageResponses.push(await analysePdfDocument(buffer))
           }
         }
       } else if (isImageFile(file)) {
@@ -230,7 +272,7 @@ export async function POST(req: NextRequest) {
     const blood = await prisma.bloodResult.create({
       data: {
         userId: authed.id,
-        drawDate: drawDate ? new Date(drawDate) : new Date(),
+        drawDate: parseDrawDate(drawDate),
         markers: JSON.parse(JSON.stringify(markers)),
         pdfUrl: null,
         aiSummary,
@@ -244,6 +286,10 @@ export async function POST(req: NextRequest) {
         console.error('[blood] health score recalc failed:', scoreErr)
       }
     }
+
+    revalidatePath('/blood')
+    revalidatePath('/blood/history')
+    revalidatePath('/dashboard')
 
     return NextResponse.json({
       success: true,

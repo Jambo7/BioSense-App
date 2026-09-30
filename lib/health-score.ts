@@ -16,6 +16,7 @@ import { aggregateWearableMetrics } from '@/lib/wearable-metrics'
 import { refreshBiologicalAge, wearableFreshnessWeight } from '@/lib/maturity'
 import { refreshUserPatterns } from '@/lib/pattern-store'
 import { recountTiers, sanitizeBloodMarkers } from '@/lib/blood-sanity'
+import { latestBloodWithMarkers } from '@/lib/latest-blood'
 
 type ScoreResult = ReturnType<typeof calcHealthScore>
 
@@ -50,11 +51,7 @@ export async function recalculateHealthScore(userId: string) {
       select: { lastSync: true, data: true },
     }),
     prisma.healthScore.findFirst({ where: { userId }, orderBy: { date: 'desc' } }),
-    prisma.bloodResult.findFirst({
-      where: { userId },
-      orderBy: { drawDate: 'desc' },
-      select: { markers: true },
-    }),
+    latestBloodWithMarkers(userId),
   ])
 
   const wearable = aggregateWearableMetrics(wearables)

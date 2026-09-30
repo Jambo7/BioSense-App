@@ -33,19 +33,25 @@ export default async function InsightsPage() {
   // for the small history sparkline (in-range % over time).
   const results = await prisma.bloodResult.findMany({
     where: { userId: session.user.id },
-    orderBy: { drawDate: 'desc' },
-    take: 6,
+    orderBy: { createdAt: 'desc' },
+    take: 12,
   })
 
-  const latest = results[0]
-  const latestMarkers = (latest?.markers as unknown as BloodMarkerRecord[] | null) ?? []
+  const markerList = (raw: unknown): BloodMarkerRecord[] =>
+    Array.isArray(raw) ? (raw as BloodMarkerRecord[]) : []
+
+  const withMarkers = results
+    .map((r) => ({ result: r, markers: markerList(r.markers) }))
+    .filter((row) => row.markers.length > 0)
+
+  const latest = withMarkers[0]?.result
+  const latestMarkers = withMarkers[0]?.markers ?? []
   const latestCounts = tierCounts(latestMarkers)
   const totalCount = latestMarkers.length
 
-  const chronological = results.slice().reverse()
+  const chronological = withMarkers.slice().reverse()
 
-  const history = chronological.map((r) => {
-    const m = (r.markers as unknown as BloodMarkerRecord[] | null) ?? []
+  const history = chronological.map(({ result: r, markers: m }) => {
     const c = tierCounts(m)
     const total = m.length
     const inRangePct = total > 0 ? Math.round((c.t1 / total) * 100) : 0
@@ -59,8 +65,7 @@ export default async function InsightsPage() {
   // canonical name so "LDL" and "LDL Cholesterol" line up across uploads.
   // Powers the inline trend graphs and the real "previous result" row.
   const seriesMap = new Map<string, { values: number[]; dates: string[] }>()
-  for (const r of chronological) {
-    const ms = (r.markers as unknown as BloodMarkerRecord[] | null) ?? []
+  for (const { result: r, markers: ms } of chronological) {
     const date = r.drawDate.toISOString().split('T')[0]
     for (const m of ms) {
       if (typeof m.value !== 'number') continue
@@ -81,7 +86,7 @@ export default async function InsightsPage() {
       t2={latestCounts.t2}
       t3={latestCounts.t3}
       history={history}
-      historyTotal={results.length}
+      historyTotal={withMarkers.length}
       markers={latestMarkers.map((m) => {
         const entry = seriesMap.get(canonicalMarker(m.name))
         const hasTrend = !!entry && entry.values.length >= 2

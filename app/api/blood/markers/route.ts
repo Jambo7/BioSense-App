@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
 import { getRequestUser } from '@/lib/api-auth'
+import { latestBloodWithMarkers } from '@/lib/latest-blood'
 
 interface BloodMarkerRecord {
   name: string
@@ -22,10 +22,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const latest = await prisma.bloodResult.findFirst({
-    where: { userId: authed.id },
-    orderBy: { drawDate: 'desc' },
-  })
+  const latest = await latestBloodWithMarkers(authed.id)
 
   const markers = (latest?.markers as unknown as BloodMarkerRecord[] | null) ?? []
 

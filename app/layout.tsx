@@ -58,8 +58,13 @@ export default function RootLayout({
           {children}
           <Toaster
             position="top-center"
-            offset="calc(env(safe-area-inset-top, 0px) + 72px)"
-            mobileOffset="calc(env(safe-area-inset-top, 0px) + 88px)"
+            offset={{ top: 'calc(env(safe-area-inset-top, 0px) + 72px)' }}
+            mobileOffset={{
+              top: 'calc(env(safe-area-inset-top, 0px) + 88px)',
+              right: 16,
+              bottom: 16,
+              left: 16,
+            }}
             toastOptions={{
               style: {
                 background: '#FFFFFF',
